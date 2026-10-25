@@ -12,9 +12,18 @@ import {
 import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
+import { builtInLists, listMatcher } from "../services/smart-lists";
 import { priorities, stages, availabilities, categories } from "../data/models";
 export function Network() {
-  const { contacts, organizations } = usePulse();
+  const p = usePulse();
+  const { contacts, organizations } = p;
+  const [smart, setSmart] = useState("all");
+  const match = listMatcher(p);
+  const insights = new Map(
+    p.intelligence.relationships.map((i) => [i.contactId, i]),
+  );
+  const smartList = p.smartLists.find((l) => l.id === smart) || smart;
+  const [limit, setLimit] = useState(60);
   const [tab, setTab] = useState<"people" | "companies">("people");
   const [search, setSearch] = useState("");
   const [priority, setPriority] = useState("");
@@ -33,8 +42,9 @@ export function Network() {
           .includes(query) &&
         (!priority || c.priority === priority) &&
         (!stage || c.stage === stage) &&
-        (!availability || c.availability === availability) &&
-        (!category || c.category === category),
+        (!availability || insights.get(c.id)?.availability === availability) &&
+        (!category || c.category === category) &&
+        match(c, smartList),
     )
     .sort((a, b) =>
       sort === "priority"
@@ -75,6 +85,34 @@ export function Network() {
           <Plus size={18} />
           Add {tab === "people" ? "person" : "company"}
         </button>
+      </div>
+      <div className="review-toolbar">
+        <Link className="button secondary" to="/review">
+          Relationship Review
+        </Link>
+        <Link className="button ghost" to="/lists">
+          Manage Smart Lists
+        </Link>
+        <Link className="button ghost" to="/import">
+          Import contacts
+        </Link>
+        {tab === "people" && (
+          <label className="field">
+            <span>Smart List</span>
+            <select value={smart} onChange={(e) => setSmart(e.target.value)}>
+              {builtInLists.map(([id, name]) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+              {p.smartLists.map((l) => (
+                <option value={l.id} key={l.id}>
+                  {l.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
       <div className="directory-toolbar">
         <div className="tabs" role="tablist" aria-label="Directory view">
@@ -186,6 +224,7 @@ export function Network() {
               setAvailability("");
               setCategory("");
               setSearch("");
+              setSmart("all");
             }}
           >
             Clear filters
@@ -201,7 +240,7 @@ export function Network() {
       </div>
       <div className="directory-grid">
         {tab === "people"
-          ? people.map((c) => {
+          ? people.slice(0, limit).map((c) => {
               const org = organizations.find((o) => o.id === c.organizationId);
               return (
                 <Link
@@ -226,6 +265,11 @@ export function Network() {
                     {org?.name || "Independent"}
                   </div>
                   <div className="profile-card-bottom">
+                    <Badge tone="purple">
+                      {p.intelligence.relationships.find(
+                        (r) => r.contactId === c.id,
+                      )?.health || "Not enough history"}
+                    </Badge>
                     <Badge
                       tone={
                         c.stage === "Proposal"
@@ -240,21 +284,24 @@ export function Network() {
                     <span
                       className={
                         "availability-label " +
-                        (c.availability === "Available" ? "available" : "")
+                        (insights.get(c.id)?.availability === "Available"
+                          ? "available"
+                          : "")
                       }
                     >
                       <i />
-                      {c.availability === "Available"
+                      {insights.get(c.id)?.availability === "Available"
                         ? "Available"
-                        : c.availability === "Temporarily unavailable"
+                        : insights.get(c.id)?.availability ===
+                            "Temporarily unavailable"
                           ? "Paused"
-                          : c.availability}
+                          : insights.get(c.id)?.availability}
                     </span>
                   </div>
                 </Link>
               );
             })
-          : companies.map((o) => (
+          : companies.slice(0, limit).map((o) => (
               <Link
                 key={o.id}
                 to={`/network/companies/${o.id}`}
@@ -285,20 +332,39 @@ export function Network() {
               </Link>
             ))}
       </div>
+      {(tab === "people" ? people.length : companies.length) > limit && (
+        <button
+          className="button secondary"
+          onClick={() => setLimit(limit + 60)}
+        >
+          Show more connections
+        </button>
+      )}
       {!(tab === "people" ? people.length : companies.length) && (
         <Empty
           title={
-            search || stage || priority || availability || category
+            search ||
+            stage ||
+            priority ||
+            availability ||
+            category ||
+            smart !== "all"
               ? "No connections found"
               : "A little space for possibility"
           }
           body="Try a different search, or add your first connection."
           action={
-            search || stage || priority || availability || category ? (
+            search ||
+            stage ||
+            priority ||
+            availability ||
+            category ||
+            smart !== "all" ? (
               <button
                 className="button secondary"
                 onClick={() => {
                   setSearch("");
+                  setSmart("all");
                   setPriority("");
                   setStage("");
                   setAvailability("");

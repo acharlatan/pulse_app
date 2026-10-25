@@ -1,3 +1,4 @@
+import { settingsSchema } from "./models";
 import Dexie, { type Table } from "dexie";
 import type {
   Organization,
@@ -12,8 +13,14 @@ import type {
   GamificationState,
   IntegrationConfiguration,
   Workspace,
+  SmartList,
+  RecommendationAction,
+  ImportBatch,
 } from "./models";
 export class PulseDB extends Dexie {
+  smartLists!: Table<SmartList>;
+  recommendationActions!: Table<RecommendationAction>;
+  importBatches!: Table<ImportBatch>;
   organizations!: Table<Organization>;
   contacts!: Table<Contact>;
   interactions!: Table<Interaction>;
@@ -40,6 +47,20 @@ export class PulseDB extends Dexie {
       gamification: "id",
       integrations: "id",
     });
+    this.version(2)
+      .stores({
+        smartLists: "id,name",
+        recommendationActions: "id,key,recordId",
+        importBatches: "id,createdAt",
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table("settings")
+          .toCollection()
+          .modify((s) => {
+            s.intelligence = settingsSchema.parse(s).intelligence;
+          });
+      });
   }
 }
 const instances = new Map<Workspace, PulseDB>();

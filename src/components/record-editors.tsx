@@ -206,6 +206,17 @@ export function RecordEditorModal({
           })
         }
       >
+        {o &&
+        p.intelligence.opportunities.find((i) => i.opportunityId === o.id)
+          ?.flags.length ? (
+          <p className="field-help wide">
+            Review:{" "}
+            {
+              p.intelligence.opportunities.find((i) => i.opportunityId === o.id)
+                ?.reason
+            }
+          </p>
+        ) : null}
         <Field label="Opportunity title" wide>
           <input
             name="title"

@@ -59,6 +59,14 @@ export const contactSchema = z.object({
   priority: z.enum(priorities),
   tags: z.array(z.string()),
   nextFollowUp: z.string().datetime().nullable(),
+  importProvenance: z
+    .object({
+      batchId: z.string(),
+      fileName: z.string(),
+      importedAt: z.string().datetime(),
+      lastContactAt: z.string().datetime().nullable(),
+    })
+    .optional(),
 });
 export const interactionSchema = z.object({
   ...base,
@@ -70,6 +78,7 @@ export const interactionSchema = z.object({
   outcome: z.string(),
   opportunityId: z.string().nullable(),
   followUpId: z.string().nullable(),
+  source: z.string().optional(),
 });
 export const taskSchema = z.object({
   ...base,
@@ -121,6 +130,99 @@ export const eventSchema = z.object({
   organizationId: z.string().nullable(),
   summary: z.string(),
 });
+export const intelligenceSchema = z.object({
+  coolingDays: z.number().int().min(1).max(3650).default(30),
+  dormantDays: z.number().int().min(1).max(3650).default(90),
+  stalledDays: z.number().int().min(1).max(3650).default(21),
+  closingDays: z.number().int().min(1).max(365).default(7),
+  enabled: z.boolean().default(true),
+  opportunities: z.boolean().default(true),
+  noHistory: z.boolean().default(true),
+  timeoutReviews: z.boolean().default(true),
+  snoozeDays: z.number().int().min(1).max(365).default(7),
+  homeLimit: z.number().int().min(1).max(10).default(3),
+});
+export const filterFields = [
+  "category",
+  "stage",
+  "priority",
+  "availability",
+  "organizationId",
+  "tag",
+  "daysSince",
+  "health",
+  "taskState",
+  "opportunityStatus",
+  "opportunityStage",
+] as const;
+export const healthStates = [
+  "Active",
+  "Needs attention",
+  "Cooling",
+  "Dormant",
+  "Paused",
+  "Restricted",
+  "Not enough history",
+] as const;
+export const conditionSchema = z
+  .object({
+    field: z.enum(filterFields),
+    operator: z.enum(["is", "contains", "atLeast", "atMost"]),
+    value: z.string().max(300),
+  })
+  .superRefine((v, ctx) => {
+    const enums: Partial<Record<typeof v.field, readonly string[]>> = {
+      category: categories,
+      stage: stages,
+      priority: priorities,
+      availability: availabilities,
+      health: healthStates,
+      taskState: ["Due today", "Overdue", "Upcoming", "Completed", "None"],
+      opportunityStatus: ["open", "won", "lost", "none"],
+      opportunityStage: stages,
+    };
+    if (
+      v.field === "daysSince"
+        ? !["atLeast", "atMost"].includes(v.operator) ||
+          !/^\d+$/.test(v.value) ||
+          Number(v.value) > 36500
+        : v.field === "tag"
+          ? !["contains", "is"].includes(v.operator) || !v.value.trim()
+          : v.operator !== "is" ||
+            (enums[v.field] && !enums[v.field]!.includes(v.value))
+    )
+      ctx.addIssue({
+        code: "custom",
+        message: "Choose a supported condition and value.",
+      });
+  });
+export const smartListSchema = z.object({
+  ...base,
+  name: z.string().trim().min(1).max(100),
+  mode: z.enum(["all", "any"]),
+  conditions: z.array(conditionSchema).min(1).max(10),
+});
+export const recommendationActionSchema = z.object({
+  ...base,
+  key: z.string().min(1).max(1000),
+  recordId: z.string(),
+  kind: z.enum(["snooze", "dismiss"]),
+  until: z.string().datetime().nullable(),
+});
+export const importBatchSchema = z.object({
+  ...base,
+  fileName: z.string().max(300),
+  createdContacts: z.number().int().nonnegative(),
+  updatedContacts: z.number().int().nonnegative(),
+  createdOrganizations: z.number().int().nonnegative(),
+  updatedOrganizations: z.number().int().nonnegative(),
+  skipped: z.number().int().nonnegative(),
+  invalid: z.number().int().nonnegative(),
+});
+export type SmartList = z.infer<typeof smartListSchema>;
+export type RecommendationAction = z.infer<typeof recommendationActionSchema>;
+export type ImportBatch = z.infer<typeof importBatchSchema>;
+export type Health = (typeof healthStates)[number];
 export const settingsSchema = z.object({
   id: z.literal("settings"),
   theme: z.enum(["light", "dark", "system"]),
@@ -153,6 +255,7 @@ export const settingsSchema = z.object({
   gamification: z.boolean(),
   reducedMotion: z.boolean(),
   dismissed: z.array(z.string()),
+  intelligence: intelligenceSchema.default({}),
   pipeline: z.object({
     id: z.string(),
     name: z.string(),
@@ -203,6 +306,7 @@ export const defaults: Settings = {
   gamification: true,
   reducedMotion: false,
   dismissed: [],
+  intelligence: intelligenceSchema.parse({}),
   pipeline: {
     id: "default",
     name: "Relationship pipeline",

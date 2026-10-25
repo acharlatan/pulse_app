@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useRef, useState, type FormEvent } from "react";
 import {
   ArrowLeftRight,
@@ -18,7 +19,11 @@ import {
 } from "lucide-react";
 import { usePulse } from "../app/context";
 import { Badge, Confirm, SectionHeading } from "../components/ui";
-import { exportBackup, restoreBackup } from "../data/repository";
+import {
+  exportBackup,
+  restoreBackup,
+  validateBackup,
+} from "../data/repository";
 import { resetWorkspace } from "../data/seed";
 import type { Settings as Preferences } from "../data/models";
 function download(content: string, name: string, type = "application/json") {
@@ -54,6 +59,24 @@ export function Settings() {
     e.preventDefault();
     const d = new FormData(e.currentTarget);
     await update({
+      intelligence: {
+        ...p.settings.intelligence,
+        ...Object.fromEntries(
+          [
+            "coolingDays",
+            "dormantDays",
+            "stalledDays",
+            "closingDays",
+            "snoozeDays",
+            "homeLimit",
+          ].map((k) => [k, Number(d.get(k))]),
+        ),
+        ...Object.fromEntries(
+          ["enabled", "opportunities", "noHistory", "timeoutReviews"].map(
+            (k) => [k, d.get(k) === "on"],
+          ),
+        ),
+      },
       name: String(d.get("name")),
       locale: String(d.get("locale")),
       timezone: String(d.get("timezone")),
@@ -213,6 +236,79 @@ export function Settings() {
                     />
                   </label>
                 </div>
+                <details className="intelligence-settings">
+                  <summary>Relationship intelligence settings</summary>
+                  <p className="field-help">
+                    Cooling and dormant thresholds are at least your applicable
+                    review threshold. Unknown history is never classified as
+                    cooling or dormant. Stalled opportunities require a real
+                    linked conversation.
+                  </p>
+                  <div className="form-grid">
+                    {[
+                      { key: "coolingDays", label: "Cooling after (days)" },
+                      { key: "dormantDays", label: "Dormant after (days)" },
+                      {
+                        key: "stalledDays",
+                        label: "Stalled opportunity after (days)",
+                      },
+                      {
+                        key: "closingDays",
+                        label: "Closing soon window (days)",
+                      },
+                      { key: "snoozeDays", label: "Default snooze (days)" },
+                      { key: "homeLimit", label: "Maximum Home reviews" },
+                    ].map(({ key, label }) => (
+                      <label className="field" key={key}>
+                        <span>{label}</span>
+                        <input
+                          type="number"
+                          name={key}
+                          required
+                          min={1}
+                          max={
+                            key === "homeLimit"
+                              ? 10
+                              : key === "coolingDays" ||
+                                  key === "dormantDays" ||
+                                  key === "stalledDays"
+                                ? 3650
+                                : 365
+                          }
+                          defaultValue={
+                            p.settings.intelligence[key as "coolingDays"]
+                          }
+                        />
+                      </label>
+                    ))}
+                  </div>
+                  {[
+                    { key: "enabled", label: "Enable relationship reviews" },
+                    {
+                      key: "opportunities",
+                      label: "Include opportunity reviews",
+                    },
+                    {
+                      key: "noHistory",
+                      label: "Include contacts without recorded history",
+                    },
+                    {
+                      key: "timeoutReviews",
+                      label: "Review ended temporary pauses",
+                    },
+                  ].map(({ key, label }) => (
+                    <label key={key} className="check-confirm">
+                      <input
+                        type="checkbox"
+                        name={key}
+                        defaultChecked={
+                          p.settings.intelligence[key as "enabled"]
+                        }
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </details>
                 <p className="field-help">
                   Display dates use your selected timezone. Date and time inputs
                   use this device's timezone. Paused and restricted people are
@@ -333,6 +429,39 @@ export function Settings() {
               </div>
               <div className="data-action">
                 <div>
+                  <strong>Import contacts from CSV</strong>
+                  <small>
+                    Add or selectively update contacts after mapping, validation
+                    and duplicate review. This does not replace the workspace.
+                  </small>
+                </div>
+                <Link className="button secondary" to="/import">
+                  Import contacts
+                </Link>
+              </div>
+              <p className="field-help">
+                Storage belongs to this site origin. To move between GitHub
+                Pages, Cloudflare or another device, export a backup here and
+                restore it there. There is no cloud synchronization or recovery
+                account.
+              </p>
+              {p.importBatches.length > 0 && (
+                <details>
+                  <summary>Recent imports</summary>
+                  {p.importBatches.slice(0, 5).map((b) => (
+                    <p key={b.id}>
+                      {b.fileName} ·{" "}
+                      {new Date(b.createdAt).toLocaleString(p.settings.locale, {
+                        timeZone: p.settings.timezone,
+                      })}{" "}
+                      · {b.createdContacts} created, {b.updatedContacts}{" "}
+                      updated, {b.skipped} skipped, {b.invalid} rejected
+                    </p>
+                  ))}
+                </details>
+              )}
+              <div className="data-action">
+                <div>
                   <strong>Export a workspace backup</strong>
                   <small>
                     JSON · All CRM records and preferences for this workspace.
@@ -378,11 +507,11 @@ export function Settings() {
                       return;
                     }
                     try {
-                      setBackup(JSON.parse(await file.text()));
+                      setBackup(validateBackup(JSON.parse(await file.text())));
                       setConfirm("restore");
                     } catch {
                       setFileError(
-                        "This file is not valid JSON. Your data has not changed.",
+                        "This backup is invalid or incompatible. No records have changed.",
                       );
                     }
                   }}
@@ -572,7 +701,10 @@ export function Settings() {
           }
           body={
             confirm === "restore"
-              ? "A valid backup replaces all CRM data and preferences in this workspace. The other workspace is untouched. Export a backup first if you want to keep the current records. Invalid backups are rejected without changing data."
+              ? (() => {
+                  const b = validateBackup(backup);
+                  return `Compatible backup v${b.version} · ${b.metadata?.exportedAt || "Date not recorded (legacy backup)"} · ${b.contacts.length} contacts, ${b.organizations.length} companies, ${b.interactions.length} interactions, ${b.tasks.length} tasks, ${b.opportunities.length} opportunities, ${b.smartLists.length} Smart Lists. This REPLACES ALL records and preferences in ${p.workspace}. The other workspace is untouched. Export a backup first.`;
+                })()
               : confirm === "reset"
                 ? "Your demo edits will be replaced with fictional sample data. Your personal workspace will not change."
                 : "All personal CRM records on this device will be permanently deleted. Export a backup first if you need a copy. The demo workspace is untouched."

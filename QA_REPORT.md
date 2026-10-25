@@ -75,3 +75,41 @@ Physical mobile keyboard, screen-reader/contrast audit, iOS/Android installation
 ## Deployment
 
 Changes prepared on development/iteration-02. Production deployment is verified after integration through the existing Cloudflare Workers Builds connection; the delivery report records the resulting commit and build outcome. Do not interpret local build success alone as a production deployment result.
+
+# Iteration 03 verification
+
+Date: 26 October 2026 (Asia/Manila). Iterations 01–02 above remain historical reports.
+
+## Executed automated verification
+
+- `npm run typecheck`: passed, strict TypeScript.
+- `npm run lint`: passed.
+- `npm test`: 57 passed across 3 files (26 retained CRM tests, 1 retained form test and 30 intelligence/import/migration tests). Two legacy inactivity tests now supply real recorded conversations instead of using contact creation dates as evidence. The completed-task test isolates task behavior with no-history suggestions disabled. No tests were removed.
+- Production build passed via the standard build script with a clean output directory: `npm run build -- --outDir /tmp/pulse03-release-build`. Vite generated the manifest and 27 offline app-shell precache entries. Existing Cloudflare command/config remain unchanged. Vite reports a non-fatal main-chunk warning at approximately 505 KB minified / 153 KB gzip. CSV/Papa Parse and the new feature routes are lazy loaded.
+- Playwright: 14 cases passed across the mobile (390×844) and desktop (1440×1000) projects using `PULSE_CHROMIUM_PATH=/tmp/pulse-chromium npm run test:browser -- --workers=1`. Chromium 153 and the optional executable override are the same temporary test environment described in iteration 02. No browser binary or test-only browser dependency is committed. A final targeted four-case import/wizard run also passed after the conflicting-domain safeguards; the repeat-import helper uses the real restart action rather than relying on rapid same-hash route changes.
+
+## Functional coverage
+
+The new data suite covers normal/priority thresholds, cooling/dormant/unknown history, sourced imported dates, overdue ordering and recalculation, timeout ending versus do-not-contact/withdrawal, persistent snoozes/expiry/new evidence, stable deal keys, opportunity deadlines/stalls/closed outcomes, ALL/ANY list matching and dynamic membership, list CRUD/persistence/invalid definitions, CSV BOM/quotes/commas/newlines/empty fields, mapping conflicts, invalid names/emails/enums/websites/dates, company matching, conflicting websites within a file and against existing companies, reserved-looking company names, duplicate contacts and in-file duplicates, selected-field updates, blank preservation, restriction/consent preservation, reimport defaults, stale previews, missing references and transaction rollback after a simulated storage failure.
+
+Migration testing creates a real version-one Dexie database with old settings and contact records, closes it, then opens version two and verifies retained records/default intelligence settings. Backup tests round-trip new tables and accept v1-shaped data with defaults; invalid references leave the current workspace intact. Separate demo/personal import databases verify isolation.
+
+Browser acceptance imports two seed contacts then an 80-contact fictional CSV across 15 companies. It verifies a selected duplicate role update, a skipped duplicate, 78 newly created contacts, 13 new companies alongside the two existing companies, correct directory membership, profile provenance, no fabricated interactions and reload persistence. It exports a real backup file, validates the replacement preview and cancels without mutation; a malformed backup is rejected while all 80 contacts remain. Additional browser workflows cover overdue rescheduling, snooze/refresh/unsnooze, custom list creation/persistence and automatic removal after a follow-up completes. Previous opportunity/profile/task/interaction/permission/theme journeys still pass.
+
+## Responsive and visual verification
+
+Programmatic page-width checks cover Home, Network, company/person profiles, Pipeline, Activity, Settings, Relationship Review, Smart Lists and the import entry screen at 320, 375, 390, 430, 768, 1024, 1280 and 1440px in light/dark themes. No page overflow was detected. Existing profile/opportunity/availability dialog bounds remain tested.
+
+A separate wizard audit checks mapping, expanded duplicate comparison, and confirmation at every requested width in both themes. It checks that the final Apply control can scroll clear of the fixed mobile navigation. Actual 390px light/dark import confirmation screenshots were inspected internally. No owner-supplied screenshots or visual approvals were requested. These checks do not constitute a formal contrast/screen-reader or physical keyboard/device audit.
+
+## Scale and limits
+
+Data tests build imports and derive intelligence at 10, 100 and 1,000 contacts, and commit the 1,000-contact plan successfully. These are synthetic desktop test-runtime checks, not proof of 1,000-record UI performance on ordinary phones. CSV is bounded to UTF-8, 2 MB, 2,000 rows and 40 columns; parsing/validation are local bounded main-thread operations with busy feedback. Duplicate rows/company decisions are paged, timelines/reviews/lists are incremental, and Network initially renders 60 matches. Larger-file workers, standalone company-only CSV/list workflows, XLSX, fuzzy matching/enrichment, advanced consent audit, encrypted backups, cloud recovery and cross-tab conflict resolution remain future work.
+
+## Compatibility and deployment boundary
+
+DB v2 adds only Smart Lists, review actions and import history, and supplies default settings without deleting old records. Optional provenance/source fields leave old records readable. Backup format 2 includes these tables and metadata; format 1 restores remain accepted. An old backup replaces the current workspace, including empty defaults for new tables, as explicitly disclosed by restore confirmation.
+
+After a database has upgraded, any source rollback must retain the v2-compatible data layer; do not deploy a database-version downgrade or discard new-table backups. Prefer a forward fix. The additive schema and feature branch preserve source history and existing record data.
+
+Changes are prepared on development/iteration-03 and are integrated only after checks pass. Production build and live behavior verification are recorded in the delivery report after integration; an HTTP 200 alone is not treated as workflow proof. Physical PWA installation, full offline/update adoption and device keyboard behavior remain unverified. No AI, credentials, outreach delivery, synchronization or paid backend was introduced.

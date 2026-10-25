@@ -13,6 +13,9 @@ test("all primary screens and editors fit supported widths in both themes", asyn
     "/pipeline",
     "/activity",
     "/settings",
+    "/review",
+    "/lists",
+    "/import",
   ];
   for (const theme of ["light", "dark"]) {
     await page.goto("/#/settings");
