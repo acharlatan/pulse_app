@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>PULSE responsive QA</title>
+    <style>
+      body {
+        font: 14px system-ui;
+        margin: 16px;
+        background: #dedee5;
+      }
+      header {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+      select,
+      button {
+        padding: 8px;
+      }
+      iframe {
+        display: block;
+        border: 0;
+        background: white;
+        box-shadow: 0 3px 20px #0002;
+        transform-origin: top left;
+      }
+      #stage {
+        overflow: auto;
+        width: 100%;
+        height: 850px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <strong>Responsive QA fixture</strong
+      ><label
+        >Viewport width
+        <select id="width">
+          <option>320</option>
+          <option>375</option>
+          <option selected>390</option>
+          <option>430</option>
+          <option>768</option>
+          <option>1024</option>
+          <option>1280</option>
+          <option>1440</option>
+        </select></label
+      ><label
+        >Screen
+        <select id="route">
+          <option value="/">Daily Pulse</option>
+          <option value="/network">Network</option>
+          <option value="/network/companies/org-0">Company</option>
+          <option value="/network/people/contact-0">Person</option>
+          <option value="/settings">Settings</option>
+          <option value="/activity">Activity</option>
+          <option value="/pipeline">Pipeline</option>
+        </select></label
+      ><button id="audit">Audit horizontal overflow</button
+      ><output id="result"></output>
+    </header>
+    <div id="stage">
+      <iframe
+        id="preview"
+        title="PULSE viewport"
+        width="390"
+        height="800"
+        src="/#/"
+      ></iframe>
+    </div>
+    <script>
+      const frame = document.querySelector("iframe");
+      document.querySelector("#width").onchange = (e) => {
+        frame.width = e.target.value;
+      };
+      document.querySelector("#route").onchange = (e) => {
+        frame.src = "/#" + e.target.value;
+      };
+      document.querySelector("#audit").onclick = () => {
+        const d = frame.contentDocument;
+        document.querySelector("#result").textContent =
+          `${frame.width}px · ${d.documentElement.scrollWidth > d.documentElement.clientWidth ? "OVERFLOW" : "PASS — no horizontal overflow"} · actual content ${d.documentElement.scrollWidth}px`;
+      };
+    </script>
+  </body>
+</html>

@@ -1,0 +1,412 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  CheckCheck,
+  ChevronRight,
+  Clock3,
+  Heart,
+  MessageCircle,
+  Plus,
+  Sparkles,
+  TrendingUp,
+  Users,
+  Workflow,
+} from "lucide-react";
+import { motion } from "motion/react";
+import { usePulse } from "../app/context";
+import {
+  Avatar,
+  Badge,
+  Empty,
+  SectionHeading,
+  useFormat,
+  ViewLink,
+} from "../components/ui";
+import { EditorModal, type Editor } from "../components/forms";
+import { completeTask } from "../data/repository";
+import { recommendations, overdue } from "../services/recommendations";
+export function Home() {
+  const p = usePulse();
+  const { date, money } = useFormat();
+  const [editor, setEditor] = useState<Editor | null>(null);
+  const recs = recommendations(
+    p.contacts,
+    p.interactions,
+    p.tasks,
+    p.settings,
+    p.permissions,
+    p.restrictions,
+  );
+  const outstanding = p.tasks.filter((t) => !t.completedAt);
+  const today = (v: string) =>
+    date(v, { year: "numeric", month: "2-digit", day: "2-digit" }) ===
+    date(new Date().toISOString(), {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  const completed = p.tasks.filter(
+    (t) => t.completedAt && today(t.completedAt),
+  ).length;
+  const dueToday = p.tasks.filter((t) => today(t.dueAt)).length;
+  const pipeline = p.opportunities
+    .filter((o) => o.status === "open")
+    .reduce((v, o) => v + (o.currency === "USD" ? o.value || 0 : 0), 0);
+  const recent = [...p.contacts]
+    .sort((a, b) => {
+      const time = (id: string) =>
+        p.interactions.find((i) => i.contactId === id)?.occurredAt || "";
+      return time(b.id).localeCompare(time(a.id));
+    })
+    .slice(0, 5);
+  return (
+    <motion.div
+      className="page home-page"
+      initial={p.settings.reducedMotion ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <div className="page-heading">
+        <div>
+          <p className="eyebrow date-label">
+            {date(new Date().toISOString(), {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
+            <span className="tiny-dot" />
+            YOUR DAILY PULSE
+          </p>
+          <h1>
+            A good day to connect<span className="accent">.</span>
+          </h1>
+          <p className="subtitle">
+            Welcome{p.settings.name ? ` back, ${p.settings.name}` : ""}. A
+            little intention goes a long way.
+          </p>
+        </div>
+        <button
+          className="button primary desktop-quick"
+          onClick={() => setEditor({ kind: "contact" })}
+        >
+          <Plus size={17} />
+          New connection
+        </button>
+      </div>
+      <section className="hero-card">
+        <div className="hero-copy">
+          <Badge tone="hero-badge">
+            <span className="live-dot" />
+            IN GOOD COMPANY
+          </Badge>
+          <h2>
+            Keep your
+            <br />
+            relationships moving.
+          </h2>
+          <p>
+            Pick up where you left off. Make the next
+            <br className="desktop-break" /> conversation a meaningful one.
+          </p>
+          <Link to="/network" className="button hero-button">
+            Explore your network
+            <ArrowUpRight size={17} />
+          </Link>
+        </div>
+        <div className="relationship-art" aria-hidden="true">
+          <div className="orbit orbit-one" />
+          <div className="orbit orbit-two" />
+          <div className="orbit orbit-three" />
+          <div className="orbit-center">
+            <Heart size={35} fill="currentColor" />
+          </div>
+          <div className="orbit-person person-one">
+            <Avatar name="Olivia Chen" size="large" />
+            <span className="orbit-label">A familiar face</span>
+          </div>
+          <div className="orbit-person person-two">
+            <Avatar name="Marcus Johnson" size="large" />
+          </div>
+          <div className="orbit-person person-three">
+            <Avatar name="Sofia Rivera" />
+          </div>
+          <div className="orbit-person person-four">
+            <Avatar name="James Park" />
+          </div>
+          <div className="art-spark spark-one">✳</div>
+          <div className="art-spark spark-two">✦</div>
+          <div className="art-message">
+            <MessageCircle size={16} />
+            <span>Good things start with hello.</span>
+          </div>
+        </div>
+      </section>
+      <div className="stats-grid">
+        <Link to="/network" className="stat-card">
+          <span className="stat-icon lavender">
+            <Users size={19} />
+          </span>
+          <div>
+            <span className="stat-name">Your network</span>
+            <strong>
+              {p.contacts.length}
+              <small>people</small>
+            </strong>
+          </div>
+          <ArrowUpRight size={17} />
+        </Link>
+        <Link to="/activity" className="stat-card">
+          <span className="stat-icon peach">
+            <Clock3 size={19} />
+          </span>
+          <div>
+            <span className="stat-name">Next steps</span>
+            <strong>
+              {outstanding.length}
+              <small>follow-ups</small>
+            </strong>
+          </div>
+          <ArrowUpRight size={17} />
+        </Link>
+        <Link to="/pipeline" className="stat-card">
+          <span className="stat-icon sage">
+            <TrendingUp size={19} />
+          </span>
+          <div>
+            <span className="stat-name">Open opportunities</span>
+            <strong>
+              {money(pipeline, "USD")}
+              <small>USD pipeline</small>
+            </strong>
+          </div>
+          <ArrowUpRight size={17} />
+        </Link>
+      </div>
+      <div className="home-columns">
+        <div className="home-primary">
+          <section className="surface">
+            <SectionHeading
+              title="A little attention goes a long way"
+              eyebrow="YOUR NEXT BEST CONNECTION"
+              action={
+                <span className="soft-icon">
+                  <Sparkles size={19} />
+                </span>
+              }
+            />
+            <p className="section-description">
+              Thoughtful nudges, based on your relationship history.
+            </p>
+            <div className="recommendation-list">
+              {recs.slice(0, 3).map((r) => (
+                <div className="recommendation" key={r.key}>
+                  <Link
+                    to={`/network/people/${r.contact.id}`}
+                    className="person-summary"
+                  >
+                    <Avatar name={r.contact.name} />
+                    <div>
+                      <strong>{r.contact.name}</strong>
+                      <span>
+                        {p.organizations.find(
+                          (o) => o.id === r.contact.organizationId,
+                        )?.name || "Independent"}
+                        <span className="inline-dot">·</span>
+                        {r.contact.role}
+                      </span>
+                      <small>
+                        <Clock3 size={12} />
+                        {r.reason}
+                      </small>
+                    </div>
+                  </Link>
+                  <div className="recommendation-action">
+                    <button
+                      className="button secondary small-button"
+                      onClick={() =>
+                        setEditor({ kind: "interaction", contact: r.contact })
+                      }
+                    >
+                      Log a touchpoint
+                      <ArrowUpRight size={14} />
+                    </button>
+                    <button
+                      className="dismiss-link"
+                      onClick={() =>
+                        p.run(
+                          () =>
+                            p.setSettings({
+                              dismissed: [...p.settings.dismissed, r.key],
+                            }),
+                          "Suggestion dismissed",
+                        )
+                      }
+                    >
+                      Dismiss suggestion
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {!recs.length && (
+                <Empty
+                  title="Your relationships have room to breathe"
+                  body="No reconnections are due. Add people or adjust your thresholds in Settings."
+                />
+              )}
+            </div>
+            <Link to="/network" className="surface-footer">
+              Find someone in your network
+              <ArrowRight size={16} />
+            </Link>
+          </section>
+          <section className="surface">
+            <SectionHeading
+              title="Conversations in motion"
+              action={<ViewLink to="/activity" />}
+            />
+            <div className="mini-timeline">
+              {p.events.slice(0, 3).map((e) => (
+                <div key={e.id} className="timeline-row">
+                  <span className="timeline-dot">
+                    <MessageCircle size={15} />
+                  </span>
+                  <div>
+                    {e.contactId ? (
+                      <Link to={`/network/people/${e.contactId}`}>
+                        {e.summary}
+                      </Link>
+                    ) : (
+                      <strong>{e.summary}</strong>
+                    )}
+                    <small>
+                      {date(e.createdAt, {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </small>
+                  </div>
+                </div>
+              ))}
+              {!p.events.length && (
+                <p className="muted">
+                  Your relationship story starts with your first connection.
+                </p>
+              )}
+            </div>
+          </section>
+        </div>
+        <aside className="home-secondary">
+          <section className="surface follow-up-panel">
+            <SectionHeading
+              title="On your radar"
+              action={
+                <Link to="/activity" className="count-pill">
+                  {outstanding.length}
+                </Link>
+              }
+            />
+            <p className="section-description">
+              Small steps. Meaningful progress.
+            </p>
+            <div className="task-list">
+              {outstanding.slice(0, 4).map((t) => {
+                const c = p.contacts.find((c) => c.id === t.contactId);
+                return (
+                  <div className="task-row" key={t.id}>
+                    <button
+                      className="task-check"
+                      aria-label={`Complete ${t.title}`}
+                      onClick={() =>
+                        p.run(
+                          () => completeTask(p.db, t.id),
+                          "One thoughtful step, complete.",
+                        )
+                      }
+                    >
+                      <Check size={13} />
+                    </button>
+                    <div>
+                      <strong>{t.title}</strong>
+                      {c && (
+                        <Link to={`/network/people/${c.id}`}>{c.name}</Link>
+                      )}
+                      <small className={overdue(t) ? "overdue" : ""}>
+                        {overdue(t) ? "Overdue · " : ""}
+                        {date(t.dueAt)}
+                      </small>
+                    </div>
+                  </div>
+                );
+              })}
+              {!outstanding.length && (
+                <div className="small-empty">
+                  <CheckCheck />
+                  <p>All clear. Plan your next meaningful step.</p>
+                </div>
+              )}
+            </div>
+            <button
+              className="button add-task"
+              onClick={() => setEditor({ kind: "task" })}
+            >
+              <Plus size={16} />
+              Plan a follow-up
+            </button>
+          </section>
+          {p.settings.gamification && (
+            <section className="progress-card">
+              <div className="progress-title">
+                <span className="stat-icon sage">
+                  <CheckCheck size={19} />
+                </span>
+                <Badge tone="green">TODAY'S MOMENTUM</Badge>
+              </div>
+              <h3>A little better, every day.</h3>
+              <p>
+                <strong>{completed}</strong> follow-ups completed today
+              </p>
+              <div className="progress-track">
+                <span
+                  style={{
+                    width: `${Math.min(100, dueToday ? (completed / dueToday) * 100 : 0)}%`,
+                  }}
+                />
+              </div>
+              <small>
+                {dueToday
+                  ? `${completed} complete · ${dueToday} scheduled for today`
+                  : "No follow-ups scheduled for today. Set your own pace."}
+              </small>
+            </section>
+          )}
+          <section className="recent-section">
+            <SectionHeading
+              title="Familiar faces"
+              action={<ViewLink to="/network" />}
+            />
+            <div className="face-stack">
+              {recent.map((c) => (
+                <Link
+                  key={c.id}
+                  to={`/network/people/${c.id}`}
+                  aria-label={`Open ${c.name}`}
+                >
+                  <Avatar name={c.name} />
+                </Link>
+              ))}
+            </div>
+            <p className="muted">The people behind the possibilities.</p>
+          </section>
+        </aside>
+      </div>
+      {editor && (
+        <EditorModal editor={editor} onClose={() => setEditor(null)} />
+      )}
+    </motion.div>
+  );
+}
