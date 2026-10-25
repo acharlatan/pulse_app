@@ -1,6 +1,6 @@
 {
   "name": "pulse",
-  "compatibility_date": "2026-10-26",
+  "compatibility_date": "2026-10-25",
   "workers_dev": true,
   "assets": {
     "directory": "./dist",
