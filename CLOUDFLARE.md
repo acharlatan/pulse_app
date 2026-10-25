@@ -1,17 +1,17 @@
 # PULSE on Cloudflare Workers
 
-Worker name: `pulse`. Repository: `acharlatan/pulse_app`, production branch `main`.
+Worker: `pulse`. App URL: https://pulse.icareaboutyoufam.workers.dev
 
-`wrangler.jsonc` deploys the Vite `dist` folder as Workers Static Assets. No backend or database migration is required. CRM records stay in the browser; export/import a backup to transfer data between hosting origins.
+Repository `acharlatan/pulse_app` is connected to Workers Builds. Pushes to `main` automatically build and deploy. The initial production build completed successfully on 25 October 2026 UTC.
 
-## Complete Workers Builds setup
-
-Open Worker `pulse` → Settings → Builds. Connect/select GitHub repository `acharlatan/pulse_app` and authorize a deployment API token in the dashboard. The repository connection has been registered, but a production build trigger and successful app deployment have not yet been verified.
+## Build configuration
 
 - Build command: `npm run build`
 - Deploy command: `npx wrangler deploy`
 - Root directory: `/`
 - Production branch: `main`
-- Set `VITE_BASE_PATH` to `/` if specifying it; do not use the GitHub Pages repository subpath here.
+- Worker configuration: `wrangler.jsonc`
 
-Run the initial build and check the deployment logs. The initial Worker only returns a 503 deployment-pending message until the real app assets are deployed. Do not treat its existence as a live app deployment.
+The Vite `dist` folder is deployed as Workers Static Assets. If setting `VITE_BASE_PATH`, use `/`, rather than the GitHub Pages repository subpath. View builds in the Cloudflare dashboard under Worker `pulse` → Settings → Builds.
+
+CRM records stay in browser IndexedDB. Export/import a backup to transfer data between hosting origins. This deployment adds hosting, not synchronization or an AI agent. Gemini remains a future optional integration. Never put provider keys in the frontend or repository; future AI requests must use a secure Worker endpoint with secrets, explicit record selection, validation, and rate limits.
