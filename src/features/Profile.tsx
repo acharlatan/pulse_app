@@ -28,6 +28,7 @@ import {
   TaskRow,
   OpportunityCard,
   PermissionsPanel,
+  HealthSummary,
 } from "../components/relationship";
 import { EditorModal, type Editor } from "../components/forms";
 import { deleteContact, deleteOrganization } from "../data/repository";
@@ -361,6 +362,7 @@ export function Profile({ company = false }: { company?: boolean }) {
               </>
             )}
           </section>
+          {contact && <HealthSummary contactId={contact.id} />}
           {contact && <PermissionsPanel contact={contact} onEdit={setEditor} />}
           <section className="surface" id="opportunities">
             <SectionHeading

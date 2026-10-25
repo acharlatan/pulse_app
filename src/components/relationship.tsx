@@ -111,6 +111,7 @@ function StoryEntry({
           {c.name}
         </Link>
       )}
+      {i.source && <p className="muted">Source: {i.source}</p>}
       <p className="story-copy">
         {i.summary.length > 500 && !expanded
           ? i.summary.slice(0, 500) + "…"
@@ -246,6 +247,18 @@ export function OpportunityCard({
           })}
         </p>
       )}
+      {p.intelligence.opportunities.find((i) => i.opportunityId === o.id)?.flags
+        .length ? (
+        <details className="opportunity-flags">
+          <summary>Requires review</summary>
+          <p>
+            {
+              p.intelligence.opportunities.find((i) => i.opportunityId === o.id)
+                ?.reason
+            }
+          </p>
+        </details>
+      ) : null}
       <p className="deal-people">
         {o.contactIds
           .map((id) => p.contacts.find((c) => c.id === id))
@@ -367,6 +380,49 @@ export function PermissionsPanel({
           Record permission
         </button>
       </details>
+    </section>
+  );
+}
+
+export function HealthSummary({ contactId }: { contactId: string }) {
+  const p = usePulse(),
+    { date } = useFormat(),
+    insight = p.intelligence.relationships.find(
+      (r) => r.contactId === contactId,
+    ),
+    contact = p.contacts.find((c) => c.id === contactId);
+  if (!insight) return null;
+  return (
+    <section className="surface health-summary">
+      <SectionHeading title="Relationship pulse" />
+      <Badge
+        tone={
+          insight.health === "Restricted"
+            ? "red"
+            : insight.health === "Active"
+              ? "green"
+              : "purple"
+        }
+      >
+        {insight.health}
+      </Badge>
+      <p>{insight.reason}</p>
+      {insight.history === "Imported unknown" && (
+        <p className="muted">
+          Imported from {contact?.importProvenance?.fileName}. No last-contact
+          date was provided.
+        </p>
+      )}
+      {insight.history === "Imported date" && (
+        <p className="muted">
+          Last-contact date supplied by {contact?.importProvenance?.fileName} ·{" "}
+          {date(insight.lastAt!)}. This is imported metadata, not a logged
+          conversation.
+        </p>
+      )}
+      <Link className="button ghost" to="/review">
+        Open Relationship Review
+      </Link>
     </section>
   );
 }

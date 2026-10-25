@@ -9,6 +9,7 @@ import {
   ChevronDown,
   CircleHelp,
   Home,
+  HeartPulse,
   LayoutGrid,
   Plus,
   Search,
@@ -21,7 +22,7 @@ import { OfflineStatus } from "../components/OfflineStatus";
 import { usePulse } from "./context";
 import { Avatar, Modal } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
-import { recommendations, overdue } from "../services/recommendations";
+import { overdue } from "../services/recommendations";
 const nav = [
   { to: "/", label: "Daily Pulse", short: "Home", icon: Home },
   { to: "/network", label: "My network", short: "Network", icon: Users },
@@ -29,15 +30,7 @@ const nav = [
   { to: "/activity", label: "Activity", short: "Activity", icon: Activity },
 ];
 export function Shell({ children }: { children: ReactNode }) {
-  const {
-    workspace,
-    settings,
-    contacts,
-    tasks,
-    interactions,
-    permissions,
-    restrictions,
-  } = usePulse();
+  const { intelligence, workspace, settings, contacts, tasks } = usePulse();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [add, setAdd] = useState(false);
   const [alerts, setAlerts] = useState(false);
@@ -55,14 +48,7 @@ export function Shell({ children }: { children: ReactNode }) {
       ).length
     : 0;
   const reconnectionCount = settings.alerts.relationships
-    ? recommendations(
-        contacts,
-        interactions,
-        tasks,
-        settings,
-        permissions,
-        restrictions,
-      ).length
+    ? intelligence.queue.length
     : 0;
   const count = overdueCount + upcomingCount + reconnectionCount;
   return (
@@ -110,6 +96,10 @@ export function Shell({ children }: { children: ReactNode }) {
               )}
             </NavLink>
           ))}
+          <Link className="nav-item" to="/review">
+            <HeartPulse size={20} />
+            Relationship Review
+          </Link>
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-note">
@@ -276,7 +266,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <h3>A little attention goes a long way</h3>
               <p>
                 {overdueCount} overdue tasks · {upcomingCount} follow-ups in the
-                next 24 hours · {reconnectionCount} reconnection suggestions
+                next 24 hours · {reconnectionCount} relationship/deal reviews
               </p>
               <Link
                 className="button primary"

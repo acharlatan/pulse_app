@@ -271,11 +271,27 @@ describe("transparent recommendation rules", () => {
       id: "blocked",
       availability: "Do not contact" as const,
     };
-    const recs = recommendations([c, blocked], [], [], defaults);
+    const history = [
+      {
+        ...stamp(),
+        contactId: c.id,
+        organizationId: null,
+        type: "Call" as const,
+        occurredAt: c.createdAt,
+        summary: "Recorded conversation",
+        outcome: "",
+        opportunityId: null,
+        followUpId: null,
+      },
+    ];
+    const recs = recommendations([c, blocked], history, [], defaults);
     expect(recs).toHaveLength(1);
     expect(recs[0].reason).toContain("30 days");
     expect(
-      recommendations([c], [], [], { ...defaults, dismissed: [recs[0].key] }),
+      recommendations([c], history, [], {
+        ...defaults,
+        dismissed: [recs[0].key],
+      }),
     ).toHaveLength(0);
   });
   it("uses editable priority thresholds and does not recommend completed tasks alone", () => {
@@ -284,16 +300,32 @@ describe("transparent recommendation rules", () => {
       priority: "High" as const,
       createdAt: new Date(Date.now() - 8 * 86400000).toISOString(),
     };
-    expect(recommendations([c], [], [], defaults)).toHaveLength(1);
+    const history = [
+      {
+        ...stamp(),
+        contactId: c.id,
+        organizationId: null,
+        type: "Meeting" as const,
+        occurredAt: c.createdAt,
+        summary: "Recorded meeting",
+        outcome: "",
+        opportunityId: null,
+        followUpId: null,
+      },
+    ];
+    expect(recommendations([c], history, [], defaults)).toHaveLength(1);
     expect(
-      recommendations([c], [], [], { ...defaults, priorityDays: 10 }),
+      recommendations([c], history, [], { ...defaults, priorityDays: 10 }),
     ).toHaveLength(0);
     expect(
       recommendations(
         [person()],
         [],
         [{ ...task(), completedAt: new Date().toISOString() }],
-        defaults,
+        {
+          ...defaults,
+          intelligence: { ...defaults.intelligence, noHistory: false },
+        },
       ),
     ).toHaveLength(0);
   });

@@ -37,6 +37,15 @@ const Pipeline = lazy(() =>
 const Settings = lazy(() =>
   import("../features/Settings").then((m) => ({ default: m.Settings })),
 );
+const CsvImport = lazy(() =>
+  import("../features/CsvImport").then((m) => ({ default: m.CsvImport })),
+);
+const Review = lazy(() =>
+  import("../features/Review").then((m) => ({ default: m.Review })),
+);
+const SmartLists = lazy(() =>
+  import("../features/SmartLists").then((m) => ({ default: m.SmartLists })),
+);
 export class ErrorBoundary extends Component<
   { children: ReactNode },
   { error: boolean }
@@ -101,6 +110,9 @@ export function App() {
                     path="/network/companies/:id"
                     element={<Profile company />}
                   />
+                  <Route path="/import" element={<CsvImport />} />
+                  <Route path="/review" element={<Review />} />
+                  <Route path="/lists" element={<SmartLists />} />
                   <Route path="/pipeline" element={<Pipeline />} />
                   <Route path="/activity" element={<Activity />} />
                   <Route path="/settings" element={<Settings />} />

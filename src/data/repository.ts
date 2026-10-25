@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { type PulseDB } from "./db";
 import {
+  smartListSchema,
+  recommendationActionSchema,
+  importBatchSchema,
+  type SmartList,
+  type RecommendationAction,
   gamificationSchema,
   integrationSchema,
   organizationSchema,
@@ -24,7 +29,7 @@ import {
   type Permission,
 } from "./models";
 export async function settings(db: PulseDB) {
-  return (await db.settings.get("settings")) || defaults;
+  return settingsSchema.parse((await db.settings.get("settings")) || defaults);
 }
 export async function updateSettings(db: PulseDB, patch: Partial<Settings>) {
   const value = settingsSchema.parse({ ...(await settings(db)), ...patch });
@@ -205,6 +210,7 @@ export async function deleteContact(db: PulseDB, id: string) {
         i.contactId !== id
       )
         await db.interactions.update(i.id, { followUpId: null });
+    await db.recommendationActions.where("recordId").equals(id).delete();
     await db.contacts.delete(id);
     for (const table of [
       db.interactions,
@@ -242,7 +248,17 @@ export async function deleteOrganization(db: PulseDB, id: string) {
 }
 export const backupSchema = z.object({
   format: z.literal("pulse-backup"),
-  version: z.literal(1),
+  version: z.union([z.literal(1), z.literal(2)]),
+  metadata: z
+    .object({
+      appVersion: z.string(),
+      exportedAt: z.string().datetime(),
+      workspace: z.enum(["demo", "personal"]),
+    })
+    .optional(),
+  smartLists: z.array(smartListSchema).default([]),
+  recommendationActions: z.array(recommendationActionSchema).default([]),
+  importBatches: z.array(importBatchSchema).default([]),
   organizations: z.array(organizationSchema),
   contacts: z.array(contactSchema),
   interactions: z.array(interactionSchema),
@@ -258,7 +274,15 @@ export const backupSchema = z.object({
 export async function exportBackup(db: PulseDB) {
   return db.transaction("r", db.tables, async () => ({
     format: "pulse-backup",
-    version: 1,
+    version: 2,
+    metadata: {
+      appVersion: "0.3.0",
+      exportedAt: new Date().toISOString(),
+      workspace: db.workspace,
+    },
+    smartLists: await db.smartLists.toArray(),
+    recommendationActions: await db.recommendationActions.toArray(),
+    importBatches: await db.importBatches.toArray(),
     organizations: await db.organizations.toArray(),
     contacts: await db.contacts.toArray(),
     interactions: await db.interactions.toArray(),
@@ -272,7 +296,7 @@ export async function exportBackup(db: PulseDB) {
     integrations: await db.integrations.toArray(),
   }));
 }
-export async function restoreBackup(db: PulseDB, input: unknown) {
+export function validateBackup(input: unknown) {
   const b = backupSchema.parse(input);
   // Version-one backups remain supported. The stage is authoritative for outcomes.
   for (const o of b.opportunities)
@@ -281,6 +305,9 @@ export async function restoreBackup(db: PulseDB, input: unknown) {
   const orgs = new Set(b.organizations.map((v) => v.id)),
     contacts = new Set(b.contacts.map((v) => v.id));
   for (const records of [
+    b.smartLists,
+    b.recommendationActions,
+    b.importBatches,
     b.organizations,
     b.contacts,
     b.interactions,
@@ -313,6 +340,13 @@ export async function restoreBackup(db: PulseDB, input: unknown) {
   for (const o of b.opportunities)
     if (o.contactIds.some((id) => !contacts.has(id)))
       throw new Error("Opportunity references a missing contact.");
+  const validReviewRecords = new Set([
+    ...b.contacts.map((c) => c.id),
+    ...b.opportunities.map((o) => o.id),
+  ]);
+  for (const a of b.recommendationActions)
+    if (!validReviewRecords.has(a.recordId))
+      throw new Error("Recommendation action references a missing record.");
   const opportunities = new Set(b.opportunities.map((o) => o.id)),
     tasks = new Set(b.tasks.map((t) => t.id));
   for (const i of b.interactions) {
@@ -321,8 +355,15 @@ export async function restoreBackup(db: PulseDB, input: unknown) {
     if (i.followUpId && !tasks.has(i.followUpId))
       throw new Error("Missing follow-up reference.");
   }
+  return b;
+}
+export async function restoreBackup(db: PulseDB, input: unknown) {
+  const b = validateBackup(input);
   await db.transaction("rw", db.tables, async () => {
     for (const key of [
+      "smartLists",
+      "recommendationActions",
+      "importBatches",
       "organizations",
       "contacts",
       "interactions",
@@ -505,7 +546,7 @@ export async function saveOpportunity(db: PulseDB, value: Opportunity) {
 export async function deleteOpportunity(db: PulseDB, id: string) {
   await db.transaction(
     "rw",
-    [db.opportunities, db.interactions, db.events],
+    [db.opportunities, db.interactions, db.events, db.recommendationActions],
     async () => {
       const o = await db.opportunities.get(id);
       if (!o) return;
@@ -515,6 +556,7 @@ export async function deleteOpportunity(db: PulseDB, id: string) {
             opportunityId: null,
             updatedAt: new Date().toISOString(),
           });
+      await db.recommendationActions.where("recordId").equals(id).delete();
       await db.opportunities.delete(id);
       await event(
         db,
@@ -630,6 +672,66 @@ export async function savePermission(db: PulseDB, value: Permission) {
         c.id,
         c.organizationId,
       );
+    },
+  );
+}
+
+export async function saveSmartList(db: PulseDB, value: SmartList) {
+  const parsed = smartListSchema.parse({
+    ...value,
+    updatedAt: new Date().toISOString(),
+  });
+  await db.transaction("rw", [db.smartLists, db.events], async () => {
+    const old = await db.smartLists.get(parsed.id);
+    if (old) parsed.createdAt = old.createdAt;
+    await db.smartLists.put(parsed);
+    await event(db, "Smart List saved");
+  });
+}
+export async function deleteSmartList(db: PulseDB, id: string) {
+  await db.transaction("rw", [db.smartLists, db.events], async () => {
+    await db.smartLists.delete(id);
+    await event(db, "Smart List deleted");
+  });
+}
+export async function saveRecommendationAction(
+  db: PulseDB,
+  value: RecommendationAction,
+) {
+  const parsed = recommendationActionSchema.parse(value);
+  if (
+    parsed.kind === "snooze" &&
+    (!parsed.until || Date.parse(parsed.until) <= Date.now())
+  )
+    throw new Error("Choose a future snooze date.");
+  await db.transaction(
+    "rw",
+    [db.recommendationActions, db.events, db.contacts, db.opportunities],
+    async () => {
+      if (
+        !(await db.contacts.get(parsed.recordId)) &&
+        !(await db.opportunities.get(parsed.recordId))
+      )
+        throw new Error("Review record no longer exists.");
+      await db.recommendationActions.where("key").equals(parsed.key).delete();
+      await db.recommendationActions.add(parsed);
+      await event(
+        db,
+        parsed.kind === "snooze"
+          ? "Recommendation snoozed"
+          : "Recommendation dismissed",
+      );
+    },
+  );
+}
+export async function clearRecommendationAction(db: PulseDB, id: string) {
+  await db.transaction(
+    "rw",
+    [db.recommendationActions, db.events],
+    async () => {
+      if (!(await db.recommendationActions.get(id))) return;
+      await db.recommendationActions.delete(id);
+      await event(db, "Recommendation returned to review");
     },
   );
 }

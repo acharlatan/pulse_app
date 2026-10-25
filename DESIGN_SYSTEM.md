@@ -42,3 +42,9 @@ Semantic headings, labels, native dialogs with Escape/focus handling, skip link 
 ## Iteration 02 profile and record patterns
 
 Profiles retain the original cover and avatar identity. Section jump navigation, a three-part factual relationship snapshot and progressive permission/history details organize longer pages. Shared relationship stories use type-specific icons, attribution, occurred timestamps, full-text expansion, a type filter and 20-entry pagination. Task actions wrap into comfortable rows on phones. Opportunity details use the same scrollable native dialog and form rhythm as profiles; checkbox representatives avoid a cramped native multi-select. All surfaces and controls use existing semantic theme variables. No remote images or custom cover storage was introduced.
+
+## Iteration 03 patterns
+
+Relationship Review uses responsive avatar cards with a factual explanation, evidence-specific actions and a restrained category badge. Category controls wrap on phones; the four-item mobile navigation remains intact, with Review reachable from Home and Network. Saved-list management uses a compact selector and live people rows. Filter builders use shared scrollable native dialogs with labeled conditions.
+
+The import wizard uses seven visible stages (file, preview, mapping, validation, duplicates, confirmation, results). Sample rows and existing/imported comparisons expand within the page; no unbounded spreadsheet is rendered. Duplicate rows paginate in tens. Summary tiles show actual plan/result counts. The explicit confirmation names the active workspace. Semantic tokens theme every new surface; no remote media, charts, fonts or AI decoration is required.

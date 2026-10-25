@@ -18,3 +18,8 @@ Read README.md, PRODUCT_BLUEPRINT.md, DESIGN_SYSTEM.md, DEVELOPMENT_ROADMAP.md a
 - Interaction organizationId is a historical snapshot. Never aggregate old conversations under a new employer solely by current contact membership. Changes to this policy require migration and regression tests.
 - Stage is authoritative for opportunity outcome (Won→won, Lost→lost, other→open); reopening requires selecting an active stage. Deleting tasks/deals must clear interaction references while preserving conversations.
 - Permission purposes remain distinct. Detailed availability edits preserve ended snapshots; an ended timeout must never supersede another active restriction or grant marketing permission.
+
+- Health/review/availability calculations belong in the shared recommendations service. Never count record/import timestamps or notes as meaningful conversations. Sourced imported dates must retain provenance.
+- Review-action keys identify structural evidence, never presentation strings. Snoozes/dismissals do not change contact restrictions, consent or task state.
+- CSV must use the parser/mapping/validated plan path. Duplicate decisions are user controlled; blank fields preserve existing data and imports never write permissions or restrictions. Validate stale previews and commit atomically with regression tests for rollback.
+- DB v2 and backup v2 include saved definitions, review actions and import history. Preserve v1 upgrade/restore support; never downgrade production databases or discard new tables on export. Smart Lists store definitions rather than copied contacts.

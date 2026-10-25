@@ -27,19 +27,17 @@ import {
 } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
 import { completeTask } from "../data/repository";
-import { recommendations, overdue } from "../services/recommendations";
+import { overdue } from "../services/recommendations";
 export function Home() {
   const p = usePulse();
   const { date, money } = useFormat();
   const [editor, setEditor] = useState<Editor | null>(null);
-  const recs = recommendations(
-    p.contacts,
-    p.interactions,
-    p.tasks,
-    p.settings,
-    p.permissions,
-    p.restrictions,
-  );
+  const recs = p.intelligence.queue
+    .filter((r) => r.contactId)
+    .map((r) => ({
+      ...r,
+      contact: p.contacts.find((c) => c.id === r.contactId)!,
+    }));
   const outstanding = p.tasks.filter((t) => !t.completedAt);
   const today = (v: string) =>
     date(v, { year: "numeric", month: "2-digit", day: "2-digit" }) ===
@@ -189,7 +187,7 @@ export function Home() {
         <div className="home-primary">
           <section className="surface">
             <SectionHeading
-              title="A little attention goes a long way"
+              title="Today’s relationship focus"
               eyebrow="YOUR NEXT BEST CONNECTION"
               action={
                 <span className="soft-icon">
@@ -198,10 +196,10 @@ export function Home() {
               }
             />
             <p className="section-description">
-              Thoughtful nudges, based on your relationship history.
+              Explainable reviews, based on recorded history and commitments.
             </p>
             <div className="recommendation-list">
-              {recs.slice(0, 3).map((r) => (
+              {recs.slice(0, p.settings.intelligence.homeLimit).map((r) => (
                 <div className="recommendation" key={r.key}>
                   <Link
                     to={`/network/people/${r.contact.id}`}
@@ -257,11 +255,41 @@ export function Home() {
                 />
               )}
             </div>
-            <Link to="/network" className="surface-footer">
-              Find someone in your network
+            <Link to="/review" className="surface-footer">
+              Open Relationship Review
               <ArrowRight size={16} />
             </Link>
           </section>
+          {p.intelligence.opportunities.some((o) => o.flags.length > 0) &&
+            p.settings.intelligence.enabled &&
+            p.settings.intelligence.opportunities && (
+              <section className="surface">
+                <SectionHeading
+                  title="Opportunities to review"
+                  action={<ViewLink to="/review" />}
+                />
+                {p.intelligence.opportunities
+                  .filter((o) => o.flags.length)
+                  .slice(0, 2)
+                  .map((insight) => {
+                    const deal = p.opportunities.find(
+                      (o) => o.id === insight.opportunityId,
+                    )!;
+                    return (
+                      <button
+                        className="opportunity-review-link"
+                        key={deal.id}
+                        onClick={() =>
+                          setEditor({ kind: "opportunity", record: deal })
+                        }
+                      >
+                        <strong>{deal.title}</strong>
+                        <span>{insight.flags[0]}</span>
+                      </button>
+                    );
+                  })}
+              </section>
+            )}
           <section className="surface">
             <SectionHeading
               title="Conversations in motion"

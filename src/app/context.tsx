@@ -2,14 +2,16 @@ import {
   createContext,
   useContext,
   useState,
+  useMemo,
   useEffect,
   type ReactNode,
 } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { database } from "../data/db";
 import { initialize } from "../data/seed";
-import { defaults, type Workspace } from "../data/models";
+import { defaults, settingsSchema, type Workspace } from "../data/models";
 import { updateSettings } from "../data/repository";
+import { analyzeRelationships } from "../services/recommendations";
 import type { PulseDB } from "../data/db";
 function useWorkspaceData(db: PulseDB) {
   return useLiveQuery(
@@ -24,7 +26,15 @@ function useWorkspaceData(db: PulseDB) {
         tasks: await db.tasks.orderBy("dueAt").toArray(),
         opportunities: await db.opportunities.toArray(),
         events: await db.events.orderBy("createdAt").reverse().toArray(),
-        settings: (await db.settings.get("settings")) || defaults,
+        settings: settingsSchema.parse(
+          (await db.settings.get("settings")) || defaults,
+        ),
+        smartLists: await db.smartLists.toArray(),
+        recommendationActions: await db.recommendationActions.toArray(),
+        importBatches: await db.importBatches
+          .orderBy("createdAt")
+          .reverse()
+          .toArray(),
         permissions: await db.permissions.toArray(),
         restrictions: await db.restrictions.toArray(),
       })),
@@ -33,6 +43,7 @@ function useWorkspaceData(db: PulseDB) {
 }
 type Data = NonNullable<ReturnType<typeof useWorkspaceData>>;
 interface ContextValue extends Data {
+  intelligence: ReturnType<typeof analyzeRelationships>;
   db: PulseDB;
   workspace: Workspace;
   switchWorkspace: (w: Workspace) => void;
@@ -59,10 +70,17 @@ export function WorkspaceProvider({
   const data = useWorkspaceData(db);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
-  const [, tick] = useState(0);
+  const [clock, tick] = useState(0);
   useEffect(() => {
-    const timer = setInterval(() => tick((v) => v + 1), 60000);
-    return () => clearInterval(timer);
+    const refresh = () => tick((v) => v + 1);
+    const timer = setInterval(refresh, 60000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
   }, []);
   const [toast, setToast] = useState("");
   useEffect(() => {
@@ -110,6 +128,13 @@ export function WorkspaceProvider({
       return false;
     }
   }
+  const intelligence = useMemo(
+    () =>
+      data
+        ? analyzeRelationships(data)
+        : { relationships: [], opportunities: [], all: [], queue: [] },
+    [data, clock],
+  );
   if (error)
     return (
       <div className="startup">
@@ -129,6 +154,7 @@ export function WorkspaceProvider({
     <Context.Provider
       value={{
         ...data,
+        intelligence,
         db,
         workspace,
         switchWorkspace: onSwitch,
