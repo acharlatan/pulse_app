@@ -13,20 +13,29 @@
 
 ## Partial foundations
 
-- Pipeline read/stage updates; no opportunity creation/edit/delete yet.
-- Restriction/permission repositories and schemas; no full channel consent editor.
+- One configured pipeline; custom pipeline/stage editing remains future work.
+- Basic channel/purpose permissions and availability history; advanced consent audit/export and multi-rule conflict resolution remain future work.
 - In-app alerts evaluated when active; no background/browser/push/email delivery.
 - Gamification data schema; actual daily task progress only.
 - Integration metadata only. Every provider is planned and disconnected.
 - PWA build verified; physical installation, cache-update lifecycle, and full offline navigation await device testing.
 
-## Prompt 02 — recommended priority
+## Iteration 02 — implemented
 
-1. Add complete opportunity CRUD, organization/contact association validation, won/lost outcomes, and clean mobile stage workflow.
-2. Add interaction edit/delete with recalculated relationship history and task edit/reschedule with explicit linked next actions.
-3. Expand permission editor and timeout reason/history; explain which restriction suppresses a suggestion.
-4. Improve readable metadata/contrast and complete keyboard/screen-reader QA; strengthen mobile dialogs with real keyboard testing.
-5. Extend browser regression suite and physical iOS/Android install/offline/update tests.
+- Opportunity CRUD from pipeline/person/company; representative validation, manual values/probability, expected close and explicit stage/outcomes.
+- Interaction edit/delete, historical company attribution, filtered/paged relationship stories and preserved linked tasks.
+- Follow-up editing, reassignment/rescheduling, completion/reopen and safe deletion.
+- Availability date/reason/source editors, ended restriction snapshots and channel/purpose permission editing.
+- Profile snapshots, section navigation, linked representatives and shared record cards/actions.
+- Directory availability/category filters, trimmed search and reset/empty states.
+- Expanded data and browser acceptance/layout regression coverage. Exact executed results in QA_REPORT.md.
+
+## Prompt 03 — recommended priority
+
+1. Expand import mapping, deduplication and recovery workflows; strengthen backups and origin-to-origin workspace transfer.
+2. Add channel-specific recommendation explanations and a purposeful review queue; preserve deterministic rules and opt-outs.
+3. Extend browser coverage for restriction/permission edge cases, backup file chooser and multi-tab conflict handling.
+4. Physical iOS/Android keyboard, PWA installation/offline/update QA. Keep the screenshot-guided product review for Prompts 07–08.
 
 ## Later iterations
 

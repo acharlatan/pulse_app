@@ -38,3 +38,7 @@ Filled primary, soft secondary, ghost and destructive actions. Selection uses ex
 ## Accessibility and motion
 
 Semantic headings, labels, native dialogs with Escape/focus handling, skip link and keyboard focus. Reduced-motion media query plus user setting. Home uses a short opacity/position transition disabled by either preference. Never introduce auto-playing celebrations or dragging as the only way to change pipeline stage. Screen-reader and contrast audits remain part of ongoing QA; no certification claimed.
+
+## Iteration 02 profile and record patterns
+
+Profiles retain the original cover and avatar identity. Section jump navigation, a three-part factual relationship snapshot and progressive permission/history details organize longer pages. Shared relationship stories use type-specific icons, attribution, occurred timestamps, full-text expansion, a type filter and 20-entry pagination. Task actions wrap into comfortable rows on phones. Opportunity details use the same scrollable native dialog and form rhythm as profiles; checkbox representatives avoid a cramped native multi-select. All surfaces and controls use existing semantic theme variables. No remote images or custom cover storage was introduced.

@@ -2,6 +2,16 @@ import { afterEach, beforeEach, describe, it, expect } from "vitest";
 import { PulseDB } from "../src/data/db";
 import { initialize, resetWorkspace } from "../src/data/seed";
 import {
+  saveOpportunity,
+  deleteOpportunity,
+  moveOpportunity,
+  updateInteraction,
+  deleteInteraction,
+  reopenTask,
+  deleteTask,
+  saveRestriction,
+  endRestriction,
+  savePermission,
   saveOrganization,
   saveContact,
   addInteraction,
@@ -19,6 +29,7 @@ import {
   recommendations,
   overdue,
   lastInteraction,
+  taskState,
 } from "../src/services/recommendations";
 import {
   stamp,
@@ -26,6 +37,7 @@ import {
   type Contact,
   type Organization,
   type Task,
+  type Opportunity,
 } from "../src/data/models";
 let db: PulseDB;
 const company = (): Organization => ({
@@ -312,5 +324,329 @@ describe("restriction preservation", () => {
     expect(await db.restrictions.count()).toBe(1);
     await saveContact(db, { ...c, availability: "Available" });
     expect(await db.restrictions.count()).toBe(0);
+  });
+});
+
+describe("Iteration 02 complete workflows", () => {
+  const deal = (
+    organizationId: string | null,
+    contactIds: string[] = [],
+  ): Opportunity => ({
+    ...stamp(),
+    title: "Northstar partnership",
+    organizationId,
+    contactIds,
+    pipelineId: "default",
+    stageId: "Proposal",
+    value: 25000,
+    currency: "USD",
+    status: "open",
+    probability: 60,
+    expectedCloseAt: null,
+    notes: "Budget review",
+  });
+  it("keeps historical interactions at the original company when representatives move", async () => {
+    const a = company(),
+      b = company();
+    await saveOrganization(db, a);
+    await saveOrganization(db, b);
+    const c = person(a.id);
+    await saveContact(db, c);
+    const i = {
+      ...stamp(),
+      contactId: c.id,
+      organizationId: a.id,
+      type: "Call" as const,
+      occurredAt: new Date().toISOString(),
+      summary: "Budget review",
+      outcome: "",
+      opportunityId: null,
+      followUpId: null,
+    };
+    await addInteraction(db, i);
+    await saveContact(db, {
+      ...c,
+      organizationId: b.id,
+      priority: "VIP",
+      stage: "Negotiation",
+    });
+    expect(await db.contacts.where("organizationId").equals(a.id).count()).toBe(
+      0,
+    );
+    expect(await db.contacts.where("organizationId").equals(b.id).count()).toBe(
+      1,
+    );
+    await updateInteraction(db, { ...i, summary: "Corrected budget review" });
+    expect((await db.interactions.get(i.id))?.organizationId).toBe(a.id);
+    db.close();
+    await db.open();
+    expect((await db.contacts.get(c.id))?.priority).toBe("VIP");
+  });
+  it("corrects interactions in place, recalculates last contact and preserves linked tasks", async () => {
+    const c = person();
+    await saveContact(db, c);
+    const t = task(c.id);
+    await saveTask(db, t);
+    const i = {
+      ...stamp(),
+      contactId: c.id,
+      organizationId: null,
+      type: "Call" as const,
+      occurredAt: new Date().toISOString(),
+      summary: "Call",
+      outcome: "",
+      opportunityId: null,
+      followUpId: t.id,
+    };
+    await addInteraction(db, i);
+    await updateInteraction(db, {
+      ...i,
+      type: "Note",
+      summary: "Actually a note",
+    });
+    expect(
+      lastInteraction(c.id, await db.interactions.toArray()),
+    ).toBeUndefined();
+    expect(await db.interactions.count()).toBe(1);
+    expect((await db.interactions.get(i.id))?.createdAt).toBe(i.createdAt);
+    await deleteInteraction(db, i.id);
+    expect(await db.tasks.count()).toBe(1);
+  });
+  it("reschedules, completes, reopens and deletes without duplicate tasks or dangling links", async () => {
+    const c = person();
+    await saveContact(db, c);
+    const t = task(c.id);
+    await saveTask(db, t);
+    const tomorrow = new Date(Date.now() + 86400000).toISOString();
+    await saveTask(db, {
+      ...t,
+      dueAt: tomorrow,
+      title: "Rescheduled",
+      priority: "High",
+    });
+    expect(await db.tasks.count()).toBe(1);
+    expect(overdue((await db.tasks.get(t.id))!)).toBe(false);
+    await completeTask(db, t.id);
+    await reopenTask(db, t.id);
+    expect((await db.tasks.get(t.id))?.completedAt).toBeNull();
+    const i = {
+      ...stamp(),
+      contactId: c.id,
+      organizationId: null,
+      type: "Note" as const,
+      occurredAt: tomorrow,
+      summary: "Plan",
+      outcome: "",
+      opportunityId: null,
+      followUpId: t.id,
+    };
+    await addInteraction(db, i);
+    await deleteTask(db, t.id);
+    expect((await db.interactions.get(i.id))?.followUpId).toBeNull();
+    expect(await db.contacts.count()).toBe(1);
+  });
+  it("creates and manages deal outcomes and validates representatives", async () => {
+    const org = company();
+    await saveOrganization(db, org);
+    const c = person(org.id),
+      other = person();
+    await saveContact(db, c);
+    await saveContact(db, other);
+    const o = deal(org.id, [c.id]);
+    await saveOpportunity(db, o);
+    await expect(
+      saveOpportunity(db, { ...o, contactIds: [other.id] }),
+    ).rejects.toThrow("belong");
+    await moveOpportunity(db, o.id, "Negotiation");
+    expect((await db.opportunities.get(o.id))?.status).toBe("open");
+    await moveOpportunity(db, o.id, "Won");
+    expect((await db.opportunities.get(o.id))?.status).toBe("won");
+    await moveOpportunity(db, o.id, "Lost");
+    expect((await db.opportunities.get(o.id))?.status).toBe("lost");
+    await moveOpportunity(db, o.id, "Discovery");
+    expect((await db.opportunities.get(o.id))?.status).toBe("open");
+    await saveOpportunity(db, { ...o, title: "Revised", value: 30000 });
+    expect((await db.opportunities.get(o.id))?.createdAt).toBe(o.createdAt);
+    const i = {
+      ...stamp(),
+      contactId: c.id,
+      organizationId: org.id,
+      type: "Meeting" as const,
+      occurredAt: new Date().toISOString(),
+      summary: "Discovery",
+      outcome: "",
+      opportunityId: o.id,
+      followUpId: null,
+    };
+    await addInteraction(db, i);
+    await deleteOpportunity(db, o.id);
+    expect((await db.interactions.get(i.id))?.opportunityId).toBeNull();
+    expect(await db.organizations.count()).toBe(1);
+    expect(await db.contacts.count()).toBe(2);
+  });
+  it("archives timeout edits and retains authoritative restrictions and marketing withdrawal", async () => {
+    const c = person();
+    await saveContact(db, c);
+    const now = Date.now();
+    const r = {
+      ...stamp(),
+      id: `profile-${c.id}`,
+      contactId: c.id,
+      type: "Temporarily unavailable" as const,
+      startAt: new Date(now - 10000).toISOString(),
+      endAt: new Date(now + 10000).toISOString(),
+      reason: "Budget review",
+      source: "Call",
+    };
+    await saveRestriction(db, r);
+    await savePermission(db, {
+      ...stamp(),
+      contactId: c.id,
+      channel: "Email",
+      purpose: "Marketing",
+      status: "Withdrawn",
+      evidence: "Client request",
+      withdrawnAt: null,
+    });
+    await saveRestriction(db, {
+      ...r,
+      endAt: new Date(now + 20000).toISOString(),
+      reason: "Extended",
+    });
+    expect(await db.restrictions.count()).toBe(2);
+    const contact = (await db.contacts.get(c.id))!;
+    expect(
+      eligible(
+        contact,
+        await db.permissions.toArray(),
+        await db.restrictions.toArray(),
+        now + 5000,
+      ),
+    ).toBe(false);
+    expect(
+      eligible(
+        contact,
+        await db.permissions.toArray(),
+        await db.restrictions.toArray(),
+        now + 30000,
+      ),
+    ).toBe(true);
+    const dnc = {
+      ...stamp(),
+      contactId: c.id,
+      type: "Do not contact" as const,
+      startAt: null,
+      endAt: null,
+      reason: "No outreach",
+      source: "Client",
+    };
+    await saveRestriction(db, dnc);
+    await endRestriction(db, r.id);
+    expect(
+      eligible(
+        (await db.contacts.get(c.id))!,
+        await db.permissions.toArray(),
+        await db.restrictions.toArray(),
+      ),
+    ).toBe(false);
+    expect((await db.permissions.toArray())[0].status).toBe("Withdrawn");
+    await expect(
+      savePermission(db, {
+        ...(await db.permissions.toArray())[0],
+        id: stamp().id,
+      }),
+    ).rejects.toThrow("existing permission");
+  });
+  it("applies start windows and explicitly ends indefinite restrictions", async () => {
+    const c = person();
+    await saveContact(db, c);
+    const r = {
+      ...stamp(),
+      id: `profile-${c.id}`,
+      contactId: c.id,
+      type: "Temporarily unavailable" as const,
+      startAt: new Date(Date.now() + 86400000).toISOString(),
+      endAt: new Date(Date.now() + 2 * 86400000).toISOString(),
+      reason: "Vacation",
+      source: "User",
+    };
+    await saveRestriction(db, r);
+    expect(
+      eligible(
+        (await db.contacts.get(c.id))!,
+        [],
+        await db.restrictions.toArray(),
+      ),
+    ).toBe(true);
+    const dnc = {
+      ...stamp(),
+      contactId: c.id,
+      type: "Do not contact" as const,
+      startAt: null,
+      endAt: null,
+      reason: "",
+      source: "",
+    };
+    await saveRestriction(db, dnc);
+    await endRestriction(db, dnc.id);
+    expect(
+      eligible(
+        (await db.contacts.get(c.id))!,
+        [],
+        await db.restrictions.toArray(),
+      ),
+    ).toBe(true);
+  });
+  it("compares due-today using the chosen timezone", () => {
+    const t = { ...task(), dueAt: "2026-03-08T12:00:00.000Z" };
+    expect(
+      taskState(t, "America/New_York", Date.parse("2026-03-08T07:00:00Z")),
+    ).toBe("Due today");
+    expect(
+      taskState(t, "America/New_York", Date.parse("2026-03-09T07:00:00Z")),
+    ).toBe("Overdue");
+  });
+  it("roundtrips original version-one backups and rejects broken new links atomically", async () => {
+    const c = person();
+    await saveContact(db, c);
+    const legacy = await exportBackup(db);
+    await restoreBackup(db, legacy);
+    const o = deal(null, [c.id]);
+    await saveOpportunity(db, o);
+    const current = await exportBackup(db);
+    await restoreBackup(db, current);
+    expect(await db.opportunities.count()).toBe(1);
+    await expect(
+      restoreBackup(db, {
+        ...current,
+        opportunities: [{ ...o, contactIds: ["missing"] }],
+      }),
+    ).rejects.toThrow();
+    expect(await db.opportunities.count()).toBe(1);
+  });
+});
+
+it("preserves detailed availability evidence when the general profile editor reschedules a timeout", async () => {
+  const c = person();
+  await saveContact(db, c);
+  const r = {
+    ...stamp(),
+    id: `profile-${c.id}`,
+    contactId: c.id,
+    type: "Temporarily unavailable" as const,
+    startAt: null,
+    endAt: new Date(Date.now() + 86400000).toISOString(),
+    reason: "Budget review",
+    source: "Client call",
+  };
+  await saveRestriction(db, r);
+  await saveContact(db, {
+    ...(await db.contacts.get(c.id))!,
+    timeoutUntil: new Date(Date.now() + 2 * 86400000).toISOString(),
+  });
+  expect(await db.restrictions.get(r.id)).toMatchObject({
+    createdAt: r.createdAt,
+    reason: r.reason,
+    source: r.source,
   });
 });

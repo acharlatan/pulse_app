@@ -4,7 +4,7 @@ AI Powered CRM Messenger
 
 **PULSE — Every relationship has a story.**
 
-**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Development iteration 01.
+**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Development iteration 02.
 
 ## Run
 
@@ -36,7 +36,9 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 - Transparent, dismissible reconnect recommendations that respect availability, saved restrictions and denied/withdrawn relationship permissions.
 - Light/dark/device themes; motion preference; local name, locale/timezone and rhythm settings; category-specific in-app alerts.
 - JSON backups with runtime validation and atomic restore; contact CSV export; separate demo reset/personal deletion; workspace switching.
-- Read/update opportunity stages. Opportunity creation is deliberately deferred and labeled in the UI.
+- Complete opportunity creation, editing, deletion and stage/outcome transitions; company and representative associations, values, expected close and user-entered probabilities.
+- Editable/deletable conversations and follow-ups; rescheduling, completion and reopening; filtered relationship stories with historical company attribution.
+- Availability reason/source editors, restriction history, explicit ending of restrictions and channel/purpose permission records.
 - Generated PWA manifest, icons, prompt-based updates and offline app-shell precache. Requires HTTPS or localhost. Actual device installation/offline navigation require further device QA.
 
 ## Storage and privacy
@@ -53,12 +55,22 @@ Deleting a company **detaches and preserves** its people, conversations, tasks, 
 
 ## Architecture
 
-`src/app` owns providers/router/shell. `src/data` owns models, migrations, seed and transactional repositories. `src/services` holds pure recommendation rules. `src/components` contains reusable primitives, forms and offline/update feedback. `src/features` contains route modules. CSS semantic tokens form the design system; Tailwind v4 is available through Vite. Dexie live queries refresh all views after writes. Route modules are lazy loaded; Motion is used for restrained entry transitions.
+`src/app` owns providers/router/shell. `src/data` owns models, migrations, seed and transactional repositories. `src/services` holds pure recommendation rules. `src/components` contains reusable primitives, forms and offline/update feedback. `src/features` contains route modules. Shared record editors and relationship views live under `src/components`. CSS semantic tokens form the design system; Tailwind v4 is available through Vite. Dexie live queries refresh all views after writes. Route modules are lazy loaded; Motion is used for restrained entry transitions.
 
 ## Limits and next work
 
-No sync, authentication, team permissions or external integrations. Integrations are honestly labeled planned/disconnected. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Opportunity creation, full permission editing, custom pipelines, advanced pagination and detailed gamification are deferred. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
+No sync, authentication, team permissions or external integrations. Integrations are honestly labeled planned/disconnected. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Custom pipelines, advanced directory pagination and detailed gamification are deferred. Relationship stories render 20 entries at a time. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
 
 ## License
 
 MIT. See `LICENSE`. Fictional sample data uses reserved `.example` / `example.com` domains. Brand and initial icons are original code-native artwork.
+
+## Cloudflare Workers
+
+Production: https://pulse.icareaboutyoufam.workers.dev. `main` automatically builds through Workers Builds using `npm run build` and `npx wrangler deploy`. `wrangler.jsonc` serves `dist` as Static Assets. See `CLOUDFLARE.md`. No Gemini credentials are required or stored.
+
+## Iteration 02 data policy
+
+Interaction `organizationId` captures the company at the time of the conversation. Moving a contact does not rewrite old conversations; editing an interaction offers an explicit historical-company selector. Each company story selects original interaction IDs once. Tasks use their current assigned contact's company when saved. Existing opportunity associations survive employer changes; new representatives must match the selected company. Stage is authoritative: Won/Lost set their respective outcomes; selecting an active stage explicitly reopens the deal. Existing version-one backups remain accepted; restore normalizes opportunity outcomes to stage. No IndexedDB structure changes or destructive migration is needed.
+
+For a preinstalled test browser, set `PULSE_CHROMIUM_PATH` when running `npm run test:browser`. Ordinary development uses Playwright's installed Chromium. See QA_REPORT.md for exact executed checks and limits.

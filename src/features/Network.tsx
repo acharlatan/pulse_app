@@ -12,17 +12,19 @@ import {
 import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
-import { priorities, stages } from "../data/models";
+import { priorities, stages, availabilities, categories } from "../data/models";
 export function Network() {
   const { contacts, organizations } = usePulse();
   const [tab, setTab] = useState<"people" | "companies">("people");
   const [search, setSearch] = useState("");
   const [priority, setPriority] = useState("");
+  const [availability, setAvailability] = useState("");
+  const [category, setCategory] = useState("");
   const [stage, setStage] = useState("");
   const [sort, setSort] = useState("name");
   const [filters, setFilters] = useState(false);
   const [editor, setEditor] = useState<Editor | null>(null);
-  const query = search.toLowerCase();
+  const query = search.trim().toLowerCase();
   const people = contacts
     .filter(
       (c) =>
@@ -30,7 +32,9 @@ export function Network() {
           .toLowerCase()
           .includes(query) &&
         (!priority || c.priority === priority) &&
-        (!stage || c.stage === stage),
+        (!stage || c.stage === stage) &&
+        (!availability || c.availability === availability) &&
+        (!category || c.category === category),
     )
     .sort((a, b) =>
       sort === "priority"
@@ -150,11 +154,38 @@ export function Network() {
               ))}
             </select>
           </label>
+          <label>
+            Availability
+            <select
+              value={availability}
+              onChange={(e) => setAvailability(e.target.value)}
+            >
+              <option value="">All availability</option>
+              {availabilities.map((v) => (
+                <option key={v}>{v}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Relationship
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="">All relationships</option>
+              {categories.map((v) => (
+                <option key={v}>{v}</option>
+              ))}
+            </select>
+          </label>
           <button
             className="button ghost"
             onClick={() => {
               setStage("");
               setPriority("");
+              setAvailability("");
+              setCategory("");
+              setSearch("");
             }}
           >
             Clear filters
@@ -257,19 +288,36 @@ export function Network() {
       {!(tab === "people" ? people.length : companies.length) && (
         <Empty
           title={
-            search ? "No connections found" : "A little space for possibility"
+            search || stage || priority || availability || category
+              ? "No connections found"
+              : "A little space for possibility"
           }
           body="Try a different search, or add your first connection."
           action={
-            <button
-              className="button primary"
-              onClick={() =>
-                setEditor({ kind: tab === "people" ? "contact" : "company" })
-              }
-            >
-              <Plus size={17} />
-              Add {tab === "people" ? "person" : "company"}
-            </button>
+            search || stage || priority || availability || category ? (
+              <button
+                className="button secondary"
+                onClick={() => {
+                  setSearch("");
+                  setPriority("");
+                  setStage("");
+                  setAvailability("");
+                  setCategory("");
+                }}
+              >
+                Reset search & filters
+              </button>
+            ) : (
+              <button
+                className="button primary"
+                onClick={() =>
+                  setEditor({ kind: tab === "people" ? "contact" : "company" })
+                }
+              >
+                <Plus size={17} />
+                Add {tab === "people" ? "person" : "company"}
+              </button>
+            )
           }
         />
       )}

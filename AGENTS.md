@@ -14,3 +14,7 @@ Read README.md, PRODUCT_BLUEPRINT.md, DESIGN_SYSTEM.md, DEVELOPMENT_ROADMAP.md a
 - Run npm run typecheck, npm run lint, npm test and npm run build. Add business/regression tests for consequential changes. Run browser tests where supported and visually inspect actual output; report unavailable checks honestly.
 - PWA uses relative base assets and HashRouter. Verify GitHub Pages subpath builds after routing/PWA changes. Do not cache private third-party responses or force a reload during user editing.
 - Keep documentation accurate and concise. Distinguish implemented functionality, partial foundations and future work. Never claim production readiness or WCAG compliance solely from a build.
+
+- Interaction organizationId is a historical snapshot. Never aggregate old conversations under a new employer solely by current contact membership. Changes to this policy require migration and regression tests.
+- Stage is authoritative for opportunity outcome (Won→won, Lost→lost, other→open); reopening requires selecting an active stage. Deleting tasks/deals must clear interaction references while preserving conversations.
+- Permission purposes remain distinct. Detailed availability edits preserve ended snapshots; an ended timeout must never supersede another active restriction or grant marketing permission.

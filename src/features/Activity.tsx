@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, MessageCircle, Plus } from "lucide-react";
+import { MessageCircle, Plus } from "lucide-react";
 import { usePulse } from "../app/context";
-import { Avatar, Badge, Empty, useFormat } from "../components/ui";
+import { Empty, useFormat } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
-import { completeTask } from "../data/repository";
+import { TaskRow } from "../components/relationship";
 import { overdue } from "../services/recommendations";
 export function Activity() {
   const p = usePulse();
@@ -72,64 +72,7 @@ export function Activity() {
       </div>
       <section className="surface activity-surface">
         {tab === "tasks"
-          ? tasks.map((t) => {
-              const c = p.contacts.find((c) => c.id === t.contactId);
-              return (
-                <div className="activity-task" key={t.id}>
-                  <button
-                    className={"task-check " + (t.completedAt ? "checked" : "")}
-                    disabled={!!t.completedAt}
-                    aria-label={
-                      t.completedAt
-                        ? `${t.title} completed`
-                        : `Complete ${t.title}`
-                    }
-                    onClick={() =>
-                      p.run(
-                        () => completeTask(p.db, t.id),
-                        "Follow-up completed",
-                      )
-                    }
-                  >
-                    <Check size={16} />
-                  </button>
-                  <div>
-                    <h3 className={t.completedAt ? "completed-text" : ""}>
-                      {t.title}
-                    </h3>
-                    <p>{t.description}</p>
-                    {c && (
-                      <Link
-                        to={`/network/people/${c.id}`}
-                        className="task-person"
-                      >
-                        <Avatar name={c.name} size="tiny" />
-                        {c.name}
-                      </Link>
-                    )}
-                  </div>
-                  <div className="task-metadata">
-                    <Badge
-                      tone={!t.completedAt && overdue(t) ? "red" : "green"}
-                    >
-                      {t.completedAt
-                        ? "Completed"
-                        : overdue(t)
-                          ? "Overdue"
-                          : "Upcoming"}
-                    </Badge>
-                    <time>
-                      {date(t.dueAt, {
-                        month: "short",
-                        day: "numeric",
-                        hour: "numeric",
-                        minute: "2-digit",
-                      })}
-                    </time>
-                  </div>
-                </div>
-              );
-            })
+          ? tasks.map((t) => <TaskRow key={t.id} task={t} onEdit={setEditor} />)
           : p.events.map((e) => (
               <div className="timeline-row" key={e.id}>
                 <span className="timeline-dot">
@@ -138,6 +81,10 @@ export function Activity() {
                 <div>
                   {e.contactId ? (
                     <Link to={`/network/people/${e.contactId}`}>
+                      {e.summary}
+                    </Link>
+                  ) : e.organizationId ? (
+                    <Link to={`/network/companies/${e.organizationId}`}>
                       {e.summary}
                     </Link>
                   ) : (

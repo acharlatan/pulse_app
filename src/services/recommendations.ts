@@ -12,32 +12,60 @@ export function eligible(
   restrictions: Restriction[] = [],
   now = Date.now(),
 ) {
-  if (
-    contact.availability === "Do not contact" ||
-    contact.availability === "On hold"
-  )
-    return false;
-  if (
-    contact.availability === "Temporarily unavailable" &&
-    (!contact.timeoutUntil || Date.parse(contact.timeoutUntil) > now)
-  )
-    return false;
-  if (
-    restrictions.some(
-      (r) =>
-        r.contactId === contact.id &&
-        (!r.startAt || Date.parse(r.startAt) <= now) &&
-        (!r.endAt || Date.parse(r.endAt) > now) &&
-        r.type !== "Available",
+  return (
+    restrictionReasons(contact, permissions, restrictions, now).length === 0
+  );
+}
+export function restrictionReasons(
+  contact: Contact,
+  permissions: Permission[] = [],
+  restrictions: Restriction[] = [],
+  now = Date.now(),
+) {
+  const reasons: string[] = [];
+  // Explicit profile restrictions carry the start/end window. Legacy profiles without
+  // a restriction row retain their existing availability behavior.
+  if (!restrictions.some((r) => r.id === `profile-${contact.id}`)) {
+    if (["Do not contact", "On hold"].includes(contact.availability))
+      reasons.push(contact.availability);
+    if (
+      contact.availability === "Temporarily unavailable" &&
+      (!contact.timeoutUntil || Date.parse(contact.timeoutUntil) > now)
     )
-  )
-    return false;
-  return !permissions.some(
-    (p) =>
+      reasons.push("Temporarily unavailable");
+  }
+  for (const r of restrictions)
+    if (
+      r.contactId === contact.id &&
+      r.type !== "Available" &&
+      (!r.startAt || Date.parse(r.startAt) <= now) &&
+      (!r.endAt || Date.parse(r.endAt) > now)
+    )
+      reasons.push(
+        `${r.type}${r.endAt ? " until " + r.endAt.slice(0, 10) : " until explicitly ended"}`,
+      );
+  for (const p of permissions)
+    if (
       p.contactId === contact.id &&
       p.purpose === "Relationship" &&
-      (p.status === "Denied" || p.status === "Withdrawn"),
-  );
+      ["Denied", "Withdrawn"].includes(p.status)
+    )
+      reasons.push(
+        `${p.channel} relationship permission ${p.status.toLowerCase()}`,
+      );
+  return reasons;
+}
+export function taskState(task: Task, timezone: string, now = Date.now()) {
+  if (task.completedAt) return "Completed";
+  const day = (d: number) =>
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(d);
+  if (overdue(task, now)) return "Overdue";
+  return day(Date.parse(task.dueAt)) === day(now) ? "Due today" : "Upcoming";
 }
 export function lastInteraction(id: string, interactions: Interaction[]) {
   return interactions

@@ -31,4 +31,10 @@ Commerce will use a separate workspace/domain adapter, never overload B2B lifecy
 
 ## Honest scope
 
-Pipeline supports viewing and stage changes only. Communication permission models/rules exist; a full consent editing journey is deferred. Organization category/priority/stage are not independent first-release fields; opportunities and representatives supply relationship context. Progress reflects completed tasks, not fabricated XP. Recommendations are rule based and conservative, not predictive advice. Full profile cover images, custom field editors, reminders beyond in-app evaluation, and purchase/loyalty systems are future modules.
+Pipeline supports full opportunity CRUD and deterministic won/lost/reopen transitions. Channel/purpose permission editing and availability reason/source/history are implemented. Organization category/priority/stage are not independent first-release fields; opportunities and representatives supply relationship context. Progress reflects completed tasks, not fabricated XP. Recommendations are rule based and conservative, not predictive advice. Full profile cover images, custom field editors, reminders beyond in-app evaluation, and purchase/loyalty systems are future modules.
+
+## Iteration 02 extensions
+
+Shared record editors and relationship views extend the existing providers/repositories without new persistent stores. Interactions preserve createdAt and IDs on correction, while occurredAt drives chronological ordering. Company IDs are historical snapshots; reassignment of a person changes directory membership without moving old conversations. Company stories select stored company IDs, so direct and representative interactions appear once each.
+
+Task edits preserve completion state; reopen is explicit. Deleting tasks clears interaction followUpId; deleting deals clears opportunityId. Conversations are retained. New representatives on a deal must match its company; existing historical representative links survive a move. Outcome derives from stage on save and backup restore. Unknown permission is never converted to Granted. Relationship denials suppress generic reconnect suggestions; marketing decisions stay separately recorded. Detailed restriction edits archive ended snapshots and explicit ending preserves the instruction. No new DB fields/indexes: schema and backup format remain version 1.

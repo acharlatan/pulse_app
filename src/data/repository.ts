@@ -19,6 +19,9 @@ import {
   type Interaction,
   type Task,
   type Settings,
+  type Opportunity,
+  type Restriction,
+  type Permission,
 } from "./models";
 export async function settings(db: PulseDB) {
   return (await db.settings.get("settings")) || defaults;
@@ -48,6 +51,8 @@ export async function saveOrganization(db: PulseDB, value: Organization) {
     updatedAt: new Date().toISOString(),
   });
   await db.transaction("rw", [db.organizations, db.events], async () => {
+    const previous = await db.organizations.get(parsed.id);
+    if (previous) parsed.createdAt = previous.createdAt;
     await db.organizations.put(parsed);
     await event(db, `Updated company · ${parsed.name}`, null, parsed.id);
   });
@@ -66,23 +71,35 @@ export async function saveContact(db: PulseDB, value: Contact) {
         !(await db.organizations.get(parsed.organizationId))
       )
         throw new Error("Choose an existing company.");
+      const previous = await db.contacts.get(parsed.id);
+      if (previous) parsed.createdAt = previous.createdAt;
       await db.contacts.put(parsed);
       const restrictionId = `profile-${parsed.id}`;
-      if (parsed.availability === "Available")
+      const previousRestriction = await db.restrictions.get(restrictionId);
+      if (
+        parsed.availability === "Available" &&
+        previous?.availability !== "Available"
+      )
         await db.restrictions.delete(restrictionId);
-      if (parsed.availability !== "Available")
+      if (
+        parsed.availability !== "Available" &&
+        (!previous ||
+          previous.availability !== parsed.availability ||
+          previous.timeoutUntil !== parsed.timeoutUntil)
+      )
         await db.restrictions.put({
           ...stamp(),
+          createdAt: previousRestriction?.createdAt || parsed.updatedAt,
           id: restrictionId,
           contactId: parsed.id,
           type: parsed.availability,
-          startAt: null,
+          startAt: new Date().toISOString(),
           endAt:
             parsed.availability === "Temporarily unavailable"
               ? parsed.timeoutUntil
               : null,
-          reason: "Set in profile",
-          source: "User",
+          reason: previousRestriction?.reason || "Set in profile",
+          source: previousRestriction?.source || "User",
         });
       await event(
         db,
@@ -97,7 +114,14 @@ export async function addInteraction(db: PulseDB, value: Interaction) {
   const parsed = interactionSchema.parse(value);
   await db.transaction(
     "rw",
-    [db.interactions, db.contacts, db.organizations, db.events],
+    [
+      db.interactions,
+      db.contacts,
+      db.organizations,
+      db.events,
+      db.tasks,
+      db.opportunities,
+    ],
     async () => {
       if (parsed.contactId) {
         const contact = await db.contacts.get(parsed.contactId);
@@ -109,10 +133,11 @@ export async function addInteraction(db: PulseDB, value: Interaction) {
         !(await db.organizations.get(parsed.organizationId))
       )
         throw new Error("Company no longer exists.");
+      await validateInteractionLinks(db, parsed);
       await db.interactions.add(parsed);
       await event(
         db,
-        `${parsed.type} logged · ${parsed.summary.slice(0, 90)}`,
+        `${parsed.type} logged`,
         parsed.contactId,
         parsed.organizationId,
       );
@@ -120,7 +145,10 @@ export async function addInteraction(db: PulseDB, value: Interaction) {
   );
 }
 export async function saveTask(db: PulseDB, value: Task) {
-  const parsed = taskSchema.parse(value);
+  const parsed = taskSchema.parse({
+    ...value,
+    updatedAt: new Date().toISOString(),
+  });
   await db.transaction(
     "rw",
     [db.tasks, db.contacts, db.organizations, db.events],
@@ -135,15 +163,12 @@ export async function saveTask(db: PulseDB, value: Task) {
         !(await db.organizations.get(parsed.organizationId))
       )
         throw new Error("Company no longer exists.");
-      if (
-        parsed.organizationId &&
-        !(await db.organizations.get(parsed.organizationId))
-      )
-        throw new Error("Company no longer exists.");
+      const previous = await db.tasks.get(parsed.id);
+      if (previous) parsed.createdAt = previous.createdAt;
       await db.tasks.put(parsed);
       await event(
         db,
-        `Follow-up planned · ${parsed.title}`,
+        `${previous ? "Follow-up updated" : "Follow-up planned"} · ${parsed.title}`,
         parsed.contactId,
         parsed.organizationId,
       );
@@ -170,6 +195,16 @@ export async function deleteContact(db: PulseDB, id: string) {
   await db.transaction("rw", db.tables, async () => {
     const c = await db.contacts.get(id);
     if (!c) return;
+    const removedTaskIds = new Set(
+      (await db.tasks.where("contactId").equals(id).toArray()).map((t) => t.id),
+    );
+    for (const i of await db.interactions.toArray())
+      if (
+        i.followUpId &&
+        removedTaskIds.has(i.followUpId) &&
+        i.contactId !== id
+      )
+        await db.interactions.update(i.id, { followUpId: null });
     await db.contacts.delete(id);
     for (const table of [
       db.interactions,
@@ -239,6 +274,10 @@ export async function exportBackup(db: PulseDB) {
 }
 export async function restoreBackup(db: PulseDB, input: unknown) {
   const b = backupSchema.parse(input);
+  // Version-one backups remain supported. The stage is authoritative for outcomes.
+  for (const o of b.opportunities)
+    o.status =
+      o.stageId === "Won" ? "won" : o.stageId === "Lost" ? "lost" : "open";
   const orgs = new Set(b.organizations.map((v) => v.id)),
     contacts = new Set(b.contacts.map((v) => v.id));
   for (const records of [
@@ -305,19 +344,292 @@ export async function restoreBackup(db: PulseDB, input: unknown) {
 export async function moveOpportunity(db: PulseDB, id: string, stage: string) {
   const record = await db.opportunities.get(id);
   if (!record) throw new Error("Opportunity no longer exists.");
-  const parsed = opportunitySchema.parse({
+  await saveOpportunity(db, {
     ...record,
-    stageId: stage,
-    status: stage === "Won" ? "won" : stage === "Lost" ? "lost" : "open",
-    updatedAt: new Date().toISOString(),
+    stageId: stage as Opportunity["stageId"],
   });
-  await db.transaction("rw", [db.opportunities, db.events], async () => {
-    await db.opportunities.put(parsed);
+}
+
+async function validateInteractionLinks(db: PulseDB, i: Interaction) {
+  if (!i.contactId && !i.organizationId)
+    throw new Error("Choose a person or company.");
+  if (i.opportunityId && !(await db.opportunities.get(i.opportunityId)))
+    throw new Error("Opportunity no longer exists.");
+  if (i.followUpId && !(await db.tasks.get(i.followUpId)))
+    throw new Error("Follow-up no longer exists.");
+}
+export async function updateInteraction(db: PulseDB, value: Interaction) {
+  await db.transaction("rw", db.tables, async () => {
+    const previous = await db.interactions.get(value.id);
+    if (!previous) throw new Error("Interaction no longer exists.");
+    const parsed = interactionSchema.parse({
+      ...value,
+      createdAt: previous.createdAt,
+      updatedAt: new Date().toISOString(),
+    });
+    if (parsed.contactId && !(await db.contacts.get(parsed.contactId)))
+      throw new Error("Contact no longer exists.");
+    if (
+      parsed.organizationId &&
+      !(await db.organizations.get(parsed.organizationId))
+    )
+      throw new Error("Company no longer exists.");
+    await validateInteractionLinks(db, parsed);
+    // The company is a historical snapshot, retained when a person moves companies.
+    await db.interactions.put(parsed);
     await event(
       db,
-      `${record.title} moved to ${stage}`,
-      null,
-      record.organizationId,
+      `${parsed.type} corrected`,
+      parsed.contactId,
+      parsed.organizationId,
     );
   });
+}
+export async function deleteInteraction(db: PulseDB, id: string) {
+  await db.transaction("rw", [db.interactions, db.events], async () => {
+    const i = await db.interactions.get(id);
+    if (!i) return;
+    await db.interactions.delete(id);
+    await event(
+      db,
+      "Interaction deleted; linked tasks preserved",
+      i.contactId,
+      i.organizationId,
+    );
+  });
+}
+export async function reopenTask(db: PulseDB, id: string) {
+  await db.transaction("rw", [db.tasks, db.events], async () => {
+    const t = await db.tasks.get(id);
+    if (!t?.completedAt) return;
+    await db.tasks.update(id, {
+      completedAt: null,
+      updatedAt: new Date().toISOString(),
+    });
+    await event(
+      db,
+      `Follow-up reopened · ${t.title}`,
+      t.contactId,
+      t.organizationId,
+    );
+  });
+}
+export async function deleteTask(db: PulseDB, id: string) {
+  await db.transaction(
+    "rw",
+    [db.tasks, db.interactions, db.events],
+    async () => {
+      const t = await db.tasks.get(id);
+      if (!t) return;
+      for (const i of await db.interactions.toArray())
+        if (i.followUpId === id)
+          await db.interactions.update(i.id, {
+            followUpId: null,
+            updatedAt: new Date().toISOString(),
+          });
+      await db.tasks.delete(id);
+      await event(
+        db,
+        `Follow-up deleted · ${t.title}`,
+        t.contactId,
+        t.organizationId,
+      );
+    },
+  );
+}
+export async function saveOpportunity(db: PulseDB, value: Opportunity) {
+  const parsed = opportunitySchema.parse({
+    ...value,
+    status:
+      value.stageId === "Won"
+        ? "won"
+        : value.stageId === "Lost"
+          ? "lost"
+          : "open",
+    updatedAt: new Date().toISOString(),
+  });
+  if (!parsed.title.trim()) throw new Error("Enter an opportunity title.");
+  if (!/^[A-Z]{3}$/.test(parsed.currency))
+    throw new Error("Use a three-letter currency code.");
+  try {
+    new Intl.NumberFormat("en", {
+      style: "currency",
+      currency: parsed.currency,
+    });
+  } catch {
+    throw new Error("Invalid currency.");
+  }
+  await db.transaction(
+    "rw",
+    [db.opportunities, db.contacts, db.organizations, db.settings, db.events],
+    async () => {
+      const config = await settings(db);
+      if (parsed.pipelineId !== config.pipeline.id)
+        throw new Error("Choose the configured pipeline.");
+      if (
+        parsed.organizationId &&
+        !(await db.organizations.get(parsed.organizationId))
+      )
+        throw new Error("Company no longer exists.");
+      if (new Set(parsed.contactIds).size !== parsed.contactIds.length)
+        throw new Error("Duplicate representative.");
+      for (const id of parsed.contactIds) {
+        const c = await db.contacts.get(id);
+        if (!c) throw new Error("Contact no longer exists.");
+        // Existing links remain valid when representatives change employers.
+        const previous = await db.opportunities.get(parsed.id);
+        if (
+          parsed.organizationId &&
+          c.organizationId !== parsed.organizationId &&
+          !(
+            previous?.organizationId === parsed.organizationId &&
+            previous.contactIds.includes(id)
+          )
+        )
+          throw new Error(
+            "New representatives must belong to the selected company.",
+          );
+      }
+      const previous = await db.opportunities.get(parsed.id);
+      if (previous) parsed.createdAt = previous.createdAt;
+      await db.opportunities.put(parsed);
+      await event(
+        db,
+        `Opportunity ${previous ? "updated" : "created"} · ${parsed.title} · ${parsed.stageId}`,
+        null,
+        parsed.organizationId,
+      );
+    },
+  );
+}
+export async function deleteOpportunity(db: PulseDB, id: string) {
+  await db.transaction(
+    "rw",
+    [db.opportunities, db.interactions, db.events],
+    async () => {
+      const o = await db.opportunities.get(id);
+      if (!o) return;
+      for (const i of await db.interactions.toArray())
+        if (i.opportunityId === id)
+          await db.interactions.update(i.id, {
+            opportunityId: null,
+            updatedAt: new Date().toISOString(),
+          });
+      await db.opportunities.delete(id);
+      await event(
+        db,
+        `Opportunity deleted · ${o.title}`,
+        null,
+        o.organizationId,
+      );
+    },
+  );
+}
+export async function saveRestriction(db: PulseDB, value: Restriction) {
+  const parsed = restrictionSchema.parse({
+    ...value,
+    updatedAt: new Date().toISOString(),
+  });
+  if (parsed.startAt && parsed.endAt && parsed.startAt >= parsed.endAt)
+    throw new Error("End must be after start.");
+  if (["Do not contact", "On hold"].includes(parsed.type) && parsed.endAt)
+    throw new Error("Indefinite restrictions must be ended explicitly.");
+  await db.transaction(
+    "rw",
+    [db.contacts, db.restrictions, db.events],
+    async () => {
+      const c = await db.contacts.get(parsed.contactId);
+      if (!c) throw new Error("Contact no longer exists.");
+      const previous = await db.restrictions.get(parsed.id);
+      if (previous) parsed.createdAt = previous.createdAt;
+      if (
+        previous &&
+        JSON.stringify({ ...previous, updatedAt: "" }) !==
+          JSON.stringify({ ...parsed, updatedAt: "" })
+      ) {
+        await db.restrictions.add({
+          ...previous,
+          id: stamp().id,
+          endAt:
+            previous.endAt && previous.endAt < parsed.updatedAt
+              ? previous.endAt
+              : parsed.updatedAt,
+          updatedAt: parsed.updatedAt,
+        });
+      }
+      await db.restrictions.put(parsed);
+      if (parsed.id === `profile-${c.id}`)
+        await db.contacts.update(c.id, {
+          availability: parsed.type,
+          timeoutUntil:
+            parsed.type === "Temporarily unavailable" ? parsed.endAt : null,
+          updatedAt: parsed.updatedAt,
+        });
+      await event(
+        db,
+        `Availability recorded · ${parsed.type}`,
+        c.id,
+        c.organizationId,
+      );
+    },
+  );
+}
+export async function endRestriction(db: PulseDB, id: string) {
+  await db.transaction(
+    "rw",
+    [db.restrictions, db.contacts, db.events],
+    async () => {
+      const r = await db.restrictions.get(id);
+      if (!r) return;
+      // Preserve the original instruction as an ended record.
+      const now = new Date().toISOString();
+      await db.restrictions.update(id, { endAt: now, updatedAt: now });
+      if (id === `profile-${r.contactId}`)
+        await db.contacts.update(r.contactId, {
+          availability: "Available",
+          timeoutUntil: null,
+          updatedAt: now,
+        });
+      await event(db, "Availability restriction ended", r.contactId);
+    },
+  );
+}
+export async function savePermission(db: PulseDB, value: Permission) {
+  const parsed = permissionSchema.parse({
+    ...value,
+    updatedAt: new Date().toISOString(),
+    withdrawnAt:
+      value.status === "Withdrawn"
+        ? value.withdrawnAt || new Date().toISOString()
+        : null,
+  });
+  await db.transaction(
+    "rw",
+    [db.permissions, db.contacts, db.events],
+    async () => {
+      const c = await db.contacts.get(parsed.contactId);
+      if (!c) throw new Error("Contact no longer exists.");
+      const existing = (
+        await db.permissions.where("contactId").equals(c.id).toArray()
+      ).find(
+        (p) =>
+          p.channel === parsed.channel &&
+          p.purpose === parsed.purpose &&
+          p.id !== parsed.id,
+      );
+      if (existing)
+        throw new Error(
+          "Edit the existing permission for this channel and purpose.",
+        );
+      const previous = await db.permissions.get(parsed.id);
+      if (previous) parsed.createdAt = previous.createdAt;
+      await db.permissions.put(parsed);
+      await event(
+        db,
+        `${parsed.purpose} permission · ${parsed.channel} · ${parsed.status}`,
+        c.id,
+        c.organizationId,
+      );
+    },
+  );
 }

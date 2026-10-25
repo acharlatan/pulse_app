@@ -5,7 +5,6 @@ import {
   ArrowUpRight,
   Building2,
   CalendarPlus,
-  Clock3,
   Mail,
   MapPin,
   MessageCircle,
@@ -24,22 +23,20 @@ import {
   SectionHeading,
   useFormat,
 } from "../components/ui";
+import {
+  RelationshipTimeline,
+  TaskRow,
+  OpportunityCard,
+  PermissionsPanel,
+} from "../components/relationship";
 import { EditorModal, type Editor } from "../components/forms";
-import {
-  deleteContact,
-  deleteOrganization,
-  completeTask,
-} from "../data/repository";
-import {
-  eligible,
-  lastInteraction,
-  overdue,
-} from "../services/recommendations";
+import { deleteContact, deleteOrganization } from "../data/repository";
+import { eligible, lastInteraction } from "../services/recommendations";
 export function Profile({ company = false }: { company?: boolean }) {
   const { id } = useParams();
   const p = usePulse();
   const navigate = useNavigate();
-  const { date, money } = useFormat();
+  const { date } = useFormat();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [deleting, setDeleting] = useState(false);
   const contact = p.contacts.find((c) => c.id === id);
@@ -69,9 +66,13 @@ export function Profile({ company = false }: { company?: boolean }) {
   const opportunities = p.opportunities.filter((o) =>
     company ? o.organizationId === id : o.contactIds.includes(id!),
   );
-  const last = contact
-    ? lastInteraction(contact.id, p.interactions)
-    : undefined;
+  const last = company
+    ? interactions
+        .filter((i) => i.type !== "Note")
+        .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))[0]?.occurredAt
+    : contact
+      ? lastInteraction(contact.id, p.interactions)
+      : undefined;
   return (
     <div className="page profile-page">
       <Link to="/network" className="text-link back-link">
@@ -111,6 +112,10 @@ export function Profile({ company = false }: { company?: boolean }) {
         <div className="profile-header-content">
           <div>
             <h1>{record.name}</h1>
+            {contact?.preferredName &&
+              contact.preferredName !== contact.name && (
+                <p className="muted">Goes by {contact.preferredName}</p>
+              )}
             <p className="profile-subtitle">
               {company ? org?.industry : contact?.role || "A new connection"}
               {!company && org && (
@@ -127,6 +132,7 @@ export function Profile({ company = false }: { company?: boolean }) {
             <div className="profile-badges">
               {contact && (
                 <>
+                  <Badge>{contact.category}</Badge>
                   <Badge tone="purple">{contact.stage}</Badge>
                   <Badge tone="amber">{contact.priority} priority</Badge>
                   <Badge
@@ -136,7 +142,13 @@ export function Profile({ company = false }: { company?: boolean }) {
                         : "red"
                     }
                   >
-                    {contact.availability}
+                    {contact.availability === "Available" &&
+                    !eligible(contact, p.permissions, p.restrictions)
+                      ? "Outreach restricted"
+                      : contact.availability === "Temporarily unavailable" &&
+                          eligible(contact, p.permissions, p.restrictions)
+                        ? "Timeout expired · review"
+                        : contact.availability}
                     {contact.timeoutUntil
                       ? ` · until ${date(contact.timeoutUntil)}`
                       : ""}
@@ -176,22 +188,96 @@ export function Profile({ company = false }: { company?: boolean }) {
                 </button>
               </>
             ) : (
-              <button
-                className="button primary"
-                onClick={() =>
-                  setEditor({ kind: "contact", organizationId: id })
-                }
-              >
-                <Plus size={17} />
-                Add representative
-              </button>
+              <>
+                <button
+                  className="button secondary"
+                  onClick={() =>
+                    setEditor({ kind: "interaction", organizationId: id })
+                  }
+                >
+                  Log interaction
+                </button>
+                <button
+                  className="button secondary"
+                  onClick={() =>
+                    setEditor({ kind: "task", organizationId: id })
+                  }
+                >
+                  Follow up
+                </button>
+                <button
+                  className="button primary"
+                  onClick={() =>
+                    setEditor({ kind: "contact", organizationId: id })
+                  }
+                >
+                  <Plus size={17} />
+                  Add representative
+                </button>
+              </>
             )}
+            <button
+              className="button secondary"
+              onClick={() =>
+                setEditor({
+                  kind: "opportunity",
+                  contact: company ? undefined : contact,
+                  organizationId: org?.id,
+                })
+              }
+            >
+              Create opportunity
+            </button>
           </div>
         </div>
       </section>
+      <nav className="profile-section-nav" aria-label="Profile sections">
+        {[
+          "overview",
+          "story",
+          "next-steps",
+          "opportunities",
+          ...(company ? ["people"] : ["permissions"]),
+        ].map((section) => (
+          <button
+            key={section}
+            onClick={() =>
+              document.getElementById(section)?.scrollIntoView({
+                behavior: p.settings.reducedMotion ? "instant" : "smooth",
+                block: "start",
+              })
+            }
+          >
+            {section.replace("-", " ")}
+          </button>
+        ))}
+      </nav>
+      <div className="relationship-snapshot">
+        <div>
+          <strong>{tasks.filter((t) => !t.completedAt).length}</strong>
+          <span>Open next steps</span>
+        </div>
+        <div>
+          <strong>
+            {opportunities.filter((o) => o.status === "open").length}
+          </strong>
+          <span>Open opportunities</span>
+        </div>
+        <div>
+          <strong>
+            {last
+              ? Math.max(
+                  0,
+                  Math.floor((Date.now() - Date.parse(last)) / 86400000),
+                )
+              : "—"}
+          </strong>
+          <span>Days since conversation</span>
+        </div>
+      </div>
       <div className="profile-columns">
         <aside>
-          <section className="surface">
+          <section className="surface" id="overview">
             <SectionHeading
               title={company ? "About the company" : "The little details"}
             />
@@ -275,18 +361,27 @@ export function Profile({ company = false }: { company?: boolean }) {
               </>
             )}
           </section>
-          <section className="surface">
-            <SectionHeading title="Opportunities" />
+          {contact && <PermissionsPanel contact={contact} onEdit={setEditor} />}
+          <section className="surface" id="opportunities">
+            <SectionHeading
+              title="Opportunities"
+              action={
+                <button
+                  className="button ghost"
+                  onClick={() =>
+                    setEditor({
+                      kind: "opportunity",
+                      contact: company ? undefined : contact,
+                      organizationId: org?.id,
+                    })
+                  }
+                >
+                  Create
+                </button>
+              }
+            />
             {opportunities.map((o) => (
-              <Link to="/pipeline" className="opportunity-preview" key={o.id}>
-                <strong>{o.title}</strong>
-                <span>
-                  {o.value === null
-                    ? "No value set"
-                    : money(o.value, o.currency)}
-                  <Badge tone="purple">{o.stageId}</Badge>
-                </span>
-              </Link>
+              <OpportunityCard key={o.id} opportunity={o} onEdit={setEditor} />
             ))}
             {!opportunities.length && (
               <p className="muted">No opportunities linked yet.</p>
@@ -295,7 +390,7 @@ export function Profile({ company = false }: { company?: boolean }) {
         </aside>
         <div className="profile-story">
           {company && (
-            <section className="surface">
+            <section className="surface" id="people">
               <SectionHeading
                 title="The people behind the company"
                 action={
@@ -321,7 +416,14 @@ export function Profile({ company = false }: { company?: boolean }) {
                     <Avatar name={c.name} />
                     <div>
                       <strong>{c.name}</strong>
-                      <span>{c.role}</span>
+                      <span>
+                        {c.role} · {c.priority}
+                      </span>
+                      <small>
+                        {lastInteraction(c.id, p.interactions)
+                          ? `Last conversation ${date(lastInteraction(c.id, p.interactions)!)}`
+                          : "No conversations logged"}
+                      </small>
                     </div>
                     <Badge tone="purple">{c.stage}</Badge>
                     <ArrowUpRight size={17} />
@@ -334,55 +436,31 @@ export function Profile({ company = false }: { company?: boolean }) {
               )}
             </section>
           )}
-          <section className="surface">
+          <section className="surface" id="story">
             <SectionHeading
               title="Relationship story"
               eyebrow="CONVERSATIONS & NOTES"
               action={
-                contact && (
-                  <button
-                    className="button ghost"
-                    onClick={() => setEditor({ kind: "interaction", contact })}
-                  >
-                    <Plus size={16} />
-                    Add
-                  </button>
-                )
+                <button
+                  className="button ghost"
+                  onClick={() =>
+                    setEditor({
+                      kind: "interaction",
+                      contact: company ? undefined : contact,
+                      organizationId: company ? id : undefined,
+                    })
+                  }
+                >
+                  <Plus size={16} /> Add
+                </button>
               }
             />
-            {interactions.map((i) => (
-              <article className="story-entry" key={i.id}>
-                <div className="story-meta">
-                  <span className="soft-icon">
-                    <MessageCircle size={16} />
-                  </span>
-                  <strong>{i.type}</strong>
-                  <time>
-                    {date(i.occurredAt, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
-                    })}
-                  </time>
-                </div>
-                <p>{i.summary}</p>
-                {i.outcome && (
-                  <div className="story-outcome">
-                    Next step <span>{i.outcome}</span>
-                  </div>
-                )}
-              </article>
-            ))}
-            {!interactions.length && (
-              <Empty
-                title="A story waiting to be told"
-                body="Log a conversation or a note to remember what matters."
-              />
-            )}
+            <RelationshipTimeline
+              interactions={interactions}
+              onEdit={setEditor}
+            />
           </section>
-          <section className="surface">
+          <section className="surface" id="next-steps">
             <SectionHeading
               title="Next steps"
               action={
@@ -402,36 +480,7 @@ export function Profile({ company = false }: { company?: boolean }) {
               }
             />
             {tasks.map((t) => (
-              <div className="profile-task" key={t.id}>
-                <div>
-                  <strong className={t.completedAt ? "completed-text" : ""}>
-                    {t.title}
-                  </strong>
-                  <small
-                    className={!t.completedAt && overdue(t) ? "overdue" : ""}
-                  >
-                    {t.completedAt
-                      ? "Completed"
-                      : overdue(t)
-                        ? "Overdue"
-                        : "Due"}{" "}
-                    · {date(t.completedAt || t.dueAt)}
-                  </small>
-                </div>
-                {!t.completedAt && (
-                  <button
-                    className="button secondary small-button"
-                    onClick={() =>
-                      p.run(
-                        () => completeTask(p.db, t.id),
-                        "Follow-up completed",
-                      )
-                    }
-                  >
-                    Complete
-                  </button>
-                )}
-              </div>
+              <TaskRow key={t.id} task={t} onEdit={setEditor} />
             ))}
             {!tasks.length && (
               <p className="muted">
