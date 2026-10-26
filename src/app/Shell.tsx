@@ -150,7 +150,9 @@ export function Shell({ children }: { children: ReactNode }) {
                     ? "Activity"
                     : location.pathname === "/settings"
                       ? "Settings"
-                      : "Daily Pulse"}
+                      : location.pathname === "/assistant"
+                        ? "PULSE Intelligence"
+                        : "Daily Pulse"}
             </strong>
           </div>
           <Link to="/" className="mobile-brand">

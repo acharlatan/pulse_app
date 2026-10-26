@@ -68,3 +68,5 @@ Browser-local storage can be cleared/evicted; no encrypted database or synchroni
 ## Iteration 05 boundaries and Prompt 06 priorities
 
 No live-provider generation, Google OAuth, automatic synchronization or persisted AI chat. Scope is one contact/company/opportunity at a time; summaries may omit older records within documented caps. Citations are source-membership checks, not guarantees of correct interpretation. Access browser-session setup is operator-managed. Prompt 06 should prioritize accessible assistant/form navigation, actual-device mailto/WhatsApp/calendar behavior, physical PWA offline/update lifecycle, contrast/focus/screen-reader review, mobile keyboards, bundle measurement and optional model activation QA only after fresh credentials/access are configured. Public demo must remain useful with AI disabled.
+
+Production review observed a stale lazy-loaded asset in a tab spanning deployment; the existing Reload action recovered without data loss. Prompt 06 must improve update adoption and stale-chunk recovery without automatically discarding active edits.
