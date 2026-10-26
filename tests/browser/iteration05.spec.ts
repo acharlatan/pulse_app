@@ -164,6 +164,9 @@ test("selected context, cancel, grounded summary, scoped QA, editable draft, acc
     .getByRole("button", { name: "Reject proposal", exact: true })
     .click();
   await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "PULSE Intelligence.", exact: true }),
+  ).toBeVisible();
   await expect(page.locator(".ai-answer")).toHaveCount(0);
   await page.goto("/#/activity");
   await expect(

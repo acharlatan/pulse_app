@@ -198,6 +198,9 @@ export function Shell({ children }: { children: ReactNode }) {
                       : location.pathname === "/assistant"
                         ? "PULSE Intelligence"
                         : {
+                            "/orbit": "Relationship Orbit",
+                            "/focus": "My Focus",
+                            "/customize": "Personalize PULSE",
                             "/review": "Relationship Review",
                             "/lists": "Smart Lists",
                             "/import": "Import contacts",

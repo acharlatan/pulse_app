@@ -56,7 +56,7 @@ Initial route remains lazy; Orbit and crop editor load separately. Media is quer
 
 ## M. Deployment
 
-Publication uses the existing authorized feature-branch PR, expected-head merge and automatic Cloudflare main build. Final SHA/build/release metadata and live fictional workflows are appended after verification. No GitHub tag or native app-store publication is implied.
+Publication uses [PR #3](https://github.com/acharlatan/pulse_app/pull/3), an expected-head merge and the existing automatic Cloudflare main build. The PR deployment record is the live source for the exact merge SHA, Cloudflare build/deployment/version IDs and fictional workflow results; it is updated after deployment without triggering another documentation-only deployment. No GitHub tag or native app-store publication is implied.
 
 ## N. Known limitations
 
@@ -65,3 +65,24 @@ Physical iOS/Android installation, keyboard/download/orientation behavior, nativ
 ## O. Prompt 10 readiness
 
 Explicit associations, historical interaction attribution, authoritative stage outcomes, typed fields and validated isolated backups are ready inputs for advanced analytics, historical relationship reporting, deterministic rule automation and opportunity insights. Those systems and external integrations are not implemented here. Media/Orbit never changes permissions, scores or sends outreach.
+
+## Executed release evidence
+
+| Check | Result |
+| --- | --- |
+| `npm run typecheck`, `npm run lint` | Passed |
+| `npm test -- --reporter=verbose` | 156/156, 12 files |
+| Full compiled `npm run test:browser -- --config=playwright.production.config.ts --workers=2` | 51 passed / 5 failed; corrected reruns below |
+| Compiled affected-journey rerun, `--grep 'Northstar relationship\|CSV mapping\|selected context\|major routes\|demo acceptance' --workers=1` | 10/10; all 56 distinct cases demonstrated across runs |
+| `npm run build -- --outDir /tmp/pulse09-release-final` | 38 precache entries / 907.64 KiB |
+| `npm run check:worker -- --assets /tmp/pulse09-release-final` | Passed; disabled flags and bindings retained |
+| `VITE_BASE_PATH=/pulse_app/ npm run build -- --outDir /tmp/pulse09-subpath-publish` | Passed |
+| `PULSE_DIST=/tmp/pulse09-release-final npm run test:pwa -- --workers=1` | 12/12 |
+| Absolute-subpath PWA `--grep 'repository subpath'` | 2/2 |
+| `npm audit --json` | Zero known findings |
+
+Browser commands use temporary Chromium153 via PULSE_CHROMIUM_PATH; no binary enters the repository. The full-run/rerun distinction is deliberate: readiness assertions were strengthened, a button theme-transition contrast defect was corrected, and a concurrent lazy-load deadline was rerun with assertions retained. No failing final affected-journey gate remains. See QA_REPORT.md for exact options, timings, measurements and platform limitations.
+
+Final raw/gzip bytes: initial JS235,362/73,682; CSS102,960/20,618; Workspace349,740/107,062; lazy Home8,814/2,848, Orbit12,676/4,297, image editor6,077/2,534. Pure Orbit10/100/1000-contact derivation observed18.9/6.7/9.1ms. These are hosted-run measurements, not field guarantees.
+
+Saved-media acceptance: four active crop-editor axe analyses passed. Person/company crop and saved-profile screenshots were captured and reviewed; deleting a fictional local image Blob then reloading verified initials fallback without a broken profile. JPEG/PNG/WebP, isolated v5 media restore/reload, offline image persistence and quota/corruption rollback are covered by the suites above. Final production verification and exact deployment IDs are in [PR #3](https://github.com/acharlatan/pulse_app/pull/3).

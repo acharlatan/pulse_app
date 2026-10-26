@@ -1,6 +1,6 @@
-# PULSE 1.0 release gates
+# PULSE release gates
 
-Status: **public 1.0.0-rc.1 candidate; stable 1.0 not declared.** QA_REPORT.md distinguishes full runs, focused reruns and unexecuted checks. Deploying this explicitly limited candidate is authorized; it does not mark the stable-only manual gates complete.
+Current candidate: **1.2.0-rc.1 (iteration 09); stable release remains undeclared.** The 1.0/1.1 sections below retain historical evidence; current gates are in the iteration09 section. QA_REPORT.md distinguishes full runs, focused reruns and unexecuted checks. Deploying this explicitly limited candidate is authorized; it does not mark the stable-only manual gates complete.
 
 ## Candidate integration
 
@@ -55,3 +55,9 @@ Stable-only platform gates above remain open. Retain v4-compatible data code for
 - [x] Existing AI/Access/quota/migration boundary remains unchanged and disabled.
 
 Final browser/PWA/publication evidence is recorded in QA_REPORT.md and RELEASE_1_2.md. Existing native-device, browser-engine and assistive-technology stable-only gates remain open. Retain v5-compatible forward fixes after database migration; do not downgrade the client schema.
+
+- [x] All 56 distinct browser cases demonstrated across the compiled full run and corrected 10/10 rerun; no single-clean-run claim.
+- [x] Final PWA12/12 and absolute-subpath2/2, including saved offline photos, update safety and scale.
+- [x] Color-transition contrast defect fixed, test startup readiness strengthened, assertions retained.
+- [x] Comprehensive A–O report in RELEASE_1_2.md; exact release/live deployment record in PR #3.
+- [x] Active image-editor axe checks, actual saved-media screenshot review and missing-Blob fallback verified.

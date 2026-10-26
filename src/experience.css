@@ -146,9 +146,7 @@ h3 {
   padding: 11px 18px;
   font-weight: 650;
   letter-spacing: 0;
-  transition:
-    background 160ms,
-    transform 160ms;
+  transition: transform 160ms;
 }
 .button.primary {
   box-shadow: 0 6px 18px color-mix(in srgb, var(--primary) 15%, transparent);

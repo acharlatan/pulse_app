@@ -15,7 +15,7 @@ npm test
 npm run build
 ```
 
-The production site is the `dist/` directory. `npm run dev` is for development; the production build generates the service worker. `npm run test:browser` supplies a portable Playwright suite; install its Chromium browser in your own development environment first (`npx playwright install chromium`). See `QA_REPORT.md` for what was actually run in the build environment.
+The production site is the `dist/` directory. `npm run dev` is for development; the production build generates the service worker. `npm run test:browser` supplies a portable Playwright suite; install its Chromium browser in your own development environment first (`npx playwright install chromium`). For compiled-release browser checks, build first, then use `PULSE_DIST=dist npm run test:browser -- --config=playwright.production.config.ts`. The separate PWA suite tests offline caching and service-worker updates. See `QA_REPORT.md` for what was actually run in the build environment.
 
 ## Deploy to GitHub Pages
 
