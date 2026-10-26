@@ -380,3 +380,32 @@ Production integration was attempted through an expected-head squash merge. Auto
 The owner subsequently granted standing authorization to merge/update the project and deploy it. PR #2 merged as **6b30c2cc37000b25cfd2596ebedc51d25121548c**. Cloudflare automatic build **fa623358-1f9a-4e25-afe5-fd4ffdf636b5** completed successfully. Deployment **7f7d2ee8-ed35-4f32-a6c8-2a38b505c57b** serves Worker version **cdea617a-117b-4b1a-afae-e3b089f1d0b5** at 100% traffic.
 
 The production `/release.json` reports 1.1.0-rc.1, database 4 and backup 4. A fresh isolated Chromium context on the production origin exercised fictional demo data: existing opportunities were readable; a custom Partnerships pipeline and opportunity were created; the custom Active Partnership stage produced Won; pipeline/opportunity state survived reload; a company select field/value and Focus pin saved; and a downloaded v4 backup contained 2 pipelines, 16 stages, 1 custom definition/value, 1 pin and all 24 demo contacts. No real user's workspace was accessed or modified. `/api/ai/status` returned available:false and mode:disabled. This is actual live workflow/export evidence, not HTTP-200-only verification. Physical-device/native-assistive-technology limits remain open. Release decision: published PULSE 1.1.0-rc.1 candidate.
+
+## Iteration 09 — PULSE 1.2.0-rc.1
+
+Base main verified at b93b5d9511ac4607fde973e520f1f9a821267b30. DB/backup v5 adds media; existing v1–v4 restore compatibility and historical CRM/reward/permission/pipeline behavior are retained. See RELEASE_1_2.md (sections A–O) for design, implementation and support boundaries.
+
+### Data/build checks
+
+- `npm run typecheck` and `npm run lint`: passed on the completed experience, media/Orbit and selected-pipeline handoff changes.
+- `npm test -- --reporter=verbose`: **156 passed / 12 files**. Eleven new media/Orbit cases cover save/replace/remove, stale slot, injected quota/write rollback, v5 export/corrupt rejection/valid roundtrip, decoder failure before replacement, missing cover references, shared-reference deletion cleanup, workspace isolation, actual v4 upgrade, signature/dimension validation, explicit graph links/scopes/deletion and bounded scale. Prior 145 CRM/pipeline/custom-field/Focus/reward/import/historical backup/Worker security tests remain.
+- `npm run build -- --outDir /tmp/pulse09-final`: passed, **38 precache entries / 907.58 KiB**. `npm run check:worker -- --assets /tmp/pulse09-final`: passed, **783.09 KiB / 124.50 KiB gzip**; ASSETS/AI_QUOTA, existing SQLite migration and AI_ENABLED=false preserved. No provider call or paid service was enabled.
+- `VITE_BASE_PATH=/pulse_app/ npm run build -- --outDir /tmp/pulse09-final-subpath`: passed, 38 entries / 907.40 KiB.
+- `npm audit --json`: **zero known findings**. This is an advisory snapshot, not total security certification.
+- Repeated builds in the inherited dist directory retained stale generated assets in this hosted filesystem despite emptyOutDir. Release measurements and final PWA checks use a fresh named output directory; stale precache counts are not presented as release sizes. Cloudflare builds start from a clean checkout.
+
+### Observed performance
+
+Hosted Node 24.22.1/Linux; Chromium 153 software rendering, automated viewport emulation. Initial JS **235,362 bytes / 73,683 gzip** (baseline 235,446 bytes); CSS **102,976 / 20,625 gzip** (baseline 77,061 bytes). Lazy Workspace **349,657 / 107,039 gzip**, Home **8,814 / 2,845**, Orbit **12,676 / 4,297**, crop editor **6,077 / 2,535**. New media is not loaded into the global CRM context. No Core Web Vitals or field performance guarantee is inferred.
+
+Pure derivation with fixed layout budget, limit60 and 10/100/1,000 synthetic contacts measured **18.9 / 6.7 / 9.1 ms** in the final unit run (warm-up affects comparison). DOM/SVG is separately capped: desktop map24, mobile map18, list60/hard80. An earlier production PWA scale run observed import/directory/search-action ms: mobile1000 **553/539/182**, desktop100 **290/897/259**, desktop1000 **783/620/231** under concurrent verification. These are observations, not phone benchmarks.
+
+### Browser/visual procedure
+
+Portable Playwright Chromium archives could not be used directly in this environment. Chromium153 from temporary @sparticuz/chromium was extracted with no ownership restoration, outside project dependencies, with software-rendering libraries. Browser binaries are not distributed. Commands set `PULSE_CHROMIUM_PATH=/tmp/pulse-chromium`.
+
+Focused new feature suite passed **8/8** before final label separation/pipeline refinement. Full exploratory verification found a genuine race: immediately opening New opportunity after pipeline selection could initialize from the prior saved preference. The view now selects synchronously and passes its selected ID to the editor. Another focused run under overlapping browser workloads reached all workflow writes but missed the lazy Focus route after reload; it is not counted as a release pass. Final release browser/PWA counts are appended below.
+
+Actual screenshots reviewed: 390px light action-first Home; 390px light directory; 390px dark company; 1440px dark Orbit before/after fixed-budget label separation; prior light/dark profile/Home captures. Current screenshot suites record Home/profile/Orbit at390/1440 both themes, Customize and primary editors at320–1440, CSV mapping/duplicate/confirm and Assistant approvals. Corrections: map auto-fit and node caps, nonshrinking two-line labels and deterministic separation, search width, wrapped toolbar, mobile details sheet, native checkbox sizing and profile button spacing. All eight accent/theme combinations have axe assertions. Final saved-media/crop captures and fallback evidence are appended after execution.
+
+Physical iOS/Android install/standalone/keyboard/download/orientation, native VoiceOver/NVDA, genuine 200%/400% zoom and Firefox/WebKit remain **unverified**, not silently passed. Automated axe/viewport checks do not certify WCAG conformance. Release remains a candidate. No analytics, automation engine, sync or external integrations are claimed for Prompt09.

@@ -1,3 +1,4 @@
+import { LocalMedia } from "./local-media";
 import { useEffect, useRef, useId, type ReactNode } from "react";
 import { confirmDialogClose } from "../app/update-safety";
 import { X, ArrowUpRight, Users } from "lucide-react";
@@ -7,10 +8,12 @@ export function Avatar({
   name,
   size = "",
   company = false,
+  mediaId,
 }: {
   name: string;
   size?: string;
   company?: boolean;
+  mediaId?: string;
 }) {
   const colors = ["lavender", "peach", "sage", "blue", "pink"];
   const n = [...name].reduce((v, c) => v + c.charCodeAt(0), 0);
@@ -19,12 +22,24 @@ export function Avatar({
       aria-hidden="true"
       className={`avatar ${size} ${company ? "company" : ""} ${colors[n % colors.length]}`}
     >
-      {name
-        .split(/\s|&/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((s) => s[0])
-        .join("")}
+      {mediaId?.startsWith("media-") ? (
+        <LocalMedia
+          id={mediaId}
+          fallback={name
+            .split(/\s|&/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map((s) => s[0])
+            .join("")}
+        />
+      ) : (
+        name
+          .split(/\s|&/)
+          .filter(Boolean)
+          .slice(0, 2)
+          .map((s) => s[0])
+          .join("")
+      )}
     </span>
   );
 }

@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwind from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
+  build: { emptyOutDir: true },
   server: {
     allowedHosts: ["terminal.local"],
     proxy: { "/api": "http://127.0.0.1:8787" },

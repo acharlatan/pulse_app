@@ -44,3 +44,14 @@ Historical 1.0 checklist above remains release evidence for that candidate. This
 - [x] Cloudflare automatic build succeeded for 6b30c2c; actual live persistence/custom fields/Focus/export checks recorded in QA_REPORT.md.
 
 Stable-only platform gates above remain open. Retain v4-compatible data code for forward fixes after upgrade. Do not deploy an old database client to migrated devices.
+
+## Iteration 09 — 1.2.0-rc.1 candidate
+
+- [x] Shared editorial system, action-first Home, directory modes, profile identity and secondary-route refinements.
+- [x] Desktop Discover/mobile More, scoped real Relationship Orbit and accessible List/navigation alternatives.
+- [x] Local portrait/logo/cover/workspace identity; validated bounded crop/compression and atomic cleanup.
+- [x] DB/backup v5, supported v1–v4 restores, real upgrade/roundtrip/corrupt/quota rollback and isolation tests.
+- [x] Typecheck, lint, 156 unit/Worker tests, clean build, Worker dry run and repository-subpath build.
+- [x] Existing AI/Access/quota/migration boundary remains unchanged and disabled.
+
+Final browser/PWA/publication evidence is recorded in QA_REPORT.md and RELEASE_1_2.md. Existing native-device, browser-engine and assistive-technology stable-only gates remain open. Retain v5-compatible forward fixes after database migration; do not downgrade the client schema.

@@ -42,6 +42,7 @@ export function Network() {
   const [stage, setStage] = useState(params.get("stage") || "");
   const [sort, setSort] = useState(params.get("sort") || "name");
   const [filters, setFilters] = useState(false);
+  const [display, setDisplay] = useState("cards");
   const [editor, setEditor] = useState<Editor | null>(null);
   useEffect(() => {
     const next = new URLSearchParams();
@@ -129,6 +130,9 @@ export function Network() {
         </button>
       </div>
       <div className="review-toolbar">
+        <Link className="button secondary" to="/orbit">
+          Relationship Orbit
+        </Link>
         <Link className="button secondary" to="/review">
           Relationship Review
         </Link>
@@ -311,6 +315,23 @@ export function Network() {
         type={tab === "people" ? "contact" : "organization"}
         records={tab === "people" ? people : companies}
       />
+      <div
+        className="tabs directory-display"
+        aria-label="Directory presentation"
+      >
+        <button
+          aria-pressed={display === "cards"}
+          onClick={() => setDisplay("cards")}
+        >
+          Cards
+        </button>
+        <button
+          aria-pressed={display === "list"}
+          onClick={() => setDisplay("list")}
+        >
+          Compact list
+        </button>
+      </div>
       <div className="results-label">
         <span>
           {tab === "people" ? people.length : companies.length}{" "}
@@ -319,7 +340,7 @@ export function Network() {
         <span>Good connections grow here.</span>
       </div>
       <div
-        className="directory-grid"
+        className={`directory-grid ${display === "list" ? "directory-list" : ""}`}
         id="directory-results"
         role="tabpanel"
         aria-labelledby={`directory-${tab}-tab`}
@@ -338,7 +359,7 @@ export function Network() {
                   className="profile-card"
                 >
                   <div className="profile-card-top">
-                    <Avatar name={c.name} size="large" />
+                    <Avatar mediaId={c.avatar} name={c.name} size="large" />
                     {["VIP", "High"].includes(c.priority) ? (
                       <Badge tone="amber">
                         {c.priority === "VIP" ? "★ VIP" : "High priority"}
@@ -401,7 +422,12 @@ export function Network() {
                 className="profile-card company-card"
               >
                 <div className="profile-card-top">
-                  <Avatar name={o.name} company size="large" />
+                  <Avatar
+                    mediaId={o.avatar}
+                    name={o.name}
+                    company
+                    size="large"
+                  />
                   <Badge>{o.industry || "Company"}</Badge>
                 </div>
                 <h3>{o.name}</h3>

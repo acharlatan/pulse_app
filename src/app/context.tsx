@@ -131,6 +131,7 @@ export function WorkspaceProvider({
     const apply = () => {
       document.documentElement.dataset.theme =
         s.theme === "system" ? (query.matches ? "dark" : "light") : s.theme;
+      document.documentElement.dataset.accent = s.identity.accent;
       document.documentElement.dataset.motion = s.reducedMotion
         ? "reduced"
         : "normal";

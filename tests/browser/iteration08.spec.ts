@@ -90,6 +90,7 @@ test("custom pipeline, stable rename, custom company field, segmentation and foc
   await expect(
     page.locator(".focus-row").filter({ hasText: "Forma Studio" }),
   ).toHaveCount(1);
+  await page.getByText("Add a priority", { exact: true }).click();
   await page
     .getByRole("combobox", { name: "Record type", exact: true })
     .selectOption("task");

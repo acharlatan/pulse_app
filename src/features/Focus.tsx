@@ -35,7 +35,7 @@ export function Focus() {
     return rows.find((r) => r.id === f.recordId);
   };
   return (
-    <div className="page">
+    <div className="page focus-page">
       <div className="page-heading">
         <div>
           <p className="eyebrow">CHOSEN BY YOU</p>
@@ -48,8 +48,8 @@ export function Focus() {
         </div>
       </div>
       <FocusSummary />
-      <section className="surface">
-        <h2>Add a priority</h2>
+      <details className="surface focus-picker">
+        <summary>Add a priority</summary>
         <div className="form-grid">
           <label className="field">
             <span>Record type</span>
@@ -120,7 +120,7 @@ export function Focus() {
           selections remain on their chosen date. Removing a priority does not
           reschedule its task.
         </p>
-      </section>
+      </details>
       {(
         [
           "Today",

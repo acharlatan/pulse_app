@@ -6,16 +6,16 @@ Airy editorial spacing, warm neutrals, periwinkle emphasis and relationship-cent
 
 ## Tokens
 
-Semantic CSS variables in `src/styles.css`:
+Current semantic variables in `src/experience.css`, extending `src/styles.css`:
 
 | Token        | Light     | Dark      |
 | ------------ | --------- | --------- |
-| Background   | `#f7f7fa` | `#171820` |
-| Surface      | `#ffffff` | `#21222d` |
-| Text         | `#292a3b` | `#efedf7` |
-| Muted        | `#626477` | `#b7b3c8` |
-| Primary      | `#6956d8` | `#a598ff` |
-| Soft primary | `#efedfc` | `#312c4e` |
+| Background   | `#f6f5f2` | `#17181d` |
+| Surface      | `#fffefa` | `#202127` |
+| Text         | `#262739` | `#f1f0eb` |
+| Muted        | `#626373` | `#b7b6c2` |
+| Primary      | `#6650ce` | `#b3a3ff` |
+| Soft primary | `#efebfb` | `#332b4b` |
 | Success      | `#247965` | `#8dd6ba` |
 | Danger       | `#b53d55` | `#ffa5b5` |
 
@@ -73,3 +73,10 @@ Getting Started reuses surface, text-link and primary/secondary button patterns.
 ## Iteration 08 — current expansion
 
 Iteration 08 retains semantic light/dark tokens, native form controls, clear stage category labels and reusable modal forms. Stage color is only a border accent; meaning remains textual. Pipeline boards use readable stage groups and bounded card batches. Customization lives behind Manage Pipelines/Personalize PULSE. Focus cards distinguish personal choices and underlying task completion. Mobile customization actions wrap as complete buttons, and checkboxes retain compact native dimensions.
+
+
+## Iteration 09 — editorial-social system
+
+`src/experience.css` extends the semantic system: warm paper/deep charcoal, periwinkle/forest/coral/blue accent presets, expressive headings, 12px metadata/13px labels/15px body floors and 16px mobile inputs. Inactive buttons use quiet filled surfaces; selection/focus states remain distinct. Ambient color stays behind readable surfaces; profile names/actions sit off cover photography. Reusable Avatar/LocalMedia and lazy MediaControls retain deterministic initials/ambient fallbacks. Photo and logo editing is adjacent to profile actions rather than nested in the record form, keeping record/media transactions and stale snapshots explicit.
+
+Home separates commitments, relationship brief, familiar faces, opportunities/history and optional progress. Directories offer Cards/Compact; Focus selection is progressive disclosure. Desktop Discover and mobile More expose secondary routes. Orbit uses semantic buttons/SVG edges and an equivalent searchable list, fitted bounded maps, a mobile details sheet and reduced-motion-safe interactions. No graph animation or inferred connections. Native inputs, existing editors and theme tokens remain shared across pipeline, Activity, Review, Lists, Customize, Settings, Import, Help and Assistant.

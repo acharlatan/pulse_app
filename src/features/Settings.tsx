@@ -1,3 +1,5 @@
+import { MediaControls } from "../components/media-controls";
+import { Avatar } from "../components/ui";
 import { AISettings } from "../components/ai-settings";
 import { ProgressSettings } from "../components/progress";
 import { Link, useSearchParams } from "react-router-dom";
@@ -140,6 +142,66 @@ export function Settings() {
           ))}
         </nav>
         <section className="surface settings-content">
+          {section === "appearance" && (
+            <section className="surface workspace-identity-panel">
+              <div>
+                <p className="eyebrow">MY WORKSPACE · LOCAL IDENTITY</p>
+                <h2>Make this space yours.</h2>
+                <p className="muted">
+                  Your workspace identity stays on this device.
+                </p>
+              </div>
+              <Avatar
+                name={p.settings.identity.workspaceName || "My workspace"}
+                mediaId={p.settings.identity.avatarMediaId}
+                size="xl"
+              />
+              <MediaControls owner="workspace" id="settings" />
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const d = new FormData(e.currentTarget);
+                  void update({
+                    identity: {
+                      ...p.settings.identity,
+                      workspaceName: String(d.get("workspaceName")),
+                    },
+                  });
+                }}
+              >
+                <label className="field">
+                  <span>Workspace name</span>
+                  <input
+                    name="workspaceName"
+                    maxLength={80}
+                    defaultValue={p.settings.identity.workspaceName}
+                  />
+                </label>
+                <button className="button secondary">
+                  Save workspace name
+                </button>
+              </form>
+              <label className="field">
+                <span>Accent preset</span>
+                <select
+                  value={p.settings.identity.accent}
+                  onChange={(e) =>
+                    void update({
+                      identity: {
+                        ...p.settings.identity,
+                        accent: e.target.value as "periwinkle",
+                      },
+                    })
+                  }
+                >
+                  <option value="periwinkle">Signature Periwinkle</option>
+                  <option value="forest">Forest / Sage</option>
+                  <option value="coral">Soft Coral</option>
+                  <option value="blue">Cool Blue</option>
+                </select>
+              </label>
+            </section>
+          )}
           {section === "appearance" && (
             <>
               <SectionHeading
@@ -517,8 +579,8 @@ export function Settings() {
                     const file = e.target.files?.[0];
                     e.target.value = "";
                     if (!file) return;
-                    if (file.size > 10 * 1024 * 1024) {
-                      setFileError("Choose a backup smaller than 10 MB.");
+                    if (file.size > 32 * 1024 * 1024) {
+                      setFileError("Choose a backup smaller than 32 MB.");
                       return;
                     }
                     try {

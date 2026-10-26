@@ -89,3 +89,10 @@ Personal onboarding derives steps from current saved records, with workspace set
 ## Iteration 08 — current expansion
 
 Iteration 08 implements customizable pipeline/stage records, separate outcome categories, typed relationship fields, deliberate My Focus selections and company segmentation. These remain local, workspace-isolated records. Existing social profiles, conversations, permissions, optional progress and disabled-by-default AI are preserved. Full JSON export is the transfer format for customization; no synchronization is implied.
+
+
+## Iteration 09 — identity and relationship context
+
+DB/backup v5 adds validated optimized media Blobs, stable local references, optional person/company coverMediaId, and identity defaults for workspace name/avatar/accent. Media operations and orphan cleanup are transactional, workspace-isolated and unrewarded. A separate live media component revokes ephemeral object URLs; media is excluded from AI context. Backup v1–v5 validation rejects corrupted/duplicate/dangling media before atomic restore, including browser decoding before any replacement.
+
+Orbit derives namespaced person/company/opportunity nodes and only saved membership/representative/company-opportunity edges. Deterministic bounded layout has Map/List, filters, scopes, details, record navigation and keyboard pan/zoom controls. Desktop map24/mobile18/list60/hard80; larger networks use scoped/search views. Shared editorial tokens govern the redesigned Home/navigation/directories/profiles and secondary surfaces. Analytics, rule automation, external integrations and explicit person-person links remain future work.

@@ -40,6 +40,7 @@ export const organizationSchema = z.object({
   website: z.string(),
   description: z.string(),
   avatar: z.string(),
+  coverMediaId: z.string().max(200).optional(),
   location: z.string(),
   tags: z.array(z.string()),
   customFields: z.record(z.string(), z.string()),
@@ -54,6 +55,7 @@ export const contactSchema = z.object({
   phones: z.array(z.string()),
   links: z.array(z.string().url()),
   avatar: z.string(),
+  coverMediaId: z.string().max(200).optional(),
   category: z.enum(categories),
   stage: z.enum(stages),
   availability: z.enum(availabilities),
@@ -300,6 +302,15 @@ export const settingsSchema = z.object({
       exportInitiatedAt: z.string().datetime().nullable().default(null),
     })
     .prefault({}),
+  identity: z
+    .object({
+      workspaceName: z.string().trim().max(80).default("My workspace"),
+      avatarMediaId: z.string().max(200).default(""),
+      accent: z
+        .enum(["periwinkle", "forest", "coral", "blue"])
+        .default("periwinkle"),
+    })
+    .prefault({}),
   focus: z
     .object({
       homeLayout: z
@@ -366,6 +377,11 @@ export const defaults: Settings = {
   progress: progressPreferencesSchema.parse({}),
   ai: aiPreferencesSchema.parse({}),
   onboarding: { hidden: false, exportInitiatedAt: null },
+  identity: {
+    workspaceName: "My workspace",
+    avatarMediaId: "",
+    accent: "periwinkle",
+  },
   focus: {
     homeLayout: "balanced",
     shortcuts: true,

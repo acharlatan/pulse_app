@@ -1,3 +1,4 @@
+import type { MediaAsset } from "./media-models";
 import {
   pipelineSchema,
   pipelineStageSchema,
@@ -36,6 +37,7 @@ import type {
   ImportBatch,
 } from "./models";
 export class PulseDB extends Dexie {
+  media!: Table<MediaAsset>;
   pipelines!: Table<PipelineDefinition>;
   pipelineStages!: Table<PipelineStage>;
   fieldDefinitions!: Table<FieldDefinition>;
@@ -129,6 +131,16 @@ export class PulseDB extends Dexie {
           .bulkPut(graph.stages.map((s) => pipelineStageSchema.parse(s)));
         await tx.table("opportunities").bulkPut(graph.opportunities);
         // Legacy filters refer to names. Default pipeline identities retain those exact IDs.
+      });
+    this.version(5)
+      .stores({ media: "id,createdAt" })
+      .upgrade(async (tx) => {
+        await tx
+          .table("settings")
+          .toCollection()
+          .modify((s) => {
+            s.identity = settingsSchema.parse(s).identity;
+          });
       });
   }
 }

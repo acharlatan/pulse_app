@@ -42,3 +42,10 @@ Read README.md, PRODUCT_BLUEPRINT.md, DESIGN_SYSTEM.md, DEVELOPMENT_ROADMAP.md a
 ## Iteration 08 — current expansion
 
 DB/backup v4 adds pipelines, pipelineStages, fieldDefinitions, fieldValues and focusItems. Preserve v1–v3 restore compatibility and legacy organization customFields. Contact.stage remains lifecycle; Opportunity.stageId references a stage whose category is authoritative. New stage IDs are stable UUIDs; legacy default IDs retain their deterministic legacy values after label changes. Pipeline configuration writes require stale snapshots and explicit impact mappings, and must never grant XP. Custom-field types are immutable; references/types are validated on save/restore. Focus task completion reuses completeTask. Bulk administration validates selected snapshots and commits atomically without changing restrictions/permissions. Never roll migrated devices back to older DB schema support.
+
+
+## Iteration 09 — local identity and Orbit
+
+DB/backup v5 adds bounded media Blobs. Preserve v1–v4 restore compatibility, stable media references, workspace isolation, reference-aware cleanup and atomic rollback. Validate input signatures/dimensions before decode and optimized data/references before restore; browser-decode restored media before the replacement transaction. Never include media in AI context, remote image requests or logs. Revoke object URLs, keep image editors lazy and preserve full accessible initials/cover fallback. Media saves grant no XP and must not overwrite stale image slots or bypass record stale-save guards. Forward fixes must retain v5 DB compatibility.
+
+Orbit is a bounded derived view of saved associations, not authoritative relationship inference. Keep deterministic namespaced IDs, semantic list/navigation equivalents, explicit saved-edge meaning, mobile default List and bounded map/list rendering. Do not add unbounded simulation or infer interpersonal links. Keep identity text off covers and both theme/accent palettes readable. See EXPERIENCE_09.md for caps and architecture.

@@ -71,11 +71,8 @@ function Welcome({ onSelect }: { onSelect: (w: Workspace) => void }) {
             <br />
             has a <em>story.</em>
           </h1>
-          <p>
-            A little intention.
-            <br />A thoughtful follow-up.
-            <br />A world of possibility.
-          </p>
+          <p>The people. The conversations. The next chapter.
+            Your relationships, brought together.</p>
           <div className="welcome-art" aria-hidden="true">
             <div className="welcome-orbit" />
             <span className="welcome-heart">
@@ -95,9 +92,7 @@ function Welcome({ onSelect }: { onSelect: (w: Workspace) => void }) {
         <BadgeWelcome />
         <h2>Find your rhythm.</h2>
         <p>
-          Contacts, conversations and follow-ups. One thoughtful space.
-          <br />
-          Keep track of people and your next commitments.
+          A private space for people, conversations and the work you do together.
         </p>
         <button className="welcome-choice" onClick={() => onSelect("demo")}>
           <span className="choice-icon lavender">

@@ -29,3 +29,12 @@ A rejected restore should be replaced with a valid original backup; do not bypas
 ## Iteration 08 — current expansion
 
 Current DB/backup format is v4. Backups include pipelines, stages, custom definitions, typed values and Focus records plus every v3 table. Restore accepts versions 1–4, supplies legacy pipelines deterministically for older files, validates graph references/duplicates/value types and reward integrity before a single replacement transaction. Field filters may intentionally refer to archived/deleted definitions; they fail closed rather than deleting saved lists. Stage labels are not identities. Do not return migrated users to v3-only code: use a v4-compatible forward fix. Keep pre-upgrade exports, and save editing work before adopting an update. Existing origin isolation and device-loss limitations still apply.
+
+
+## Iteration 09 — media and v5 transfer
+
+Current export/DB version is **5**; accepted backups are **1–5**. Optimized portraits, logos, covers and workspace avatars are encoded with bounded metadata inside JSON. The binary store permits 128 images/12 MB; intake is limited to 32 MB including encoding and other records. A copy includes the selected workspace's media only. Older backups use initials/default covers and safe identity defaults.
+
+Restore validates metadata, content signatures/dimensions, decoded bytes, duplicate IDs, total limits and image references, then browser-decodes every image before one atomic replacement. Invalid images reject without changing current data. Export/restore JPEG/PNG/WebP-derived images was exercised in isolated browser contexts with reload; decoder failure and injected write/storage failures preserve current records/photos. Photos are local browser data and may be lost to device clearing/eviction; retain an export outside the browser. No encryption/cloud recovery is implied.
+
+Use Photo & cover or Logo & cover on a profile to replace/remove images, or Workspace photo in Appearance. Unsupported HEIC/SVG or >8 MB/24 MP inputs need conversion/resizing first. Storage-full feedback keeps the original image intact; export a backup, remove unneeded images and retry. After v5 upgrade, recovery must use a v5-compatible forward fix; older clients cannot open the upgraded database.

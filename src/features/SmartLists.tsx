@@ -152,7 +152,7 @@ export function SmartLists() {
               className="representative-row"
               to={`/network/${isCompany ? "companies" : "people"}/${c.id}`}
             >
-              <Avatar name={c.name} />
+              <Avatar mediaId={c.avatar} name={c.name} />
               <div>
                 <strong>{c.name}</strong>
                 <span>

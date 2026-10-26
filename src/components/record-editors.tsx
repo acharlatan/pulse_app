@@ -19,6 +19,7 @@ import {
 export type RecordEditor =
   | {
       kind: "opportunity";
+      pipelineId?: string;
       record?: Opportunity;
       contact?: Contact;
       organizationId?: string;
@@ -176,6 +177,7 @@ export function RecordEditorModal({
   const [pipelineId, setPipelineId] = useState(
     editor.kind === "opportunity"
       ? editor.record?.pipelineId ||
+          editor.pipelineId ||
           p.settings.focus.lastPipelineId ||
           p.pipelines.find((x) => x.isDefault)?.id ||
           "default"

@@ -69,3 +69,8 @@ Iteration 07 retains AI_ENABLED=false, Access checks, quota binding and SQLite m
 ## Iteration 07 public candidate
 
 Dependency remediation, onboarding/help and stale-editor safeguards preserve the production Worker name, source-triggered deployment, API Access boundary, disabled AI and SQLite migration. The validator's patched major version increases dry-run bundle size; actual local Worker security/quota tests and bundle checks pass. Browser DB remains v3. Public support evidence is Chromium automation/mobile emulation; physical installation and assistive-technology limits remain explicit. RELEASE_CHECKLIST.md separates candidate integration from stable-only manual gates. Save edits before adopting the update, especially from pre-06 clients. Production commit/build and live smoke evidence are recorded in the final QA section.
+
+
+## Iteration 09 — unchanged hosting boundary
+
+The experience/media/Orbit release uses the existing automatic main build and Worker. No paid storage, image service, new binding or provider request is required. Photos stay in IndexedDB; only optimized images explicitly exported in a backup leave browser storage. AI_ENABLED remains false and Access/quota/SQLite protections are unchanged. Database clients move to v5; any rollback must be a compatible forward fix. Save active edits before adopting the service-worker update. See RELEASE_1_2.md for exact deployment evidence.

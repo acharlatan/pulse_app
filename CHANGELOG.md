@@ -1,3 +1,11 @@
+# 1.2.0-rc.1 — iteration 09
+
+- Editorial-social redesign across Home, directories, profiles, shared navigation and secondary surfaces; Cards/Compact browsing and progressive Focus selection.
+- Local cropped/compressed person portraits, company logos/covers, workspace identity and four light/dark accent presets.
+- Validated media Blob store, reference-aware cleanup and v5 backup/restore with v1–v4 compatibility; no media hosting or AI sharing.
+- Relationship Orbit with real saved associations, focused views, filters, fitted bounded map, mobile default List and record details/navigation.
+- Release remains a candidate; see RELEASE_1_2.md for checks, deployment and manual platform limits.
+
 # Changelog
 
 ## 1.1.0-rc.1 — customization expansion
