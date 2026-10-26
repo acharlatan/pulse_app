@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { ProgressSettings } from "../components/progress";
+import { Link, useSearchParams } from "react-router-dom";
 import { useRef, useState, type FormEvent } from "react";
 import {
   ArrowLeftRight,
@@ -36,7 +37,19 @@ function download(content: string, name: string, type = "application/json") {
 }
 export function Settings() {
   const p = usePulse();
-  const [section, setSection] = useState("appearance");
+  const [params, setParams] = useSearchParams();
+  const requested = params.get("section");
+  const section = [
+    "relationships",
+    "alerts",
+    "progress",
+    "data",
+    "integrations",
+  ].includes(requested || "")
+    ? requested!
+    : "appearance";
+  const setSection = (value: string) =>
+    setParams(value === "appearance" ? {} : { section: value });
   const [confirm, setConfirm] = useState<"reset" | "delete" | "restore" | null>(
     null,
   );
@@ -388,24 +401,11 @@ export function Settings() {
                 A little encouragement for meaningful work, without the
                 pressure.
               </p>
-              <label className="setting-toggle">
-                <div>
-                  <strong>Daily momentum summary</strong>
-                  <small>
-                    Show today's completed follow-ups on Daily Pulse.
-                  </small>
-                </div>
-                <input
-                  type="checkbox"
-                  role="switch"
-                  checked={p.settings.gamification}
-                  onChange={(e) => update({ gamification: e.target.checked })}
-                />
-              </label>
-              <p className="inline-notice">
-                XP, levels, achievements, quests, and streaks are planned.
-                Today's progress comes from your actual completed tasks.
-              </p>
+              <ProgressSettings
+                key={
+                  JSON.stringify(p.settings.progress) + p.settings.gamification
+                }
+              />
             </>
           )}
           {section === "data" && (
@@ -703,7 +703,7 @@ export function Settings() {
             confirm === "restore"
               ? (() => {
                   const b = validateBackup(backup);
-                  return `Compatible backup v${b.version} · ${b.metadata?.exportedAt || "Date not recorded (legacy backup)"} · ${b.contacts.length} contacts, ${b.organizations.length} companies, ${b.interactions.length} interactions, ${b.tasks.length} tasks, ${b.opportunities.length} opportunities, ${b.smartLists.length} Smart Lists. This REPLACES ALL records and preferences in ${p.workspace}. The other workspace is untouched. Export a backup first.`;
+                  return `Compatible backup v${b.version} · ${b.metadata?.exportedAt || "Date not recorded (legacy backup)"} · ${b.contacts.length} contacts, ${b.organizations.length} companies, ${b.interactions.length} interactions, ${b.tasks.length} tasks, ${b.opportunities.length} opportunities, ${b.smartLists.length} Smart Lists, ${b.rewards.length} reward entitlements and ${b.dailyQuests.length} saved quests. This REPLACES ALL records and preferences in ${p.workspace}. The other workspace is untouched. Export a backup first.`;
                 })()
               : confirm === "reset"
                 ? "Your demo edits will be replaced with fictional sample data. Your personal workspace will not change."

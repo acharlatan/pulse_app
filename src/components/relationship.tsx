@@ -19,6 +19,13 @@ export function TaskRow({
   const [busy, setBusy] = useState(false);
   const state = taskState(t, p.settings.timezone);
   const c = p.contacts.find((c) => c.id === t.contactId);
+  const org = p.organizations.find((o) => o.id === t.organizationId);
+  const restrictions = c
+    ? restrictionReasons(c, p.permissions, p.restrictions)
+    : [];
+  const reward = p.rewards.find(
+    (r) => r.sourceType === "task" && r.sourceId === t.id,
+  );
   return (
     <article className="managed-task">
       <div className="record-main">
@@ -26,6 +33,21 @@ export function TaskRow({
           {t.title}
         </strong>
         {c && <Link to={`/network/people/${c.id}`}>{c.name}</Link>}
+        {!c && org && (
+          <Link to={`/network/companies/${org.id}`}>{org.name}</Link>
+        )}
+        <small className="muted">{t.priority} priority</small>
+        {restrictions.length > 0 && (
+          <p className="restriction-note">
+            Outreach restricted. Administrative editing remains available;
+            completion does not override restrictions.
+          </p>
+        )}
+        {p.settings.gamification && p.settings.progress.enabled && reward && (
+          <small className="muted">
+            {reward.active ? "5 XP recorded" : "Original reward inactive"}
+          </small>
+        )}
         {t.description && <p>{t.description}</p>}
         <span>
           <Badge tone={state === "Overdue" ? "red" : ""}>{state}</Badge>{" "}

@@ -1,3 +1,9 @@
+import type {
+  Reward,
+  RewardChange,
+  ProgressState,
+  DailyQuest,
+} from "./progress-models";
 import { settingsSchema } from "./models";
 import Dexie, { type Table } from "dexie";
 import type {
@@ -18,6 +24,10 @@ import type {
   ImportBatch,
 } from "./models";
 export class PulseDB extends Dexie {
+  rewards!: Table<Reward>;
+  rewardChanges!: Table<RewardChange>;
+  progressState!: Table<ProgressState>;
+  dailyQuests!: Table<DailyQuest>;
   smartLists!: Table<SmartList>;
   recommendationActions!: Table<RecommendationAction>;
   importBatches!: Table<ImportBatch>;
@@ -59,6 +69,21 @@ export class PulseDB extends Dexie {
           .toCollection()
           .modify((s) => {
             s.intelligence = settingsSchema.parse(s).intelligence;
+          });
+      });
+    this.version(3)
+      .stores({
+        rewards: "id,&[day+fingerprint],fingerprint,sourceId,earnedAt,day,week",
+        rewardChanges: "id,rewardId,at",
+        progressState: "id",
+        dailyQuests: "id,day,taskId",
+      })
+      .upgrade(async (tx) => {
+        await tx
+          .table("settings")
+          .toCollection()
+          .modify((s) => {
+            s.progress = settingsSchema.parse(s).progress;
           });
       });
   }

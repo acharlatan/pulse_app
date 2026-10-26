@@ -4,7 +4,7 @@ AI Powered CRM Messenger
 
 **PULSE — Every relationship has a story.**
 
-**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Development iteration 03.
+**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Development iteration 04 of 07.
 
 ## Run
 
@@ -36,7 +36,7 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 - Centralized, explainable relationship health and reviews; saved snoozes/dismissals; opportunity risk flags; authoritative restriction and permission checks.
 - Dynamic built-in and saved ALL/ANY Smart Lists; Network applies the same saved definitions.
 - CSV preview, editable mapping, row validation, deterministic duplicate comparisons, selected-field merges, company matching, atomic import and accurate result/history reports. No consent or availability is imported.
-- Version-two JSON backups with metadata and a validated replacement preview; version-one restores remain supported.
+- Version-three JSON backups with metadata and a validated replacement preview; version-one and version-two restores remain supported.
 - Light/dark/device themes; motion preference; local name, locale/timezone and rhythm settings; category-specific in-app alerts.
 - JSON backups with runtime validation and atomic restore; contact CSV export; separate demo reset/personal deletion; workspace switching.
 - Complete opportunity creation, editing, deletion and stage/outcome transitions; company and representative associations, values, expected close and user-entered probabilities.
@@ -46,7 +46,7 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 
 ## Storage and privacy
 
-Dexie schema version 2 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
+Dexie schema version 3 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
 
 No account, analytics, external fonts, external avatars, AI processing or API keys. Records do not leave the browser unless you export them. IndexedDB is **not application-level encryption**; browser-profile access permits data access. Browser clearing/eviction and device loss can erase data. Back up important records. Workspace data is scoped to an origin: preview, GitHub Pages and hosted deployments do not share records. Export/import to move between them. Databases are not yet namespaced for multiple PULSE deployments on the same origin.
 
@@ -62,7 +62,7 @@ Deleting a company **detaches and preserves** its people, conversations, tasks, 
 
 ## Limits and next work
 
-No sync, authentication, team permissions or external integrations. Integrations are honestly labeled planned/disconnected. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Custom pipelines, advanced directory pagination and detailed gamification are deferred. Relationship stories render 20 entries at a time. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
+No sync, authentication, team permissions or external integrations. Integrations are honestly labeled planned/disconnected. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Custom pipelines, advanced directory pagination and broader external integrations are deferred. Relationship stories render 20 entries at a time. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
 
 ## License
 
@@ -90,4 +90,20 @@ Duplicates default to Skip. Exact normalized email is a strong match; exact phon
 
 Only valid selected rows are committed, in one IndexedDB transaction. Invalid rows are reported and excluded, not partially written. A full contact/company snapshot check rejects stale previews; storage errors roll back the entire plan. The wizard caps row rendering and the directory reveals 60 records at a time. Export a JSON backup before bulk edits; there is no import undo beyond restoring a backup. Reimporting unchanged data warns/skips duplicates by default; choosing Create as new intentionally permits duplicates.
 
-Backups now export format 2 with app version, time, workspace and record arrays (including Smart Lists, review actions and import history). Format 1 restores supply empty new tables and default intelligence preferences. Restore replaces only the current workspace after validation and explicit confirmation; it is not a merge or synchronization service.
+Backups export format 3 with app version, time, workspace and record arrays (including Smart Lists, review actions, import history and progress). Format 1 restores supply empty new tables and default intelligence preferences. Restore replaces only the current workspace after validation and explicit confirmation; it is not a merge or synchronization service.
+
+## Iteration 04 — optional momentum
+
+Activity now contains Open, Today (not-yet-overdue), Overdue, Upcoming and Completed task views, due/priority/recently-updated sorting, contextual restriction notices and a separate **Your progress** view. Direct links preserve Activity/Settings section context. Existing task editors, rescheduling and profile links remain shared.
+
+Opt in under **Settings → Your momentum → Earn XP from meaningful work**. Showing widgets is a separate preference: hiding them does not stop earning. Disabling XP pauses new earning and quest selection, preserves history and still applies source corrections. Achievements, quests, streak display/reminders, weekly target and restrained animation are individually configurable. Reduced-motion settings always take precedence. Reminders appear only while the app is open.
+
+Rules are intentionally small: **5 XP** for completing a previously saved follow-up linked to an eligible person (title ≥12 characters OR description ≥20); **10 XP** for a newly logged Call/Meeting linked to an eligible person with summary ≥40 characters and an occurred time within the previous 24 hours; **5 XP** for moving an existing open opportunity to Won/Lost with eligible associated people and notes ≥20 characters. Minimum text length rejects empty entries, not proof of quality. Notes, imports/restores, profiles, ordinary edits and delivered-message claims earn nothing. Closed opportunities created directly do not earn. Existing open commitments may qualify when completed after opt-in; old conversations/completions are never backfilled.
+
+Every 100 active XP adds a level, starting at level 1. At most 10 original entitlements can be earned per progress day. Same-day equivalent source signatures suppress duplicates, and deleted-source signatures suppress equivalent recreation on later days too; these are conservative heuristics, not fraud prevention. A unique source ID and unique day/content signature enforce one entitlement. Reopening/requalification deactivates/restores the original entitlement and earning date; deleting a source leaves a non-earning audit tombstone. Deleted task titles are removed from quest snapshots. Signatures avoid retaining deleted note/task text and are non-security hashes. Corrections can lower XP, relock achievements and update goals/streaks. Later restrictions do not retroactively rewrite already valid rewards; current restrictions are checked before any new grant. No outbound communication is performed.
+
+Up to three daily quests reference specific eligible due tasks, retain their identity and append new eligible commitments only while slots remain. Completion requires that task's active original entitlement earned on that day. Reopened tasks from earlier days are not offered as fresh quests. A daily cap or same-day duplicate can make an otherwise completed task ineligible; quests add no bonus XP. Five small milestones derive from active evidence. The weekly goal counts active qualifying follow-up entitlements; zero disables it. Its achievement reflects the current target and can relock if the target changes. No quest/goal/achievement bonus can be farmed.
+
+The progress calendar captures the selected timezone at first opt-in and stays fixed for the workspace. Display-timezone changes do not move historical days, duplicate rewards or change progress week boundaries. Weeks begin Monday. Streaks count distinct qualifying calendar days, continuing through yesterday when today has no completion; corrected/reopened records recalculate them. Historical logs cannot manufacture past streaks.
+
+DB v3 adds rewards, sequenced rewardChanges, progressState and dailyQuests without clearing old tables. Legacy gamification placeholders remain preserved but are not authoritative XP. Backup v3 includes all new tables; compatible v1/v2 files supply safe empty progress defaults. Restore validates source/calendar/audit consistency before atomic replacement and never replays rewards. Retain the v3-compatible data layer for any rollback after migration; prefer a forward fix.

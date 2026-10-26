@@ -16,7 +16,7 @@
 - One configured pipeline; custom pipeline/stage editing remains future work.
 - Basic channel/purpose permissions and availability history; advanced consent audit/export and multi-rule conflict resolution remain future work.
 - In-app alerts evaluated when active; no background/browser/push/email delivery.
-- Gamification data schema; actual daily task progress only.
+- Optional progress now implemented in iteration 04; advanced challenges and richer planning remain future work.
 - Integration metadata only. Every provider is planned and disconnected.
 - PWA build verified; physical installation, cache-update lifecycle, and full offline navigation await device testing.
 
@@ -40,23 +40,26 @@
 - Home and opportunity/profile intelligence; configurable thresholds/preferences; directory incremental rendering.
 - Expanded data, migration, import and browser regression coverage. Exact executed results and limits are in QA_REPORT.md.
 
-## Prompt 04 — meaningful, optional progress
+## Iteration 04 — implemented
 
-1. Add structured activity references (entity type/ID and action) and a durable reward ledger before awarding XP. Existing tasks, outcomes and stable IDs provide the evidence, but summaries must not be parsed as a reward source.
-2. Reward planned follow-up completion and meaningful opportunity outcomes once per source milestone. Reopen/complete loops, imports, empty notes and repeated edits must not farm XP.
-3. Introduce opt-in goals and modest quests using real records; respect restrictions, reduced motion and existing progress preferences.
-4. Keep CSV recovery, permission and migration regressions intact. Expand device/PWA/keyboard testing; reserve the major screenshot-guided review for Prompts 07–08.
+- Unified Activity task views and sorting; context/restriction labels; direct section links.
+- Structured CRM action references, additive DB v3, unique-source reward entitlements and sequenced corrections within CRM transactions.
+- Opt-in 5/10/5 XP rules, 100-XP levels, conservative duplicate/cap safeguards, reversal/restoration and deleted-source tombstones.
+- Persisted daily task quests, configurable weekly follow-up goal, derived achievements and fixed-calendar streaks; no bonus awards or retroactive/import/restore XP.
+- Independent widget, XP, achievement, quest, streak/reminder and animation controls; quiet Home integration.
+- Backup v3, old v1/v2 compatibility, migration/reward/rollback and browser regression coverage. See QA_REPORT.md for exact executed results.
 
-## Later iterations
+## Remaining consolidated iterations — 7 total
 
-- Custom profile sections/covers, richer import reconciliation, standalone organization segments and broader directory scaling.
-- More advanced channel-specific relationship review, proposal evidence and organization intelligence.
-- Optional XP/quests/streaks with anti-farming and explicit opt-out.
-- Optional Gemini contextual summaries and reviewed drafts via secure backend; no secret frontend tokens.
-- Authorized Calendar/Gmail/Contacts, WhatsApp deep links, external LinkedIn URLs; never scrape private data.
-- Custom pipelines, health/orbit views, forecasting, custom fields.
-- Separate Commerce workspace: purchases, loyalty and purpose-specific opt-in marketing.
-- Optional synchronization, conflicts, encrypted backups and team access.
+**05 — Optional AI and selected integrations.** Secure Gemini requests using explicitly selected CRM context, reviewed summaries/drafts and note-to-task; prioritize a small number of authorized practical calendar/email workflows. Preserve local/offline operation and clear disconnected states. No frontend secrets or autonomous changes.
+
+**06 — Comprehensive visual/mobile/accessibility/PWA refinement.** Screenshot-guided review moves here; refine all screens without replacing the identity. Physical installation/offline/update adoption, device keyboard behavior, contrast/screen-reader/keyboard QA and measured performance.
+
+**07 — Release hardening and distribution.** Complete end-to-end journeys, onboarding, migration/recovery checks, defect fixing, documentation, public demo and personal-use distribution. Resolve or explicitly document remaining release limitations.
+
+## Post-release expansions
+
+Commerce/loyalty, multi-user/team access and synchronization are separate product expansions. Other candidates: custom pipelines, richer profile covers/custom fields, company-only segments/imports, large-data pagination, encrypted backups and advanced consent auditing. Optional integrations require secure authorization and verified provider behavior.
 
 ## Known limitations
 

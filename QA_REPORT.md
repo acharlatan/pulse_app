@@ -113,3 +113,45 @@ DB v2 adds only Smart Lists, review actions and import history, and supplies def
 After a database has upgraded, any source rollback must retain the v2-compatible data layer; do not deploy a database-version downgrade or discard new-table backups. Prefer a forward fix. The additive schema and feature branch preserve source history and existing record data.
 
 Changes are prepared on development/iteration-03 and are integrated only after checks pass. Production build and live behavior verification are recorded in the delivery report after integration; an HTTP 200 alone is not treated as workflow proof. Physical PWA installation, full offline/update adoption and device keyboard behavior remain unverified. No AI, credentials, outreach delivery, synchronization or paid backend was introduced.
+
+# Iteration 04 verification
+
+Date: 26 October 2026 (Asia/Manila). Earlier iteration reports remain historical.
+
+## Executed checks
+
+- `npm run typecheck`: passed (strict application TypeScript).
+- `npm run lint`: passed.
+- `npm test`: **93 tests passed across 4 files**: all 57 prior tests retained, plus 36 progress/reward/migration tests. Existing assertions that export/database versions equal 2 now expect version 3; compatible v1/v2 restore tests remain explicit. No assertions for functioning CRM journeys were removed.
+- `npm run build -- --outDir /tmp/pulse04-release-build`: passed. Generated manifest and 27 app-shell precache entries (~838 KiB). Nonfatal Vite warning: main chunk ~518 KB minified / 157 KB gzip. No deployment, PWA, routing, dependency or hosting changes were required. Package version is 0.4.0.
+- `PULSE_CHROMIUM_PATH=/tmp/pulse04-chromium LD_LIBRARY_PATH=/tmp:/tmp/pulse04-browser-libs/lib VK_ICD_FILENAMES=/tmp/vk_swiftshader_icd.json npm run test:browser -- --workers=1`: **18 browser cases passed**, across mobile 390×844 and desktop 1440×1000 projects. A prior focused four-case progress run also passed before the final safety refinements.
+
+## Environment and resolved intermediate failures
+
+The standard Playwright Chromium download again returned truncated archives. Used Chromium 153 from a temporary npm @sparticuz/chromium installation outside the repository, with manually unpacked registry-supplied runtime libraries and software rendering. The package helper failed on environment ownership operations; direct unpacking avoided those operations. An initial missing software-renderer path prevented browser launch; the documented runtime environment above resolved it. No binary or test-only browser package was added to project dependencies.
+
+Early browser iterations corrected ambiguous empty-directory Add person selectors, toast text assertions and the backup input/export selectors. The first full run still had two old v2 backup-preview expectations and one development hot-reload interruption while an editor was open. The final full run used frozen source and all 18 passed. No product behavior assertion was weakened. Section-query navigation was made authoritative after browser inspection found stale tab state.
+
+## Functional evidence
+
+Reward tests verify concurrent/repeated completion, one entitlement per source, source reopen/recomplete reversal/restoration without a new date, source edit/delete correction, same-day duplicate signatures, later-day deletion/recreation suppression, ten-grant cap, substantive/recent conversation rules, historical/no-note/import exclusions, won/lost/reopen loops, contact restrictions/relationship withdrawal, disabled earning/widget separation, and rollback of CRM+ledger when audit storage fails. They verify contact deletion reverses dependent rewards while preserving ledger tombstones.
+
+Quest/goal tests cover stable persisted references, no more than three definitions, honest empty/restricted states, duplicate-content suppression, completion/reopen recalculation, no fresh quests for earlier-day entitlements, settings persistence, target changes without bonus rewards, achievements relocking, day/week and DST boundaries, fixed calendar on display-timezone changes and later-day recompletion not manufacturing streak evidence. A 10,000-entry synthetic selector history verifies level/streak/goal calculation; this is not a physical-phone benchmark or a persisted 10,000-action acceptance run.
+
+Migration testing opens an actual v2 database containing settings, contact and historical completed task data with the v3 implementation, retaining records and adding safe opt-in defaults without awarding XP. The existing real v1 upgrade test remains. Current backups round-trip all progress tables without replay; v1/v2 shapes restore empty progress defaults; malformed source/calendar/audit data is rejected before replacement. A forced mid-restore storage error rolls back both CRM and reward data. Demo reset and CSV import do not alter Personal progress or issue rewards.
+
+Browser acceptance creates a fictional personal contact and planned follow-up, earns 5 XP, reopens to reverse it, recompletes without duplication, records a substantive meeting for 10 XP, verifies quests/milestones/weekly goal, refreshes with 15 XP and four audit entries intact, disables animations/widgets, verifies preferences after reload, checks task filtering and validates/cancels an exported v3 restore preview. Prior suites still verify companies/representatives, interactions/tasks/opportunities, permission restrictions, review snoozes, dynamic lists, 80-contact import/duplicate decisions and invalid-restore protection.
+
+## Responsive and visual checks
+
+All previous screen/editor bounds checks remain. New progress, task, Home and progress-settings checks cover **320, 375, 390, 430, 768, 1024, 1280 and 1440px** in light/dark. No horizontal page overflow was detected, and progress-settings Save scrolls clear of fixed navigation. Actual rendered 390px dark and 1440px light progress screenshots were inspected internally; viewport screenshots are preferred for production proof because full-page captures place fixed navigation/skip links/toasts relative to the capture scroll position. No owner screenshots or design approval were requested.
+
+## Compatibility, limits and deployment boundary
+
+DB/backup v3 is additive and preserves old record tables and legacy gamification placeholders. Progress is off by default until opt-in; historical completed work is not replayed. Reward corrections and their source mutation are atomic. Original source/day entitlements, sequenced audit changes and conservative non-security content signatures provide deterministic idempotency, not fraud-proof activity verification. The minimum text rules cannot judge substantive business quality.
+
+Progress calendar timezone is fixed at initial opt-in; display-timezone changes do not rebase progress. Quests are specific due follow-ups rather than arbitrary activity templates, and milestones/goals/quests grant no bonus XP. Weekly milestone uses the current week/target and may relock. Older backups explicitly replace new progress tables with empty defaults. Keep the v3-compatible data layer when rolling back source; prefer a forward fix over database downgrade.
+
+Optional manual Today focus, bulk task actions and weekly calendar previews were deferred. Histories display the latest 40 reward corrections; complete history remains in backups. Local-only storage/privacy and browser-eviction limitations remain. Formal contrast/screen-reader testing, physical keyboard/phone tests, installation and offline/update lifecycle QA remain iteration 06 work. This iteration introduces no AI, secrets, delivery infrastructure, paid service or synchronization.
+
+Development branch: development/iteration-04. The delivery report records the actual integrated commit, Cloudflare build outcome and focused live-browser results after deployment. Local success or HTTP status alone is not presented as full production acceptance.

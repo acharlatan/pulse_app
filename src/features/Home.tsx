@@ -1,3 +1,4 @@
+import { ProgressSummary } from "../components/progress";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -39,17 +40,6 @@ export function Home() {
       contact: p.contacts.find((c) => c.id === r.contactId)!,
     }));
   const outstanding = p.tasks.filter((t) => !t.completedAt);
-  const today = (v: string) =>
-    date(v, { year: "numeric", month: "2-digit", day: "2-digit" }) ===
-    date(new Date().toISOString(), {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    });
-  const completed = p.tasks.filter(
-    (t) => t.completedAt && today(t.completedAt),
-  ).length;
-  const dueToday = p.tasks.filter((t) => today(t.dueAt)).length;
   const pipeline = p.opportunities
     .filter((o) => o.status === "open")
     .reduce((v, o) => v + (o.currency === "USD" ? o.value || 0 : 0), 0);
@@ -386,32 +376,7 @@ export function Home() {
               Plan a follow-up
             </button>
           </section>
-          {p.settings.gamification && (
-            <section className="progress-card">
-              <div className="progress-title">
-                <span className="stat-icon sage">
-                  <CheckCheck size={19} />
-                </span>
-                <Badge tone="green">TODAY'S MOMENTUM</Badge>
-              </div>
-              <h3>A little better, every day.</h3>
-              <p>
-                <strong>{completed}</strong> follow-ups completed today
-              </p>
-              <div className="progress-track">
-                <span
-                  style={{
-                    width: `${Math.min(100, dueToday ? (completed / dueToday) * 100 : 0)}%`,
-                  }}
-                />
-              </div>
-              <small>
-                {dueToday
-                  ? `${completed} complete · ${dueToday} scheduled for today`
-                  : "No follow-ups scheduled for today. Set your own pace."}
-              </small>
-            </section>
-          )}
+          <ProgressSummary />
           <section className="recent-section">
             <SectionHeading
               title="Familiar faces"

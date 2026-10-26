@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { progressPreferencesSchema } from "./progress-models";
 export const stages = [
   "New",
   "Researching",
@@ -126,6 +127,11 @@ export const permissionSchema = z.object({
 export const eventSchema = z.object({
   ...base,
   category: z.string(),
+  entityType: z.enum(["task", "interaction", "opportunity"]).optional(),
+  entityId: z.string().optional(),
+  action: z.string().optional(),
+  workspace: z.enum(["demo", "personal"]).optional(),
+  occurrenceId: z.string().optional(),
   contactId: z.string().nullable(),
   organizationId: z.string().nullable(),
   summary: z.string(),
@@ -253,6 +259,7 @@ export const settingsSchema = z.object({
     relationships: z.boolean(),
   }),
   gamification: z.boolean(),
+  progress: progressPreferencesSchema.default({}),
   reducedMotion: z.boolean(),
   dismissed: z.array(z.string()),
   intelligence: intelligenceSchema.default({}),
@@ -304,6 +311,7 @@ export const defaults: Settings = {
   timeoutDays: 30,
   alerts: { followUps: true, tasks: true, relationships: true },
   gamification: true,
+  progress: progressPreferencesSchema.parse({}),
   reducedMotion: false,
   dismissed: [],
   intelligence: intelligenceSchema.parse({}),

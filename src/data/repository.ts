@@ -1,3 +1,11 @@
+import { ensureProgress, syncReward } from "./progress-repository";
+import {
+  rewardSchema,
+  rewardChangeSchema,
+  progressStateSchema,
+  dailyQuestSchema,
+} from "./progress-models";
+import { calendarDay, weekOf, sourceRule } from "../services/progress";
 import { z } from "zod";
 import { type PulseDB } from "./db";
 import {
@@ -32,18 +40,30 @@ export async function settings(db: PulseDB) {
   return settingsSchema.parse((await db.settings.get("settings")) || defaults);
 }
 export async function updateSettings(db: PulseDB, patch: Partial<Settings>) {
-  const value = settingsSchema.parse({ ...(await settings(db)), ...patch });
-  await db.settings.put(value);
-  return value;
+  return db.transaction("rw", [db.settings, db.progressState], async () => {
+    const value = settingsSchema.parse({ ...(await settings(db)), ...patch });
+    await db.settings.put(value);
+    await ensureProgress(db);
+    return value;
+  });
 }
 async function event(
   db: PulseDB,
   summary: string,
   contactId: string | null = null,
   organizationId: string | null = null,
+  reference?: {
+    entityType: "task" | "interaction" | "opportunity";
+    entityId: string;
+    action: string;
+  },
 ) {
+  const identity = stamp();
   await db.events.add({
-    ...stamp(),
+    ...identity,
+    ...reference,
+    workspace: db.workspace,
+    occurrenceId: identity.id,
     category: "crm",
     summary,
     contactId,
@@ -117,83 +137,83 @@ export async function saveContact(db: PulseDB, value: Contact) {
 }
 export async function addInteraction(db: PulseDB, value: Interaction) {
   const parsed = interactionSchema.parse(value);
-  await db.transaction(
-    "rw",
-    [
-      db.interactions,
-      db.contacts,
-      db.organizations,
-      db.events,
-      db.tasks,
-      db.opportunities,
-    ],
-    async () => {
-      if (parsed.contactId) {
-        const contact = await db.contacts.get(parsed.contactId);
-        if (!contact) throw new Error("Contact no longer exists.");
-        parsed.organizationId = contact.organizationId;
-      }
-      if (
-        parsed.organizationId &&
-        !(await db.organizations.get(parsed.organizationId))
-      )
-        throw new Error("Company no longer exists.");
-      await validateInteractionLinks(db, parsed);
-      await db.interactions.add(parsed);
-      await event(
-        db,
-        `${parsed.type} logged`,
-        parsed.contactId,
-        parsed.organizationId,
-      );
-    },
-  );
+  return db.transaction("rw", db.tables, async () => {
+    if (parsed.contactId) {
+      const contact = await db.contacts.get(parsed.contactId);
+      if (!contact) throw new Error("Contact no longer exists.");
+      parsed.organizationId = contact.organizationId;
+    }
+    if (
+      parsed.organizationId &&
+      !(await db.organizations.get(parsed.organizationId))
+    )
+      throw new Error("Company no longer exists.");
+    await validateInteractionLinks(db, parsed);
+    await db.interactions.add(parsed);
+    const feedback = await syncReward(
+      db,
+      "interaction",
+      parsed.id,
+      true,
+      false,
+    );
+    await event(
+      db,
+      `${parsed.type} logged`,
+      parsed.contactId,
+      parsed.organizationId,
+      { entityType: "interaction", entityId: parsed.id, action: "logged" },
+    );
+    return feedback;
+  });
 }
 export async function saveTask(db: PulseDB, value: Task) {
   const parsed = taskSchema.parse({
     ...value,
     updatedAt: new Date().toISOString(),
   });
-  await db.transaction(
-    "rw",
-    [db.tasks, db.contacts, db.organizations, db.events],
-    async () => {
-      if (parsed.contactId) {
-        const contact = await db.contacts.get(parsed.contactId);
-        if (!contact) throw new Error("Contact no longer exists.");
-        parsed.organizationId = contact.organizationId;
-      }
-      if (
-        parsed.organizationId &&
-        !(await db.organizations.get(parsed.organizationId))
-      )
-        throw new Error("Company no longer exists.");
-      const previous = await db.tasks.get(parsed.id);
-      if (previous) parsed.createdAt = previous.createdAt;
-      await db.tasks.put(parsed);
-      await event(
-        db,
-        `${previous ? "Follow-up updated" : "Follow-up planned"} · ${parsed.title}`,
-        parsed.contactId,
-        parsed.organizationId,
-      );
-    },
-  );
+  await db.transaction("rw", db.tables, async () => {
+    if (parsed.contactId) {
+      const contact = await db.contacts.get(parsed.contactId);
+      if (!contact) throw new Error("Contact no longer exists.");
+      parsed.organizationId = contact.organizationId;
+    }
+    if (
+      parsed.organizationId &&
+      !(await db.organizations.get(parsed.organizationId))
+    )
+      throw new Error("Company no longer exists.");
+    const previous = await db.tasks.get(parsed.id);
+    if (previous) parsed.createdAt = previous.createdAt;
+    parsed.completedAt = previous?.completedAt || null;
+    await db.tasks.put(parsed);
+    await syncReward(db, "task", parsed.id, false, false);
+    await event(
+      db,
+      `${previous ? "Follow-up updated" : "Follow-up planned"} · ${parsed.title}`,
+      parsed.contactId,
+      parsed.organizationId,
+      { entityType: "task", entityId: parsed.id, action: "saved" },
+    );
+  });
 }
 export async function completeTask(db: PulseDB, id: string) {
-  await db.transaction("rw", [db.tasks, db.events], async () => {
+  return db.transaction("rw", db.tables, async () => {
     const task = await db.tasks.get(id);
     if (!task || task.completedAt) return;
     await db.tasks.update(id, {
       completedAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     });
+    const feedback = await syncReward(db, "task", task.id, true, false);
     await event(
       db,
       `Task completed · ${task.title}`,
       task.contactId,
       task.organizationId,
+      { entityType: "task", entityId: task.id, action: "completed" },
     );
+    return feedback;
   });
 }
 export async function deleteContact(db: PulseDB, id: string) {
@@ -211,6 +231,21 @@ export async function deleteContact(db: PulseDB, id: string) {
       )
         await db.interactions.update(i.id, { followUpId: null });
     await db.recommendationActions.where("recordId").equals(id).delete();
+    for (const reward of await db.rewards.toArray()) {
+      const source =
+        reward.sourceType === "task"
+          ? await db.tasks.get(reward.sourceId)
+          : reward.sourceType === "interaction"
+            ? await db.interactions.get(reward.sourceId)
+            : null;
+      if (source?.contactId === id)
+        await syncReward(db, reward.sourceType, reward.sourceId, false, true);
+    }
+    for (const taskId of removedTaskIds)
+      await db.dailyQuests
+        .where("taskId")
+        .equals(taskId)
+        .modify({ title: "Removed follow-up" });
     await db.contacts.delete(id);
     for (const table of [
       db.interactions,
@@ -221,10 +256,12 @@ export async function deleteContact(db: PulseDB, id: string) {
       await table.where("contactId").equals(id).delete();
     await db.events.where("contactId").equals(id).delete();
     for (const o of await db.opportunities.toArray())
-      if (o.contactIds.includes(id))
+      if (o.contactIds.includes(id)) {
         await db.opportunities.update(o.id, {
           contactIds: o.contactIds.filter((v) => v !== id),
         });
+        await syncReward(db, "opportunity", o.id);
+      }
     await event(db, `Deleted contact · ${c.name}`);
   });
 }
@@ -248,7 +285,7 @@ export async function deleteOrganization(db: PulseDB, id: string) {
 }
 export const backupSchema = z.object({
   format: z.literal("pulse-backup"),
-  version: z.union([z.literal(1), z.literal(2)]),
+  version: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   metadata: z
     .object({
       appVersion: z.string(),
@@ -256,6 +293,10 @@ export const backupSchema = z.object({
       workspace: z.enum(["demo", "personal"]),
     })
     .optional(),
+  rewards: z.array(rewardSchema).default([]),
+  rewardChanges: z.array(rewardChangeSchema).default([]),
+  progressState: z.array(progressStateSchema).max(1).default([]),
+  dailyQuests: z.array(dailyQuestSchema).default([]),
   smartLists: z.array(smartListSchema).default([]),
   recommendationActions: z.array(recommendationActionSchema).default([]),
   importBatches: z.array(importBatchSchema).default([]),
@@ -274,12 +315,16 @@ export const backupSchema = z.object({
 export async function exportBackup(db: PulseDB) {
   return db.transaction("r", db.tables, async () => ({
     format: "pulse-backup",
-    version: 2,
+    version: 3,
     metadata: {
-      appVersion: "0.3.0",
+      appVersion: "0.4.0",
       exportedAt: new Date().toISOString(),
       workspace: db.workspace,
     },
+    rewards: await db.rewards.toArray(),
+    rewardChanges: await db.rewardChanges.toArray(),
+    progressState: await db.progressState.toArray(),
+    dailyQuests: await db.dailyQuests.toArray(),
     smartLists: await db.smartLists.toArray(),
     recommendationActions: await db.recommendationActions.toArray(),
     importBatches: await db.importBatches.toArray(),
@@ -305,6 +350,10 @@ export function validateBackup(input: unknown) {
   const orgs = new Set(b.organizations.map((v) => v.id)),
     contacts = new Set(b.contacts.map((v) => v.id));
   for (const records of [
+    b.rewards,
+    b.rewardChanges,
+    b.progressState,
+    b.dailyQuests,
     b.smartLists,
     b.recommendationActions,
     b.importBatches,
@@ -355,12 +404,99 @@ export function validateBackup(input: unknown) {
     if (i.followUpId && !tasks.has(i.followUpId))
       throw new Error("Missing follow-up reference.");
   }
+  const state = b.progressState[0];
+  if (
+    (b.rewards.length || b.dailyQuests.length || b.rewardChanges.length) &&
+    !state
+  )
+    throw new Error("Progress calendar is missing.");
+  const sourceMaps = {
+    task: new Map(b.tasks.map((t) => [t.id, t])),
+    interaction: new Map(b.interactions.map((i) => [i.id, i])),
+    opportunity: new Map(b.opportunities.map((o) => [o.id, o])),
+  };
+  const correctionGroups = new Map<string, typeof b.rewardChanges>();
+  for (const c of b.rewardChanges) {
+    const rows = correctionGroups.get(c.rewardId) || [];
+    rows.push(c);
+    correctionGroups.set(c.rewardId, rows);
+  }
+  const structurallyAvailableContacts = b.contacts.map((c) => ({
+    ...c,
+    availability: "Available" as const,
+    timeoutUntil: null,
+  }));
+  const fingerprints = new Set<string>();
+  for (const r of b.rewards) {
+    if (!r.deleted && !sourceMaps[r.sourceType].has(r.sourceId))
+      throw new Error("Reward references a missing source.");
+    if (
+      !state ||
+      r.timezone !== state.timezone ||
+      r.day !== calendarDay(r.earnedAt, r.timezone) ||
+      r.week !== weekOf(r.day) ||
+      r.earnedAt < state.startedAt
+    )
+      throw new Error("Invalid reward calendar.");
+    const key = JSON.stringify([r.day, r.fingerprint]);
+    if (fingerprints.has(key)) throw new Error("Duplicate reward fingerprint.");
+    fingerprints.add(key);
+  }
+  for (const r of b.rewards) {
+    if (r.active) {
+      const source = sourceMaps[r.sourceType].get(r.sourceId);
+      // Validate current source structure without retroactively applying later communication instructions.
+      if (
+        !source ||
+        !sourceRule(
+          r.sourceType,
+          source,
+          {
+            contacts: structurallyAvailableContacts,
+            permissions: [],
+            restrictions: [],
+          },
+          Date.parse(r.earnedAt),
+        )
+      )
+        throw new Error("Active reward source no longer qualifies.");
+    }
+    const changes = (correctionGroups.get(r.id) || []).sort(
+      (a, b) => a.sequence - b.sequence,
+    );
+    if (
+      changes.length === 0 ||
+      changes[0].action !== "granted" ||
+      changes.filter((c) => c.action === "granted").length !== 1 ||
+      changes.some((c, i) => c.sequence !== i + 1) ||
+      (changes.at(-1)!.action !== "reversed") !== r.active
+    )
+      throw new Error("Invalid reward correction history.");
+  }
+  const rewardIds = new Set(b.rewards.map((r) => r.id));
+  for (const change of b.rewardChanges)
+    if (!rewardIds.has(change.rewardId))
+      throw new Error("Reward correction references a missing entitlement.");
+  // Quest source tombstones are intentional: a deleted task remains an unavailable quest for that day.
+  if (
+    b.dailyQuests.some(
+      (q) =>
+        !state ||
+        q.createdAt < state.startedAt ||
+        q.day !== calendarDay(q.createdAt, state.timezone),
+    )
+  )
+    throw new Error("Invalid quest history.");
   return b;
 }
 export async function restoreBackup(db: PulseDB, input: unknown) {
   const b = validateBackup(input);
   await db.transaction("rw", db.tables, async () => {
     for (const key of [
+      "rewards",
+      "rewardChanges",
+      "progressState",
+      "dailyQuests",
       "smartLists",
       "recommendationActions",
       "importBatches",
@@ -418,65 +554,73 @@ export async function updateInteraction(db: PulseDB, value: Interaction) {
     await validateInteractionLinks(db, parsed);
     // The company is a historical snapshot, retained when a person moves companies.
     await db.interactions.put(parsed);
+    await syncReward(db, "interaction", parsed.id, false, false);
     await event(
       db,
       `${parsed.type} corrected`,
       parsed.contactId,
       parsed.organizationId,
+      { entityType: "interaction", entityId: parsed.id, action: "corrected" },
     );
   });
 }
 export async function deleteInteraction(db: PulseDB, id: string) {
-  await db.transaction("rw", [db.interactions, db.events], async () => {
+  await db.transaction("rw", db.tables, async () => {
     const i = await db.interactions.get(id);
     if (!i) return;
     await db.interactions.delete(id);
+    await syncReward(db, "interaction", i.id, false, true);
     await event(
       db,
       "Interaction deleted; linked tasks preserved",
       i.contactId,
       i.organizationId,
+      { entityType: "interaction", entityId: i.id, action: "deleted" },
     );
   });
 }
 export async function reopenTask(db: PulseDB, id: string) {
-  await db.transaction("rw", [db.tasks, db.events], async () => {
+  await db.transaction("rw", db.tables, async () => {
     const t = await db.tasks.get(id);
     if (!t?.completedAt) return;
     await db.tasks.update(id, {
       completedAt: null,
       updatedAt: new Date().toISOString(),
     });
+    await syncReward(db, "task", t.id, false, false);
     await event(
       db,
       `Follow-up reopened · ${t.title}`,
       t.contactId,
       t.organizationId,
+      { entityType: "task", entityId: t.id, action: "reopened" },
     );
   });
 }
 export async function deleteTask(db: PulseDB, id: string) {
-  await db.transaction(
-    "rw",
-    [db.tasks, db.interactions, db.events],
-    async () => {
-      const t = await db.tasks.get(id);
-      if (!t) return;
-      for (const i of await db.interactions.toArray())
-        if (i.followUpId === id)
-          await db.interactions.update(i.id, {
-            followUpId: null,
-            updatedAt: new Date().toISOString(),
-          });
-      await db.tasks.delete(id);
-      await event(
-        db,
-        `Follow-up deleted · ${t.title}`,
-        t.contactId,
-        t.organizationId,
-      );
-    },
-  );
+  await db.transaction("rw", db.tables, async () => {
+    const t = await db.tasks.get(id);
+    if (!t) return;
+    for (const i of await db.interactions.toArray())
+      if (i.followUpId === id)
+        await db.interactions.update(i.id, {
+          followUpId: null,
+          updatedAt: new Date().toISOString(),
+        });
+    await db.tasks.delete(id);
+    await db.dailyQuests
+      .where("taskId")
+      .equals(id)
+      .modify({ title: "Removed follow-up" });
+    await syncReward(db, "task", t.id, false, true);
+    await event(
+      db,
+      `Follow-up deleted · ${t.title}`,
+      t.contactId,
+      t.organizationId,
+      { entityType: "task", entityId: t.id, action: "deleted" },
+    );
+  });
 }
 export async function saveOpportunity(db: PulseDB, value: Opportunity) {
   const parsed = opportunitySchema.parse({
@@ -500,72 +644,75 @@ export async function saveOpportunity(db: PulseDB, value: Opportunity) {
   } catch {
     throw new Error("Invalid currency.");
   }
-  await db.transaction(
-    "rw",
-    [db.opportunities, db.contacts, db.organizations, db.settings, db.events],
-    async () => {
-      const config = await settings(db);
-      if (parsed.pipelineId !== config.pipeline.id)
-        throw new Error("Choose the configured pipeline.");
+  return db.transaction("rw", db.tables, async () => {
+    const config = await settings(db);
+    if (parsed.pipelineId !== config.pipeline.id)
+      throw new Error("Choose the configured pipeline.");
+    if (
+      parsed.organizationId &&
+      !(await db.organizations.get(parsed.organizationId))
+    )
+      throw new Error("Company no longer exists.");
+    if (new Set(parsed.contactIds).size !== parsed.contactIds.length)
+      throw new Error("Duplicate representative.");
+    for (const id of parsed.contactIds) {
+      const c = await db.contacts.get(id);
+      if (!c) throw new Error("Contact no longer exists.");
+      // Existing links remain valid when representatives change employers.
+      const previous = await db.opportunities.get(parsed.id);
       if (
         parsed.organizationId &&
-        !(await db.organizations.get(parsed.organizationId))
-      )
-        throw new Error("Company no longer exists.");
-      if (new Set(parsed.contactIds).size !== parsed.contactIds.length)
-        throw new Error("Duplicate representative.");
-      for (const id of parsed.contactIds) {
-        const c = await db.contacts.get(id);
-        if (!c) throw new Error("Contact no longer exists.");
-        // Existing links remain valid when representatives change employers.
-        const previous = await db.opportunities.get(parsed.id);
-        if (
-          parsed.organizationId &&
-          c.organizationId !== parsed.organizationId &&
-          !(
-            previous?.organizationId === parsed.organizationId &&
-            previous.contactIds.includes(id)
-          )
+        c.organizationId !== parsed.organizationId &&
+        !(
+          previous?.organizationId === parsed.organizationId &&
+          previous.contactIds.includes(id)
         )
-          throw new Error(
-            "New representatives must belong to the selected company.",
-          );
-      }
-      const previous = await db.opportunities.get(parsed.id);
-      if (previous) parsed.createdAt = previous.createdAt;
-      await db.opportunities.put(parsed);
-      await event(
-        db,
-        `Opportunity ${previous ? "updated" : "created"} · ${parsed.title} · ${parsed.stageId}`,
-        null,
-        parsed.organizationId,
-      );
-    },
-  );
+      )
+        throw new Error(
+          "New representatives must belong to the selected company.",
+        );
+    }
+    const previous = await db.opportunities.get(parsed.id);
+    if (previous) parsed.createdAt = previous.createdAt;
+    await db.opportunities.put(parsed);
+    const feedback = await syncReward(
+      db,
+      "opportunity",
+      parsed.id,
+      !!previous && previous.status === "open" && parsed.status !== "open",
+      false,
+    );
+    await event(
+      db,
+      `Opportunity ${previous ? "updated" : "created"} · ${parsed.title} · ${parsed.stageId}`,
+      null,
+      parsed.organizationId,
+      { entityType: "opportunity", entityId: parsed.id, action: "saved" },
+    );
+    return feedback;
+  });
 }
 export async function deleteOpportunity(db: PulseDB, id: string) {
-  await db.transaction(
-    "rw",
-    [db.opportunities, db.interactions, db.events, db.recommendationActions],
-    async () => {
-      const o = await db.opportunities.get(id);
-      if (!o) return;
-      for (const i of await db.interactions.toArray())
-        if (i.opportunityId === id)
-          await db.interactions.update(i.id, {
-            opportunityId: null,
-            updatedAt: new Date().toISOString(),
-          });
-      await db.recommendationActions.where("recordId").equals(id).delete();
-      await db.opportunities.delete(id);
-      await event(
-        db,
-        `Opportunity deleted · ${o.title}`,
-        null,
-        o.organizationId,
-      );
-    },
-  );
+  await db.transaction("rw", db.tables, async () => {
+    const o = await db.opportunities.get(id);
+    if (!o) return;
+    for (const i of await db.interactions.toArray())
+      if (i.opportunityId === id)
+        await db.interactions.update(i.id, {
+          opportunityId: null,
+          updatedAt: new Date().toISOString(),
+        });
+    await db.recommendationActions.where("recordId").equals(id).delete();
+    await db.opportunities.delete(id);
+    await syncReward(db, "opportunity", o.id, false, true);
+    await event(
+      db,
+      `Opportunity deleted · ${o.title}`,
+      null,
+      o.organizationId,
+      { entityType: "opportunity", entityId: o.id, action: "deleted" },
+    );
+  });
 }
 export async function saveRestriction(db: PulseDB, value: Restriction) {
   const parsed = restrictionSchema.parse({

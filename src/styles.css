@@ -4402,3 +4402,129 @@ img {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Meaningful progress shares the existing surface, form and status tokens. */
+.progress-workspace {
+  display: grid;
+  gap: 24px;
+}
+.momentum-summary p,
+.progress-workspace p {
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.momentum-summary {
+  min-width: 0;
+}
+.momentum-numbers {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 16px 0;
+}
+.momentum-numbers strong {
+  font-size: 24px;
+}
+.momentum-summary progress {
+  width: 100%;
+  height: 10px;
+  accent-color: var(--primary);
+}
+.milestone-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 16px;
+}
+.milestone,
+.quest-row {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+.milestone h3,
+.quest-row h3 {
+  margin: 12px 0 8px;
+  overflow-wrap: anywhere;
+}
+.reward-rules {
+  padding-left: 20px;
+  line-height: 1.8;
+}
+.reward-rules li {
+  margin: 12px 0;
+}
+.reward-history {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.reward-history p {
+  margin: 4px 0;
+}
+.reward-history > div {
+  min-width: 0;
+}
+.progress-settings {
+  display: grid;
+  gap: 16px;
+}
+.progress-workspace summary {
+  cursor: pointer;
+  min-height: 44px;
+  padding: 12px 0;
+}
+.progress-workspace .surface {
+  min-width: 0;
+}
+.momentum-celebration {
+  animation: momentum-in 0.35s ease-out;
+}
+@keyframes momentum-in {
+  from {
+    opacity: 0.7;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .momentum-celebration {
+    animation: none;
+  }
+}
+[data-motion="reduced"] .momentum-celebration {
+  animation: none;
+}
+@media (max-width: 430px) {
+  .reward-history {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .progress-workspace {
+    gap: 16px;
+  }
+}
+.momentum-summary progress {
+  appearance: none;
+  border: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--primary-soft);
+}
+.momentum-summary progress::-webkit-progress-bar {
+  background: var(--primary-soft);
+  border-radius: 8px;
+}
+.momentum-summary progress::-webkit-progress-value {
+  background: var(--primary);
+  border-radius: 8px;
+}
+.momentum-summary progress::-moz-progress-bar {
+  background: var(--primary);
+  border-radius: 8px;
+}

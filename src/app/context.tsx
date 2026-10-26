@@ -12,11 +12,22 @@ import { initialize } from "../data/seed";
 import { defaults, settingsSchema, type Workspace } from "../data/models";
 import { updateSettings } from "../data/repository";
 import { analyzeRelationships } from "../services/recommendations";
+import { ensureProgress, ensureDailyQuests } from "../data/progress-repository";
+import { deriveProgress } from "../services/progress";
 import type { PulseDB } from "../data/db";
 function useWorkspaceData(db: PulseDB) {
   return useLiveQuery(
     async () =>
       db.transaction("r", db.tables, async () => ({
+        rewards: await db.rewards.toArray(),
+        rewardChanges: (await db.rewardChanges.toArray()).sort(
+          (a, b) =>
+            b.at.localeCompare(a.at) ||
+            b.sequence - a.sequence ||
+            a.id.localeCompare(b.id),
+        ),
+        progressState: (await db.progressState.get("progress")) || null,
+        dailyQuests: await db.dailyQuests.toArray(),
         organizations: await db.organizations.toArray(),
         contacts: await db.contacts.toArray(),
         interactions: await db.interactions
@@ -43,6 +54,7 @@ function useWorkspaceData(db: PulseDB) {
 }
 type Data = NonNullable<ReturnType<typeof useWorkspaceData>>;
 interface ContextValue extends Data {
+  progress: ReturnType<typeof deriveProgress>;
   intelligence: ReturnType<typeof analyzeRelationships>;
   db: PulseDB;
   workspace: Workspace;
@@ -86,6 +98,7 @@ export function WorkspaceProvider({
   useEffect(() => {
     setReady(false);
     initialize(db)
+      .then(() => ensureProgress(db))
       .then(() => setReady(true))
       .catch(() =>
         setError(
@@ -116,8 +129,19 @@ export function WorkspaceProvider({
   }, [data?.settings]);
   async function run(action: () => Promise<unknown>, message?: string) {
     try {
-      await action();
-      if (message) setToast(message);
+      const result = await action();
+      const earned =
+        result &&
+        typeof result === "object" &&
+        "earnedXP" in result &&
+        typeof result.earnedXP === "number"
+          ? result.earnedXP
+          : 0;
+      if (message)
+        setToast(
+          message +
+            (earned && data?.settings.gamification ? ` · +${earned} XP` : ""),
+        );
       return true;
     } catch (e) {
       setToast(
@@ -135,6 +159,24 @@ export function WorkspaceProvider({
         : { relationships: [], opportunities: [], all: [], queue: [] },
     [data, clock],
   );
+  const progress = useMemo(
+    () =>
+      deriveProgress(
+        data?.rewards || [],
+        data?.dailyQuests || [],
+        data?.progressState || null,
+        data?.settings.progress.weeklyGoal || 0,
+      ),
+    [data, clock],
+  );
+  useEffect(() => {
+    if (ready && data)
+      ensureDailyQuests(db).catch(() =>
+        setToast(
+          "Daily quests could not be saved. Your CRM records are unchanged.",
+        ),
+      );
+  }, [ready, db, data, clock]);
   if (error)
     return (
       <div className="startup">
@@ -155,6 +197,7 @@ export function WorkspaceProvider({
       value={{
         ...data,
         intelligence,
+        progress,
         db,
         workspace,
         switchWorkspace: onSwitch,
@@ -167,7 +210,10 @@ export function WorkspaceProvider({
     >
       {children}
       {toast && (
-        <div className="toast" role="status">
+        <div
+          className={`toast ${toast.includes("XP") && data.settings.progress.celebrations ? "momentum-celebration" : ""}`}
+          role="status"
+        >
           {toast}
           <button aria-label="Dismiss message" onClick={() => setToast("")}>
             ×
