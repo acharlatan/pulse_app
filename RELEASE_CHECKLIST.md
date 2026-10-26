@@ -38,7 +38,7 @@ Historical 1.0 checklist above remains release evidence for that candidate. This
 - [x] Selected-only bulk writes, stale-selection rejection and storage-failure rollback.
 - [x] Strict TypeScript, ESLint, 145 unit/Worker tests, production build, Worker dry run and repository-subpath build.
 - [x] Production PWA/offline/update and 100/1000-contact tests (10 Chromium cases).
-- [ ] Final browser reruns after accessibility/selector fixes recorded in QA_REPORT.md.
+- [x] Clean full browser run: 48/48 passed after accessibility/selector fixes; recorded in QA_REPORT.md.
 - [ ] Authorized main integration, Cloudflare deployment and production workflow evidence recorded.
 
 Stable-only platform gates above remain open. Retain v4-compatible data code for forward fixes after upgrade. Do not deploy an old database client to migrated devices.
