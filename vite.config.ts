@@ -13,8 +13,10 @@ export default defineConfig({
     tailwind(),
     VitePWA({
       registerType: "prompt",
+      injectRegister: false,
       includeAssets: ["icon.svg", "icon-192.png", "icon-512.png"],
       manifest: {
+        id: "./",
         name: "PULSE — Every relationship has a story",
         short_name: "PULSE",
         description: "Your local-first relationship workspace",
@@ -38,6 +40,8 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//],
         globPatterns: ["**/*.{js,css,html,png,svg,webmanifest}"],
         cleanupOutdatedCaches: true,
+        skipWaiting: false,
+        clientsClaim: true,
       },
     }),
   ],

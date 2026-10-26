@@ -269,6 +269,7 @@ test("unconfigured AI remains off and local communication review works without p
     .click();
   await expect(page.getByRole("alert")).toContainText("Enable optional AI");
   await page.goto("/#/network/people/contact-0");
+  await page.getByText("More relationship tools", { exact: true }).click();
   await page
     .getByRole("button", { name: "Message handoff", exact: true })
     .click();

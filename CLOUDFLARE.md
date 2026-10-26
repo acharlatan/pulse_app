@@ -51,3 +51,13 @@ These are conservative request/token ceilings, **not a guaranteed dollar budget*
 No live Gemini key, Access application or paid billing was configured during implementation. Quotas and provider/auth failure paths are tested with synthetic credentials, plus a real local workerd/SQLite test. Live provider quality, account authorization and actual cost must be verified during activation. Google Calendar/Gmail/Contacts OAuth, cloud storage of CRM records, scheduled background AI and automatic message sending remain unimplemented.
 
 Keep the Durable Object class and migration when rolling back frontend code. Do not remove the deployed SQLite binding or change its identifier to evade usage history. Browser DB remains v3; prefer forward fixes over database downgrades.
+
+## Iteration 06 static/PWA lifecycle
+
+Worker/API bindings, access checks, quota class/migration and disabled AI vars are unchanged. Browser DB and backup remain v3; rollback must retain their compatible data layer and the existing SQLite migration.
+
+The static application now registers sw.js natively with a scope derived from Vite's base path. VitePWA remains generateSW/prompt with injection disabled, skipWaiting false and clientsClaim true. Explicit approval posts SKIP_WAITING; other controlled tabs receive a notice without automatic reload. Static code is checked on focus/visibility and every 15 foreground minutes. No CRM is uploaded by these checks. Missing old route chunks produce a bounded manual recovery screen; saving unfinished work before adoption remains important, especially for pre-06 tabs that cannot retroactively gain new guards.
+
+Production should build from a clean checkout as Workers Builds already does. Local repeated builds in this environment retained old generated assets; release QA used a fresh output directory to verify the current 30-entry precache, then passed that directory to Wrangler's dry run. Do not deploy accumulated stale asset folders or infer performance from their inflated cache size. Repository-subpath builds and real scoped offline navigation remain tested. API paths stay excluded from fallback/caching; provider credentials and responses never enter the offline app shell.
+
+Tests in tests/pwa use a local-only static server with controlled SW comment revisions. Its /test/update endpoint is a test fixture, never a Worker route or production asset. Root and repository-scoped offline operation, multi-tab dirty editing and explicit update adoption were verified in Chromium. Native Android/iOS installation and live production cross-version sessions are separately reported; do not infer them from a build.

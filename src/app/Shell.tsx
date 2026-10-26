@@ -22,6 +22,7 @@ import { OfflineStatus } from "../components/OfflineStatus";
 import { usePulse } from "./context";
 import { Avatar, Modal } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
+import { useEffect, useRef } from "react";
 import { overdue } from "../services/recommendations";
 const nav = [
   { to: "/", label: "Daily Pulse", short: "Home", icon: Home },
@@ -36,6 +37,14 @@ export function Shell({ children }: { children: ReactNode }) {
   const [alerts, setAlerts] = useState(false);
   const [help, setHelp] = useState(false);
   const location = useLocation();
+  const firstRoute = useRef(true);
+  useEffect(() => {
+    if (firstRoute.current) {
+      firstRoute.current = false;
+      return;
+    }
+    document.querySelector<HTMLElement>("main")?.focus({ preventScroll: true });
+  }, [location.pathname]);
   const overdueCount = tasks.filter(
     (t) => overdue(t) && settings.alerts.tasks,
   ).length;
@@ -53,7 +62,14 @@ export function Shell({ children }: { children: ReactNode }) {
   const count = overdueCount + upcomingCount + reconnectionCount;
   return (
     <div className="app-shell">
-      <a className="skip-link" href="#main">
+      <a
+        className="skip-link"
+        href="#main"
+        onClick={(e) => {
+          e.preventDefault();
+          document.querySelector<HTMLElement>("main")?.focus();
+        }}
+      >
         Skip to content
       </a>
       <aside className="sidebar">
@@ -96,10 +112,15 @@ export function Shell({ children }: { children: ReactNode }) {
               )}
             </NavLink>
           ))}
-          <Link className="nav-item" to="/review">
+          <NavLink
+            className={({ isActive }) =>
+              "nav-item " + (isActive ? "active" : "")
+            }
+            to="/review"
+          >
             <HeartPulse size={20} />
             Relationship Review
-          </Link>
+          </NavLink>
         </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-note">
@@ -152,7 +173,11 @@ export function Shell({ children }: { children: ReactNode }) {
                       ? "Settings"
                       : location.pathname === "/assistant"
                         ? "PULSE Intelligence"
-                        : "Daily Pulse"}
+                        : {
+                            "/review": "Relationship Review",
+                            "/lists": "Smart Lists",
+                            "/import": "Import contacts",
+                          }[location.pathname] || "Daily Pulse"}
             </strong>
           </div>
           <Link to="/" className="mobile-brand">
@@ -207,6 +232,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <button
         className="floating-add"
         aria-label="Create a new record"
+        aria-haspopup="dialog"
         onClick={() => setAdd(true)}
       >
         <Plus size={23} />

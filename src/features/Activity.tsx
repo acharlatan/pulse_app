@@ -66,6 +66,7 @@ export function Activity() {
       <div className="directory-toolbar">
         <div className="tabs">
           <button
+            aria-pressed={tab === "tasks"}
             className={tab === "tasks" ? "selected" : ""}
             onClick={() => setTab("tasks")}
           >
@@ -73,12 +74,14 @@ export function Activity() {
             <span>{p.tasks.filter((t) => !t.completedAt).length}</span>
           </button>
           <button
+            aria-pressed={tab === "timeline"}
             className={tab === "timeline" ? "selected" : ""}
             onClick={() => setTab("timeline")}
           >
             Activity timeline
           </button>
           <button
+            aria-pressed={tab === "progress"}
             className={tab === "progress" ? "selected" : ""}
             onClick={() => setTab("progress")}
           >

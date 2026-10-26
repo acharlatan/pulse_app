@@ -16,7 +16,6 @@ import {
   Users,
   Workflow,
 } from "lucide-react";
-import { motion } from "motion/react";
 import { usePulse } from "../app/context";
 import {
   Avatar,
@@ -51,12 +50,7 @@ export function Home() {
     })
     .slice(0, 5);
   return (
-    <motion.div
-      className="page home-page"
-      initial={p.settings.reducedMotion ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
+    <div className="page home-page page-enter">
       <div className="page-heading">
         <div>
           <p className="eyebrow date-label">
@@ -83,98 +77,6 @@ export function Home() {
           <Plus size={17} />
           New connection
         </button>
-      </div>
-      <section className="hero-card">
-        <div className="hero-copy">
-          <Badge tone="hero-badge">
-            <span className="live-dot" />
-            IN GOOD COMPANY
-          </Badge>
-          <h2>
-            Keep your
-            <br />
-            relationships moving.
-          </h2>
-          <p>
-            Pick up where you left off. Make the next
-            <br className="desktop-break" /> conversation a meaningful one.
-          </p>
-          <Link to="/network" className="button hero-button">
-            Explore your network
-            <ArrowUpRight size={17} />
-          </Link>
-        </div>
-        <div className="relationship-art" aria-hidden="true">
-          <div className="orbit orbit-one" />
-          <div className="orbit orbit-two" />
-          <div className="orbit orbit-three" />
-          <div className="orbit-center">
-            <Heart size={35} fill="currentColor" />
-          </div>
-          <div className="orbit-person person-one">
-            <Avatar name="Olivia Chen" size="large" />
-            <span className="orbit-label">A familiar face</span>
-          </div>
-          <div className="orbit-person person-two">
-            <Avatar name="Marcus Johnson" size="large" />
-          </div>
-          <div className="orbit-person person-three">
-            <Avatar name="Sofia Rivera" />
-          </div>
-          <div className="orbit-person person-four">
-            <Avatar name="James Park" />
-          </div>
-          <div className="art-spark spark-one">✳</div>
-          <div className="art-spark spark-two">✦</div>
-          <div className="art-message">
-            <MessageCircle size={16} />
-            <span>Good things start with hello.</span>
-          </div>
-        </div>
-      </section>
-      <Link className="button ghost" to="/assistant">
-        Open PULSE Intelligence · optional AI
-      </Link>
-      <div className="stats-grid">
-        <Link to="/network" className="stat-card">
-          <span className="stat-icon lavender">
-            <Users size={19} />
-          </span>
-          <div>
-            <span className="stat-name">Your network</span>
-            <strong>
-              {p.contacts.length}
-              <small>people</small>
-            </strong>
-          </div>
-          <ArrowUpRight size={17} />
-        </Link>
-        <Link to="/activity" className="stat-card">
-          <span className="stat-icon peach">
-            <Clock3 size={19} />
-          </span>
-          <div>
-            <span className="stat-name">Next steps</span>
-            <strong>
-              {outstanding.length}
-              <small>follow-ups</small>
-            </strong>
-          </div>
-          <ArrowUpRight size={17} />
-        </Link>
-        <Link to="/pipeline" className="stat-card">
-          <span className="stat-icon sage">
-            <TrendingUp size={19} />
-          </span>
-          <div>
-            <span className="stat-name">Open opportunities</span>
-            <strong>
-              {money(pipeline, "USD")}
-              <small>USD pipeline</small>
-            </strong>
-          </div>
-          <ArrowUpRight size={17} />
-        </Link>
       </div>
       <div className="home-columns">
         <div className="home-primary">
@@ -400,9 +302,103 @@ export function Home() {
           </section>
         </aside>
       </div>
+      <div className="home-explore">
+        <section className="hero-card">
+          <div className="hero-copy">
+            <Badge tone="hero-badge">
+              <span className="live-dot" />
+              IN GOOD COMPANY
+            </Badge>
+            <h2>
+              Keep your
+              <br />
+              relationships moving.
+            </h2>
+            <p>
+              Pick up where you left off. Make the next
+              <br className="desktop-break" /> conversation a meaningful one.
+            </p>
+            <Link to="/network" className="button hero-button">
+              Explore your network
+              <ArrowUpRight size={17} />
+            </Link>
+          </div>
+          <div className="relationship-art" aria-hidden="true">
+            <div className="orbit orbit-one" />
+            <div className="orbit orbit-two" />
+            <div className="orbit orbit-three" />
+            <div className="orbit-center">
+              <Heart size={35} fill="currentColor" />
+            </div>
+            <div className="orbit-person person-one">
+              <Avatar name="Olivia Chen" size="large" />
+              <span className="orbit-label">A familiar face</span>
+            </div>
+            <div className="orbit-person person-two">
+              <Avatar name="Marcus Johnson" size="large" />
+            </div>
+            <div className="orbit-person person-three">
+              <Avatar name="Sofia Rivera" />
+            </div>
+            <div className="orbit-person person-four">
+              <Avatar name="James Park" />
+            </div>
+            <div className="art-spark spark-one">✳</div>
+            <div className="art-spark spark-two">✦</div>
+            <div className="art-message">
+              <MessageCircle size={16} />
+              <span>Good things start with hello.</span>
+            </div>
+          </div>
+        </section>
+        <Link className="button ghost" to="/assistant">
+          Open PULSE Intelligence · optional AI
+        </Link>
+        <div className="stats-grid">
+          <Link to="/network" className="stat-card">
+            <span className="stat-icon lavender">
+              <Users size={19} />
+            </span>
+            <div>
+              <span className="stat-name">Your network</span>
+              <strong>
+                {p.contacts.length}
+                <small>people</small>
+              </strong>
+            </div>
+            <ArrowUpRight size={17} />
+          </Link>
+          <Link to="/activity" className="stat-card">
+            <span className="stat-icon peach">
+              <Clock3 size={19} />
+            </span>
+            <div>
+              <span className="stat-name">Next steps</span>
+              <strong>
+                {outstanding.length}
+                <small>follow-ups</small>
+              </strong>
+            </div>
+            <ArrowUpRight size={17} />
+          </Link>
+          <Link to="/pipeline" className="stat-card">
+            <span className="stat-icon sage">
+              <TrendingUp size={19} />
+            </span>
+            <div>
+              <span className="stat-name">Open opportunities</span>
+              <strong>
+                {money(pipeline, "USD")}
+                <small>USD pipeline</small>
+              </strong>
+            </div>
+            <ArrowUpRight size={17} />
+          </Link>
+        </div>
+      </div>
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}
-    </motion.div>
+    </div>
   );
 }

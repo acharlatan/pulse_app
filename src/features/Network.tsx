@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowUpRight,
   Building2,
@@ -16,23 +16,55 @@ import { builtInLists, listMatcher } from "../services/smart-lists";
 import { priorities, stages, availabilities, categories } from "../data/models";
 export function Network() {
   const p = usePulse();
+  const [params, setParams] = useSearchParams();
   const { contacts, organizations } = p;
-  const [smart, setSmart] = useState("all");
+  const [smart, setSmart] = useState(params.get("list") || "all");
   const match = listMatcher(p);
   const insights = new Map(
     p.intelligence.relationships.map((i) => [i.contactId, i]),
   );
   const smartList = p.smartLists.find((l) => l.id === smart) || smart;
   const [limit, setLimit] = useState(60);
-  const [tab, setTab] = useState<"people" | "companies">("people");
-  const [search, setSearch] = useState("");
-  const [priority, setPriority] = useState("");
-  const [availability, setAvailability] = useState("");
-  const [category, setCategory] = useState("");
-  const [stage, setStage] = useState("");
-  const [sort, setSort] = useState("name");
+  const [tab, setTab] = useState<"people" | "companies">(
+    params.get("view") === "companies" ? "companies" : "people",
+  );
+  const [search, setSearch] = useState(params.get("q") || "");
+  const [priority, setPriority] = useState(params.get("priority") || "");
+  const [availability, setAvailability] = useState(
+    params.get("availability") || "",
+  );
+  const [category, setCategory] = useState(params.get("category") || "");
+  const [stage, setStage] = useState(params.get("stage") || "");
+  const [sort, setSort] = useState(params.get("sort") || "name");
   const [filters, setFilters] = useState(false);
   const [editor, setEditor] = useState<Editor | null>(null);
+  useEffect(() => {
+    const next = new URLSearchParams();
+    for (const [key, value] of Object.entries({
+      q: search,
+      view: tab === "companies" ? tab : "",
+      priority,
+      stage,
+      category,
+      availability,
+      sort: sort === "name" ? "" : sort,
+      list: smart === "all" ? "" : smart,
+    }))
+      if (value) next.set(key, value);
+    if (next.toString() !== params.toString())
+      setParams(next, { replace: true });
+  }, [
+    search,
+    tab,
+    priority,
+    stage,
+    category,
+    availability,
+    sort,
+    smart,
+    params,
+    setParams,
+  ]);
   const query = search.trim().toLowerCase();
   const people = contacts
     .filter(
@@ -115,9 +147,31 @@ export function Network() {
         )}
       </div>
       <div className="directory-toolbar">
-        <div className="tabs" role="tablist" aria-label="Directory view">
+        <div
+          className="tabs"
+          role="tablist"
+          aria-label="Directory view"
+          onKeyDown={(e) => {
+            if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key))
+              return;
+            e.preventDefault();
+            const next =
+              e.key === "Home"
+                ? "people"
+                : e.key === "End"
+                  ? "companies"
+                  : tab === "people"
+                    ? "companies"
+                    : "people";
+            setTab(next);
+            document.getElementById(`directory-${next}-tab`)?.focus();
+          }}
+        >
           <button
             role="tab"
+            id="directory-people-tab"
+            aria-controls="directory-results"
+            tabIndex={tab === "people" ? 0 : -1}
             aria-selected={tab === "people"}
             className={tab === "people" ? "selected" : ""}
             onClick={() => setTab("people")}
@@ -127,6 +181,9 @@ export function Network() {
           </button>
           <button
             role="tab"
+            id="directory-companies-tab"
+            aria-controls="directory-results"
+            tabIndex={tab === "companies" ? 0 : -1}
             aria-selected={tab === "companies"}
             className={tab === "companies" ? "selected" : ""}
             onClick={() => setTab("companies")}
@@ -238,7 +295,12 @@ export function Network() {
         </span>
         <span>Good connections grow here.</span>
       </div>
-      <div className="directory-grid">
+      <div
+        className="directory-grid"
+        id="directory-results"
+        role="tabpanel"
+        aria-labelledby={`directory-${tab}-tab`}
+      >
         {tab === "people"
           ? people.slice(0, limit).map((c) => {
               const org = organizations.find((o) => o.id === c.organizationId);
@@ -246,6 +308,10 @@ export function Network() {
                 <Link
                   key={c.id}
                   to={`/network/people/${c.id}`}
+                  state={{
+                    networkReturn:
+                      "/network" + (params.size ? "?" + params.toString() : ""),
+                  }}
                   className="profile-card"
                 >
                   <div className="profile-card-top">
@@ -305,6 +371,10 @@ export function Network() {
               <Link
                 key={o.id}
                 to={`/network/companies/${o.id}`}
+                state={{
+                  networkReturn:
+                    "/network" + (params.size ? "?" + params.toString() : ""),
+                }}
                 className="profile-card company-card"
               >
                 <div className="profile-card-top">

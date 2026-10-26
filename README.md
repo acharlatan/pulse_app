@@ -1,6 +1,6 @@
 # PULSE
 
-**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Development iteration 05 of 07.
+**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Development iteration 06 of 07.
 
 ## Run
 
@@ -121,3 +121,19 @@ Answers, typed questions and drafts remain temporary in component memory and cle
 `npm run dev:worker` runs the local Worker on port 8787; `npm run dev` proxies `/api` there. Missing secrets keep generation disabled. `npm run check:worker` performs a deploy dry run. Run `npm run build` before it so static assets are current. Ordinary static/GitHub Pages distribution retains all local CRM and handoff features; without a protected API host it honestly reports AI unavailable. Service workers exclude `/api/` navigation and never cache AI responses.
 
 IndexedDB and backup formats stay at **v3**: optional AI preferences default off on older settings, and optional task provenance is additive. Compatible v1/v2/v3 backups remain accepted. No new CRM database table, migration, secret field or persisted AI chat is introduced. Restoring data never replays AI operations or creates XP.
+
+## Iteration 06 — product quality and update reliability
+
+Home now leads with actionable relationship work and commitments; decorative artwork and secondary statistics follow it. Profiles lead with identity and essential actions; **More relationship tools** holds optional assistance/handoffs. Shared typography uses a 15px body, 13px labels and 12px metadata floor instead of 6–12px mobile overrides. Contrast, touch targets, wrapped controls, short-screen dialogs, safe-area navigation and dark surfaces were refined without changing CRM rules. Directory search/filter/sort state is encoded in its URL and retained when returning from profiles.
+
+Native dialogs have unique titles, an explicit Tab boundary, Escape dismissal and focus restoration. Their height responds to the visual viewport; the floating create button hides during dialogs and field focus. Native keyboard/device validation remains a release check, not a claim based on emulation. The skip link focuses content without changing the HashRouter route; directory tabs support arrows/Home/End. Automated axe checks cover major routes against WCAG A/AA and 2.1/2.2 tags; no WCAG certification or physical screen-reader testing is claimed.
+
+**Updates are deliberate.** Native service-worker registration replaces the helper that automatically reloaded controlled tabs. A waiting release displays Update & reload / Later. Edited forms, assistant inputs and import work are tracked only in memory; an update or full-page unload warns before discarding them. Successful settings saves clear only that form's marker. Changes made while activation is pending require another review. Adopting an update in one tab does not automatically reload another editing tab. There is no automatic draft save, external transmission or background AI retry. These safeguards apply to iteration-06 clients; save active edits before the first upgrade from an older client.
+
+Missing lazy JS/CSS files render a route-level recovery screen while keeping the shell available. Reload is explicit, requires internet and warns about unfinished work; ordinary application/database errors are distinguished. Nothing resets IndexedDB and there is no auto-reload loop. This is graceful recovery, not a guarantee that every obsolete asset URL can load indefinitely. Browser Back/in-app navigation are not a universal draft-recovery service, and markers may conservatively warn after an import or assistant selection even when little remains to save.
+
+The app shell precaches all current route files after a successful online workspace load. Cached contacts, companies, tasks, lists, recommendations, progress and local edits work offline; backup download remains available where supported. `/api/` stays out of caches. AI always needs a network connection and remains disabled unless separately secured/configured. Manifest icons/scope/standalone fields and Chromium installability diagnostics were checked; no Android/iOS/native installation was exercised. Use your browser's available install/Add to Home Screen control; browser and OS availability vary.
+
+`npm run test:pwa` runs production-build tests after `npm run build`. Tests use a local-only server, real service workers and synthetic records; no test control endpoint is deployed. For an isolated build set `PULSE_DIST` to its directory. `npm run test:browser` retains all CRM and AI mock regression journeys and adds accessibility/recovery/keyboard checks. See QA_REPORT.md for measured results and limits.
+
+Welcome now defers the CRM workspace code until selection. The only large Home animation dependency was removed after confirming no other usage; a small transform-only CSS entrance honors reduced motion. Initial JS is approximately 235 KB minified / 73 KB gzip, with a separate workspace chunk. No IndexedDB schema or backup-format migration is needed; metadata now identifies app 0.6.0, while backups remain v3 and accept compatible v1/v2 files.

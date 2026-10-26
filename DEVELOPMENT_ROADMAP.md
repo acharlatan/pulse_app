@@ -53,7 +53,7 @@
 
 **05 — Implemented with activation boundary.** Protected, disabled-by-default Gemini Worker; bounded selected-context approvals; Catch Me Up/Ask/drafts/reviewed note-to-task; local .ics/email/WhatsApp handoffs. Synthetic provider tests and local SQLite runtime verification cover application behavior. Live generation remains off pending a fresh server secret, explicit Access configuration and provider quota/privacy review. See CLOUDFLARE.md and QA_REPORT.md. No frontend secrets, automatic sends or OAuth connection claims.
 
-**06 — Comprehensive visual/mobile/accessibility/PWA refinement.** Screenshot-guided review moves here; refine all screens without replacing the identity. Physical installation/offline/update adoption, device keyboard behavior, contrast/screen-reader/keyboard QA and measured performance.
+**06 — Implemented with device limits.** Shared typography/contrast/spacing, action-first Home, profile hierarchy, keyboard/dialog controls, directory return context, native edit-aware multi-tab updates, missing-chunk recovery, offline/scoped PWA tests and smaller initial/Home bundles. Automated accessibility and browser checks passed; physical installation, native keyboards/screen readers and literal browser zoom remain release checks. See QA_REPORT.md.
 
 **07 — Release hardening and distribution.** Complete end-to-end journeys, onboarding, migration/recovery checks, defect fixing, documentation, public demo and personal-use distribution. Resolve or explicitly document remaining release limitations.
 
@@ -70,3 +70,15 @@ Browser-local storage can be cleared/evicted; no encrypted database or synchroni
 No live-provider generation, Google OAuth, automatic synchronization or persisted AI chat. Scope is one contact/company/opportunity at a time; summaries may omit older records within documented caps. Citations are source-membership checks, not guarantees of correct interpretation. Access browser-session setup is operator-managed. Prompt 06 should prioritize accessible assistant/form navigation, actual-device mailto/WhatsApp/calendar behavior, physical PWA offline/update lifecycle, contrast/focus/screen-reader review, mobile keyboards, bundle measurement and optional model activation QA only after fresh credentials/access are configured. Public demo must remain useful with AI disabled.
 
 Production review observed a stale lazy-loaded asset in a tab spanning deployment; the existing Reload action recovered without data loss. Prompt 06 must improve update adoption and stale-chunk recovery without automatically discarding active edits.
+
+## Prompt 07 — prioritized release checklist
+
+1. P1 verification: real iOS/Android keyboards, safe areas, install/standalone launch and offline/update adoption; native VoiceOver/NVDA, 200%/400% browser zoom and long-content checks. Fix any confirmed blocked actions before release.
+2. Validate first-upgrade behavior from pre-06 tabs and supported-browser combinations. Existing old client scripts cannot retroactively receive new unsaved-edit guards; instruct users to save before upgrading. Test normal/emergency forward fixes while preserving DB v3 and quota migrations.
+3. Complete onboarding with concise local-storage/backup guidance; distinguish fictional Demo, Personal and optional operator-only AI. Keep public demo useful without generation or account connection.
+4. Exercise export/restore on fresh browser origins with v1/v2/v3 backups, storage-denial/eviction recovery and large real-world-shaped datasets. No cloud recovery or encryption claims without implementation.
+5. Review uniform unsaved navigation/workspace-switch behavior beyond update/full-page-unload protection. Current markers can conservatively warn after import/assistant selections; they are not persistent draft recovery.
+6. Run the final CRM/import/reward/AI-mock/PWA/accessibility suites, distribution packaging, README install/deploy instructions and production smoke checks. Define supported browsers and remaining limits; do not present Chromium diagnostics as physical installation.
+7. Activate optional Gemini only in a separately reviewed setup with a fresh server secret, protected Access policy and verified provider quotas/privacy. No public or paid generation is enabled by iteration 06.
+
+No confirmed P0 defect remains from the exercised journeys. Device/assistive-technology gaps are verification limits, not proof that those platforms pass. Commerce, teams and synchronization remain post-release.

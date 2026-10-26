@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useId, type ReactNode } from "react";
 import { X, ArrowUpRight, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -63,24 +63,73 @@ export function Modal({
   children: ReactNode;
   onClose: () => void;
 }) {
+  const titleId = useId();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    const dialog = ref.current;
+    const dialog = ref.current,
+      opener = document.activeElement;
+    const viewport = window.visualViewport;
+    const fit = () => {
+      if (!dialog || !viewport) return;
+      dialog.style.maxHeight = `${Math.max(120, viewport.height - 24)}px`;
+      if (viewport.height < window.innerHeight - 100) {
+        dialog.style.top = `${viewport.offsetTop + 12}px`;
+        dialog.style.marginBlock = "0";
+      } else {
+        dialog.style.top = "";
+        dialog.style.marginBlock = "";
+      }
+    };
     dialog?.showModal();
-    return () => dialog?.close();
+    fit();
+    viewport?.addEventListener("resize", fit);
+    viewport?.addEventListener("scroll", fit);
+    return () => {
+      viewport?.removeEventListener("resize", fit);
+      viewport?.removeEventListener("scroll", fit);
+      dialog?.close();
+      if (opener instanceof HTMLElement && opener.isConnected)
+        opener.focus({ preventScroll: true });
+    };
   }, []);
   return (
     <dialog
       ref={ref}
       className="modal"
       onCancel={onClose}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+      onKeyDown={(e) => {
+        if (e.key !== "Tab") return;
+        const items = [
+          ...e.currentTarget.querySelectorAll<HTMLElement>(
+            'button:not([disabled]),a[href],input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])',
+          ),
+        ].filter((el) => el.getClientRects().length);
+        const first = items[0],
+          last = items.at(-1);
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
       }}
-      aria-labelledby="dialog-title"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          const box = e.currentTarget.getBoundingClientRect();
+          if (
+            e.clientX < box.left ||
+            e.clientX > box.right ||
+            e.clientY < box.top ||
+            e.clientY > box.bottom
+          )
+            onClose();
+        }
+      }}
+      aria-labelledby={titleId}
     >
       <div className="modal-heading">
-        <h2 id="dialog-title">{title}</h2>
+        <h2 id={titleId}>{title}</h2>
         <button
           className="icon-button"
           aria-label="Close dialog"

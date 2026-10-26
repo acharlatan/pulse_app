@@ -1,0 +1,57 @@
+import { afterEach, it, expect, vi } from "vitest";
+import {
+  hasUnsavedWork,
+  installEditProtection,
+  markSaved,
+  confirmRefresh,
+  isChunkFailure,
+} from "../src/app/update-safety";
+afterEach(() => {
+  document.body.innerHTML = "";
+  vi.restoreAllMocks();
+});
+it("tracks ephemeral form edits, failed saves stay guarded, and successful saves clear only that form", () => {
+  const cleanup = installEditProtection();
+  document.body.innerHTML =
+    '<form id="first"><input /></form><form id="second"><textarea></textarea></form>';
+  const forms = document.querySelectorAll("form");
+  forms[0]
+    .querySelector("input")!
+    .dispatchEvent(new Event("input", { bubbles: true }));
+  forms[1]
+    .querySelector("textarea")!
+    .dispatchEvent(new Event("input", { bubbles: true }));
+  expect(hasUnsavedWork()).toBe(true);
+  const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+  expect(confirmRefresh()).toBe(false);
+  expect(confirm).toHaveBeenCalledOnce();
+  markSaved(forms[0]);
+  expect(hasUnsavedWork()).toBe(true);
+  forms[1].remove();
+  expect(hasUnsavedWork()).toBe(false);
+  cleanup();
+});
+it("guards unloaded pages after edits without writing draft contents anywhere", () => {
+  const cleanup = installEditProtection();
+  document.body.innerHTML =
+    '<section class="assistant-page"><textarea></textarea></section>';
+  document
+    .querySelector("textarea")!
+    .dispatchEvent(new Event("input", { bubbles: true }));
+  const e = new Event("beforeunload", { cancelable: true });
+  window.dispatchEvent(e);
+  expect(e.defaultPrevented).toBe(true);
+  cleanup();
+});
+it("distinguishes missing application files from ordinary application errors", () => {
+  expect(
+    isChunkFailure(
+      new Error("Failed to fetch dynamically imported module: /assets/old.js"),
+    ),
+  ).toBe(true);
+  expect(
+    isChunkFailure(new Error("Unable to preload CSS for /assets/old.css")),
+  ).toBe(true);
+  expect(isChunkFailure(new Error("Database write failed"))).toBe(false);
+  expect(isChunkFailure(new Error("fetch request failed"))).toBe(false);
+});

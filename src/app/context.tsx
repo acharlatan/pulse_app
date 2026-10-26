@@ -1,3 +1,4 @@
+import { markSaved } from "./update-safety";
 import {
   createContext,
   useContext,
@@ -204,7 +205,9 @@ export function WorkspaceProvider({
         notify: setToast,
         run,
         setSettings: async (patch) => {
+          const form = document.activeElement?.closest("form") || null;
           await updateSettings(db, patch);
+          markSaved(form);
         },
       }}
     >

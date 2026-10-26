@@ -200,3 +200,75 @@ Deployment commit/build and focused production-browser results are recorded in t
 Feature commit `fc9daf0` deployed successfully through Workers Builds (build `3f0ea7f5-c045-43f9-ad68-af68e8686868`). A managed production browser verified the real unconfigured status, temporary Demo opt-in, selected-context approval preview with Send disabled, local message-review dialog, do-not-contact message-handoff suppression, and a real `.ics` download. The downloaded event retained the task UID and correct UTC start/end; downloading left the task incomplete. Demo AI opt-in was restored to off afterward. No provider invocation or external message was sent. These are focused live checks, not the entire mock-backed acceptance suite against production.
 
 A landing tab opened before deployment attempted an old lazy Home chunk after the deployment replaced static assets and reached the existing error boundary. Its Reload action recovered the current application with demo records intact. This is a reproducible cross-deployment asset/update-lifecycle limitation, recorded for Prompt 06; do not claim uninterrupted update adoption. A small follow-up corrects the Assistant breadcrumb label and records this evidence; it changes no data schema, permissions or API behavior.
+
+# Iteration 06 — visual quality, accessibility and PWA reliability
+
+Baseline: `9a64961`; development branch `development/iteration-06`; app version 0.6.0. Existing reports above describe earlier iterations and remain historical evidence.
+
+## Audit and implemented changes
+
+Baseline browser screenshots showed a mobile Home dominated by a promotional hero/statistics before useful work, small metadata, crowded profile tool placement and a floating create control near bottom content. Source inspection found a 521 KB eager main bundle, CRM code loaded before workspace choice, a 135 KB Home chunk for a simple Motion entrance, unguarded SW refresh, repeated dialog title IDs and reliance on native focus wrapping alone.
+
+Shared styles were refined in place: 15px body, 13px labels, 12px metadata floor, 16px mobile controls, stronger muted/faint text and input borders, restrained ambient depth, wrapped tabs/toolbars, larger linked-person targets, safe-area top/bottom navigation, scrollable short sidebars, and create-control hiding during field/dialog editing. Home places relationship work before promotional content; profiles place identity/core actions first and optional tools in a disclosure. Other screens inherit the consistent typography, spacing, control and surface rules; no business screen was replaced with mock content. Directory filters/search/sorting now survive profile return through URL state. Keyboard tabs, skip focus, unique modal titles, explicit focus boundaries/restoration and short visual-viewport scrolling were added. No domain schema, reward rules, import semantics, permissions or provider controls changed.
+
+## Executed automated checks
+
+- `npm run typecheck`: passed strict app and Worker TypeScript, also run through the production build.
+- `npm run lint`: passed.
+- `npm test`: **117 passed across eight files**, retaining all 114 existing tests. New edit-safety tests cover multiple forms, failed-save/unload protection, marker cleanup and missing-chunk versus ordinary-error classification.
+- `npm run test:browser -- --workers=1` with the Chromium environment below: **34 passed** across mobile 390×844 and desktop 1440×1000. This retains all 24 previous cases and adds ten cases for axe, keyboard/dialog/short-screen editing, directory return, bounded stale-chunk recovery and landscape/enlarged text. After final shared wrapping/sidebar refinements, the 12-case iteration06/layout subset passed again.
+- `npm run build -- --outDir /tmp/pulse06-release-build`: passed in a fresh directory, with 30 app-shell precache entries and no >500 KB JS chunk warning.
+- `VITE_BASE_PATH=/pulse_app/ npm run build -- --outDir /tmp/pulse06-subpath-final`: passed; manifest, scope, icons, JS/CSS and service worker use the repository base.
+- `npm run check:worker -- --assets /tmp/pulse06-release-build`: passed, ~138 KB / 25 KB gzip Worker bundle, existing ASSETS/AI_QUOTA bindings and disabled AI vars preserved.
+- `PULSE_DIST=/tmp/pulse06-release-build npm run test:pwa -- --workers=1`: **eight passed** (four offline/update cases and four 100/1,000-contact scale cases). A subsequent focused repository-subpath run passed two additional cases. PWA output is separate under ignored `.codex/pwa-results`.
+
+Browser commands used `PULSE_CHROMIUM_PATH=/tmp/pulse06-chromium LD_LIBRARY_PATH=/tmp:/tmp/pulse06-libs/lib VK_ICD_FILENAMES=/tmp/vk_swiftshader_icd.json`. Chromium 153 came from a temporary registry package outside project dependencies; archive ownership operations required `--no-same-owner`. The first baseline script tried a nonexistent previous binary and a server in another command namespace; unpacking the registry runtime and starting the server as the browser script's child resolved this. No browser binary, private data or provider key was committed.
+
+## Accessibility and visual findings
+
+Axe-core checks WCAG A/AA, 2.1 AA and 2.2 AA tags on Home, Network, person/company profiles, Pipeline, tasks/progress, Review, Smart Lists, Import, Assistant and Settings in both themes and both viewport projects. **Zero violations remained in that exercised matrix.** Initial checks identified a short linked-person target, native dialog Tab wrapping inconsistency, a 320px tab-group overflow and low contrast during a button theme transition. Enlarged targets, an explicit Tab boundary, flexible tabs and removal of background-color button animation resolved them. A transform-only Home entrance avoids fading text through low contrast. A missing-file test aborts a genuine lazy route request, verifies no automatic reload, then manually recovers once and confirms saved contacts remain.
+
+Keyboard testing includes Tab/Shift+Tab containment, Escape, restored opener focus, arrow-key directory selection and focus after navigation. A long fictional note is saved/reloaded from a 390×430 viewport with reachable Save; this simulates reduced available height, not a physical virtual keyboard. Native VoiceOver/NVDA was unavailable. Actual 200%/400% browser zoom was not exercised; 320px reflow and enlarged text tokens were checked instead. No WCAG certification is claimed.
+
+Programmatic layout checks cover all existing primary screens/editors at 320, 375, 390, 430, 768, 1024, 1280 and 1440px in light/dark. Additional 844×390 landscape and enlarged text checks passed. Actual rendered baseline/final Welcome, Home, Network, profiles, Pipeline, Activity/Progress, Review, Lists, Import, Assistant and Settings screenshots were captured internally. Inspected 390px light Home, 390px dark contact, 320px dark Home, 768px/tablet and 1440px desktop theme views; contact sheets supported review of advanced routes. Fixed-content checks do not establish every physical safe-area/keyboard behavior. No owner screenshot was required.
+
+## Real service-worker/offline evidence
+
+The production-build harness serves generated assets and a genuine SW. Root and repository-scoped registrations cache routes successfully. Offline reload, contacts/company profiles, tasks, lists, recommendations, progress, local note creation/persistence and backup downloads passed. Cache inspection found no `/api/` entries. Chromium's installability diagnostics returned an empty error list on the tested root pages; manifest name/icons/standalone fields were validated. No native install button was pressed and no physical Android/iOS standalone app is claimed.
+
+Controlled SW script revisions create a real waiting worker. Updating an edited settings form first requires confirmation; dismissing preserves the draft. Accepting updates that tab while a second tab retains its unfinished input and receives a notice. The updated tab has its saved records and no repeated update loop. Native registration replaces the helper's unconditional cross-tab reload handler. Edit markers remain in memory and never autosave sensitive fields. Old pre-06 clients cannot retroactively receive these guards; save before the initial upgrade. The controlled test changes SW content while keeping fixture assets available; the separate failed-import test simulates missing old route files. Full production/CDN/physical-device combinations remain release QA, not proven by this simulation.
+
+## Performance measurements
+
+Clean-build baseline versus iteration06 (rounded):
+
+| Asset | Before minified / gzip | After minified / gzip |
+| --- | --- | --- |
+| Initial main JS | 521.46 / 157.89 KB | 234.53 / 73.44 KB |
+| Deferred workspace | included in main | 289.55 / 86.52 KB |
+| Home JS | 135.46 / 44.17 KB | 10.67 / 3.39 KB |
+| CSS | 69.02 / 14.23 KB | 75.11 / 14.99 KB |
+| Offline precache | 873.56 KiB | about 756.42 KiB |
+
+Workspace deferral improves first-use loading; it does not pretend to eliminate all deferred CRM code. Removing the only Motion usage removes substantial Home code; its CSS replacement honors reduced motion. CSS grows modestly due to readable shared tokens/control refinements. Repeated local builds retained old generated files in this environment, so release cache measurements use a fresh output rather than accumulated dist assets.
+
+Three fresh-context unthrottled localhost Welcome samples measured FCP/LCP before 312/152/140ms and after 112/132/92ms; medians 152→112ms, CLS 0 in all samples. Browser-reported initial JS encoded body bytes were 157,886→73,436. This is a shared-runtime lab observation, not a field Core Web Vitals/Lighthouse score, a phone benchmark or a controlled-network performance guarantee. No field INP is claimed.
+
+Production-build browser scale tests import synthetic data through the real wizard and bound directory DOM to 60 cards. Measured Apply-click→confirmation / directory-action / search-action times (automation overhead included):
+
+| Contacts | Mobile viewport | Desktop viewport |
+| --- | --- | --- |
+| 100 | 105 / 847 / 24ms | 115 / 365 / 26ms |
+| 1,000 | 167 / 366 / 42ms | 240 / 377 / 68ms |
+
+These timings exclude earlier mapping/validation steps and are not equivalent to INP. Empty Personal and fictional Demo journeys remain covered by the retained suite. This does not establish unlimited dataset scalability.
+
+## Data safety, scope and release limits
+
+DB and backup remain v3; old v1/v2 restoration, atomic replacement, workspace isolation, restrictions, historical company attribution and reward correction regressions remain passing. App metadata is 0.6.0 only. No secret, Access, quota, model, billing, integration connection or Worker migration change was introduced. Gemini remains off.
+
+No confirmed P0/P1 defect remains in the executed journeys. Remaining **verification priorities**: physical iOS/Android installation/keyboards/safe areas, native screen readers, literal browser zoom, Firefox/WebKit, broader live CDN transition coverage and real-device performance. **P2 limits:** pre-06 tabs use old update code; ordinary in-app Back/workspace navigation is not universal draft recovery; edit markers can conservatively warn after assistant/import selections. See the prioritized Prompt 07 checklist in DEVELOPMENT_ROADMAP.md. Do not declare these untested platforms verified.
+
+The delivery report records the actual integrated commit, Workers Builds result and focused production-browser evidence after deployment. Local or HTTP success alone is not treated as live workflow acceptance.
+
+Final visual review caught a clipped tablet sidebar label; allowing navigation text to wrap fixed it. The final clean deployment build and a two-case full layout rerun (including sidebar internal-width assertions) passed after that and safe-area top-padding refinements.

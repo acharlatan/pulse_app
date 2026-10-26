@@ -1,7 +1,7 @@
 import { CommunicationHandoff } from "../components/communication";
 import { outreachReasons } from "../ai/context";
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -36,6 +36,7 @@ import { EditorModal, type Editor } from "../components/forms";
 import { deleteContact, deleteOrganization } from "../data/repository";
 import { eligible, lastInteraction } from "../services/recommendations";
 export function Profile({ company = false }: { company?: boolean }) {
+  const returnPath = useLocation().state?.networkReturn;
   const { id } = useParams();
   const p = usePulse();
   const navigate = useNavigate();
@@ -78,17 +79,18 @@ export function Profile({ company = false }: { company?: boolean }) {
       : undefined;
   return (
     <div className="page profile-page">
-      <Link to="/network" className="text-link back-link">
+      <Link
+        to={
+          typeof returnPath === "string" &&
+          /^\/network(?:\?|$)/.test(returnPath)
+            ? returnPath
+            : "/network"
+        }
+        className="text-link back-link"
+      >
         <ArrowLeft size={16} />
         Back to your network
       </Link>
-      <Link
-        className="button secondary"
-        to={`/assistant?scope=${company ? "organization" : "contact"}&id=${encodeURIComponent(id!)}`}
-      >
-        PULSE Intelligence · selected context
-      </Link>
-      {contact && !company && <CommunicationHandoff contact={contact} />}
       <section className="surface profile-header">
         <div className="profile-cover">
           <div />
@@ -239,6 +241,20 @@ export function Profile({ company = false }: { company?: boolean }) {
               Create opportunity
             </button>
           </div>
+          <details className="profile-secondary">
+            <summary>More relationship tools</summary>
+            <div className="record-actions">
+              <Link
+                className="button secondary"
+                to={`/assistant?scope=${company ? "organization" : "contact"}&id=${encodeURIComponent(id!)}`}
+              >
+                Catch Me Up · optional AI
+              </Link>
+              {contact && !company && (
+                <CommunicationHandoff contact={contact} />
+              )}
+            </div>
+          </details>
         </div>
       </section>
       <nav className="profile-section-nav" aria-label="Profile sections">

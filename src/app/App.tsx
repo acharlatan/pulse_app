@@ -1,83 +1,20 @@
+import { lazy, Suspense, useEffect, useState } from "react";
 import {
-  Component,
-  Suspense,
-  lazy,
-  useState,
-  type ReactNode,
-  type ErrorInfo,
-} from "react";
-import { HashRouter, Routes, Route, Link } from "react-router-dom";
-import {
-  ArrowRight,
   ArrowUpRight,
   AudioLines,
-  Check,
   Heart,
   LockKeyhole,
   Users,
 } from "lucide-react";
-import { WorkspaceProvider } from "./context";
-import { Shell } from "./Shell";
 import type { Workspace } from "../data/models";
-const Assistant = lazy(() =>
-  import("../features/Assistant").then((m) => ({ default: m.Assistant })),
+import { ErrorBoundary } from "./Recovery";
+import { installEditProtection } from "./update-safety";
+const WorkspaceApp = lazy(() =>
+  import("./Workspace").then((m) => ({ default: m.WorkspaceApp })),
 );
-const Home = lazy(() =>
-  import("../features/Home").then((m) => ({ default: m.Home })),
-);
-const Network = lazy(() =>
-  import("../features/Network").then((m) => ({ default: m.Network })),
-);
-const Profile = lazy(() =>
-  import("../features/Profile").then((m) => ({ default: m.Profile })),
-);
-const Activity = lazy(() =>
-  import("../features/Activity").then((m) => ({ default: m.Activity })),
-);
-const Pipeline = lazy(() =>
-  import("../features/Pipeline").then((m) => ({ default: m.Pipeline })),
-);
-const Settings = lazy(() =>
-  import("../features/Settings").then((m) => ({ default: m.Settings })),
-);
-const CsvImport = lazy(() =>
-  import("../features/CsvImport").then((m) => ({ default: m.CsvImport })),
-);
-const Review = lazy(() =>
-  import("../features/Review").then((m) => ({ default: m.Review })),
-);
-const SmartLists = lazy(() =>
-  import("../features/SmartLists").then((m) => ({ default: m.SmartLists })),
-);
-export class ErrorBoundary extends Component<
-  { children: ReactNode },
-  { error: boolean }
-> {
-  state = { error: false };
-  static getDerivedStateFromError() {
-    return { error: true };
-  }
-  componentDidCatch(_error: Error, _info: ErrorInfo) {
-    /* CRM details intentionally never logged. */
-  }
-  render() {
-    return this.state.error ? (
-      <div className="startup">
-        <h1>Let's find our footing.</h1>
-        <p>
-          PULSE hit an unexpected problem. Your saved workspace is still on this
-          device.
-        </p>
-        <button className="button primary" onClick={() => location.reload()}>
-          Reload PULSE
-        </button>
-      </div>
-    ) : (
-      this.props.children
-    );
-  }
-}
+export { ErrorBoundary } from "./Recovery";
 export function App() {
+  useEffect(installEditProtection, []);
   const [workspace, setWorkspace] = useState<Workspace | null>(() => {
     const w = localStorage.getItem("pulse-workspace");
     return w === "demo" || w === "personal" ? w : null;
@@ -91,51 +28,19 @@ export function App() {
       {!workspace ? (
         <Welcome onSelect={select} />
       ) : (
-        <HashRouter>
-          <WorkspaceProvider
+        <Suspense
+          fallback={
+            <div className="startup" role="status">
+              Opening your local workspace…
+            </div>
+          }
+        >
+          <WorkspaceApp
             key={workspace}
             workspace={workspace}
             onSwitch={select}
-          >
-            <Shell>
-              <Suspense
-                fallback={
-                  <div className="page" role="status">
-                    Finding your rhythm…
-                  </div>
-                }
-              >
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/network" element={<Network />} />
-                  <Route path="/network/people/:id" element={<Profile />} />
-                  <Route
-                    path="/network/companies/:id"
-                    element={<Profile company />}
-                  />
-                  <Route path="/assistant" element={<Assistant />} />
-                  <Route path="/import" element={<CsvImport />} />
-                  <Route path="/review" element={<Review />} />
-                  <Route path="/lists" element={<SmartLists />} />
-                  <Route path="/pipeline" element={<Pipeline />} />
-                  <Route path="/activity" element={<Activity />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route
-                    path="*"
-                    element={
-                      <div className="page">
-                        <h1>A little off the path.</h1>
-                        <Link className="button primary" to="/">
-                          Back to Daily Pulse
-                        </Link>
-                      </div>
-                    }
-                  />
-                </Routes>
-              </Suspense>
-            </Shell>
-          </WorkspaceProvider>
-        </HashRouter>
+          />
+        </Suspense>
       )}
     </ErrorBoundary>
   );
@@ -181,9 +86,9 @@ function Welcome({ onSelect }: { onSelect: (w: Workspace) => void }) {
         <BadgeWelcome />
         <h2>Find your rhythm.</h2>
         <p>
-          Your people. Their stories. One thoughtful space.
+          Contacts, conversations and follow-ups. One thoughtful space.
           <br />
-          Let's make room for what comes next.
+          Keep track of people and your next commitments.
         </p>
         <button className="welcome-choice" onClick={() => onSelect("demo")}>
           <span className="choice-icon lavender">

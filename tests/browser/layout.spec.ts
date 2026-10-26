@@ -44,6 +44,13 @@ test("all primary screens and editors fit supported widths in both themes", asyn
           `${theme} ${width} ${route}`,
         ).toBe(true);
       }
+      if (width >= 768)
+        expect(
+          await page
+            .locator(".sidebar")
+            .evaluate((el) => el.scrollWidth <= el.clientWidth),
+          "sidebar text wraps within the navigation rail",
+        ).toBe(true);
       await page.goto("/#/network/people/contact-0");
       await expect(
         page.getByRole("button", { name: "Edit profile", exact: true }),

@@ -13,17 +13,17 @@ Semantic CSS variables in `src/styles.css`:
 | Background   | `#f7f7fa` | `#171820` |
 | Surface      | `#ffffff` | `#21222d` |
 | Text         | `#292a3b` | `#efedf7` |
-| Muted        | `#757587` | `#aba8bc` |
-| Primary      | `#7161e8` | `#a598ff` |
+| Muted        | `#626477` | `#b7b3c8` |
+| Primary      | `#6956d8` | `#a598ff` |
 | Soft primary | `#efedfc` | `#312c4e` |
 | Success      | `#247965` | `#8dd6ba` |
 | Danger       | `#b53d55` | `#ffa5b5` |
 
-Muted/faint metadata must be checked for contrast before claiming WCAG conformance; a formal contrast audit is still pending. Semantic tokens apply to every surface, input, dialog and feedback state. Illustration hues and avatar pastels are decorative component-specific exceptions.
+Muted/faint values were strengthened and automated contrast checks passed on the tested major routes. Manual contrast and screen-reader review remain necessary before any conformance claim. Semantic tokens apply to every surface, input, dialog and feedback state. Illustration hues and avatar pastels are decorative component-specific exceptions.
 
 ## Type and space
 
-Native system sans-serif avoids remote font requests. Page titles 26–38px; section titles 15–21px; body 12–14px; compact desktop metadata 9–12px. Mobile body copy and key profile details increase for readability. Metadata is intentionally lower emphasis; continue readability QA on physical devices.
+Native system sans-serif avoids remote font requests. Page titles 26–38px; section titles 15–21px; body 15px; labels 13px; metadata 12px minimum. Mobile form controls use 16px to preserve reading comfort. Secondary information stays lower emphasis through hierarchy, not tiny text; continue physical-device readability QA.
 
 Use a 4px base and 8px major rhythm; card padding 20–32px, page gutters 14–40px, grid gaps 16–24px. Compact metadata spacing and icon alignment may use optical adjustments. Standard button/input height at least 44–46px; task check visuals extend their hit area. Cards 15–22px radii; inputs/buttons 10–12px. Avoid treating secondary buttons as selected controls.
 
@@ -37,7 +37,7 @@ Filled primary, soft secondary, ghost and destructive actions. Selection uses ex
 
 ## Accessibility and motion
 
-Semantic headings, labels, native dialogs with Escape/focus handling, skip link and keyboard focus. Reduced-motion media query plus user setting. Home uses a short opacity/position transition disabled by either preference. Never introduce auto-playing celebrations or dragging as the only way to change pipeline stage. Screen-reader and contrast audits remain part of ongoing QA; no certification claimed.
+Semantic headings, labels, native dialogs with Escape/focus handling, skip link and keyboard focus. Reduced-motion media query plus user setting. Home uses a short transform-only entrance disabled by either preference; text never fades through low contrast. Never introduce auto-playing celebrations or dragging as the only way to change pipeline stage. Screen-reader and contrast audits remain part of ongoing QA; no certification claimed.
 
 ## Iteration 02 profile and record patterns
 
@@ -56,3 +56,11 @@ Progress uses existing surfaces, badges, native progress bars and form controls.
 ## Iteration 05 assistance and handoffs
 
 Assistant uses existing surfaces, semantic tokens and maximum content width with a single-column mobile form. Identity/category controls precede exact-context approval; long JSON previews scroll within a bounded panel rather than widening the page. Response sections distinguish cited facts, suggestions and missing evidence. AI labels remain visible; drafts and proposals retain ordinary editable fields and explicit Save/Reject actions. Restrictions appear in plain text, not color alone. New calendar and message reviews reuse the accessible Modal and shared button patterns. No second navigation system, remote imagery or new animation framework is introduced. Large visual/accessibility/PWA review remains iteration 06.
+
+## Iteration 06 refinements
+
+The existing declarations and responsive variants use shared `--font-meta`, `--font-label`, `--font-body`, `--input-border`, `--ambient` and `--hero-ink` tokens. Light muted/faint are #626477/#6d6f82; dark #b7b3c8/#aaa5bc. A restrained top-edge ambient wash and low elevation provide depth. Ordinary controls keep filled/soft/ghost states; color-changing button transitions were removed to avoid illegible light/dark crossover.
+
+Home puts useful work ahead of the hero; profile tools use an accessible disclosure. Tab groups wrap at small widths, task/person links have useful target heights and short desktop sidebars scroll while hiding nonessential promotional copy. Mobile top and bottom navigation respect safe areas. Page padding reserves the final action/navigation region; create controls hide while editing a field or dialog. Toasts sit near the mobile top rather than over bottom actions. Dialogs use viewport-aware internal scrolling, unique accessible titles and an explicit focus boundary/restoration. Larger typography is applied in existing style rules rather than replacing the design language.
+
+Welcome, Home, Network, profiles, Pipeline, Activity/Progress, Review, Smart Lists, Import, Assistant and Settings were captured internally. Tests combine overflow, dialog bounds, landscape, enlarged text, keyboard and axe findings. No screenshot was accepted solely because overflow was absent. See QA_REPORT.md for exact coverage and unavailable physical/native assistive technology tests.
