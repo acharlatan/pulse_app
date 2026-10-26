@@ -104,8 +104,8 @@ export function SmartLists() {
                   {l.name} ·{" "}
                   {l.entityType === "organization"
                     ? p.organizations.filter((o) => companyMatch(o, l)).length
-                    : p.contacts.filter((c) => matcher(c, l)).length}{" "}
-                  · {l.entityType === "organization" ? "companies" : "people"}
+                    : p.contacts.filter((c) => matcher(c, l)).length}
+                  {l.entityType === "organization" ? " · companies" : ""}
                 </option>
               ))}
             </select>

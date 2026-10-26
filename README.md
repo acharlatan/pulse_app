@@ -32,7 +32,7 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 - Centralized, explainable relationship health and reviews; saved snoozes/dismissals; opportunity risk flags; authoritative restriction and permission checks.
 - Dynamic built-in and saved ALL/ANY Smart Lists; Network applies the same saved definitions.
 - CSV preview, editable mapping, row validation, deterministic duplicate comparisons, selected-field merges, company matching, atomic import and accurate result/history reports. No consent or availability is imported.
-- Version-three JSON backups with metadata and a validated replacement preview; version-one and version-two restores remain supported.
+- Version-four JSON backups with metadata and a validated replacement preview; version-one through version-three restores remain supported.
 - Light/dark/device themes; motion preference; local name, locale/timezone and rhythm settings; category-specific in-app alerts.
 - JSON backups with runtime validation and atomic restore; contact CSV export; separate demo reset/personal deletion; workspace switching.
 - Complete opportunity creation, editing, deletion and stage/outcome transitions; company and representative associations, values, expected close and user-entered probabilities.

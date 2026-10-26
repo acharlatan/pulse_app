@@ -339,3 +339,23 @@ The distribution script checks inventory, ZIP integrity and SHA-256. Static file
 Final feedback-preservation verification: `npx playwright test --config=.codex/release.config.ts tests/browser/release07.spec.ts tests/browser/iteration04.spec.ts --workers=1 --output=.codex/deploy-focused` passed **12/12** on current source. `npm test` passed **124/124** again. Final static ZIP contains 36 entries, 272,233 bytes, SHA-256 `7b68631678d208d4b4c2c24aec2967080220ef3d0ea0d090534b8494a06e1648`; credential-pattern scan passed. The package is generated locally; no GitHub asset upload is claimed.
 
 Final deployment-build PWA commands: `PULSE_DIST=/tmp/pulse07-deploy npm run test:pwa -- --workers=1` passed **10/10** (57.7s). `PULSE_DIST=/tmp/pulse07-deploy-subpath npm run test:pwa -- --grep 'repository subpath' --workers=1` passed **2/2** (10.6s), exercising the actual absolute-subpath output. No final automated gate is left failing; the full-run/rerun distinction and manual limits above remain explicit.
+
+## Iteration 08 — PULSE 1.1.0-rc.1
+
+Implementation includes pipelines/stages with stable identities and explicit outcome categories, field definitions/typed values, Focus selections, company segments, bulk administrative updates and saved Home preferences. Existing Worker security/configuration is preserved; AI remains disabled. Database and backup evolve to v4 together.
+
+### Automated data and build evidence
+
+- `npm run typecheck`, `npm run lint`: passed.
+- `npm test`: **145 passed, 11 files**. Includes 13 expansion cases plus 8 pure pipeline cases. Actual v3 upgrade, failed-upgrade rollback, preserved reward/correction history and saved lists, stable stage rename, invalid destination, category semantics, used-stage mapping/confirmation, configuration without XP grants, custom value validation/rename/roundtrip, Focus cleanup, company rules, selected-only writes, stale-selection rejection and transaction rollback exercised. Historical v1/v2 fixtures and previous reward/CRM/Worker tests retained.
+- Test fixture maintenance changes expected current schema/backup version from 3 to 4. An import test now uses the actual persisted source snapshot rather than relying on saving within the same millisecond. The form unit test waits for the accessible dialog button before submission.
+- `npm run build`, `npm run check:worker`, `VITE_BASE_PATH=/pulse_app/ npm run build`: passed. Clean root production output rebuilt after the subpath check. Worker dry run retains ASSETS, AI_QUOTA, disabled AI and existing SQLite migration.
+- `PULSE_CHROMIUM_PATH=/tmp/pulse-chromium npm run test:pwa -- --workers=1 --reporter=line`: **10 passed**, including cached offline routes/edits/backups, update warnings with another editing tab, scoped subpath registration and bounded scale tests. Chromium diagnostics reported no installability errors; this is not physical-device installation evidence.
+
+### Measured conditions
+
+Chromium 153 software rendering in this hosted environment. Production directory: 100 contacts mobile import 104 ms/directory 863 ms/search action 26 ms; desktop 129/461/35 ms. 1,000 contacts mobile 196/862/39 ms; desktop 321/451/58 ms. These are observed run measurements, not guarantees. Pure-data fake-indexeddb/jsdom benchmark with 1,024 contacts and 306 opportunities: saving 44.0 ms, export 7.8 ms, validation 14.1 ms in a focused run.
+
+### Browser iteration evidence and limits
+
+The initial Playwright browser download was truncated. A Chromium runtime with bundled software-rendering libraries was installed for actual browser checks. Initial launch failures are environment failures, not acceptance passes. Full/focused browser results and final deployment evidence are appended below after completion. Visual review identified and fixed narrow-screen pipeline button fragmentation and oversized checkboxes. Automated accessibility identified a touch-target spacing issue around newly added opportunity details; its fix is included in the final reruns. No physical iOS/Android, Firefox/WebKit or native screen-reader certification is claimed. Release remains a candidate.

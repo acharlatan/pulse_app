@@ -27,3 +27,18 @@ Status: **public 1.0.0-rc.1 candidate; stable 1.0 not declared.** QA_REPORT.md d
 Save before browser Back. There is no persistent draft recovery or universal conflict resolution. Stale-save checks apply to person, company, task, opportunity and conversation editors; settings and other editors remain single-editor workflows. Unknown physical-device behavior is not marked passed. No confirmed P0 defect remains in the exercised candidate journeys; any new P0 blocks deployment, and confirmed P1 defects must be fixed or affected support claims restricted.
 
 Keep the release-candidate label while stable verification remains open. Rollback/forward fixes must retain IndexedDB v3 compatibility and the existing SQLite quota migration. Emergency AI disable uses AI_ENABLED=false; never weaken authentication to recover service. See CLOUDFLARE.md.
+
+## Iteration 08 — 1.1.0-rc.1 candidate
+
+Historical 1.0 checklist above remains release evidence for that candidate. This iteration does not declare stable 1.0 or 1.1.
+
+- [x] Stable pipeline identities, separate lifecycle/outcome meanings and transactional impact mappings.
+- [x] Actual v3 upgrades, failed-upgrade rollback, reward/correction/list preservation and historical backup fixtures.
+- [x] Typed custom fields, legacy organization data, Focus state and full v4 backup validation/restore.
+- [x] Selected-only bulk writes, stale-selection rejection and storage-failure rollback.
+- [x] Strict TypeScript, ESLint, 145 unit/Worker tests, production build, Worker dry run and repository-subpath build.
+- [x] Production PWA/offline/update and 100/1000-contact tests (10 Chromium cases).
+- [ ] Final browser reruns after accessibility/selector fixes recorded in QA_REPORT.md.
+- [ ] Authorized main integration, Cloudflare deployment and production workflow evidence recorded.
+
+Stable-only platform gates above remain open. Retain v4-compatible data code for forward fixes after upgrade. Do not deploy an old database client to migrated devices.

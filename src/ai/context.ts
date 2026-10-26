@@ -1,3 +1,4 @@
+import type { PipelineStage } from "../services/pipelines";
 import type {
   Contact,
   Organization,
@@ -10,6 +11,7 @@ import type {
 import { restrictionReasons } from "../services/recommendations";
 import { contextSchema, type AIContext } from "./contracts";
 export interface ContextData {
+  pipelineStages?: PipelineStage[];
   contacts: Contact[];
   organizations: Organization[];
   interactions: Interaction[];
@@ -187,7 +189,7 @@ export function buildContext(
         id: `opportunity:${d.id}`,
         kind: "opportunity",
         text: `${d.title} · ${d.notes}`.slice(0, 1500),
-        state: `${d.stageId} · ${d.status}`,
+        state: `${data.pipelineStages?.find((s) => s.id === d.stageId)?.name || d.stageId} · ${d.status}`,
         at: d.expectedCloseAt,
         ...(o.values
           ? {

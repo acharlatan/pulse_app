@@ -4813,3 +4813,5 @@ img {
 .bulk-option input { width:22px; height:22px; flex-shrink:0; }
 .customize-page > .surface { margin-block:20px; }
 .focus-summary + .surface { margin-block:20px; }
+.deal-card > details > summary { min-height:44px; display:flex; align-items:center; padding-block:10px; cursor:pointer; }
+.deal-card > .company-line { min-height:24px; margin-block:8px; }

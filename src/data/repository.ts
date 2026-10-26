@@ -873,7 +873,7 @@ export async function saveOpportunity(
     );
     await event(
       db,
-      `Opportunity ${previous ? "updated" : "created"} · ${parsed.title} · ${parsed.stageId}`,
+      `Opportunity ${previous ? "updated" : "created"} · ${parsed.title} · ${stage.name}`,
       null,
       parsed.organizationId,
       { entityType: "opportunity", entityId: parsed.id, action: "saved" },
