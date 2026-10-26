@@ -1,6 +1,6 @@
-# PULSE 1.0 release gates
+# PULSE release gates
 
-Status: **public 1.0.0-rc.1 candidate; stable 1.0 not declared.** QA_REPORT.md distinguishes full runs, focused reruns and unexecuted checks. Deploying this explicitly limited candidate is authorized; it does not mark the stable-only manual gates complete.
+Current candidate: **1.2.0-rc.1 (iteration 09); stable release remains undeclared.** The 1.0/1.1 sections below retain historical evidence; current gates are in the iteration09 section. QA_REPORT.md distinguishes full runs, focused reruns and unexecuted checks. Deploying this explicitly limited candidate is authorized; it does not mark the stable-only manual gates complete.
 
 ## Candidate integration
 
@@ -44,3 +44,20 @@ Historical 1.0 checklist above remains release evidence for that candidate. This
 - [x] Cloudflare automatic build succeeded for 6b30c2c; actual live persistence/custom fields/Focus/export checks recorded in QA_REPORT.md.
 
 Stable-only platform gates above remain open. Retain v4-compatible data code for forward fixes after upgrade. Do not deploy an old database client to migrated devices.
+
+## Iteration 09 — 1.2.0-rc.1 candidate
+
+- [x] Shared editorial system, action-first Home, directory modes, profile identity and secondary-route refinements.
+- [x] Desktop Discover/mobile More, scoped real Relationship Orbit and accessible List/navigation alternatives.
+- [x] Local portrait/logo/cover/workspace identity; validated bounded crop/compression and atomic cleanup.
+- [x] DB/backup v5, supported v1–v4 restores, real upgrade/roundtrip/corrupt/quota rollback and isolation tests.
+- [x] Typecheck, lint, 156 unit/Worker tests, clean build, Worker dry run and repository-subpath build.
+- [x] Existing AI/Access/quota/migration boundary remains unchanged and disabled.
+
+Final browser/PWA/publication evidence is recorded in QA_REPORT.md and RELEASE_1_2.md. Existing native-device, browser-engine and assistive-technology stable-only gates remain open. Retain v5-compatible forward fixes after database migration; do not downgrade the client schema.
+
+- [x] All 56 distinct browser cases demonstrated across the compiled full run and corrected 10/10 rerun; no single-clean-run claim.
+- [x] Final PWA12/12 and absolute-subpath2/2, including saved offline photos, update safety and scale.
+- [x] Color-transition contrast defect fixed, test startup readiness strengthened, assertions retained.
+- [x] Comprehensive A–O report in RELEASE_1_2.md; exact release/live deployment record in PR #3.
+- [x] Active image-editor axe checks, actual saved-media screenshot review and missing-Blob fallback verified.

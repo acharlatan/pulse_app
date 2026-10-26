@@ -1,3 +1,11 @@
+import Dexie from "dexie";
+import { cleanMedia } from "./media-repository";
+import {
+  mediaBackupSchema,
+  decodeMedia,
+  encodeBytes,
+  mediaLimits,
+} from "./media-models";
 import {
   pipelineSchema,
   pipelineStageSchema,
@@ -302,6 +310,7 @@ export async function deleteContact(db: PulseDB, id: string) {
       .filter((v) => fields.has(v.fieldId))
       .delete();
     await db.contacts.delete(id);
+    await cleanMedia(db);
     for (const pin of await db.focusItems.toArray())
       if (pin.entityType === "task" && !(await db.tasks.get(pin.recordId)))
         await db.focusItems.delete(pin.id);
@@ -356,12 +365,19 @@ export async function deleteOrganization(db: PulseDB, id: string) {
       .filter((v) => fields.has(v.fieldId))
       .delete();
     await db.organizations.delete(id);
+    await cleanMedia(db);
     await event(db, `Deleted company · ${org.name}; related records preserved`);
   });
 }
 export const backupSchema = z.object({
   format: z.literal("pulse-backup"),
-  version: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+  version: z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(4),
+    z.literal(5),
+  ]),
   metadata: z
     .object({
       appVersion: z.string(),
@@ -369,6 +385,7 @@ export const backupSchema = z.object({
       workspace: z.enum(["demo", "personal"]),
     })
     .optional(),
+  media: z.array(mediaBackupSchema).default([]),
   pipelines: z.array(pipelineSchema).default([]),
   pipelineStages: z.array(pipelineStageSchema).default([]),
   fieldDefinitions: z.array(fieldDefinitionSchema).default([]),
@@ -396,12 +413,23 @@ export const backupSchema = z.object({
 export async function exportBackup(db: PulseDB) {
   return db.transaction("r", db.tables, async () => ({
     format: "pulse-backup",
-    version: 4,
+    version: 5,
     metadata: {
-      appVersion: "1.1.0-rc.1",
+      appVersion: "1.2.0-rc.1",
       exportedAt: new Date().toISOString(),
       workspace: db.workspace,
     },
+    media: await Dexie.waitFor(
+      Promise.all(
+        (await db.media.toArray()).map(async (a) => {
+          const { blob, ...meta } = a;
+          return {
+            ...meta,
+            encoded: encodeBytes(new Uint8Array(await blob.arrayBuffer())),
+          };
+        }),
+      ),
+    ),
     pipelines: (await db.pipelines.count())
       ? await db.pipelines.toArray()
       : planLegacyPipelines(
@@ -497,9 +525,27 @@ export function validateBackup(input: unknown) {
       !entityRows[f.entityType].some((r) => r.id === f.recordId)
     )
       throw new Error("Invalid focus reference.");
+  const assets = b.media.map(decodeMedia);
+  if (
+    assets.length > mediaLimits.count ||
+    assets.reduce((n, a) => n + a.bytes, 0) > mediaLimits.totalBytes
+  )
+    throw new Error("Backup media exceeds local limits.");
+  const mediaIds = new Set(assets.map((a) => a.id));
+  for (const r of [...b.contacts, ...b.organizations])
+    for (const ref of [
+      r.avatar?.startsWith("media-") ? r.avatar : "",
+      r.coverMediaId,
+    ])
+      if (ref && !mediaIds.has(ref))
+        throw new Error("Backup references a missing image.");
+  for (const s of b.settings)
+    if (s.identity.avatarMediaId && !mediaIds.has(s.identity.avatarMediaId))
+      throw new Error("Workspace image is missing.");
   const orgs = new Set(b.organizations.map((v) => v.id)),
     contacts = new Set(b.contacts.map((v) => v.id));
   for (const records of [
+    b.media,
     b.pipelines,
     b.pipelineStages,
     b.fieldDefinitions,
@@ -646,7 +692,26 @@ export function validateBackup(input: unknown) {
 }
 export async function restoreBackup(db: PulseDB, input: unknown) {
   const b = validateBackup(input);
+  const assets = b.media.map(decodeMedia);
+  if (typeof createImageBitmap === "function")
+    for (const a of assets) {
+      let bitmap: ImageBitmap;
+      try {
+        bitmap = await createImageBitmap(a.blob);
+      } catch {
+        throw new Error(
+          "Backup contains an unreadable image. Nothing was replaced.",
+        );
+      }
+      if (bitmap.width !== a.width || bitmap.height !== a.height) {
+        bitmap.close();
+        throw new Error("Invalid image dimensions.");
+      }
+      bitmap.close();
+    }
   await db.transaction("rw", db.tables, async () => {
+    await db.media.clear();
+    await db.media.bulkAdd(assets);
     for (const key of [
       "pipelines",
       "pipelineStages",

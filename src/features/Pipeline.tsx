@@ -9,9 +9,12 @@ export function Pipeline() {
   const p = usePulse(),
     [editor, setEditor] = useState<Editor | null>(null),
     [filter, setFilter] = useState("All"),
+    [selectedId, setSelectedId] = useState(""),
     [limit, setLimit] = useState(30);
   const selected =
-    p.pipelines.find((x) => x.id === p.settings.focus.lastPipelineId) ||
+    p.pipelines.find(
+      (x) => x.id === (selectedId || p.settings.focus.lastPipelineId),
+    ) ||
     p.pipelines.find((x) => x.isDefault) ||
     p.pipelines[0];
   const rows = p.opportunities.filter((o) => o.pipelineId === selected?.id),
@@ -36,7 +39,9 @@ export function Pipeline() {
         <button
           className="button primary"
           disabled={selected?.archived}
-          onClick={() => setEditor({ kind: "opportunity" })}
+          onClick={() =>
+            setEditor({ kind: "opportunity", pipelineId: selected?.id })
+          }
         >
           New opportunity
         </button>
@@ -55,6 +60,7 @@ export function Pipeline() {
           <select
             value={selected?.id || ""}
             onChange={(e) => {
+              setSelectedId(e.target.value);
               setFilter("All");
               setLimit(30);
               void p.run(() =>

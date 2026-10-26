@@ -34,6 +34,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const { intelligence, workspace, settings, contacts, tasks } = usePulse();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [add, setAdd] = useState(false);
+  const [more, setMore] = useState(false);
   const [alerts, setAlerts] = useState(false);
 
   const location = useLocation();
@@ -85,7 +86,9 @@ export function Shell({ children }: { children: ReactNode }) {
           </span>
           <div>
             <strong>
-              {workspace === "demo" ? "The demo studio" : "My workspace"}
+              {workspace === "demo"
+                ? "The demo studio"
+                : settings.identity.workspaceName || "My workspace"}
             </strong>
             <small>
               {workspace === "demo"
@@ -122,9 +125,24 @@ export function Shell({ children }: { children: ReactNode }) {
             Relationship Review
           </NavLink>
         </nav>
-        <Link className="nav-item" to="/focus">
-          My Focus
-        </Link>
+        <nav aria-label="Discover">
+          <p className="nav-label">DISCOVER</p>
+          {[
+            ["/focus", "My Focus"],
+            ["/orbit", "Relationship Orbit"],
+            ["/lists", "Smart Lists"],
+          ].map(([to, label]) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                "nav-item " + (isActive ? "active" : "")
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+        </nav>
         <div className="sidebar-bottom">
           <div className="sidebar-note">
             <span className="little-spark">✳</span>
@@ -151,7 +169,10 @@ export function Shell({ children }: { children: ReactNode }) {
             <CircleHelp size={20} />A little guidance
           </Link>
           <Link to="/settings" className="user-card">
-            <Avatar name={settings.name || "My workspace"} />
+            <Avatar
+              mediaId={settings.identity.avatarMediaId}
+              name={settings.name || "My workspace"}
+            />
             <div>
               <strong>{settings.name || "Your workspace"}</strong>
               <small>Your personal space</small>
@@ -177,6 +198,9 @@ export function Shell({ children }: { children: ReactNode }) {
                       : location.pathname === "/assistant"
                         ? "PULSE Intelligence"
                         : {
+                            "/orbit": "Relationship Orbit",
+                            "/focus": "My Focus",
+                            "/customize": "Personalize PULSE",
                             "/review": "Relationship Review",
                             "/lists": "Smart Lists",
                             "/import": "Import contacts",
@@ -209,7 +233,11 @@ export function Shell({ children }: { children: ReactNode }) {
               {count > 0 && <i />}
             </button>
             <Link to="/settings" aria-label="Open settings">
-              <Avatar name={settings.name || "You"} size="small" />
+              <Avatar
+                mediaId={settings.identity.avatarMediaId}
+                name={settings.name || "You"}
+                size="small"
+              />
             </Link>
           </div>
         </header>
@@ -232,7 +260,36 @@ export function Shell({ children }: { children: ReactNode }) {
             <span>{short}</span>
           </NavLink>
         ))}
+        <button
+          aria-label="More destinations"
+          aria-expanded={more}
+          onClick={() => setMore(true)}
+        >
+          <LayoutGrid size={21} />
+          <span>More</span>
+        </button>
       </nav>
+      {more && (
+        <Modal title="Explore your workspace" onClose={() => setMore(false)}>
+          <nav className="explore-menu" aria-label="More destinations">
+            {[
+              ["/focus", "My Focus"],
+              ["/orbit", "Relationship Orbit"],
+              ["/review", "Relationship Review"],
+              ["/lists", "Smart Lists"],
+              ["/assistant", "PULSE Intelligence"],
+              ["/customize", "Customize"],
+              ["/settings", "Settings"],
+              ["/help", "Help"],
+            ].map(([to, label]) => (
+              <Link key={to} to={to} onClick={() => setMore(false)}>
+                {label}
+                <ArrowUpRight size={18} />
+              </Link>
+            ))}
+          </nav>
+        </Modal>
+      )}
       <button
         className="floating-add"
         aria-label="Create a new record"

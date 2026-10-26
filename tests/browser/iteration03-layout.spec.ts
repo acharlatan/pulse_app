@@ -14,6 +14,9 @@ test("CSV mapping, duplicate comparison and confirm screens fit mobile/desktop i
   test.setTimeout(120000);
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "A good day to connect.", exact: true }),
+  ).toBeVisible();
   for (const theme of ["light", "dark"]) {
     await page.goto("/#/settings");
     await page
@@ -24,15 +27,13 @@ test("CSV mapping, duplicate comparison and confirm screens fit mobile/desktop i
       .click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await page.goto("/#/import");
-    await page
-      .getByLabel("Contact CSV file")
-      .setInputFiles({
-        name: "layout.csv",
-        mimeType: "text/csv",
-        buffer: Buffer.from(
-          'Name,Email,Role,Company,Notes\nOlivia Chen,olivia.chen@company-0.example,"Director of strategic relationships and ongoing business development","A fictional organization with an intentionally long name for wrapping checks","An imported note, with a quoted comma and a meaningful next action."',
-        ),
-      });
+    await page.getByLabel("Contact CSV file").setInputFiles({
+      name: "layout.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(
+        'Name,Email,Role,Company,Notes\nOlivia Chen,olivia.chen@company-0.example,"Director of strategic relationships and ongoing business development","A fictional organization with an intentionally long name for wrapping checks","An imported note, with a quoted comma and a meaningful next action."',
+      ),
+    });
     await page
       .getByRole("button", { name: "Continue to mapping", exact: true })
       .click();

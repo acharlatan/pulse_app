@@ -286,7 +286,7 @@ it("upgrades an actual v3 database atomically preserving IDs, dates, outcomes an
   await old.table("opportunities").bulkPut(deals);
   old.close();
   await db.open();
-  expect(db.verno).toBe(4);
+  expect(db.verno).toBe(5);
   expect(await db.opportunities.toArray()).toEqual(
     [...deals].sort((a, b) => a.id.localeCompare(b.id)),
   );
@@ -443,6 +443,7 @@ it("v3 upgrade preserves real reward correction history, saved lists and legacy 
     "fieldDefinitions",
     "fieldValues",
     "focusItems",
+    "media",
   ]);
   const schema = Object.fromEntries(
     db.tables

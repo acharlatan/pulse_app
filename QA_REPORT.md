@@ -380,3 +380,57 @@ Production integration was attempted through an expected-head squash merge. Auto
 The owner subsequently granted standing authorization to merge/update the project and deploy it. PR #2 merged as **6b30c2cc37000b25cfd2596ebedc51d25121548c**. Cloudflare automatic build **fa623358-1f9a-4e25-afe5-fd4ffdf636b5** completed successfully. Deployment **7f7d2ee8-ed35-4f32-a6c8-2a38b505c57b** serves Worker version **cdea617a-117b-4b1a-afae-e3b089f1d0b5** at 100% traffic.
 
 The production `/release.json` reports 1.1.0-rc.1, database 4 and backup 4. A fresh isolated Chromium context on the production origin exercised fictional demo data: existing opportunities were readable; a custom Partnerships pipeline and opportunity were created; the custom Active Partnership stage produced Won; pipeline/opportunity state survived reload; a company select field/value and Focus pin saved; and a downloaded v4 backup contained 2 pipelines, 16 stages, 1 custom definition/value, 1 pin and all 24 demo contacts. No real user's workspace was accessed or modified. `/api/ai/status` returned available:false and mode:disabled. This is actual live workflow/export evidence, not HTTP-200-only verification. Physical-device/native-assistive-technology limits remain open. Release decision: published PULSE 1.1.0-rc.1 candidate.
+
+## Iteration 09 — PULSE 1.2.0-rc.1
+
+Base main verified at b93b5d9511ac4607fde973e520f1f9a821267b30. DB/backup v5 adds media; existing v1–v4 restore compatibility and historical CRM/reward/permission/pipeline behavior are retained. See RELEASE_1_2.md (sections A–O) for design, implementation and support boundaries.
+
+### Data/build checks
+
+- `npm run typecheck` and `npm run lint`: passed on the completed experience, media/Orbit and selected-pipeline handoff changes.
+- `npm test -- --reporter=verbose`: **156 passed / 12 files**. Eleven new media/Orbit cases cover save/replace/remove, stale slot, injected quota/write rollback, v5 export/corrupt rejection/valid roundtrip, decoder failure before replacement, missing cover references, shared-reference deletion cleanup, workspace isolation, actual v4 upgrade, signature/dimension validation, explicit graph links/scopes/deletion and bounded scale. Prior 145 CRM/pipeline/custom-field/Focus/reward/import/historical backup/Worker security tests remain.
+- `npm run build -- --outDir /tmp/pulse09-release-final`: passed, **38 precache entries / 907.64 KiB**. `npm run check:worker -- --assets /tmp/pulse09-release-final`: passed, **783.09 KiB / 124.50 KiB gzip**; ASSETS/AI_QUOTA, existing SQLite migration and AI_ENABLED=false preserved. No provider call or paid service was enabled.
+- `VITE_BASE_PATH=/pulse_app/ npm run build -- --outDir /tmp/pulse09-subpath-publish`: passed, 38 entries / 907.47 KiB.
+- `npm audit --json`: **zero known findings**. This is an advisory snapshot, not total security certification.
+- Repeated builds in the inherited dist directory retained stale generated assets in this hosted filesystem despite emptyOutDir. Release measurements and final PWA checks use a fresh named output directory; stale precache counts are not presented as release sizes. Cloudflare builds start from a clean checkout.
+
+### Observed performance
+
+Hosted Node 24.22.1/Linux; Chromium 153 software rendering, automated viewport emulation. Initial JS **235,362 bytes / 73,682 gzip** (baseline 235,446 bytes); CSS **102,960 / 20,618 gzip** (baseline 77,061 bytes). Lazy Workspace **349,740 / 107,062 gzip**, Home **8,814 / 2,848**, Orbit **12,676 / 4,297**, crop editor **6,077 / 2,534**. New media is not loaded into the global CRM context. No Core Web Vitals or field performance guarantee is inferred.
+
+Pure derivation with fixed layout budget, limit60 and 10/100/1,000 synthetic contacts measured **18.9 / 6.7 / 9.1 ms** in the final unit run (warm-up affects comparison). DOM/SVG is separately capped: desktop map24, mobile map18, list60/hard80. An earlier production PWA scale run observed import/directory/search-action ms: mobile1000 **553/539/182**, desktop100 **290/897/259**, desktop1000 **783/620/231** under concurrent verification. These are observations, not phone benchmarks.
+
+### Browser/visual procedure
+
+Portable Playwright Chromium archives could not be used directly in this environment. Chromium153 from temporary @sparticuz/chromium was extracted with no ownership restoration, outside project dependencies, with software-rendering libraries. Browser binaries are not distributed. Commands set `PULSE_CHROMIUM_PATH=/tmp/pulse-chromium`.
+
+Focused new feature suite passed **8/8** before final label separation/pipeline refinement. Full exploratory verification found a genuine race: immediately opening New opportunity after pipeline selection could initialize from the prior saved preference. The view now selects synchronously and passes its selected ID to the editor. Another focused run under overlapping browser workloads reached all workflow writes but missed the lazy Focus route after reload; it is not counted as a release pass. Final release browser/PWA counts are appended below.
+
+Actual screenshots reviewed: 390px light action-first Home; 390px light directory; 390px dark company; 1440px dark Orbit before/after fixed-budget label separation; prior light/dark profile/Home captures. Current screenshot suites record Home/profile/Orbit at390/1440 both themes, Customize and primary editors at320–1440, CSV mapping/duplicate/confirm and Assistant approvals. Corrections: map auto-fit and node caps, nonshrinking two-line labels and deterministic separation, search width, wrapped toolbar, mobile details sheet, native checkbox sizing and profile button spacing. All eight accent/theme combinations have axe assertions. Final saved-media/crop captures and fallback evidence are appended after execution.
+
+Physical iOS/Android install/standalone/keyboard/download/orientation, native VoiceOver/NVDA, genuine 200%/400% zoom and Firefox/WebKit remain **unverified**, not silently passed. Automated axe/viewport checks do not certify WCAG conformance. Release remains a candidate. No analytics, automation engine, sync or external integrations are claimed for Prompt09.
+
+
+### Final compiled browser evidence
+
+`PULSE_CHROMIUM_PATH=/tmp/pulse-chromium PULSE_DIST=/tmp/pulse09-final npm run test:browser -- --config=playwright.production.config.ts --workers=2 --reporter=line --output=.codex/browser09-production`: **51 passed / 5 failed** in 10.2 minutes. The compiled runner uses the local static harness; service workers are blocked only here so network chunk-failure interception remains meaningful. Missing-chunk assertions now cover both development and compiled module paths; no recovery assertion was removed. Real offline/update behavior is independently checked by the PWA suite.
+
+Three failures were early navigation before the first/reloaded screen was ready: a startup theme hint and an absent temporary-answer element were mistaken for React/router readiness, and the CSV test navigated immediately after choosing Demo. Added positive screen-ready assertions before the next navigation. A fourth failure sampled dark text against the previous light background during the newly introduced button-background transition. Removed color transition, retaining transform-only motion. A fifth persistence check expired while the profile still showed the lazy loading state under concurrent workload; the assertion was retained.
+
+`PULSE_CHROMIUM_PATH=/tmp/pulse-chromium PULSE_DIST=/tmp/pulse09-release-final npm run test:browser -- --config=playwright.production.config.ts --grep 'Northstar relationship|CSV mapping|selected context|major routes|demo acceptance' --workers=1 --reporter=line --output=.codex/browser09-final-reruns`: **10/10 passed in 3.8 minutes**, both projects for every affected journey, including all light/dark route axe checks. All **56 distinct browser cases** are demonstrated across the full run and corrected reruns; this is explicitly **not** a single uninterrupted 56/56 result. No assertion was removed or weakened. Final breadcrumb copy also names Orbit, Focus and Customize correctly.
+
+The full run passed the new JPEG/PNG/WebP upload/crop/replace/remove/reload journey, >8MB/unsupported/corrupt rejection, company logo/cover and workspace identity, v5 exported images restored into an isolated Personal context and reloaded, real Orbit associations/scopes/navigation/zoom/list, mobile More, new widths/themes and all preset contrast checks in both projects. Existing pipeline/custom fields/Focus/bulk/permission/reward/import/stale-save/denied-storage journeys remain covered.
+
+### Final production PWA and scoped builds
+
+`PULSE_CHROMIUM_PATH=/tmp/pulse-chromium PULSE_DIST=/tmp/pulse09-release-final npm run test:pwa -- --workers=1 --reporter=line`: **12/12 passed in 1.2 minutes**, including both saved-photo offline reload cases, offline CRM edits/backups, API noncaching, waiting-worker/multi-tab edit protection, scoped navigation and 100/1,000-contact scale tests. Chromium installability diagnostics reported no errors; this does not claim physical installation. Final scale import/directory/search-action ms: mobile100 **116/428/40**, mobile1000 **460/415/68**, desktop100 **156/486/95**, desktop1000 **276/313/120**.
+
+`VITE_BASE_PATH=/pulse_app/ npm run build -- --outDir /tmp/pulse09-subpath-publish` and the final Worker dry run passed. `PULSE_CHROMIUM_PATH=/tmp/pulse-chromium PULSE_DIST=/tmp/pulse09-subpath-publish npm run test:pwa -- --grep 'repository subpath' --workers=1 --reporter=line`: **2/2 passed in 11.5s**, exercising the actual final absolute-subpath output. App source stayed unchanged during these PWA runs. Final support remains candidate-scoped to the documented automated evidence.
+
+Deployment source and live evidence: [PR #3](https://github.com/acharlatan/pulse_app/pull/3). Its deployment record is updated after merge/build/smoke verification, avoiding an otherwise redundant documentation-only main deployment. No publication success is inferred from local checks.
+
+### Saved-media visual acceptance
+
+Final compiled helper captured person/company avatar and cover crop previews, saved person/company profiles and Welcome. Four active crop-editor axe analyses passed. A fictional company avatar Blob was then removed directly from the isolated test database; after reload the saved profile remained readable and rendered FS initials, with no broken image. Reviewed `crop-company-avatar.png` and `saved-person.png`, plus the earlier directory/company/Home/fitted-Orbit light/dark captures. Output remains in ignored `.codex/visual09`; no test database or browser binary is distributed. Functional upload/restore/offline assertions remain in the committed browser/PWA suites.
+
+Release disposition: automated candidate integration gates complete; ready for the owner's authorized expected-head merge, automatic Cloudflare build and live verification. Physical-platform/assistive-technology gates remain open. Actual production disposition is recorded in PR #3 after deployment.

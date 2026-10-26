@@ -129,6 +129,14 @@ test("Northstar relationship workflow persists and all new editors work", async 
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  // The startup theme hint appears before React/router readiness. Wait for the
+  // saved Settings route before requesting a hash-only navigation.
+  await expect(
+    page.getByRole("heading", {
+      name: "Your space, your rhythm.",
+      exact: true,
+    }),
+  ).toBeVisible();
   await page.goto(personURL);
   await expect(
     page.getByText("Corrected partnership scope.", { exact: true }),

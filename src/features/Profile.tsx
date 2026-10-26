@@ -1,3 +1,5 @@
+import { MediaControls } from "../components/media-controls";
+import { LocalMedia } from "../components/local-media";
 import { FocusButton } from "../components/focus";
 import { CustomFields } from "../components/custom-fields";
 import { CommunicationHandoff } from "../components/communication";
@@ -95,12 +97,29 @@ export function Profile({ company = false }: { company?: boolean }) {
       </Link>
       <section className="surface profile-header">
         <div className="profile-cover">
-          <div />
+          {record.coverMediaId ? (
+            <LocalMedia
+              id={record.coverMediaId}
+              className="profile-cover-image"
+              alt="Profile cover"
+            />
+          ) : (
+            <div />
+          )}
           <span>EVERY RELATIONSHIP HAS A STORY.</span>
         </div>
         <div className="profile-identity">
-          <Avatar name={record.name} size="xl" company={company} />
+          <Avatar
+            mediaId={record.avatar}
+            name={record.name}
+            size="xl"
+            company={company}
+          />
           <div className="profile-heading-actions">
+            <MediaControls
+              owner={company ? "organization" : "contact"}
+              id={record.id}
+            />
             <button
               className="button secondary"
               onClick={() =>
@@ -259,11 +278,19 @@ export function Profile({ company = false }: { company?: boolean }) {
           </details>
         </div>
       </section>
-      <FocusButton type={company ? "organization" : "contact"} id={record.id} />
-      <CustomFields
-        type={company ? "organization" : "contact"}
-        id={record.id}
-      />
+      <div className="profile-quick-links">
+        <FocusButton
+          type={company ? "organization" : "contact"}
+          id={record.id}
+        />
+        <Link
+          className="button ghost"
+          to={`/orbit?${company ? "company" : "person"}=${record.id}`}
+        >
+          View in Relationship Orbit
+        </Link>
+      </div>
+
       {company && org && Object.keys(org.customFields).length > 0 && (
         <section className="surface">
           <h2>Legacy company details</h2>
@@ -320,6 +347,10 @@ export function Profile({ company = false }: { company?: boolean }) {
       </div>
       <div className="profile-columns">
         <aside>
+          <CustomFields
+            type={company ? "organization" : "contact"}
+            id={record.id}
+          />
           <section className="surface" id="overview">
             <SectionHeading
               title={company ? "About the company" : "The little details"}
@@ -493,7 +524,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                     key={c.id}
                     to={`/network/people/${c.id}`}
                   >
-                    <Avatar name={c.name} />
+                    <Avatar mediaId={c.avatar} name={c.name} />
                     <div>
                       <strong>{c.name}</strong>
                       <span>

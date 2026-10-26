@@ -131,7 +131,8 @@ test("missing lazy chunk has a bounded manual recovery and preserves saved recor
   await demo(page);
   let reloads = 0;
   page.on("load", () => reloads++);
-  await page.route("**/src/features/Pipeline.tsx*", (r) => r.abort());
+  const chunks = ["**/src/features/Pipeline.tsx*", "**/assets/Pipeline-*.js"];
+  for (const chunk of chunks) await page.route(chunk, (r) => r.abort());
   await page
     .getByRole("link", { name: "Pipeline", exact: true })
     .first()
@@ -140,7 +141,7 @@ test("missing lazy chunk has a bounded manual recovery and preserves saved recor
     page.getByRole("heading", { name: "A newer PULSE is ready.", exact: true }),
   ).toBeVisible();
   expect(reloads).toBe(0);
-  await page.unroute("**/src/features/Pipeline.tsx*");
+  for (const chunk of chunks) await page.unroute(chunk);
   await page
     .getByRole("button", { name: "Reload current version", exact: true })
     .click();

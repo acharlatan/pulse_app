@@ -91,3 +91,10 @@ Personal onboarding derives steps from current saved records, with workspace set
 ## Iteration 08 — current expansion
 
 Iteration 08 is the first post-release expansion candidate, 1.1.0-rc.1. Pipeline customization, custom fields, My Focus, company segmentation, limited bulk administration and Home preferences are implemented. Stable certification still requires the manual platform gates. Next work: physical-device/assistive-technology verification, richer field-aware CSV mapping, directory pagination and carefully scoped future integrations; no new paid services are enabled.
+
+
+## Iteration 09 — experience release candidate
+
+Implemented the editorial visual system, action-first Home, directory modes, profile identity/cover headers, mobile More/desktop Discover, local media editing and v5 backup compatibility, workspace identity/accents and a real bounded Relationship Orbit. See RELEASE_1_2.md for verification and release disposition.
+
+Prompt 10 can build advanced analytics, historical reporting, deterministic rule automation and opportunity insights on explicit CRM associations, historical attribution, pipelines and typed fields. Prompt 11 can handle integrations and remaining distribution work. Neither external sync nor automatic outreach is implemented in Prompt 09. Physical-device/native assistive-technology verification remains a separate candidate support gate.

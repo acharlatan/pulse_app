@@ -1,6 +1,6 @@
 # PULSE
 
-**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small businesses. Release candidate 1.1.0-rc.1 (iteration 08); stable release gates remain open.
+**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small businesses. Release candidate 1.2.0-rc.1 (iteration 09); stable release gates remain open.
 
 ## Run
 
@@ -15,7 +15,7 @@ npm test
 npm run build
 ```
 
-The production site is the `dist/` directory. `npm run dev` is for development; the production build generates the service worker. `npm run test:browser` supplies a portable Playwright suite; install its Chromium browser in your own development environment first (`npx playwright install chromium`). See `QA_REPORT.md` for what was actually run in the build environment.
+The production site is the `dist/` directory. `npm run dev` is for development; the production build generates the service worker. `npm run test:browser` supplies a portable Playwright suite; install its Chromium browser in your own development environment first (`npx playwright install chromium`). For compiled-release browser checks, build first, then use `PULSE_DIST=dist npm run test:browser -- --config=playwright.production.config.ts`. The separate PWA suite tests offline caching and service-worker updates. See `QA_REPORT.md` for what was actually run in the build environment.
 
 ## Deploy to GitHub Pages
 
@@ -32,7 +32,7 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 - Centralized, explainable relationship health and reviews; saved snoozes/dismissals; opportunity risk flags; authoritative restriction and permission checks.
 - Dynamic built-in and saved ALL/ANY Smart Lists; Network applies the same saved definitions.
 - CSV preview, editable mapping, row validation, deterministic duplicate comparisons, selected-field merges, company matching, atomic import and accurate result/history reports. No consent or availability is imported.
-- Version-four JSON backups with metadata and a validated replacement preview; version-one through version-three restores remain supported.
+- Version-five JSON backups with optimized local images, metadata and a validated replacement preview; versions one through four remain supported.
 - Light/dark/device themes; motion preference; local name, locale/timezone and rhythm settings; category-specific in-app alerts.
 - JSON backups with runtime validation and atomic restore; contact CSV export; separate demo reset/personal deletion; workspace switching.
 - Complete opportunity creation, editing, deletion and stage/outcome transitions; company and representative associations, values, expected close and user-entered probabilities.
@@ -42,13 +42,13 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 
 ## Storage and privacy
 
-Dexie schema version 4 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
+Dexie schema version 5 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
 
 No mandatory account, analytics, external fonts or external avatars. Records remain local unless you export them, open a reviewed external communication handoff, or explicitly approve selected context for optional Gemini processing. AI is off by default and production generation remains unconfigured. Provider keys are never entered in the frontend. IndexedDB is **not application-level encryption**; browser-profile access permits data access. Browser clearing/eviction and device loss can erase data. Back up important records. Workspace data is scoped to an origin: preview, GitHub Pages and hosted deployments do not share records. Export/import to move between them. Databases are not yet namespaced for multiple PULSE deployments on the same origin.
 
 ## Backup and deletion
 
-Settings → Privacy & data → Export creates a versioned JSON backup of this workspace. Restore accepts a JSON file up to 10 MB and requires explicit confirmation. Zod validates records; identifiers, foreign references and duplicates are checked before a single transaction replaces tables. Failed validation changes nothing. CSV export mitigates spreadsheet-formula injection. CSV import is available through a guided local wizard (UTF-8 CSV, up to 2 MB / 2,000 rows).
+Settings → Privacy & data → Export creates a versioned JSON backup of this workspace. Restore accepts a JSON file up to 32 MB and requires explicit confirmation. Zod validates records; identifiers, foreign references and duplicates are checked before a single transaction replaces tables. Failed validation changes nothing. CSV export mitigates spreadsheet-formula injection. CSV import is available through a guided local wizard (UTF-8 CSV, up to 2 MB / 2,000 rows).
 
 Deleting a company **detaches and preserves** its people, conversations, tasks, opportunities and activity. Deleting a person removes that person's conversations, tasks, restrictions, permissions and events, and detaches the person from preserved opportunities. Both require confirmation. Neither operation silently removes unrelated records. Export before destructive operations when you need recovery.
 
@@ -86,7 +86,7 @@ Duplicates default to Skip. Exact normalized email is a strong match; exact phon
 
 Only valid selected rows are committed, in one IndexedDB transaction. Invalid rows are reported and excluded, not partially written. A full contact/company snapshot check rejects stale previews; storage errors roll back the entire plan. The wizard caps row rendering and the directory reveals 60 records at a time. Export a JSON backup before bulk edits; there is no import undo beyond restoring a backup. Reimporting unchanged data warns/skips duplicates by default; choosing Create as new intentionally permits duplicates.
 
-Backups export format 3 with app version, time, workspace and record arrays (including Smart Lists, review actions, import history and progress). Format 1 restores supply empty new tables and default intelligence preferences. Restore replaces only the current workspace after validation and explicit confirmation; it is not a merge or synchronization service.
+Backups export format 5 with app version, time, workspace and record arrays (including Smart Lists, review actions, import history and progress). Format 1 restores supply empty new tables and default intelligence preferences. Restore replaces only the current workspace after validation and explicit confirmation; it is not a merge or synchronization service.
 
 ## Iteration 04 — optional momentum
 
@@ -160,3 +160,12 @@ Smart Lists now distinguish people and companies. Company rules include industry
 Network → Bulk add tag opens explicit selection and review for adding/removing tags, contact priority and Focus pin/unpin (up to 200 filtered visible records). All selected records must still match their saved timestamps. Failure rolls back the batch. Restrictions, permissions, interaction history and rewards are not modified by administrative bulk actions.
 
 Database/JSON backup **v4** adds pipelines, stages, definitions, typed values and focus selections. Previous v1/v2/v3 backups are normalized before atomic replacement. There is no database downgrade: retain v4-compatible code for forward fixes. Export a backup before adopting a schema update. See BACKUP_AND_RECOVERY.md and QA_REPORT.md for evidence and limits.
+
+
+## Iteration 09 — the PULSE experience
+
+PULSE 1.2.0-rc.1 adds an editorial Home led by commitments, Cards/Compact directory views, redesigned profile identity headers, a desktop Discover group and mobile More destinations. Person portraits, company logos/covers and workspace photo/name are stored locally, cropped and compressed in the browser; four accent presets support both themes. Use **Photo & cover** / **Logo & cover** beside profile editing, or Settings → Appearance → Workspace photo.
+
+Relationship Orbit maps actual company memberships and opportunity associations, with search, filters, person/company scopes, selection details and record navigation. Desktop Map starts fitted and bounded to 24 records; mobile starts in List (60 records), with an optional 18-record map. Search or focus a record to explore larger networks. No interpersonal relationships are inferred.
+
+DB/backup **v5** adds a media Blob store and additive identity/cover fields. Restore accepts v1–v5. Inputs: JPEG/PNG/WebP ≤8 MB/24 MP; optimized portraits/logos 320×320, covers 1280×480, ≤512 KB each. Local media is capped at 128 images/12 MB; backups use bounded base64 JSON (32 MB intake). No image hosting, cloud sync or AI media transfer. See EXPERIENCE_09.md, RELEASE_1_2.md and QA_REPORT.md for architecture and verified limits. After upgrading, use a v5-compatible forward fix rather than older database clients.
