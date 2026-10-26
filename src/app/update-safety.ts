@@ -27,10 +27,40 @@ export function installEditProtection() {
       event.returnValue = "";
     }
   };
+  const navigate = (event: MouseEvent) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+    const link =
+      event.target instanceof Element
+        ? event.target.closest<HTMLAnchorElement>("a[href]")
+        : null;
+    if (!link || link.target === "_blank" || link.hasAttribute("download"))
+      return;
+    const next = new URL(link.href, location.href);
+    if (
+      next.origin === location.origin &&
+      next.pathname === location.pathname &&
+      next.hash !== location.hash &&
+      next.hash !== "#main" &&
+      !confirmLeave()
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  };
+  document.addEventListener("click", navigate, true);
   document.addEventListener("input", changed, true);
   document.addEventListener("change", changed, true);
   window.addEventListener("beforeunload", leaving);
   return () => {
+    document.removeEventListener("click", navigate, true);
     document.removeEventListener("input", changed, true);
     document.removeEventListener("change", changed, true);
     window.removeEventListener("beforeunload", leaving);
@@ -61,4 +91,16 @@ export function isChunkFailure(error: unknown) {
   return /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk [\w-]+ failed|Unable to preload CSS/i.test(
     message,
   );
+}
+
+export function confirmLeave() {
+  if (!hasUnsavedWork()) return true;
+  if (
+    !window.confirm(
+      "You have unfinished edits. Leave and discard them? Cancel to keep editing.",
+    )
+  )
+    return false;
+  dirty.clear();
+  return true;
 }

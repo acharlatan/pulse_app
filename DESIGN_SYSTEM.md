@@ -64,3 +64,7 @@ The existing declarations and responsive variants use shared `--font-meta`, `--f
 Home puts useful work ahead of the hero; profile tools use an accessible disclosure. Tab groups wrap at small widths, task/person links have useful target heights and short desktop sidebars scroll while hiding nonessential promotional copy. Mobile top and bottom navigation respect safe areas. Page padding reserves the final action/navigation region; create controls hide while editing a field or dialog. Toasts sit near the mobile top rather than over bottom actions. Dialogs use viewport-aware internal scrolling, unique accessible titles and an explicit focus boundary/restoration. Larger typography is applied in existing style rules rather than replacing the design language.
 
 Welcome, Home, Network, profiles, Pipeline, Activity/Progress, Review, Smart Lists, Import, Assistant and Settings were captured internally. Tests combine overflow, dialog bounds, landscape, enlarged text, keyboard and axe findings. No screenshot was accepted solely because overflow was absent. See QA_REPORT.md for exact coverage and unavailable physical/native assistive technology tests.
+
+## Release candidate guidance
+
+Getting Started reuses surface, text-link and primary/secondary button patterns. Steps have text descriptions and current-record completion indicators; no fabricated progress or XP. Help uses native details/summary with 44px summary targets, shared semantic surfaces and lazy route loading. Empty Personal Home avoids zero-value statistics.

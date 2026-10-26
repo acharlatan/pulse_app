@@ -1,0 +1,21 @@
+# Changelog
+
+## 1.0.0-rc.1 — release candidate
+
+- Optional Personal guide reflects saved records; skip/revisit through Help.
+- Expanded in-app help and installation/recovery documentation.
+- Tracked internal-link and workspace-switch warnings; optional localStorage hints tolerate denial.
+- Honest backup download-request feedback. Database/backup remain v3.
+- Stable 1.0 is gated on RELEASE_CHECKLIST.md; unexecuted environments are not certified.
+
+## 0.6.0
+
+Readable shared typography, accessible dialogs/navigation, directory return context, lighter first load, controlled service-worker updates and offline/recovery tests.
+
+## 0.5.0
+
+Protected optional selected-context AI architecture (generation disabled), reviewed task proposals, email/WhatsApp handoffs and calendar exports.
+
+## Earlier iterations
+
+CRM foundation; social profiles and complete task/opportunity/interaction workflows; relationship intelligence, Smart Lists and safe CSV import; optional meaningful XP, quests, goals, streaks and correction ledger.

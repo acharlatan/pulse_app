@@ -263,6 +263,12 @@ export const settingsSchema = z.object({
   gamification: z.boolean(),
   progress: progressPreferencesSchema.default({}),
   ai: aiPreferencesSchema.default({}),
+  onboarding: z
+    .object({
+      hidden: z.boolean().default(false),
+      exportInitiatedAt: z.string().datetime().nullable().default(null),
+    })
+    .default({}),
   reducedMotion: z.boolean(),
   dismissed: z.array(z.string()),
   intelligence: intelligenceSchema.default({}),
@@ -316,6 +322,7 @@ export const defaults: Settings = {
   gamification: true,
   progress: progressPreferencesSchema.parse({}),
   ai: aiPreferencesSchema.parse({}),
+  onboarding: { hidden: false, exportInitiatedAt: null },
   reducedMotion: false,
   dismissed: [],
   intelligence: intelligenceSchema.parse({}),

@@ -272,3 +272,29 @@ No confirmed P0/P1 defect remains in the executed journeys. Remaining **verifica
 The delivery report records the actual integrated commit, Workers Builds result and focused production-browser evidence after deployment. Local or HTTP success alone is not treated as live workflow acceptance.
 
 Final visual review caught a clipped tablet sidebar label; allowing navigation text to wrap fixed it. The final clean deployment build and a two-case full layout rerun (including sidebar internal-width assertions) passed after that and safe-area top-padding refinements.
+
+# Iteration 07 — release candidate assessment (2026-10-26)
+
+Starting main verified through GitHub at 92c122379125d5f09e5b4497e959a69dc75f5818. Work uses release/1.0.0-rc.1. This is candidate work, not stable release approval. Existing CRM/reward/permission repositories, DB and backup v3 and disabled Worker configuration are preserved.
+
+Implemented Personal saved-record onboarding with persistent hide/revisit preference, Help route reachable from mobile Settings, calm empty Personal Home, recovery/install/import documentation, truthful backup download-request feedback, guarded internal links/workspace switches and optional localStorage hint failure handling. Guide preferences are additive validated settings; older backups receive defaults, no schema downgrade/migration or reward replay.
+
+## Executed checks
+
+- `npm run typecheck`, `npm run lint`, `npm test`: passed; 118 tests / 8 files, including workerd security/quota and existing CRM/import/reward/backup regressions.
+- `npm run build -- --outDir /tmp/pulse07-release`: passed; 32 precache entries / 765.66 KiB; initial JS 235.22 KB / 73.65 KB gzip. This preserves the earlier first-load gain; no new field-performance claim.
+- `npm run check:worker -- --assets /tmp/pulse07-rc-build`: passed earlier in this candidate, unchanged Worker 138.12 KiB / 25.08 gzip, AI false and existing SQLite quota binding/migration.
+- `VITE_BASE_PATH=/pulse_app/ npm run build -- --outDir /tmp/pulse07-subpath`: passed before final help-link/import-marker correction. Both corrections preserve build/routing configuration; no newer subpath claim.
+- Full browser run: 36 passed / 2 failed. Transfer assertions awaited exact toast text and were corrected to verify restore-dialog closure and persisted linked records. No stable release approval is based on the failing run. Earlier successful-import guard regression was fixed and focused import checks passed.
+- Full production PWA run: 9 passed / 1 failed (desktop offline note test reloaded immediately after clicking Save). Added an await for successful dialog closure; focused production offline rerun passed both mobile and desktop (2/2), including saved offline note reload, export and no API caches.
+- Chromium 153 from temporary npm @sparticuz/chromium; standard Playwright Chromium download failed with truncated ZIP. Automated mobile viewport 390×844, desktop 1440×1000. Existing layout suite exercises 320–1440 and both themes; Help was added to it. Axe runs included major routes and the new Help page. No physical phone, native installation/screen reader, Firefox/WebKit or literal zoom result is claimed.
+- `npm audit --json`: 7 affected package nodes, including runtime Zod; see DEPENDENCY_REVIEW.md. Findings remain unresolved, so stable release is held.
+- `PULSE_DIST=/tmp/pulse07-release node scripts/package-static.mjs`: verified 35 ZIP entries (web assets/public guides only), ZIP integrity and SHA-256 generated. No keys/databases/test logs are included. GitHub Release/tag publication is not available through the connected write tools and has not been claimed.
+
+## Remaining release gates
+
+Stable 1.0 and production integration are held pending dependency remediation and full release-gate review. Browser Back/modal cancellation remain outside universal draft recovery, cross-tab stale-save conflict detection is not implemented, and physical hardware/assistive technology/real zoom need manual execution. Historical backup fixture review, storage-denied matrix and complete all-domain transfer validation need further evidence. No claim of conflict-free collaboration, encrypted local storage or cloud recovery.
+
+Manual device procedure: start empty Personal; add company/person; write long note with keyboard open; save/reload; create/reschedule/complete task; inspect restricted contact; export JSON and transfer to another browser; install when offered; reopen cached app offline; edit/save/reload; reconnect and approve update with another editing tab open. With VoiceOver/NVDA check labels, modal focus, errors and save/import results. At genuine 200%/400% browser zoom verify every essential action reflows/reaches viewport. Record device/browser versions and actual outcomes before changing support claims.
+
+Final focused acceptance: `npm run test:browser -- tests/browser/release07.spec.ts --workers=1 --output=.codex/transfer-confirm` passed 4/4 (22.8s): Personal skip/revisit/persistence + Help axe checks and real downloaded backup restore into isolated Personal context with linked conversation/profile reload. The restore test verifies actual records after transaction completion; this does not claim every optional progress/permission scenario independently exercised.

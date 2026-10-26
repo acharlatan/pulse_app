@@ -1,4 +1,4 @@
-import { markSaved } from "./update-safety";
+import { confirmLeave, markSaved } from "./update-safety";
 import {
   createContext,
   useContext,
@@ -122,7 +122,11 @@ export function WorkspaceProvider({
       document.documentElement.dataset.motion = s.reducedMotion
         ? "reduced"
         : "normal";
-      localStorage.setItem("pulse-theme", s.theme);
+      try {
+        localStorage.setItem("pulse-theme", s.theme);
+      } catch {
+        /* Optional startup hint only. */
+      }
     };
     apply();
     query.addEventListener("change", apply);
@@ -183,6 +187,11 @@ export function WorkspaceProvider({
       <div className="startup">
         <h1>Storage needs your attention</h1>
         <p>{error}</p>
+        <p>
+          No save has been confirmed. Use your usual browser and allow site
+          storage. Do not clear site data as a first remedy; it may erase
+          existing records. Keep any backup files.
+        </p>
         <button onClick={() => location.reload()}>Try again</button>
       </div>
     );
@@ -201,7 +210,9 @@ export function WorkspaceProvider({
         progress,
         db,
         workspace,
-        switchWorkspace: onSwitch,
+        switchWorkspace: (next) => {
+          if (confirmLeave()) onSwitch(next);
+        },
         notify: setToast,
         run,
         setSettings: async (patch) => {

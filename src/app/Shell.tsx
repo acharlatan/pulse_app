@@ -35,7 +35,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const [editor, setEditor] = useState<Editor | null>(null);
   const [add, setAdd] = useState(false);
   const [alerts, setAlerts] = useState(false);
-  const [help, setHelp] = useState(false);
+
   const location = useLocation();
   const firstRoute = useRef(true);
   useEffect(() => {
@@ -144,9 +144,9 @@ export function Shell({ children }: { children: ReactNode }) {
             <Settings size={20} />
             Settings
           </NavLink>
-          <button className="nav-item" onClick={() => setHelp(true)}>
+          <Link className="nav-item" to="/help">
             <CircleHelp size={20} />A little guidance
-          </button>
+          </Link>
           <Link to="/settings" className="user-card">
             <Avatar name={settings.name || "My workspace"} />
             <div>
@@ -177,6 +177,7 @@ export function Shell({ children }: { children: ReactNode }) {
                             "/review": "Relationship Review",
                             "/lists": "Smart Lists",
                             "/import": "Import contacts",
+                            "/help": "Help & getting started",
                           }[location.pathname] || "Daily Pulse"}
             </strong>
           </div>
@@ -318,30 +319,6 @@ export function Shell({ children }: { children: ReactNode }) {
           >
             Manage alert preferences <ArrowUpRight size={16} />
           </Link>
-        </Modal>
-      )}
-      {help && (
-        <Modal title="Find your rhythm" onClose={() => setHelp(false)}>
-          <div className="help-content">
-            <p>
-              <strong>Start with your network.</strong> Add a company, then the
-              people you know there.
-            </p>
-            <p>
-              <strong>Keep the story.</strong> Open a profile to log
-              conversations and notes, and plan a follow-up.
-            </p>
-            <p>
-              <strong>Make space.</strong> Pause someone in their profile when
-              they're unavailable. Restricted people stay out of reconnection
-              suggestions.
-            </p>
-            <p>
-              <strong>Keep a copy.</strong> Back up your workspace from
-              Settings. Records stay in this browser and aren't encrypted by
-              PULSE.
-            </p>
-          </div>
         </Modal>
       )}
     </div>

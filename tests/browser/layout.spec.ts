@@ -6,6 +6,7 @@ test("all primary screens and editors fit supported widths in both themes", asyn
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   const routes = [
+    "/help",
     "/",
     "/network",
     "/network/companies/org-0",

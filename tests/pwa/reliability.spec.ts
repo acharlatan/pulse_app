@@ -63,6 +63,7 @@ test("production manifest and cached CRM support offline routes, edits and backu
   await page
     .getByRole("button", { name: "Save interaction", exact: true })
     .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.reload();
   await expect(
     page.getByText("A fictional note created and saved while offline.", {

@@ -1,6 +1,6 @@
 # PULSE
 
-**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Development iteration 06 of 07.
+**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Release candidate 1.0.0-rc.1 (iteration 07 of 07); stable release gates remain open.
 
 ## Run
 
@@ -54,7 +54,7 @@ Deleting a company **detaches and preserves** its people, conversations, tasks, 
 
 ## Architecture
 
-`src/app` owns providers/router/shell. `src/data` owns models, migrations, seed and transactional repositories. `src/services` holds pure recommendation rules. `src/components` contains reusable primitives, forms and offline/update feedback. `src/features` contains route modules. Shared record editors and relationship views live under `src/components`. CSS semantic tokens form the design system; Tailwind v4 is available through Vite. Dexie live queries refresh all views after writes. Route modules are lazy loaded; Motion is used for restrained entry transitions.
+`src/app` owns providers/router/shell. `src/data` owns models, migrations, seed and transactional repositories. `src/services` holds pure recommendation rules. `src/components` contains reusable primitives, forms and offline/update feedback. `src/features` contains route modules. Shared record editors and relationship views live under `src/components`. CSS semantic tokens form the design system; Tailwind v4 is available through Vite. Dexie live queries refresh all views after writes. Route modules are lazy loaded; small CSS transitions respect reduced motion.
 
 ## Limits and next work
 
@@ -137,3 +137,7 @@ The app shell precaches all current route files after a successful online worksp
 `npm run test:pwa` runs production-build tests after `npm run build`. Tests use a local-only server, real service workers and synthetic records; no test control endpoint is deployed. For an isolated build set `PULSE_DIST` to its directory. `npm run test:browser` retains all CRM and AI mock regression journeys and adds accessibility/recovery/keyboard checks. See QA_REPORT.md for measured results and limits.
 
 Welcome now defers the CRM workspace code until selection. The only large Home animation dependency was removed after confirming no other usage; a small transform-only CSS entrance honors reduced motion. Initial JS is approximately 235 KB minified / 73 KB gzip, with a separate workspace chunk. No IndexedDB schema or backup-format migration is needed; metadata now identifies app 0.6.0, while backups remain v3 and accept compatible v1/v2 files.
+
+## Release candidate guides
+
+See [Getting started](GETTING_STARTED.md), [Installation](INSTALLATION.md), [Backup and recovery](BACKUP_AND_RECOVERY.md), [Changelog](CHANGELOG.md) and [Release gates](RELEASE_CHECKLIST.md). Personal Home has an optional saved-record guide; Help can reopen it. No stable 1.0 or physical-device certification is claimed.
