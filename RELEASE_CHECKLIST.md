@@ -40,7 +40,7 @@ Historical 1.0 checklist above remains release evidence for that candidate. This
 - [x] Production PWA/offline/update and 100/1000-contact tests (10 Chromium cases).
 - [x] Clean full browser run: 48/48 passed after accessibility/selector fixes; recorded in QA_REPORT.md.
 - [x] Final production PWA rerun: 10/10 passed.
-- [ ] Main integration explicitly authorized (automatic approval review rejected the attempted merge).
-- [ ] Cloudflare deployment and production workflow evidence recorded after authorized integration.
+- [x] Owner explicitly granted standing merge/update/deployment authorization; PR #2 merged.
+- [x] Cloudflare automatic build succeeded for 6b30c2c; actual live persistence/custom fields/Focus/export checks recorded in QA_REPORT.md.
 
 Stable-only platform gates above remain open. Retain v4-compatible data code for forward fixes after upgrade. Do not deploy an old database client to migrated devices.
