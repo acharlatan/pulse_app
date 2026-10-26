@@ -4,6 +4,32 @@
   "workers_dev": true,
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
-  }
+    "not_found_handling": "single-page-application",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
+  },
+  "main": "worker/index.ts",
+  "vars": {
+    "AI_ENABLED": "false",
+    "GEMINI_MODEL": "gemini-3.5-flash-lite",
+    "ACCESS_AUD": "",
+    "ACCESS_TEAM_DOMAIN": "",
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "AI_QUOTA",
+        "class_name": "AIQuota",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "pulse-ai-v1",
+      "new_sqlite_classes": ["AIQuota"],
+    },
+  ],
+  "observability": {
+    "enabled": false,
+  },
 }

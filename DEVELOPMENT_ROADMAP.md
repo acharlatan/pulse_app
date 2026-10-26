@@ -17,7 +17,7 @@
 - Basic channel/purpose permissions and availability history; advanced consent audit/export and multi-rule conflict resolution remain future work.
 - In-app alerts evaluated when active; no background/browser/push/email delivery.
 - Optional progress now implemented in iteration 04; advanced challenges and richer planning remain future work.
-- Integration metadata only. Every provider is planned and disconnected.
+- Google OAuth providers remain planned/disconnected. Iteration 05 adds disabled optional protected Gemini and local calendar/communication handoffs.
 - PWA build verified; physical installation, cache-update lifecycle, and full offline navigation await device testing.
 
 ## Iteration 02 — implemented
@@ -51,7 +51,7 @@
 
 ## Remaining consolidated iterations — 7 total
 
-**05 — Optional AI and selected integrations.** Secure Gemini requests using explicitly selected CRM context, reviewed summaries/drafts and note-to-task; prioritize a small number of authorized practical calendar/email workflows. Preserve local/offline operation and clear disconnected states. No frontend secrets or autonomous changes.
+**05 — Implemented with activation boundary.** Protected, disabled-by-default Gemini Worker; bounded selected-context approvals; Catch Me Up/Ask/drafts/reviewed note-to-task; local .ics/email/WhatsApp handoffs. Synthetic provider tests and local SQLite runtime verification cover application behavior. Live generation remains off pending a fresh server secret, explicit Access configuration and provider quota/privacy review. See CLOUDFLARE.md and QA_REPORT.md. No frontend secrets, automatic sends or OAuth connection claims.
 
 **06 — Comprehensive visual/mobile/accessibility/PWA refinement.** Screenshot-guided review moves here; refine all screens without replacing the identity. Physical installation/offline/update adoption, device keyboard behavior, contrast/screen-reader/keyboard QA and measured performance.
 
@@ -64,3 +64,7 @@ Commerce/loyalty, multi-user/team access and synchronization are separate produc
 ## Known limitations
 
 Browser-local storage can be cleared/evicted; no encrypted database or synchronization. Preview and production origins have independent data. Multiple app copies on one origin currently share the same database names. Complete dataset live queries suit small workspaces; large-scale pagination is future work. Settings locale/timezone validate, but date/time inputs use device timezone. Formal WCAG audit, physical keyboard behavior and closed-app delivery are not claimed. JSON restores limited to 10 MB; CSV contact imports limited to UTF-8, 2 MB, 2,000 rows and 40 columns. No XLSX, arbitrary encoding conversion or import undo.
+
+## Iteration 05 boundaries and Prompt 06 priorities
+
+No live-provider generation, Google OAuth, automatic synchronization or persisted AI chat. Scope is one contact/company/opportunity at a time; summaries may omit older records within documented caps. Citations are source-membership checks, not guarantees of correct interpretation. Access browser-session setup is operator-managed. Prompt 06 should prioritize accessible assistant/form navigation, actual-device mailto/WhatsApp/calendar behavior, physical PWA offline/update lifecycle, contrast/focus/screen-reader review, mobile keyboards, bundle measurement and optional model activation QA only after fresh credentials/access are configured. Public demo must remain useful with AI disabled.

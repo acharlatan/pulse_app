@@ -155,3 +155,41 @@ Progress calendar timezone is fixed at initial opt-in; display-timezone changes 
 Optional manual Today focus, bulk task actions and weekly calendar previews were deferred. Histories display the latest 40 reward corrections; complete history remains in backups. Local-only storage/privacy and browser-eviction limitations remain. Formal contrast/screen-reader testing, physical keyboard/phone tests, installation and offline/update lifecycle QA remain iteration 06 work. This iteration introduces no AI, secrets, delivery infrastructure, paid service or synchronization.
 
 Development branch: development/iteration-04. The delivery report records the actual integrated commit, Cloudflare build outcome and focused live-browser results after deployment. Local success or HTTP status alone is not presented as full production acceptance.
+
+# Iteration 05 — optional intelligence and practical handoffs
+
+Date: 26 October 2026. Baseline: `5ece121`; development branch: `development/iteration-05`. App version 0.5.0. Earlier reports above remain historical evidence.
+
+## Executed local checks
+
+- `npm run typecheck`: passed strict application and Worker TypeScript. Also executed by the production build.
+- `npm run lint`: passed.
+- `npm test`: **114 passed across 7 files**, including the original 93 tests. New suites contain 15 AI/security/context/handoff tests, five reviewed-record/persistence tests and one real workerd/SQLite runtime test.
+- `npm run build`: passed. PWA generated 30 precache entries. Main chunk is approximately 521 KB minified / 158 KB gzip, producing the existing non-fatal >500 KB warning. Assistant is lazy loaded (~19 KB minified / 6 KB gzip). No Gemini SDK is in the browser bundle.
+- `VITE_BASE_PATH=/pulse_app/ npm run build -- --outDir /tmp/pulse05-subpath-build`: passed, including the subpath manifest, assets and service worker.
+- `npm run check:worker`: passed Wrangler 4.152.0 deploy dry run with current static assets, ASSETS/SQLite bindings and AI disabled. Worker upload approximately 138 KB / 25 KB gzip.
+- `PULSE_CHROMIUM_PATH=/tmp/pulse05-chromium LD_LIBRARY_PATH=/tmp:/tmp/pulse05-browser-libs/lib VK_ICD_FILENAMES=/tmp/vk_swiftshader_icd.json npm run test:browser -- --workers=1`: **24 cases passed**, mobile 390×844 and desktop 1440×1000 projects. All 18 existing cases were retained. A preceding focused four-case run also passed before final refinements.
+
+## Functional and security evidence
+
+Tests validate context category exclusions, original source IDs, historical company attribution, record/text bounds, marketing versus relationship consent, withdrawals, malformed/extra request fields, unknown model/operation refusal and invented-reference rejection. Provider HTTP is mocked with synthetic keys and structured responses; tests inspect fixed endpoint/header/system instructions, token cap, no tools, failure propagation and no credential reflection. Signed synthetic RSA Access JWTs verify issuer/audience/signature/expiry; missing/spoofed assertions fail. Disabled/unconfigured requests fail before provider calls. Quota-storage failure refuses admission rather than bypassing controls. Mocked malicious note text remains data and cannot invoke any application command. This is an architectural safeguard test, **not evidence of real model immunity to prompt injection**.
+
+A real Miniflare/workerd instance runs the actual Worker bundle and SQLite Durable Object. It verifies static assets, disabled status/generation, concurrent admission, request replay and daily refusal. Separate pure-policy assertions cover the 200-request lifetime ceiling, per-operator rate and expired concurrency leases. The test-only reserve/release routes exist only in the test wrapper and are not deployed.
+
+Repository tests verify reviewed task idempotence, invalid-reference rejection, no proposal/note-creation XP, note provenance, missing-preference defaults, disabled-write refusal and workspace isolation. Existing migration, v1/v2/v3 backup, malformed-restore rollback, CSV import, permissions, reward integrity and CRM CRUD tests remain passing. Optional AI preferences and task provenance do not require indexed schema changes; DB/backup remain v3, compatible with old formats. No restored record initiates a network request or new reward.
+
+Browser journeys use explicit test-only mocked status/provider responses. They verify cancel means zero generation requests, exact context preview excludes default channels, cited source navigation opens saved editors, missing evidence is visible, drafts can be edited, individual proposals require a manually selected date, one accepted task persists while a rejected proposal does not, refresh clears temporary answers, and reviewed all-day `.ics` files download. A separate unconfigured flow verifies disabled generation and the independent local message-review composer. No real email/WhatsApp message, provider request, calendar synchronization or XP is claimed.
+
+## Responsive and visual review
+
+Existing full-screen/editor overflow checks remain. New assistant controls and approval-dialog bounds are checked at **320, 375, 390, 430, 768, 1024, 1280 and 1440px**, in light and dark themes. No unintended page/dialog horizontal overflow was detected. Internally inspected actual 390px dark and desktop dark screenshots; theme tokens, wrapped labels and ordinary form controls remain cohesive. These checks do not prove formal contrast/WCAG compliance, physical phone keyboard behavior, native composer availability or PWA installation/update behavior.
+
+## Resolved intermediate failures and environment
+
+Used temporary registry-supplied Chromium 153 outside the repository with manually unpacked libraries, as in prior iterations; no browser binary/package was added to application dependencies. Initial exact-label selectors included populated textarea/select child text and timed out despite correctly rendered controls; semantic role/name selectors resolved this. One JWT-expiry test initially advanced Date.now before constructing its request, causing the fixture to consume the one-shot mock; constructing the fixture first and holding/restoring the clock fixed the test. The final full browser run used frozen application source. After that full run, app/backup metadata moved to 0.5.0 and reviewed-task identifiers were strengthened to SHA-256 with transaction-safe hashing. Unit checks, production build and the focused six-case AI/handoff browser suite were repeated successfully. A synthetic audit-storage failure additionally verifies full reviewed-task rollback.
+
+## Activation boundary and deferred verification
+
+Production is intentionally configured `AI_ENABLED=false`, with no fresh provider secret or Access audience/team configured by this change. The previously exposed chat credential is not reused. No paid inference, billing change or new hosted CRM storage is enabled. Local mock success does not establish live Gemini quality, credentials, account quotas or Access browser-session behavior. CLOUDFLARE.md documents protected activation, limits and rollback requirements. Live generation requires separate fresh secret/access setup and focused verification. OAuth/calendar sync, automatic sending, full-workspace chat, stored chat history and background AI remain deferred. Physical PWA/native-app/accessibility/performance review belongs to Prompt 06.
+
+Deployment commit/build and focused production-browser results are recorded in the delivery report after integration; local builds and HTTP responses alone are not presented as production workflow acceptance.

@@ -6,3 +6,8 @@ playwright-report
 test-results
 .codex/
 *.tsbuildinfo
+
+.env*
+.dev.vars*
+.wrangler/
+upload/

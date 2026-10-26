@@ -1,10 +1,6 @@
-# pulse_app
+# PULSE
 
-AI Powered CRM Messenger
-
-**PULSE — Every relationship has a story.**
-
-**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Development iteration 04 of 07.
+**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Development iteration 05 of 07.
 
 ## Run
 
@@ -48,7 +44,7 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 
 Dexie schema version 3 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
 
-No account, analytics, external fonts, external avatars, AI processing or API keys. Records do not leave the browser unless you export them. IndexedDB is **not application-level encryption**; browser-profile access permits data access. Browser clearing/eviction and device loss can erase data. Back up important records. Workspace data is scoped to an origin: preview, GitHub Pages and hosted deployments do not share records. Export/import to move between them. Databases are not yet namespaced for multiple PULSE deployments on the same origin.
+No mandatory account, analytics, external fonts or external avatars. Records remain local unless you export them, open a reviewed external communication handoff, or explicitly approve selected context for optional Gemini processing. AI is off by default and production generation remains unconfigured. Provider keys are never entered in the frontend. IndexedDB is **not application-level encryption**; browser-profile access permits data access. Browser clearing/eviction and device loss can erase data. Back up important records. Workspace data is scoped to an origin: preview, GitHub Pages and hosted deployments do not share records. Export/import to move between them. Databases are not yet namespaced for multiple PULSE deployments on the same origin.
 
 ## Backup and deletion
 
@@ -62,7 +58,7 @@ Deleting a company **detaches and preserves** its people, conversations, tasks, 
 
 ## Limits and next work
 
-No sync, authentication, team permissions or external integrations. Integrations are honestly labeled planned/disconnected. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Custom pipelines, advanced directory pagination and broader external integrations are deferred. Relationship stories render 20 entries at a time. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
+No synchronization, hosted CRM accounts or team permissions. Google OAuth integrations remain planned/disconnected. Optional protected AI and manual communication/calendar handoffs are described below. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Custom pipelines, advanced directory pagination and broader external integrations are deferred. Relationship stories render 20 entries at a time. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
 
 ## License
 
@@ -70,7 +66,7 @@ MIT. See `LICENSE`. Fictional sample data uses reserved `.example` / `example.co
 
 ## Cloudflare Workers
 
-Production: https://pulse.icareaboutyoufam.workers.dev. `main` automatically builds through Workers Builds using `npm run build` and `npx wrangler deploy`. `wrangler.jsonc` serves `dist` as Static Assets. See `CLOUDFLARE.md`. No Gemini credentials are required or stored.
+Production: https://pulse.icareaboutyoufam.workers.dev. `main` automatically builds through Workers Builds using `npm run build` and `npx wrangler deploy`. `wrangler.jsonc` serves `dist` as Static Assets, running the Worker first only for `/api/*`. See `CLOUDFLARE.md` for the disabled-by-default AI backend, access controls and secret setup. No credentials are required for ordinary CRM use.
 
 ## Iteration 02 data policy
 
@@ -107,3 +103,21 @@ Up to three daily quests reference specific eligible due tasks, retain their ide
 The progress calendar captures the selected timezone at first opt-in and stays fixed for the workspace. Display-timezone changes do not move historical days, duplicate rewards or change progress week boundaries. Weeks begin Monday. Streaks count distinct qualifying calendar days, continuing through yesterday when today has no completion; corrected/reopened records recalculate them. Historical logs cannot manufacture past streaks.
 
 DB v3 adds rewards, sequenced rewardChanges, progressState and dailyQuests without clearing old tables. Legacy gamification placeholders remain preserved but are not authoritative XP. Backup v3 includes all new tables; compatible v1/v2 files supply safe empty progress defaults. Restore validates source/calendar/audit consistency before atomic replacement and never replays rewards. Retain the v3-compatible data layer for any rollback after migration; prefer a forward fix.
+
+## Iteration 05 — optional PULSE Intelligence and local handoffs
+
+Open PULSE Intelligence from Home, a profile, an opportunity or a saved conversation. Opt in under Settings → AI & integrations. **Production AI is disabled/unconfigured; the workflows are implemented and tested with synthetic provider responses, not a live Gemini key.** Local CRM features work independently. Do not reuse keys previously shared in chat; revoke/rotate them through the provider console.
+
+Catch Me Up, scoped Ask PULSE, editable message drafting, and Notes to Actions share one local context builder. Select one contact, company or opportunity; choose record categories, conversation date and keyword filters. Notes, contact channels and values are excluded by default. A maximum of 15 records with 1,500 characters each is shown in an exact payload preview before every request. Some category-specific limits apply (3 representatives, 5 open tasks, 3 deals). There is no entire-workspace upload or background processing. Changing records after approval requires a fresh preview.
+
+Facts cite only approved source IDs; original records can be opened for comparison. Citations validate reference membership, not factual accuracy. Suggestions and missing evidence remain distinct. Drafts are editable and are never sent automatically. Notes-to-Actions proposals show source excerpts, require individual review and a user-selected due date, and use the existing task repository. Saving a reviewed AI note creates a labeled Note; it does not replace history or count as a conversation. No AI operation or proposal creation earns XP. Later genuine task completion follows ordinary reward rules. Task provenance is stored separately from its description.
+
+Answers, typed questions and drafts remain temporary in component memory and clear on explicit Clear, scope/operation change, workspace change or refresh. Only explicitly accepted notes/tasks become persistent and enter backups. The Worker does not log or store CRM payloads; the external provider still receives approved content and has its own retention/use terms. Free-tier provider data may be used for product improvement. Avoid sharing sensitive records until you accept the applicable terms.
+
+**Local handoffs require no AI:** profiles have a reviewed relationship-message composer with Copy, mailto and WhatsApp links; follow-ups and saved meetings offer reviewed `.ics` calendar downloads. Native composers require a compatible configured device application. WhatsApp requires a full international number; PULSE does not infer country codes or verify account existence. Long link drafts fall back to Copy with an explanation. Contact restrictions and channel/purpose denials are rechecked. Marketing drafts require explicit applicable permission; availability expiry never grants consent. The manual relationship composer does not support marketing. Nothing is marked sent, synchronized, invited or completed merely by opening another app or downloading a calendar file.
+
+### Development and portability
+
+`npm run dev:worker` runs the local Worker on port 8787; `npm run dev` proxies `/api` there. Missing secrets keep generation disabled. `npm run check:worker` performs a deploy dry run. Run `npm run build` before it so static assets are current. Ordinary static/GitHub Pages distribution retains all local CRM and handoff features; without a protected API host it honestly reports AI unavailable. Service workers exclude `/api/` navigation and never cache AI responses.
+
+IndexedDB and backup formats stay at **v3**: optional AI preferences default off on older settings, and optional task provenance is additive. Compatible v1/v2/v3 backups remain accepted. No new CRM database table, migration, secret field or persisted AI chat is introduced. Restoring data never replays AI operations or creates XP.

@@ -1,3 +1,4 @@
+import { aiPreferencesSchema } from "../ai/contracts";
 import { z } from "zod";
 import { progressPreferencesSchema } from "./progress-models";
 export const stages = [
@@ -84,6 +85,7 @@ export const interactionSchema = z.object({
 export const taskSchema = z.object({
   ...base,
   title: z.string().trim().min(1).max(300),
+  source: z.string().max(200).optional(),
   description: z.string(),
   contactId: z.string().nullable(),
   organizationId: z.string().nullable(),
@@ -260,6 +262,7 @@ export const settingsSchema = z.object({
   }),
   gamification: z.boolean(),
   progress: progressPreferencesSchema.default({}),
+  ai: aiPreferencesSchema.default({}),
   reducedMotion: z.boolean(),
   dismissed: z.array(z.string()),
   intelligence: intelligenceSchema.default({}),
@@ -312,6 +315,7 @@ export const defaults: Settings = {
   alerts: { followUps: true, tasks: true, relationships: true },
   gamification: true,
   progress: progressPreferencesSchema.parse({}),
+  ai: aiPreferencesSchema.parse({}),
   reducedMotion: false,
   dismissed: [],
   intelligence: intelligenceSchema.parse({}),

@@ -27,7 +27,7 @@ Normal inactive threshold 21 days; High/VIP 7; default follow-up 7; default paus
 
 ## Expansion boundaries
 
-Commerce will use a separate workspace/domain adapter, never overload B2B lifecycle with loyalty status. Optional Gemini reads only user-selected data through a future secure backend. OAuth/token handling belongs outside ordinary settings; no secret fields exist. Integration metadata types reserve provider, scopes, features and last sync without simulating a connection. Future sync needs conflict/version handling, workspace identity and encryption design before introduction.
+Commerce will use a separate workspace/domain adapter, never overload B2B lifecycle with loyalty status. Optional Gemini uses the disabled-by-default protected Worker described below and reads only explicitly approved selected context. OAuth/token handling belongs outside ordinary settings; no secret fields exist. Integration metadata types reserve provider, scopes, features and last sync without simulating a connection. Future sync needs conflict/version handling, workspace identity and encryption design before introduction.
 
 ## Honest scope
 
@@ -62,3 +62,13 @@ DB v3 is additive. Rewards have a stable source key and unique [day+fingerprint]
 Tracking is opt-in, separate from widget visibility. The calendar timezone is captured at opt-in and fixed for this workspace; this deliberately prevents timezone-switch farming and history rewriting. Monday is the week boundary. New grants use actual mutation time; recent conversations must have occurred within the preceding 24 hours. Backdated records never create past progress. XP amounts, eligibility, correction semantics, daily cap and preferences are documented in README.md and explained inside Activity → Your progress. Quests reference up to three specific eligible due tasks rather than random activities. Milestones/goals/streaks derive from active evidence and add no bonus XP.
 
 The consolidated roadmap ends at iteration 07 for the B2B release. AI/integrations are iteration 05, comprehensive visual/mobile/PWA review is 06, and release hardening/distribution is 07. Commerce, team access and cloud synchronization remain separate later expansions.
+
+## Iteration 05 — selected-context assistance
+
+Shared `src/ai/contracts.ts` defines strict request/result validation; `src/ai/context.ts` builds local contact/company/deal context and applies authoritative communication rules. Historical company snapshots remain unchanged. Lazy Assistant UI requires an exact payload approval for every request; summaries cite approved records, Ask exposes missing evidence, drafts are editable, and action proposals require individual acceptance and an explicit due date. Sources and reviewed proposals are labeled. AI output never owns stage, dates, values, permissions, rewards or task completion.
+
+`src/data/ai-repository.ts` wraps existing task/note repositories transactionally. Stable canonical task-content IDs and duplicate checks guard acceptance retries. AI provenance is a separate optional task field; generated text does not count as conversation or earn XP merely by being saved. Preferences default disabled. Optional fields preserve DB/backup v3 and v1/v2 compatibility without indexed schema changes. Temporary chats are not exported; accepted records are ordinary backed-up CRM records.
+
+The Worker uses fixed Gemini model/endpoint, Cloudflare Access JWT validation and an atomic SQLite quota coordinator. No CRM context is persisted server-side or logged. Explicit request limits, timeouts and lifetime admission ceilings fail closed; details and activation prerequisites are in CLOUDFLARE.md. Production generation remains disabled pending fresh secret/access setup. Synthetic responses verify application behavior, not real model quality or prompt-injection immunity.
+
+Manual email/WhatsApp handoffs and reviewed .ics downloads are local conveniences, independent of AI, with no delivery/synchronization claims. Restrictions remain authoritative; unknown marketing consent stays unknown. The external provider is only involved after explicit per-request sharing approval.

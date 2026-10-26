@@ -1,3 +1,4 @@
+import { AISettings } from "../components/ai-settings";
 import { ProgressSettings } from "../components/progress";
 import { Link, useSearchParams } from "react-router-dom";
 import { useRef, useState, type FormEvent } from "react";
@@ -415,8 +416,9 @@ export function Settings() {
                 eyebrow="PRIVACY & DATA"
               />
               <p className="section-description">
-                Your CRM stays in this browser's IndexedDB. PULSE sends no CRM
-                records to AI or external services.
+                Your CRM stays in this browser’s IndexedDB. Optional AI sends
+                only the request you explicitly approve to Google Gemini; it
+                does not synchronize your workspace.
               </p>
               <div className="privacy-note">
                 <LockKeyhole size={22} />
@@ -660,15 +662,19 @@ export function Settings() {
               />
               <p className="section-description">
                 Core CRM features work offline, without an account or a paid
-                service. No external service is connected.
+                service. OAuth account connections remain unavailable.
+              </p>
+              <AISettings key={JSON.stringify(p.settings.ai)} />
+              <p className="inline-notice">
+                Available without account connection: task/meeting .ics exports,
+                email composer and WhatsApp draft handoffs. Gemini is available
+                only after provider and protected operator configuration.
               </p>
               {[
-                "Google Calendar",
+                "Google Calendar synchronization",
                 "Gmail",
                 "Google Contacts",
-                "WhatsApp quick actions",
                 "LinkedIn profile links",
-                "Gemini intelligence",
                 "Shopify & WooCommerce",
               ].map((name) => (
                 <div className="integration-row" key={name}>

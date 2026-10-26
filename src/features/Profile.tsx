@@ -1,3 +1,5 @@
+import { CommunicationHandoff } from "../components/communication";
+import { outreachReasons } from "../ai/context";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
@@ -80,6 +82,13 @@ export function Profile({ company = false }: { company?: boolean }) {
         <ArrowLeft size={16} />
         Back to your network
       </Link>
+      <Link
+        className="button secondary"
+        to={`/assistant?scope=${company ? "organization" : "contact"}&id=${encodeURIComponent(id!)}`}
+      >
+        PULSE Intelligence · selected context
+      </Link>
+      {contact && !company && <CommunicationHandoff contact={contact} />}
       <section className="surface profile-header">
         <div className="profile-cover">
           <div />
@@ -329,14 +338,50 @@ export function Profile({ company = false }: { company?: boolean }) {
                   <a
                     className="detail-line"
                     key={email}
-                    href={`mailto:${email}`}
+                    href={
+                      contact &&
+                      outreachReasons(
+                        contact,
+                        p.permissions,
+                        p.restrictions,
+                        "Email",
+                        "Relationship",
+                      ).length === 0
+                        ? `mailto:${encodeURIComponent(email)}`
+                        : undefined
+                    }
+                    aria-disabled={
+                      contact
+                        ? outreachReasons(
+                            contact,
+                            p.permissions,
+                            p.restrictions,
+                            "Email",
+                            "Relationship",
+                          ).length > 0
+                        : true
+                    }
                   >
                     <Mail size={16} />
                     {email}
                   </a>
                 ))}
                 {contact?.phones.map((phone) => (
-                  <a className="detail-line" key={phone} href={`tel:${phone}`}>
+                  <a
+                    className="detail-line"
+                    key={phone}
+                    href={
+                      contact &&
+                      eligible(contact, p.permissions, p.restrictions)
+                        ? `tel:${phone}`
+                        : undefined
+                    }
+                    aria-disabled={
+                      contact
+                        ? !eligible(contact, p.permissions, p.restrictions)
+                        : true
+                    }
+                  >
                     <Phone size={16} />
                     {phone}
                   </a>

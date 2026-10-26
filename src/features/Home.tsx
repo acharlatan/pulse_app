@@ -132,6 +132,9 @@ export function Home() {
           </div>
         </div>
       </section>
+      <Link className="button ghost" to="/assistant">
+        Open PULSE Intelligence · optional AI
+      </Link>
       <div className="stats-grid">
         <Link to="/network" className="stat-card">
           <span className="stat-icon lavender">

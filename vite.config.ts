@@ -3,7 +3,10 @@ import react from "@vitejs/plugin-react";
 import tailwind from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig({
-  server: { allowedHosts: ["terminal.local"] },
+  server: {
+    allowedHosts: ["terminal.local"],
+    proxy: { "/api": "http://127.0.0.1:8787" },
+  },
   base: process.env.VITE_BASE_PATH || "./",
   plugins: [
     react(),
@@ -32,6 +35,7 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: "index.html",
+        navigateFallbackDenylist: [/^\/api\//],
         globPatterns: ["**/*.{js,css,html,png,svg,webmanifest}"],
         cleanupOutdatedCaches: true,
       },

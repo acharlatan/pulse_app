@@ -1,3 +1,4 @@
+import { CalendarHandoff } from "./calendar";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Phone, Mail, Calendar, MessageCircle, StickyNote } from "lucide-react";
@@ -49,6 +50,7 @@ export function TaskRow({
           </small>
         )}
         {t.description && <p>{t.description}</p>}
+        {t.source && <small className="muted">Source: {t.source}</small>}
         <span>
           <Badge tone={state === "Overdue" ? "red" : ""}>{state}</Badge>{" "}
           <time>
@@ -63,6 +65,12 @@ export function TaskRow({
         </span>
       </div>
       <div className="record-actions">
+        <CalendarHandoff
+          id={t.id}
+          title={t.title}
+          description={t.description}
+          start={t.dueAt}
+        />
         <button
           className="button secondary"
           onClick={() => onEdit({ kind: "task", record: t })}
@@ -170,6 +178,20 @@ function StoryEntry({
         </p>
       )}
       <div className="record-actions">
+        <Link
+          className="button ghost"
+          to={`/assistant?scope=${i.contactId ? "contact" : "organization"}&id=${encodeURIComponent(i.contactId || i.organizationId || "")}&note=${encodeURIComponent(i.id)}`}
+        >
+          Extract next steps
+        </Link>
+        {i.type === "Meeting" && (
+          <CalendarHandoff
+            id={i.id}
+            title="Recorded meeting"
+            description={i.summary}
+            start={i.occurredAt}
+          />
+        )}
         <button
           className="button ghost"
           onClick={() => onEdit({ kind: "interaction", record: i, contact: c })}
@@ -281,6 +303,12 @@ export function OpportunityCard({
           </p>
         </details>
       ) : null}
+      <Link
+        className="button ghost"
+        to={`/assistant?scope=opportunity&id=${encodeURIComponent(o.id)}`}
+      >
+        Catch Me Up
+      </Link>
       <p className="deal-people">
         {o.contactIds
           .map((id) => p.contacts.find((c) => c.id === id))

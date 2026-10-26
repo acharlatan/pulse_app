@@ -19,6 +19,9 @@ import {
 import { WorkspaceProvider } from "./context";
 import { Shell } from "./Shell";
 import type { Workspace } from "../data/models";
+const Assistant = lazy(() =>
+  import("../features/Assistant").then((m) => ({ default: m.Assistant })),
+);
 const Home = lazy(() =>
   import("../features/Home").then((m) => ({ default: m.Home })),
 );
@@ -110,6 +113,7 @@ export function App() {
                     path="/network/companies/:id"
                     element={<Profile company />}
                   />
+                  <Route path="/assistant" element={<Assistant />} />
                   <Route path="/import" element={<CsvImport />} />
                   <Route path="/review" element={<Review />} />
                   <Route path="/lists" element={<SmartLists />} />
