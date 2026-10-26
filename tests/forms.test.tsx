@@ -86,7 +86,7 @@ describe("accessible profile editing", () => {
     fireEvent.change(screen.getByLabelText("Stage"), {
       target: { value: "Proposal" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Save person" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Save person" }));
     await waitFor(() => expect(saveContact).toHaveBeenCalled());
     expect(saveContact.mock.calls[0][1]).toMatchObject({
       name: "Updated Person",
@@ -107,7 +107,7 @@ it("keeps a failed save open and announces its error inside the editing dialog",
   fireEvent.change(await screen.findByLabelText("Full name"), {
     target: { value: "Fictional failure case" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "Save person" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Save person" }));
   await waitFor(() =>
     expect(screen.getByRole("dialog")).toContainElement(
       screen.getByRole("alert"),

@@ -1,3 +1,15 @@
+import {
+  pipelineSchema,
+  pipelineStageSchema,
+  planLegacyPipelines,
+  validatePipelineGraph,
+} from "../services/pipelines";
+import {
+  fieldDefinitionSchema,
+  fieldValueSchema,
+  focusSchema,
+  validateFieldValue,
+} from "./expansion-models";
 import { ensureProgress, syncReward } from "./progress-repository";
 import {
   rewardSchema,
@@ -271,7 +283,28 @@ export async function deleteContact(db: PulseDB, id: string) {
         .where("taskId")
         .equals(taskId)
         .modify({ title: "Removed follow-up" });
+    await db.focusItems
+      .where("recordId")
+      .equals(id)
+      .filter((f) => f.entityType === "contact")
+      .delete();
+    const fields = new Set(
+      (
+        await db.fieldDefinitions
+          .where("entityType")
+          .equals("contact")
+          .toArray()
+      ).map((f) => f.id),
+    );
+    await db.fieldValues
+      .where("recordId")
+      .equals(id)
+      .filter((v) => fields.has(v.fieldId))
+      .delete();
     await db.contacts.delete(id);
+    for (const pin of await db.focusItems.toArray())
+      if (pin.entityType === "task" && !(await db.tasks.get(pin.recordId)))
+        await db.focusItems.delete(pin.id);
     for (const table of [
       db.interactions,
       db.tasks,
@@ -304,13 +337,31 @@ export async function deleteOrganization(db: PulseDB, id: string) {
         .where("organizationId")
         .equals(id)
         .modify({ organizationId: null });
+    await db.focusItems
+      .where("recordId")
+      .equals(id)
+      .filter((f) => f.entityType === "organization")
+      .delete();
+    const fields = new Set(
+      (
+        await db.fieldDefinitions
+          .where("entityType")
+          .equals("organization")
+          .toArray()
+      ).map((f) => f.id),
+    );
+    await db.fieldValues
+      .where("recordId")
+      .equals(id)
+      .filter((v) => fields.has(v.fieldId))
+      .delete();
     await db.organizations.delete(id);
     await event(db, `Deleted company · ${org.name}; related records preserved`);
   });
 }
 export const backupSchema = z.object({
   format: z.literal("pulse-backup"),
-  version: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  version: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
   metadata: z
     .object({
       appVersion: z.string(),
@@ -318,6 +369,11 @@ export const backupSchema = z.object({
       workspace: z.enum(["demo", "personal"]),
     })
     .optional(),
+  pipelines: z.array(pipelineSchema).default([]),
+  pipelineStages: z.array(pipelineStageSchema).default([]),
+  fieldDefinitions: z.array(fieldDefinitionSchema).default([]),
+  fieldValues: z.array(fieldValueSchema).default([]),
+  focusItems: z.array(focusSchema).default([]),
   rewards: z.array(rewardSchema).default([]),
   rewardChanges: z.array(rewardChangeSchema).default([]),
   progressState: z.array(progressStateSchema).max(1).default([]),
@@ -340,12 +396,29 @@ export const backupSchema = z.object({
 export async function exportBackup(db: PulseDB) {
   return db.transaction("r", db.tables, async () => ({
     format: "pulse-backup",
-    version: 3,
+    version: 4,
     metadata: {
-      appVersion: "1.0.0-rc.1",
+      appVersion: "1.1.0-rc.1",
       exportedAt: new Date().toISOString(),
       workspace: db.workspace,
     },
+    pipelines: (await db.pipelines.count())
+      ? await db.pipelines.toArray()
+      : planLegacyPipelines(
+          await settings(db),
+          await db.opportunities.toArray(),
+          new Date().toISOString(),
+        ).pipelines,
+    pipelineStages: (await db.pipelines.count())
+      ? await db.pipelineStages.toArray()
+      : planLegacyPipelines(
+          await settings(db),
+          await db.opportunities.toArray(),
+          new Date().toISOString(),
+        ).stages,
+    fieldDefinitions: await db.fieldDefinitions.toArray(),
+    fieldValues: await db.fieldValues.toArray(),
+    focusItems: await db.focusItems.toArray(),
     rewards: await db.rewards.toArray(),
     rewardChanges: await db.rewardChanges.toArray(),
     progressState: await db.progressState.toArray(),
@@ -369,12 +442,69 @@ export async function exportBackup(db: PulseDB) {
 export function validateBackup(input: unknown) {
   const b = backupSchema.parse(input);
   // Version-one backups remain supported. The stage is authoritative for outcomes.
-  for (const o of b.opportunities)
-    o.status =
-      o.stageId === "Won" ? "won" : o.stageId === "Lost" ? "lost" : "open";
+  if (b.version < 4) {
+    const legacy = b.opportunities.map((o) => ({
+      ...o,
+      stageId: o.stageId as Opportunity["stageId"],
+    }));
+    const graph = planLegacyPipelines(
+      b.settings[0] || defaults,
+      legacy,
+      b.metadata?.exportedAt || "2026-01-01T00:00:00.000Z",
+    );
+    b.pipelines = graph.pipelines;
+    b.pipelineStages = graph.stages;
+    b.opportunities = graph.opportunities;
+  }
+  validatePipelineGraph({
+    pipelines: b.pipelines,
+    stages: b.pipelineStages,
+    opportunities: b.opportunities,
+  });
+  const entityRows = {
+    contact: b.contacts,
+    organization: b.organizations,
+    opportunity: b.opportunities,
+    task: b.tasks,
+  };
+  const definitions = new Map(b.fieldDefinitions.map((f) => [f.id, f]));
+  for (const f of b.fieldDefinitions) {
+    if (
+      b.fieldDefinitions.filter((x) => x.entityType === f.entityType).length >
+        30 ||
+      new Set(f.choices).size !== f.choices.length ||
+      (f.type === "select" && !f.choices.length)
+    )
+      throw new Error("Invalid custom field definition.");
+  }
+  const pairs = new Set<string>();
+  for (const v of b.fieldValues) {
+    const f = definitions.get(v.fieldId),
+      key = JSON.stringify([v.fieldId, v.recordId]);
+    if (
+      !f ||
+      !entityRows[f.entityType].some((r) => r.id === v.recordId) ||
+      pairs.has(key) ||
+      v.id !== key
+    )
+      throw new Error("Invalid custom field reference.");
+    pairs.add(key);
+    validateFieldValue(f, v.value);
+  }
+  for (const f of b.focusItems)
+    if (
+      f.id !== JSON.stringify([f.entityType, f.recordId]) ||
+      !entityRows[f.entityType].some((r) => r.id === f.recordId)
+    )
+      throw new Error("Invalid focus reference.");
   const orgs = new Set(b.organizations.map((v) => v.id)),
     contacts = new Set(b.contacts.map((v) => v.id));
   for (const records of [
+    b.pipelines,
+    b.pipelineStages,
+    b.fieldDefinitions,
+    b.fieldValues,
+    b.focusItems,
     b.rewards,
     b.rewardChanges,
     b.progressState,
@@ -518,6 +648,11 @@ export async function restoreBackup(db: PulseDB, input: unknown) {
   const b = validateBackup(input);
   await db.transaction("rw", db.tables, async () => {
     for (const key of [
+      "pipelines",
+      "pipelineStages",
+      "fieldDefinitions",
+      "fieldValues",
+      "focusItems",
       "rewards",
       "rewardChanges",
       "progressState",
@@ -546,10 +681,14 @@ export async function restoreBackup(db: PulseDB, input: unknown) {
 export async function moveOpportunity(db: PulseDB, id: string, stage: string) {
   const record = await db.opportunities.get(id);
   if (!record) throw new Error("Opportunity no longer exists.");
-  await saveOpportunity(db, {
-    ...record,
-    stageId: stage as Opportunity["stageId"],
-  });
+  await saveOpportunity(
+    db,
+    {
+      ...record,
+      stageId: stage as Opportunity["stageId"],
+    },
+    record.updatedAt,
+  );
 }
 
 async function validateInteractionLinks(db: PulseDB, i: Interaction) {
@@ -637,6 +776,21 @@ export async function deleteTask(db: PulseDB, id: string) {
           followUpId: null,
           updatedAt: new Date().toISOString(),
         });
+    await db.focusItems
+      .where("recordId")
+      .equals(id)
+      .filter((f) => f.entityType === "task")
+      .delete();
+    const fields = new Set(
+      (
+        await db.fieldDefinitions.where("entityType").equals("task").toArray()
+      ).map((f) => f.id),
+    );
+    await db.fieldValues
+      .where("recordId")
+      .equals(id)
+      .filter((v) => fields.has(v.fieldId))
+      .delete();
     await db.tasks.delete(id);
     await db.dailyQuests
       .where("taskId")
@@ -659,12 +813,7 @@ export async function saveOpportunity(
 ) {
   const parsed = opportunitySchema.parse({
     ...value,
-    status:
-      value.stageId === "Won"
-        ? "won"
-        : value.stageId === "Lost"
-          ? "lost"
-          : "open",
+    status: value.status,
     updatedAt: new Date().toISOString(),
   });
   if (!parsed.title.trim()) throw new Error("Enter an opportunity title.");
@@ -679,9 +828,14 @@ export async function saveOpportunity(
     throw new Error("Invalid currency.");
   }
   return db.transaction("rw", db.tables, async () => {
-    const config = await settings(db);
-    if (parsed.pipelineId !== config.pipeline.id)
-      throw new Error("Choose the configured pipeline.");
+    const pipeline = await db.pipelines.get(parsed.pipelineId);
+    const stage = await db.pipelineStages.get(parsed.stageId);
+    if (!pipeline || !stage || stage.pipelineId !== pipeline.id)
+      throw new Error("Choose a valid pipeline and stage.");
+    const existing = await db.opportunities.get(parsed.id);
+    if (pipeline.archived && existing?.pipelineId !== pipeline.id)
+      throw new Error("Choose an active pipeline.");
+    parsed.status = stage.category;
     if (
       parsed.organizationId &&
       !(await db.organizations.get(parsed.organizationId))
@@ -719,7 +873,7 @@ export async function saveOpportunity(
     );
     await event(
       db,
-      `Opportunity ${previous ? "updated" : "created"} · ${parsed.title} · ${parsed.stageId}`,
+      `Opportunity ${previous ? "updated" : "created"} · ${parsed.title} · ${stage.name}`,
       null,
       parsed.organizationId,
       { entityType: "opportunity", entityId: parsed.id, action: "saved" },
@@ -738,6 +892,24 @@ export async function deleteOpportunity(db: PulseDB, id: string) {
           updatedAt: new Date().toISOString(),
         });
     await db.recommendationActions.where("recordId").equals(id).delete();
+    await db.focusItems
+      .where("recordId")
+      .equals(id)
+      .filter((f) => f.entityType === "opportunity")
+      .delete();
+    const fields = new Set(
+      (
+        await db.fieldDefinitions
+          .where("entityType")
+          .equals("opportunity")
+          .toArray()
+      ).map((f) => f.id),
+    );
+    await db.fieldValues
+      .where("recordId")
+      .equals(id)
+      .filter((v) => fields.has(v.fieldId))
+      .delete();
     await db.opportunities.delete(id);
     await syncReward(db, "opportunity", o.id, false, true);
     await event(
@@ -863,7 +1035,40 @@ export async function saveSmartList(db: PulseDB, value: SmartList) {
     ...value,
     updatedAt: new Date().toISOString(),
   });
-  await db.transaction("rw", [db.smartLists, db.events], async () => {
+  await db.transaction("rw", db.tables, async () => {
+    for (const rule of parsed.conditions)
+      if (rule.field === "customField") {
+        const field = rule.fieldId
+          ? await db.fieldDefinitions.get(rule.fieldId)
+          : undefined;
+        if (!field || field.archived || field.entityType !== parsed.entityType)
+          throw new Error(
+            "Choose an active custom field for this record type.",
+          );
+        const allowed =
+          field.type === "number"
+            ? ["is", "atLeast", "atMost"]
+            : field.type === "date"
+              ? ["is", "before", "after"]
+              : ["text", "longText"].includes(field.type)
+                ? ["is", "contains"]
+                : ["is", "isNot"];
+        if (!allowed.includes(rule.operator))
+          throw new Error("Choose a comparison supported by this field type.");
+        validateFieldValue(
+          field,
+          field.type === "number"
+            ? Number(rule.value)
+            : field.type === "checkbox"
+              ? rule.value === "true"
+              : rule.value,
+        );
+        if (
+          field.type === "checkbox" &&
+          !["true", "false"].includes(rule.value)
+        )
+          throw new Error("Choose true or false.");
+      }
     const old = await db.smartLists.get(parsed.id);
     if (old) parsed.createdAt = old.createdAt;
     await db.smartLists.put(parsed);

@@ -102,6 +102,12 @@ export function Settings() {
   }
   return (
     <div className="page settings-page">
+      <Link className="button secondary" to="/customize">
+        Personalize PULSE · Pipelines & custom fields
+      </Link>
+      <Link className="button ghost" to="/focus">
+        My Focus
+      </Link>
       <Link className="button secondary" to="/help">
         Help & getting started
       </Link>

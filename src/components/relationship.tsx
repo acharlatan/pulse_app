@@ -1,3 +1,5 @@
+import { FocusButton } from "./focus";
+import { CustomFields } from "./custom-fields";
 import { CalendarHandoff } from "./calendar";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -65,6 +67,7 @@ export function TaskRow({
         </span>
       </div>
       <div className="record-actions">
+        <FocusButton type="task" id={t.id} />
         <CalendarHandoff
           id={t.id}
           title={t.title}
@@ -164,7 +167,9 @@ function StoryEntry({
               className="button ghost"
               onClick={() => onEdit({ kind: "opportunity", record: o })}
             >
-              {o.title} · {o.stageId}
+              {o.title} ·{" "}
+              {p.pipelineStages.find((s) => s.id === o.stageId)?.name ||
+                o.stageId}
             </button>
           )}
           {t && (
@@ -270,9 +275,15 @@ export function OpportunityCard({
           o.status === "won" ? "green" : o.status === "lost" ? "red" : "purple"
         }
       >
-        {o.stageId} · {o.status}
+        {p.pipelineStages.find((s) => s.id === o.stageId)?.name || o.stageId} ·{" "}
+        {o.status}
       </Badge>
       <h3>{o.title}</h3>
+      <FocusButton type="opportunity" id={o.id} />
+      <details>
+        <summary>Additional details</summary>
+        <CustomFields type="opportunity" id={o.id} />
+      </details>
       {org && (
         <Link className="company-line" to={`/network/companies/${org.id}`}>
           {org.name}

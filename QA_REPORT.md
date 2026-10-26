@@ -339,3 +339,37 @@ The distribution script checks inventory, ZIP integrity and SHA-256. Static file
 Final feedback-preservation verification: `npx playwright test --config=.codex/release.config.ts tests/browser/release07.spec.ts tests/browser/iteration04.spec.ts --workers=1 --output=.codex/deploy-focused` passed **12/12** on current source. `npm test` passed **124/124** again. Final static ZIP contains 36 entries, 272,233 bytes, SHA-256 `7b68631678d208d4b4c2c24aec2967080220ef3d0ea0d090534b8494a06e1648`; credential-pattern scan passed. The package is generated locally; no GitHub asset upload is claimed.
 
 Final deployment-build PWA commands: `PULSE_DIST=/tmp/pulse07-deploy npm run test:pwa -- --workers=1` passed **10/10** (57.7s). `PULSE_DIST=/tmp/pulse07-deploy-subpath npm run test:pwa -- --grep 'repository subpath' --workers=1` passed **2/2** (10.6s), exercising the actual absolute-subpath output. No final automated gate is left failing; the full-run/rerun distinction and manual limits above remain explicit.
+
+## Iteration 08 — PULSE 1.1.0-rc.1
+
+Implementation includes pipelines/stages with stable identities and explicit outcome categories, field definitions/typed values, Focus selections, company segments, bulk administrative updates and saved Home preferences. Existing Worker security/configuration is preserved; AI remains disabled. Database and backup evolve to v4 together.
+
+### Automated data and build evidence
+
+- `npm run typecheck`, `npm run lint`: passed.
+- `npm test`: **145 passed, 11 files**. Includes 13 expansion cases plus 8 pure pipeline cases. Actual v3 upgrade, failed-upgrade rollback, preserved reward/correction history and saved lists, stable stage rename, invalid destination, category semantics, used-stage mapping/confirmation, configuration without XP grants, custom value validation/rename/roundtrip, Focus cleanup, company rules, selected-only writes, stale-selection rejection and transaction rollback exercised. Historical v1/v2 fixtures and previous reward/CRM/Worker tests retained.
+- Test fixture maintenance changes expected current schema/backup version from 3 to 4. An import test now uses the actual persisted source snapshot rather than relying on saving within the same millisecond. The form unit test waits for the accessible dialog button before submission.
+- `npm run build`, `npm run check:worker`, `VITE_BASE_PATH=/pulse_app/ npm run build`: passed. Clean root production output rebuilt after the subpath check. Worker dry run retains ASSETS, AI_QUOTA, disabled AI and existing SQLite migration.
+- `PULSE_CHROMIUM_PATH=/tmp/pulse-chromium npm run test:pwa -- --workers=1 --reporter=line`: **10 passed**, including cached offline routes/edits/backups, update warnings with another editing tab, scoped subpath registration and bounded scale tests. Chromium diagnostics reported no installability errors; this is not physical-device installation evidence.
+
+### Measured conditions
+
+Chromium 153 software rendering in this hosted environment. Production directory: 100 contacts mobile import 104 ms/directory 863 ms/search action 26 ms; desktop 129/461/35 ms. 1,000 contacts mobile 196/862/39 ms; desktop 321/451/58 ms. These are observed run measurements, not guarantees. Pure-data fake-indexeddb/jsdom benchmark with 1,024 contacts and 306 opportunities: saving 44.0 ms, export 7.8 ms, validation 14.1 ms in a focused run.
+
+### Browser iteration evidence and limits
+
+The initial Playwright browser download was truncated. A Chromium runtime with bundled software-rendering libraries was installed for actual browser checks. Initial launch failures are environment failures, not acceptance passes. Full/focused browser results and final deployment evidence are appended below after completion. Visual review identified and fixed narrow-screen pipeline button fragmentation and oversized checkboxes. Automated accessibility identified a touch-target spacing issue around newly added opportunity details; its fix is included in the final reruns. No physical iOS/Android, Firefox/WebKit or native screen-reader certification is claimed. Release remains a candidate.
+
+
+### Final frozen-source browser verification
+
+`PULSE_CHROMIUM_PATH=/tmp/pulse-chromium npm run test:browser -- --workers=2 --reporter=line --output=.codex/browser-verified`: **48/48 passed in one clean run (3.8 minutes)**. This supersedes the earlier development-server runs where source edits caused HMR reloads, version-label assertions needed updating, and concurrent runners shared an artifact directory. The final run uses separate browser output and unchanged source. No assertions were removed. New acceptance tests cover custom pipeline creation, opportunity moves/custom Won outcome, stable stage renaming, company custom values, Focus task completion/reload, company segments and selected bulk tagging. Customization screenshots cover 320/375/390/430/768/1024/1280/1440px in light/dark. Existing axe/keyboard/dialog/recovery/backup journeys remain in the full suite. The previous candidate's mobile design and controls remain in the exercised coverage.
+
+Screenshots were visually inspected at narrow light/dark widths. The pipeline action now stays a readable whole button; checkbox sizing and opportunity target spacing were corrected. Earlier failed/aborted runs are not counted as passes. The candidate is ready for authorized integration, subject to the final production PWA rerun and live deployment verification. Physical-device and native assistive-technology gates remain open.
+
+
+### Final build and deployment disposition
+
+Final production rerun: `npm run lint`, `npm run build` and `npm run check:worker` passed. `PULSE_CHROMIUM_PATH=/tmp/pulse-chromium npm run test:pwa -- --workers=1 --reporter=line` passed **10/10 in 42.1s** against the final production output. The full browser run passed **48/48**; unit/Worker suite passed **145/145**. The source is published in PR #2 on feature/prompt-08-pipelines.
+
+Production integration was attempted through an expected-head squash merge. Automatic approval review rejected that action because it requires explicit user authorization for integration into the default branch. The rejection was honored; no workaround, main update or production deployment was attempted. Production remains the previous candidate. Next authorized action: merge PR #2 into main, observe the existing Cloudflare automatic build, verify the deployed commit/release.json, run fictional production workflow/export smoke checks and record evidence. No production success is claimed.

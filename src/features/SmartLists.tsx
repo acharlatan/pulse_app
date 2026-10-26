@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
-import { builtInLists, listMatcher } from "../services/smart-lists";
+import {
+  builtInLists,
+  listMatcher,
+  companyListMatcher,
+} from "../services/smart-lists";
 import {
   categories,
   stages,
@@ -17,6 +21,13 @@ import { saveSmartList, deleteSmartList } from "../data/repository";
 import { Field, RecordForm } from "../components/record-editors";
 import { Avatar, Badge, Empty } from "../components/ui";
 const labels: Record<(typeof filterFields)[number], string> = {
+  pipelineId: "Pipeline",
+  customField: "Custom field",
+  pinned: "Pinned to Focus",
+  industry: "Company industry",
+  representativePriority: "Representative priority",
+  noRepresentatives: "Without active representatives",
+  closingSoon: "Upcoming opportunity deadline",
   category: "Relationship category",
   stage: "Lifecycle stage",
   priority: "Priority",
@@ -36,7 +47,12 @@ export function SmartLists() {
     [limit, setLimit] = useState(30);
   const matcher = listMatcher(p),
     list = p.smartLists.find((l) => l.id === selected) || selected;
-  const matches = p.contacts.filter((c) => matcher(c, list));
+  const isCompany =
+    typeof list !== "string" && list.entityType === "organization";
+  const companyMatch = companyListMatcher(p);
+  const matches = isCompany
+    ? p.organizations.filter((o) => companyMatch(o, list as SmartList))
+    : p.contacts.filter((c) => matcher(c, list));
   return (
     <div className="page">
       <div className="page-heading">
@@ -57,6 +73,7 @@ export function SmartLists() {
               ...stamp(),
               name: "",
               mode: "all",
+              entityType: "contact",
               conditions: [
                 { field: "priority", operator: "is", value: "High" },
               ],
@@ -84,7 +101,11 @@ export function SmartLists() {
               ))}
               {p.smartLists.map((l) => (
                 <option value={l.id} key={l.id}>
-                  {l.name} · {p.contacts.filter((c) => matcher(c, l)).length}
+                  {l.name} ·{" "}
+                  {l.entityType === "organization"
+                    ? p.organizations.filter((o) => companyMatch(o, l)).length
+                    : p.contacts.filter((c) => matcher(c, l)).length}
+                  {l.entityType === "organization" ? " · companies" : ""}
                 </option>
               ))}
             </select>
@@ -92,6 +113,18 @@ export function SmartLists() {
           {typeof list !== "string" && (
             <div className="surface">
               <h2>{list.name}</h2>
+              {list.conditions.some(
+                (r) =>
+                  r.field === "customField" &&
+                  !p.fieldDefinitions.some(
+                    (f) => f.id === r.fieldId && !f.archived,
+                  ),
+              ) && (
+                <p role="status">
+                  Invalid condition: a custom field was archived or deleted.
+                  Edit this list to repair it.
+                </p>
+              )}
               <p>
                 {smartListSchema.safeParse(list).success
                   ? `${list.mode.toUpperCase()} conditions: ${list.conditions.map((r) => `${labels[r.field]} ${r.operator} ${r.value || "no company"}`).join(" · ")}`
@@ -110,23 +143,28 @@ export function SmartLists() {
           </Link>
         </section>
         <section className="surface">
-          <h2>{matches.length} matching people</h2>
+          <h2>
+            {matches.length} matching {isCompany ? "companies" : "people"}
+          </h2>
           {matches.slice(0, limit).map((c) => (
             <Link
               key={c.id}
               className="representative-row"
-              to={`/network/people/${c.id}`}
+              to={`/network/${isCompany ? "companies" : "people"}/${c.id}`}
             >
               <Avatar name={c.name} />
               <div>
                 <strong>{c.name}</strong>
                 <span>
-                  {c.role} ·{" "}
-                  {p.organizations.find((o) => o.id === c.organizationId)
-                    ?.name || "Independent"}
+                  {"role" in c ? c.role : c.industry} ·{" "}
+                  {p.organizations.find(
+                    (o) =>
+                      o.id ===
+                      ("organizationId" in c ? c.organizationId : c.id),
+                  )?.name || "Independent"}
                 </span>
               </div>
-              <Badge>{c.stage}</Badge>
+              <Badge>{"stage" in c ? c.stage : "Company"}</Badge>
             </Link>
           ))}
           {!matches.length && (
@@ -170,6 +208,7 @@ function SmartListEditor({
         ? record.conditions
         : [{ field: "priority", operator: "is", value: "High" }],
     );
+  const [entityType, setEntityType] = useState(record.entityType || "contact");
   const options: Partial<
     Record<(typeof filterFields)[number], readonly string[]>
   > = {
@@ -180,7 +219,12 @@ function SmartListEditor({
     health: healthStates,
     taskState: ["Due today", "Overdue", "Upcoming", "Completed", "None"],
     opportunityStatus: ["open", "won", "lost", "none"],
-    opportunityStage: stages,
+    opportunityStage: p.pipelineStages.map((s) => s.id),
+    pipelineId: p.pipelines.map((s) => s.id),
+    pinned: ["true", "false"],
+    noRepresentatives: ["true", "false"],
+    closingSoon: ["true"],
+    representativePriority: priorities,
   };
   return (
     <RecordForm
@@ -201,10 +245,20 @@ function SmartListEditor({
           name: String(d.get("name")),
           mode: String(d.get("mode")) as "all",
           conditions: rules,
+          entityType,
         });
         onSaved(record.id);
       }}
     >
+      <Field label="List contains" wide>
+        <select
+          value={entityType}
+          onChange={(e) => setEntityType(e.target.value as typeof entityType)}
+        >
+          <option value="contact">People</option>
+          <option value="organization">Companies</option>
+        </select>
+      </Field>
       <Field label="List name" wide>
         <input
           name="name"
@@ -247,11 +301,35 @@ function SmartListEditor({
                 );
               }}
             >
-              {filterFields.map((f) => (
-                <option value={f} key={f}>
-                  {labels[f]}
-                </option>
-              ))}
+              {filterFields
+                .filter((f) =>
+                  entityType === "organization"
+                    ? [
+                        "industry",
+                        "tag",
+                        "daysSince",
+                        "taskState",
+                        "opportunityStatus",
+                        "opportunityStage",
+                        "pipelineId",
+                        "customField",
+                        "pinned",
+                        "representativePriority",
+                        "noRepresentatives",
+                        "closingSoon",
+                      ].includes(f)
+                    : ![
+                        "industry",
+                        "representativePriority",
+                        "noRepresentatives",
+                        "closingSoon",
+                      ].includes(f),
+                )
+                .map((f) => (
+                  <option value={f} key={f}>
+                    {labels[f]}
+                  </option>
+                ))}
             </select>
           </Field>
           <Field label={`Comparison ${i + 1}`}>
@@ -269,14 +347,50 @@ function SmartListEditor({
             >
               {(r.field === "daysSince"
                 ? ["atLeast", "atMost"]
-                : r.field === "tag"
-                  ? ["contains", "is"]
-                  : ["is"]
+                : r.field === "customField"
+                  ? [
+                      "is",
+                      "isNot",
+                      "contains",
+                      "atLeast",
+                      "atMost",
+                      "before",
+                      "after",
+                    ]
+                  : r.field === "industry"
+                    ? ["is", "contains"]
+                    : r.field === "tag"
+                      ? ["contains", "is"]
+                      : ["is"]
               ).map((o) => (
                 <option key={o}>{o}</option>
               ))}
             </select>
           </Field>
+          {r.field === "customField" && (
+            <Field label={`Custom field ${i + 1}`}>
+              <select
+                required
+                value={r.fieldId || ""}
+                onChange={(e) =>
+                  setRules(
+                    rules.map((v, index) =>
+                      index === i ? { ...v, fieldId: e.target.value } : v,
+                    ),
+                  )
+                }
+              >
+                <option value="">Choose field</option>
+                {p.fieldDefinitions
+                  .filter((f) => f.entityType === entityType && !f.archived)
+                  .map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.label} · {f.type}
+                    </option>
+                  ))}
+              </select>
+            </Field>
+          )}
           <Field label={`Value ${i + 1}`}>
             {r.field === "organizationId" ? (
               <select
@@ -308,7 +422,13 @@ function SmartListEditor({
                 }
               >
                 {options[r.field]!.map((v) => (
-                  <option key={v}>{v}</option>
+                  <option key={v} value={v}>
+                    {r.field === "pipelineId"
+                      ? p.pipelines.find((x) => x.id === v)?.name
+                      : r.field === "opportunityStage"
+                        ? p.pipelineStages.find((x) => x.id === v)?.name
+                        : v}
+                  </option>
                 ))}
               </select>
             ) : (

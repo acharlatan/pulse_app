@@ -141,7 +141,7 @@ test("personal productivity earns once, corrects, persists and backs up without 
   const backupPath = await download.path();
   expect(backupPath).toBeTruthy();
   await page.locator('input[type="file"]').setInputFiles(backupPath!);
-  await expect(page.getByRole("dialog")).toContainText("Compatible backup v3");
+  await expect(page.getByRole("dialog")).toContainText("Compatible backup v4");
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
 });
 

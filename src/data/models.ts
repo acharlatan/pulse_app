@@ -100,7 +100,7 @@ export const opportunitySchema = z.object({
   organizationId: z.string().nullable(),
   contactIds: z.array(z.string()),
   pipelineId: z.string(),
-  stageId: z.enum(stages),
+  stageId: z.string().min(1).max(300),
   value: z.number().nonnegative().nullable(),
   currency: z.string(),
   status: z.enum(["open", "won", "lost"]),
@@ -162,6 +162,13 @@ export const filterFields = [
   "taskState",
   "opportunityStatus",
   "opportunityStage",
+  "pipelineId",
+  "customField",
+  "pinned",
+  "industry",
+  "representativePriority",
+  "noRepresentatives",
+  "closingSoon",
 ] as const;
 export const healthStates = [
   "Active",
@@ -175,7 +182,16 @@ export const healthStates = [
 export const conditionSchema = z
   .object({
     field: z.enum(filterFields),
-    operator: z.enum(["is", "contains", "atLeast", "atMost"]),
+    operator: z.enum([
+      "is",
+      "isNot",
+      "contains",
+      "atLeast",
+      "atMost",
+      "before",
+      "after",
+    ]),
+    fieldId: z.string().optional(),
     value: z.string().max(300),
   })
   .superRefine((v, ctx) => {
@@ -187,8 +203,20 @@ export const conditionSchema = z
       health: healthStates,
       taskState: ["Due today", "Overdue", "Upcoming", "Completed", "None"],
       opportunityStatus: ["open", "won", "lost", "none"],
-      opportunityStage: stages,
     };
+    if (
+      [
+        "customField",
+        "pipelineId",
+        "pinned",
+        "industry",
+        "representativePriority",
+        "noRepresentatives",
+        "closingSoon",
+        "opportunityStage",
+      ].includes(v.field)
+    )
+      return;
     if (
       v.field === "daysSince"
         ? !["atLeast", "atMost"].includes(v.operator) ||
@@ -209,6 +237,7 @@ export const smartListSchema = z.object({
   name: z.string().trim().min(1).max(100),
   mode: z.enum(["all", "any"]),
   conditions: z.array(conditionSchema).min(1).max(10),
+  entityType: z.enum(["contact", "organization"]).default("contact"),
 });
 export const recommendationActionSchema = z.object({
   ...base,
@@ -227,7 +256,9 @@ export const importBatchSchema = z.object({
   skipped: z.number().int().nonnegative(),
   invalid: z.number().int().nonnegative(),
 });
-export type SmartList = z.infer<typeof smartListSchema>;
+export type SmartList = Omit<z.infer<typeof smartListSchema>, "entityType"> & {
+  entityType?: "contact" | "organization";
+};
 export type RecommendationAction = z.infer<typeof recommendationActionSchema>;
 export type ImportBatch = z.infer<typeof importBatchSchema>;
 export type Health = (typeof healthStates)[number];
@@ -267,6 +298,18 @@ export const settingsSchema = z.object({
     .object({
       hidden: z.boolean().default(false),
       exportInitiatedAt: z.string().datetime().nullable().default(null),
+    })
+    .prefault({}),
+  focus: z
+    .object({
+      homeLayout: z
+        .enum(["balanced", "focused", "compact"])
+        .default("balanced"),
+      shortcuts: z.boolean().default(true),
+      reminders: z.boolean().default(false),
+      progress: z.boolean().default(true),
+      landing: z.enum(["home", "focus"]).default("home"),
+      lastPipelineId: z.string().default(""),
     })
     .prefault({}),
   reducedMotion: z.boolean(),
@@ -323,6 +366,14 @@ export const defaults: Settings = {
   progress: progressPreferencesSchema.parse({}),
   ai: aiPreferencesSchema.parse({}),
   onboarding: { hidden: false, exportInitiatedAt: null },
+  focus: {
+    homeLayout: "balanced",
+    shortcuts: true,
+    reminders: false,
+    progress: true,
+    landing: "home",
+    lastPipelineId: "",
+  },
   reducedMotion: false,
   dismissed: [],
   intelligence: intelligenceSchema.parse({}),

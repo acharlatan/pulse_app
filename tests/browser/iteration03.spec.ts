@@ -97,7 +97,7 @@ test("80-contact CSV import, explicit duplicate updates, provenance and safe res
   await page
     .locator('input[type="file"][accept="application/json,.json"]')
     .setInputFiles(path!);
-  await expect(page.getByRole("dialog")).toContainText("Compatible backup v3");
+  await expect(page.getByRole("dialog")).toContainText("Compatible backup v4");
   await expect(page.getByRole("dialog")).toContainText("80 contacts");
   await expect(page.getByRole("dialog")).toContainText("REPLACES ALL");
   await page.getByRole("button", { name: "Cancel", exact: true }).click();

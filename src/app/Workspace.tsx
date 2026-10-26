@@ -4,6 +4,12 @@ import { WorkspaceProvider } from "./context";
 import { Shell } from "./Shell";
 import { ErrorBoundary } from "./Recovery";
 import type { Workspace } from "../data/models";
+const Focus = lazy(() =>
+  import("../features/Focus").then((m) => ({ default: m.Focus })),
+);
+const Customize = lazy(() =>
+  import("../features/Customize").then((m) => ({ default: m.Customize })),
+);
 const Help = lazy(() =>
   import("../features/Help").then((m) => ({ default: m.Help })),
 );
@@ -65,6 +71,8 @@ export function WorkspaceApp({
               }
             >
               <Routes>
+                <Route path="/focus" element={<Focus />} />
+                <Route path="/customize" element={<Customize />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/help" element={<Help />} />
                 <Route path="/network" element={<Network />} />

@@ -1,20 +1,28 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { Badge, Empty } from "../components/ui";
 import { OpportunityCard } from "../components/relationship";
 import { EditorModal, type Editor } from "../components/forms";
-import { stages } from "../data/models";
 import { moveOpportunity } from "../data/repository";
 export function Pipeline() {
-  const p = usePulse();
-  const [editor, setEditor] = useState<Editor | null>(null),
-    [filter, setFilter] = useState("All");
-  const active = stages.filter(
-    (s) =>
-      (filter === "All" || s === filter) &&
-      p.opportunities.some((o) => o.stageId === s),
-  );
+  const p = usePulse(),
+    [editor, setEditor] = useState<Editor | null>(null),
+    [filter, setFilter] = useState("All"),
+    [limit, setLimit] = useState(30);
+  const selected =
+    p.pipelines.find((x) => x.id === p.settings.focus.lastPipelineId) ||
+    p.pipelines.find((x) => x.isDefault) ||
+    p.pipelines[0];
+  const rows = p.opportunities.filter((o) => o.pipelineId === selected?.id),
+    stages = p.pipelineStages.filter((s) => s.pipelineId === selected?.id);
+  const active = stages.filter((s) => filter === "All" || s.id === filter);
+  const totals = new Map<string, number>();
+  for (const o of rows)
+    if (o.value !== null) {
+      const key = `${o.status} · ${o.currency}`;
+      totals.set(key, (totals.get(key) || 0) + o.value);
+    }
   return (
     <div className="page">
       <div className="page-heading">
@@ -27,38 +35,92 @@ export function Pipeline() {
         </div>
         <button
           className="button primary"
+          disabled={selected?.archived}
           onClick={() => setEditor({ kind: "opportunity" })}
         >
-          <Plus size={18} />
           New opportunity
         </button>
       </div>
+      <div className="review-toolbar">
+        <Link className="button secondary" to="/customize">
+          Manage Pipelines
+        </Link>
+        <Link className="button ghost" to="/focus">
+          My Focus
+        </Link>
+      </div>
       <div className="directory-toolbar">
-        <Badge tone="purple">
-          {p.settings.pipeline.name} · {p.opportunities.length} opportunities
-        </Badge>
+        <label className="field">
+          <span>Pipeline</span>
+          <select
+            value={selected?.id || ""}
+            onChange={(e) => {
+              setFilter("All");
+              setLimit(30);
+              void p.run(() =>
+                p.setSettings({
+                  focus: {
+                    ...p.settings.focus,
+                    lastPipelineId: e.target.value,
+                  },
+                }),
+              );
+            }}
+          >
+            {p.pipelines.map((x) => (
+              <option key={x.id} value={x.id}>
+                {x.name}
+                {x.archived ? " (archived)" : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+        <Badge tone="purple">{rows.length} opportunities</Badge>
         <label className="field">
           <span>View stage</span>
-          <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-            <option>All</option>
+          <select
+            value={filter}
+            onChange={(e) => {
+              setFilter(e.target.value);
+              setLimit(30);
+            }}
+          >
+            <option value="All">All</option>
             {stages.map((s) => (
-              <option key={s}>{s}</option>
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
             ))}
           </select>
         </label>
       </div>
+      <section
+        className="pipeline-totals"
+        aria-label="Pipeline totals by currency"
+      >
+        {[...totals].map(([key, value]) => (
+          <Badge key={key}>
+            {key} ·{" "}
+            {value.toLocaleString(p.settings.locale, {
+              maximumFractionDigits: 2,
+            })}
+          </Badge>
+        ))}
+      </section>
       <div className="pipeline-grid">
-        {active.map((stage) => (
-          <section className="pipeline-column" key={stage}>
-            <div className="pipeline-title">
-              <span>{stage}</span>
-              <Badge>
-                {p.opportunities.filter((o) => o.stageId === stage).length}
-              </Badge>
-            </div>
-            {p.opportunities
-              .filter((o) => o.stageId === stage)
-              .map((o) => (
+        {active.map((stage) => {
+          const deals = rows.filter((o) => o.stageId === stage.id);
+          return (
+            <section
+              className="pipeline-column"
+              key={stage.id}
+              style={{ borderTop: `3px solid ${stage.color}` }}
+            >
+              <div className="pipeline-title">
+                <span>{stage.name}</span>
+                <Badge>{deals.length}</Badge>
+              </div>
+              {deals.slice(0, limit).map((o) => (
                 <div key={o.id} className="pipeline-deal">
                   <OpportunityCard opportunity={o} onEdit={setEditor} />
                   <label className="field">
@@ -73,27 +135,33 @@ export function Pipeline() {
                       }
                     >
                       {stages.map((s) => (
-                        <option key={s}>{s}</option>
+                        <option key={s.id} value={s.id}>
+                          {s.name} · {s.category}
+                        </option>
                       ))}
                     </select>
                   </label>
                 </div>
               ))}
-          </section>
-        ))}
+              {deals.length > limit && (
+                <button
+                  className="button secondary"
+                  onClick={() => setLimit(limit + 30)}
+                >
+                  Show more opportunities
+                </button>
+              )}
+              {!deals.length && (
+                <p className="muted">Room for the next opportunity.</p>
+              )}
+            </section>
+          );
+        })}
       </div>
-      {!active.length && (
+      {!rows.length && (
         <Empty
           title="Make room for possibility"
-          body="No opportunities in this view. Create one or choose another stage."
-          action={
-            <button
-              className="button primary"
-              onClick={() => setEditor({ kind: "opportunity" })}
-            >
-              Create opportunity
-            </button>
-          }
+          body="No opportunities in this pipeline. Create one to get started."
         />
       )}
       {editor && (
