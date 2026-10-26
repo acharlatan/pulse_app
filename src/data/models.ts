@@ -42,7 +42,7 @@ export const organizationSchema = z.object({
   avatar: z.string(),
   location: z.string(),
   tags: z.array(z.string()),
-  customFields: z.record(z.string()),
+  customFields: z.record(z.string(), z.string()),
 });
 export const contactSchema = z.object({
   ...base,
@@ -261,11 +261,17 @@ export const settingsSchema = z.object({
     relationships: z.boolean(),
   }),
   gamification: z.boolean(),
-  progress: progressPreferencesSchema.default({}),
-  ai: aiPreferencesSchema.default({}),
+  progress: progressPreferencesSchema.prefault({}),
+  ai: aiPreferencesSchema.prefault({}),
+  onboarding: z
+    .object({
+      hidden: z.boolean().default(false),
+      exportInitiatedAt: z.string().datetime().nullable().default(null),
+    })
+    .prefault({}),
   reducedMotion: z.boolean(),
   dismissed: z.array(z.string()),
-  intelligence: intelligenceSchema.default({}),
+  intelligence: intelligenceSchema.prefault({}),
   pipeline: z.object({
     id: z.string(),
     name: z.string(),
@@ -289,7 +295,7 @@ export const gamificationSchema = z.object({
   achievements: z.array(z.string()),
   completedQuests: z.array(z.string()),
   streakHistory: z.array(z.string()),
-  progress: z.record(z.number()),
+  progress: z.record(z.string(), z.number()),
 });
 export const integrationSchema = z.object({
   id: z.string(),
@@ -316,6 +322,7 @@ export const defaults: Settings = {
   gamification: true,
   progress: progressPreferencesSchema.parse({}),
   ai: aiPreferencesSchema.parse({}),
+  onboarding: { hidden: false, exportInitiatedAt: null },
   reducedMotion: false,
   dismissed: [],
   intelligence: intelligenceSchema.parse({}),

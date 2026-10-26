@@ -682,3 +682,36 @@ it("preserves detailed availability evidence when the general profile editor res
     source: r.source,
   });
 });
+
+it("rejects a stale editor snapshot and deleted-record recreation without changing newer data", async () => {
+  const c = person();
+  await saveContact(db, c);
+  const original = (await db.contacts.get(c.id))!;
+  await db.contacts.update(c.id, {
+    name: "Newer tab value",
+    updatedAt: "2099-01-01T00:00:00.000Z",
+  });
+  await expect(
+    saveContact(db, { ...original, name: "Stale tab" }, original.updatedAt),
+  ).rejects.toThrow("another tab");
+  expect((await db.contacts.get(c.id))!.name).toBe("Newer tab value");
+  await deleteContact(db, c.id);
+  await expect(saveContact(db, original, original.updatedAt)).rejects.toThrow(
+    "another tab",
+  );
+  expect(await db.contacts.count()).toBe(0);
+});
+it("quota failure during save leaves no record or activity event", async () => {
+  const before = await db.events.count();
+  const fail = () => {
+    throw new DOMException("Storage is full", "QuotaExceededError");
+  };
+  db.contacts.hook("creating", fail);
+  try {
+    await expect(saveContact(db, person())).rejects.toThrow("Storage is full");
+  } finally {
+    db.contacts.hook("creating").unsubscribe(fail);
+  }
+  expect(await db.contacts.count()).toBe(0);
+  expect(await db.events.count()).toBe(before);
+});

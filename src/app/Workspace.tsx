@@ -4,6 +4,9 @@ import { WorkspaceProvider } from "./context";
 import { Shell } from "./Shell";
 import { ErrorBoundary } from "./Recovery";
 import type { Workspace } from "../data/models";
+const Help = lazy(() =>
+  import("../features/Help").then((m) => ({ default: m.Help })),
+);
 const Assistant = lazy(() =>
   import("../features/Assistant").then((m) => ({ default: m.Assistant })),
 );
@@ -63,6 +66,7 @@ export function WorkspaceApp({
             >
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/help" element={<Help />} />
                 <Route path="/network" element={<Network />} />
                 <Route path="/network/people/:id" element={<Profile />} />
                 <Route

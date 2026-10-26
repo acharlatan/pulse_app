@@ -1,4 +1,5 @@
 import { useEffect, useRef, useId, type ReactNode } from "react";
+import { confirmDialogClose } from "../app/update-safety";
 import { X, ArrowUpRight, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -63,6 +64,9 @@ export function Modal({
   children: ReactNode;
   onClose: () => void;
 }) {
+  const close = () => {
+    if (confirmDialogClose(ref.current)) onClose();
+  };
   const titleId = useId();
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
@@ -96,7 +100,21 @@ export function Modal({
     <dialog
       ref={ref}
       className="modal"
-      onCancel={onClose}
+      onCancel={(e) => {
+        e.preventDefault();
+        close();
+      }}
+      onClickCapture={(e) => {
+        const button =
+          e.target instanceof Element ? e.target.closest("button") : null;
+        if (
+          button?.textContent?.trim() === "Cancel" &&
+          !confirmDialogClose(ref.current)
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
       onKeyDown={(e) => {
         if (e.key !== "Tab") return;
         const items = [
@@ -123,7 +141,7 @@ export function Modal({
             e.clientY < box.top ||
             e.clientY > box.bottom
           )
-            onClose();
+            close();
         }
       }}
       aria-labelledby={titleId}
@@ -133,7 +151,7 @@ export function Modal({
         <button
           className="icon-button"
           aria-label="Close dialog"
-          onClick={onClose}
+          onClick={close}
         >
           <X size={20} />
         </button>

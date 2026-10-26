@@ -4787,3 +4787,11 @@ img {
     display: none;
   }
 }
+
+.getting-started { margin-block: 24px; }
+.getting-started ul { list-style: none; padding: 0; }
+.getting-started li { display: flex; align-items: center; gap: 12px; min-height: 44px; }
+.getting-started li > :last-child { text-align: left; overflow-wrap: anywhere; }
+.help-content details { padding-block: 16px; border-bottom: 1px solid var(--border); }
+.help-content summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-weight: 600; }
+.help-content p { max-width: 70ch; line-height: 1.7; }

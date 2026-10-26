@@ -102,6 +102,9 @@ export function Settings() {
   }
   return (
     <div className="page settings-page">
+      <Link className="button secondary" to="/help">
+        Help & getting started
+      </Link>
       <div className="page-heading">
         <div>
           <p className="eyebrow">MAKE YOURSELF AT HOME</p>
@@ -472,14 +475,18 @@ export function Settings() {
                 <button
                   className="button secondary"
                   onClick={() =>
-                    p.run(
-                      async () =>
-                        download(
-                          JSON.stringify(await exportBackup(p.db), null, 2),
-                          `pulse-${p.workspace}-backup.json`,
-                        ),
-                      "Backup downloaded",
-                    )
+                    p.run(async () => {
+                      download(
+                        JSON.stringify(await exportBackup(p.db), null, 2),
+                        `pulse-${p.workspace}-backup.json`,
+                      );
+                      await p.setSettings({
+                        onboarding: {
+                          ...p.settings.onboarding,
+                          exportInitiatedAt: new Date().toISOString(),
+                        },
+                      });
+                    }, "Backup download requested. Check your Downloads and keep the file safe.")
                   }
                 >
                   <Download size={17} />

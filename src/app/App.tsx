@@ -16,11 +16,20 @@ export { ErrorBoundary } from "./Recovery";
 export function App() {
   useEffect(installEditProtection, []);
   const [workspace, setWorkspace] = useState<Workspace | null>(() => {
-    const w = localStorage.getItem("pulse-workspace");
+    let w: string | null = null;
+    try {
+      w = localStorage.getItem("pulse-workspace");
+    } catch {
+      /* IndexedDB will report its own availability. */
+    }
     return w === "demo" || w === "personal" ? w : null;
   });
   const select = (w: Workspace) => {
-    localStorage.setItem("pulse-workspace", w);
+    try {
+      localStorage.setItem("pulse-workspace", w);
+    } catch {
+      /* Workspace works for this session without a preference hint. */
+    }
     setWorkspace(w);
   };
   return (
@@ -113,7 +122,7 @@ function Welcome({ onSelect }: { onSelect: (w: Workspace) => void }) {
             <span>
               A fresh start for your real connections.
               <br />
-              Private, and saved on this device.
+              Saved in this browser. No automatic cloud backup.
             </span>
           </div>
           <ArrowUpRight size={23} />

@@ -82,3 +82,7 @@ Production review observed a stale lazy-loaded asset in a tab spanning deploymen
 7. Activate optional Gemini only in a separately reviewed setup with a fresh server secret, protected Access policy and verified provider quotas/privacy. No public or paid generation is enabled by iteration 06.
 
 No confirmed P0 defect remains from the exercised journeys. Device/assistive-technology gaps are verification limits, not proof that those platforms pass. Commerce, teams and synchronization remain post-release.
+
+## Iteration 07 candidate
+
+Personal onboarding derives steps from current saved records, with workspace settings for hiding/reopening and download-request time. These additive settings use DB/backup v3; older settings default safely. Help covers real workflows, recovery, installation and disabled AI. Internal links, workspace switches and dialog dismissal warn on tracked edits. Editors read fresh snapshots and compare versions transactionally for people, companies, tasks, opportunities and conversations; stale saves fail without overwriting newer data. Browser Back is not universally guarded, and settings/other editors have no universal conflict resolution. No persistent draft recovery is claimed. Stable release is gated by RELEASE_CHECKLIST.md. Teams, commerce, sync, OAuth and encrypted backup are post-release expansions.

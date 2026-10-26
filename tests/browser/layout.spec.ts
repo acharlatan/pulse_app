@@ -2,10 +2,12 @@ import { test, expect } from "@playwright/test";
 test("all primary screens and editors fit supported widths in both themes", async ({
   page,
 }, info) => {
-  test.setTimeout(120000);
+  // This case visits 176 route/size/theme combinations plus their editors.
+  test.setTimeout(240000);
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   const routes = [
+    "/help",
     "/",
     "/network",
     "/network/companies/org-0",
@@ -63,6 +65,9 @@ test("all primary screens and editors fit supported widths in both themes", asyn
         await page.getByRole("button", { name, exact: true }).click();
         const d = page.getByRole("dialog");
         await expect(d).toBeVisible();
+        await expect(
+          d.getByRole("button", { name: "Cancel", exact: true }),
+        ).toBeVisible();
         const b = await d.boundingBox();
         expect(b!.x).toBeGreaterThanOrEqual(0);
         expect(b!.x + b!.width).toBeLessThanOrEqual(width);

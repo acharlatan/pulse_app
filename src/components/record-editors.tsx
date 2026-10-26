@@ -186,24 +186,28 @@ export function RecordEditorModal({
         onClose={onClose}
         onDelete={o ? () => deleteOpportunity(p.db, o.id) : undefined}
         onSave={async (d) =>
-          saveOpportunity(p.db, {
-            ...stamp(),
-            ...o,
-            title: str(d, "title"),
-            organizationId: organizationId || null,
-            contactIds: d.getAll("contactIds").map(String),
-            pipelineId: p.settings.pipeline.id,
-            stageId: str(d, "stageId") as Opportunity["stageId"],
-            status: "open",
-            value: str(d, "value") === "" ? null : Number(str(d, "value")),
-            currency: str(d, "currency").toUpperCase(),
-            probability:
-              str(d, "probability") === ""
-                ? null
-                : Number(str(d, "probability")),
-            expectedCloseAt: iso(d, "expectedCloseAt"),
-            notes: str(d, "notes"),
-          })
+          saveOpportunity(
+            p.db,
+            {
+              ...stamp(),
+              ...o,
+              title: str(d, "title"),
+              organizationId: organizationId || null,
+              contactIds: d.getAll("contactIds").map(String),
+              pipelineId: p.settings.pipeline.id,
+              stageId: str(d, "stageId") as Opportunity["stageId"],
+              status: "open",
+              value: str(d, "value") === "" ? null : Number(str(d, "value")),
+              currency: str(d, "currency").toUpperCase(),
+              probability:
+                str(d, "probability") === ""
+                  ? null
+                  : Number(str(d, "probability")),
+              expectedCloseAt: iso(d, "expectedCloseAt"),
+              notes: str(d, "notes"),
+            },
+            o?.updatedAt,
+          )
         }
       >
         {o &&

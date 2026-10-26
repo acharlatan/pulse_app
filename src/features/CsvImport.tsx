@@ -1,3 +1,4 @@
+import { markSaved } from "../app/update-safety";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -692,6 +693,7 @@ export function CsvImport() {
               onClick={() =>
                 perform(async () => {
                   const saved = await commitImport(p.db, plan!);
+                  markSaved(document.querySelector(".import-page"));
                   setResult(saved);
                   setStep(6);
                   p.notify("CSV import saved");

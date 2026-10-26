@@ -272,3 +272,70 @@ No confirmed P0/P1 defect remains in the executed journeys. Remaining **verifica
 The delivery report records the actual integrated commit, Workers Builds result and focused production-browser evidence after deployment. Local or HTTP success alone is not treated as live workflow acceptance.
 
 Final visual review caught a clipped tablet sidebar label; allowing navigation text to wrap fixed it. The final clean deployment build and a two-case full layout rerun (including sidebar internal-width assertions) passed after that and safe-area top-padding refinements.
+
+# Iteration 07 — release candidate assessment (2026-10-26)
+
+Starting main verified through GitHub at 92c122379125d5f09e5b4497e959a69dc75f5818. Work uses release/1.0.0-rc.1. This is candidate work, not stable release approval. Existing CRM/reward/permission repositories, DB and backup v3 and disabled Worker configuration are preserved.
+
+Implemented Personal saved-record onboarding with persistent hide/revisit preference, Help route reachable from mobile Settings, calm empty Personal Home, recovery/install/import documentation, truthful backup download-request feedback, guarded internal links/workspace switches and optional localStorage hint failure handling. Guide preferences are additive validated settings; older backups receive defaults, no schema downgrade/migration or reward replay.
+
+## Executed checks
+
+- `npm run typecheck`, `npm run lint`, `npm test`: passed; 118 tests / 8 files, including workerd security/quota and existing CRM/import/reward/backup regressions.
+- `npm run build -- --outDir /tmp/pulse07-release`: passed; 32 precache entries / 765.66 KiB; initial JS 235.22 KB / 73.65 KB gzip. This preserves the earlier first-load gain; no new field-performance claim.
+- `npm run check:worker -- --assets /tmp/pulse07-rc-build`: passed earlier in this candidate, unchanged Worker 138.12 KiB / 25.08 gzip, AI false and existing SQLite quota binding/migration.
+- `VITE_BASE_PATH=/pulse_app/ npm run build -- --outDir /tmp/pulse07-subpath`: passed before final help-link/import-marker correction. Both corrections preserve build/routing configuration; no newer subpath claim.
+- Full browser run: 36 passed / 2 failed. Transfer assertions awaited exact toast text and were corrected to verify restore-dialog closure and persisted linked records. No stable release approval is based on the failing run. Earlier successful-import guard regression was fixed and focused import checks passed.
+- Full production PWA run: 9 passed / 1 failed (desktop offline note test reloaded immediately after clicking Save). Added an await for successful dialog closure; focused production offline rerun passed both mobile and desktop (2/2), including saved offline note reload, export and no API caches.
+- Chromium 153 from temporary npm @sparticuz/chromium; standard Playwright Chromium download failed with truncated ZIP. Automated mobile viewport 390×844, desktop 1440×1000. Existing layout suite exercises 320–1440 and both themes; Help was added to it. Axe runs included major routes and the new Help page. No physical phone, native installation/screen reader, Firefox/WebKit or literal zoom result is claimed.
+- `npm audit --json`: 7 affected package nodes, including runtime Zod; see DEPENDENCY_REVIEW.md. Findings remain unresolved, so stable release is held.
+- `PULSE_DIST=/tmp/pulse07-release node scripts/package-static.mjs`: verified 35 ZIP entries (web assets/public guides only), ZIP integrity and SHA-256 generated. No keys/databases/test logs are included. GitHub Release/tag publication is not available through the connected write tools and has not been claimed.
+
+## Remaining release gates
+
+Stable 1.0 and production integration are held pending dependency remediation and full release-gate review. Browser Back/modal cancellation remain outside universal draft recovery, cross-tab stale-save conflict detection is not implemented, and physical hardware/assistive technology/real zoom need manual execution. Historical backup fixture review, storage-denied matrix and complete all-domain transfer validation need further evidence. No claim of conflict-free collaboration, encrypted local storage or cloud recovery.
+
+Manual device procedure: start empty Personal; add company/person; write long note with keyboard open; save/reload; create/reschedule/complete task; inspect restricted contact; export JSON and transfer to another browser; install when offered; reopen cached app offline; edit/save/reload; reconnect and approve update with another editing tab open. With VoiceOver/NVDA check labels, modal focus, errors and save/import results. At genuine 200%/400% browser zoom verify every essential action reflows/reaches viewport. Record device/browser versions and actual outcomes before changing support claims.
+
+Final focused acceptance: `npm run test:browser -- tests/browser/release07.spec.ts --workers=1 --output=.codex/transfer-confirm` passed 4/4 (22.8s): Personal skip/revisit/persistence + Help axe checks and real downloaded backup restore into isolated Personal context with linked conversation/profile reload. The restore test verifies actual records after transaction completion; this does not claim every optional progress/permission scenario independently exercised.
+
+# Iteration 07 completion — public release candidate (2026-10-26)
+
+This section supersedes the earlier dependency/integration hold. Stable 1.0 remains **undeclared**. The supported evidence is automated Chromium desktop and mobile viewport emulation; untested physical platforms and assistive technologies are explicitly identified in Help, installation and release notes.
+
+## Changes and guarantees
+
+Resolved all seven dependency audit nodes: Zod 4.6.7, Vitest 4.1.12 and compatible patched Undici 7.30.1 override. Zod record keys and nested `prefault` defaults preserve legacy settings behavior. DB/backup stay v3, with no destructive migration. AI_ENABLED=false, Worker identity, Access validation, quotas and SQLite migration stay unchanged. No provider request or paid infrastructure activation was used.
+
+Dialog close/Escape/Cancel/backdrop dismissal warns before discarding tracked edits. Editors load a fresh saved record on opening. Person/company/task/opportunity/conversation saves compare the opened timestamp inside their write transaction; a changed or deleted record fails without overwriting it. Save failures are announced inside the modal, preserving editable text. No universal conflict resolution, persistent drafts or universal browser Back guard is claimed. Other settings/editors remain single-editor workflows.
+
+Historical fixture exports were produced by the actual iteration02/03 seed/export functions (777cf9f / 3bbaff0), using Zod's legacy v3 entry point only for scratch generation. They restore complete linked graphs with newer defaults, then roundtrip every exported table. Current ledger/quest roundtrip, malformed history/reference rejection and injected mid-transaction restore failure remain covered. Added quota-exhaustion rollback, stale/deleted editor and accessible failed-save tests. Browser storage denial reaches recovery rather than reporting saved data. Isolated-browser transfer compares every exported array except the workspace-specific settings after restore and reload; active reward-ledger roundtrip is independently exercised by unit tests.
+
+## Executed validation
+
+Environment: Node 24.22.1 / Linux, Chromium 153 from temporary @sparticuz/chromium outside project dependencies; no physical device. Browser commands use `PULSE_CHROMIUM_PATH=/tmp/pulse-chromium LD_LIBRARY_PATH=/tmp:/tmp/pulse-libs/lib VK_ICD_FILENAMES=/tmp/vk_swiftshader_icd.json`. Registry browser archives required extraction without ownership restoration. No browser binary is distributed.
+
+- `npm run typecheck`, `npm run lint`: passed after remediation and editor changes.
+- `npm test`: **124 passed / nine files**, including real local workerd/SQLite security/quota tests. No original assertion was removed. An initial historical-fixture read used a jsdom URL incorrectly; it was corrected to a repository-relative filesystem path.
+- `npm audit --json`: **zero known findings**, runtime and development. Advisory snapshots do not certify total security.
+- Full browser command: `npx playwright test --config=.codex/release.config.ts --workers=1 --output=.codex/verified-browser`: **40 passed / two failed**. The temporary config only selects isolated dev port 5175 and the same 15-second assertion budget now in playwright.config.ts. Failed mobile layout hit the broad case's former 120-second total budget; the case now allows 240 seconds for 176 route/size/theme combinations and waits for actual editor controls before measuring. Desktop mocked-AI/calendar case timed out waiting for its calendar form; the complete six-case iteration05 rerun passed without weakening it.
+- `npx playwright test --config=.codex/release.config.ts tests/browser/iteration05.spec.ts --workers=1 --output=.codex/verified-ai`: **six passed**.
+- `PULSE_DIST=/tmp/pulse07-verified npx playwright test --config=.codex/layout-production.config.ts tests/browser/layout.spec.ts --workers=1 --output=.codex/production-layout`: **two passed**. That temporary config serves tests/pwa/server.mjs on 4174 instead of Vite. This independently exercises the built production layout across all specified widths and both themes. A prior dev-server layout attempt lost its execution context; no layout assertion was deleted to bypass it.
+- Together the full run and reruns demonstrate all **42 distinct browser cases**; this is not described as a single uninterrupted 42/42 run. Exploratory runs while changing code had 34/38 and 5/8 results; stale-opening and modal error visibility defects found there were fixed, and the relevant new tests passed subsequently.
+- A final feedback-only correction retains earned-XP save feedback while keeping persistence errors inside the modal. Current source was rebuilt into `/tmp/pulse07-deploy` and `/tmp/pulse07-deploy-subpath`; corresponding final focused/PWA counts are appended below after completion.
+- `npm run build -- --outDir /tmp/pulse07-deploy`: passed, 32 precache entries / 806.56 KiB, initial JS approximately 235.45 KB / 73.73 KB gzip; deferred workspace about 331 KB / 102 KB gzip. Patched Zod grows deferred validation code compared with the prior candidate; lazy first-load architecture remains intact. No field performance or phone benchmark is claimed.
+- `npm run check:worker -- --assets /tmp/pulse07-deploy`: passed. Patched validator increases the Worker dry-run bundle to approximately 783 KiB / 124.5 KiB gzip. Bindings/migration and disabled flags were verified in the dry-run output.
+- `VITE_BASE_PATH=/pulse_app/ npm run build -- --outDir /tmp/pulse07-deploy-subpath`: passed. Static-only ordinary CRM remains independent of Worker services.
+- Production-build PWA verification before the feedback correction: **10/10 passed**. One earlier offline reload check found the route still loading at the old five-second assertion deadline, not an unsaved note; the shared 15-second assertion budget retains the persistence assertion. Root/scoped offline edits/backups, no API caching, real waiting workers, multi-tab edit protection and 100/1,000-contact import/search remain exercised.
+
+## Visual and manual limits
+
+Reviewed actual rendered dark CSV confirmation, light mobile progress and dark mobile profile screenshots from the final browser/production-layout output. Major routes retain automated light/dark axe, focus, short-screen, landscape, enlarged-text and responsive coverage. No WCAG certification or native screen-reader result is claimed.
+
+Unexecuted: physical iOS/Android keyboard/safe-area/install/standalone/download/handoff behavior, native VoiceOver/NVDA, literal 200%/400% browser zoom, Firefox/WebKit, field performance and full historical pre-06 CDN upgrades. Existing pre-06 scripts cannot gain new safeguards retroactively; save before upgrading. The targeted manual procedure in the earlier candidate section remains applicable. These limits restrict support claims; they are not marked passed.
+
+The distribution script checks inventory, ZIP integrity and SHA-256. Static files were scanned for common provider/GitHub credential/private-key patterns with no matches. This is a targeted scan, not proof of absence of every possible secret. The ZIP excludes databases, dependencies, logs and Worker secrets and includes public installation/recovery/release notes. GitHub Release/tag publication is not exposed by connected write tools; no published tag/Release is claimed. Source publication, merge, automatic Cloudflare deployment and live verification are separately recorded.
+
+Final feedback-preservation verification: `npx playwright test --config=.codex/release.config.ts tests/browser/release07.spec.ts tests/browser/iteration04.spec.ts --workers=1 --output=.codex/deploy-focused` passed **12/12** on current source. `npm test` passed **124/124** again. Final static ZIP contains 36 entries, 272,233 bytes, SHA-256 `7b68631678d208d4b4c2c24aec2967080220ef3d0ea0d090534b8494a06e1648`; credential-pattern scan passed. The package is generated locally; no GitHub asset upload is claimed.
+
+Final deployment-build PWA commands: `PULSE_DIST=/tmp/pulse07-deploy npm run test:pwa -- --workers=1` passed **10/10** (57.7s). `PULSE_DIST=/tmp/pulse07-deploy-subpath npm run test:pwa -- --grep 'repository subpath' --workers=1` passed **2/2** (10.6s), exercising the actual absolute-subpath output. No final automated gate is left failing; the full-run/rerun distinction and manual limits above remain explicit.

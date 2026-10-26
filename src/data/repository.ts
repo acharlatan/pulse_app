@@ -70,19 +70,38 @@ async function event(
     organizationId,
   });
 }
-export async function saveOrganization(db: PulseDB, value: Organization) {
+// Optional editor snapshot, checked inside the write transaction to prevent stale overwrites.
+function assertEditorVersion(
+  previous: { updatedAt: string } | undefined,
+  expected?: string,
+) {
+  if (expected !== undefined && (!previous || previous.updatedAt !== expected))
+    throw new Error(
+      "This record changed or was deleted in another tab. Copy your edits, close this editor, and reopen the latest record.",
+    );
+}
+export async function saveOrganization(
+  db: PulseDB,
+  value: Organization,
+  expectedUpdatedAt?: string,
+) {
   const parsed = organizationSchema.parse({
     ...value,
     updatedAt: new Date().toISOString(),
   });
   await db.transaction("rw", [db.organizations, db.events], async () => {
     const previous = await db.organizations.get(parsed.id);
+    assertEditorVersion(previous, expectedUpdatedAt);
     if (previous) parsed.createdAt = previous.createdAt;
     await db.organizations.put(parsed);
     await event(db, `Updated company · ${parsed.name}`, null, parsed.id);
   });
 }
-export async function saveContact(db: PulseDB, value: Contact) {
+export async function saveContact(
+  db: PulseDB,
+  value: Contact,
+  expectedUpdatedAt?: string,
+) {
   const parsed = contactSchema.parse({
     ...value,
     updatedAt: new Date().toISOString(),
@@ -97,6 +116,7 @@ export async function saveContact(db: PulseDB, value: Contact) {
       )
         throw new Error("Choose an existing company.");
       const previous = await db.contacts.get(parsed.id);
+      assertEditorVersion(previous, expectedUpdatedAt);
       if (previous) parsed.createdAt = previous.createdAt;
       await db.contacts.put(parsed);
       const restrictionId = `profile-${parsed.id}`;
@@ -167,7 +187,11 @@ export async function addInteraction(db: PulseDB, value: Interaction) {
     return feedback;
   });
 }
-export async function saveTask(db: PulseDB, value: Task) {
+export async function saveTask(
+  db: PulseDB,
+  value: Task,
+  expectedUpdatedAt?: string,
+) {
   const parsed = taskSchema.parse({
     ...value,
     updatedAt: new Date().toISOString(),
@@ -184,6 +208,7 @@ export async function saveTask(db: PulseDB, value: Task) {
     )
       throw new Error("Company no longer exists.");
     const previous = await db.tasks.get(parsed.id);
+    assertEditorVersion(previous, expectedUpdatedAt);
     if (previous) parsed.createdAt = previous.createdAt;
     parsed.completedAt = previous?.completedAt || null;
     await db.tasks.put(parsed);
@@ -317,7 +342,7 @@ export async function exportBackup(db: PulseDB) {
     format: "pulse-backup",
     version: 3,
     metadata: {
-      appVersion: "0.6.0",
+      appVersion: "1.0.0-rc.1",
       exportedAt: new Date().toISOString(),
       workspace: db.workspace,
     },
@@ -535,10 +560,15 @@ async function validateInteractionLinks(db: PulseDB, i: Interaction) {
   if (i.followUpId && !(await db.tasks.get(i.followUpId)))
     throw new Error("Follow-up no longer exists.");
 }
-export async function updateInteraction(db: PulseDB, value: Interaction) {
+export async function updateInteraction(
+  db: PulseDB,
+  value: Interaction,
+  expectedUpdatedAt?: string,
+) {
   await db.transaction("rw", db.tables, async () => {
     const previous = await db.interactions.get(value.id);
     if (!previous) throw new Error("Interaction no longer exists.");
+    assertEditorVersion(previous, expectedUpdatedAt);
     const parsed = interactionSchema.parse({
       ...value,
       createdAt: previous.createdAt,
@@ -622,7 +652,11 @@ export async function deleteTask(db: PulseDB, id: string) {
     );
   });
 }
-export async function saveOpportunity(db: PulseDB, value: Opportunity) {
+export async function saveOpportunity(
+  db: PulseDB,
+  value: Opportunity,
+  expectedUpdatedAt?: string,
+) {
   const parsed = opportunitySchema.parse({
     ...value,
     status:
@@ -673,6 +707,7 @@ export async function saveOpportunity(db: PulseDB, value: Opportunity) {
         );
     }
     const previous = await db.opportunities.get(parsed.id);
+    assertEditorVersion(previous, expectedUpdatedAt);
     if (previous) parsed.createdAt = previous.createdAt;
     await db.opportunities.put(parsed);
     const feedback = await syncReward(

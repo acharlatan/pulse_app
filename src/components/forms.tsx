@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, useEffect, type FormEvent, type ReactNode } from "react";
 import { usePulse } from "../app/context";
 import { Modal } from "./ui";
 import {
@@ -57,14 +57,67 @@ export function EditorModal({
   editor: Editor;
   onClose: () => void;
 }) {
+  const { db } = usePulse();
+  const [snapshot, setSnapshot] = useState<Editor | null>(null);
+  const [loadError, setLoadError] = useState("");
+  useEffect(() => {
+    let active = true;
+    setSnapshot(null);
+    const tables = {
+      contact: db.contacts,
+      company: db.organizations,
+      interaction: db.interactions,
+      task: db.tasks,
+      opportunity: db.opportunities,
+      restriction: db.restrictions,
+      permission: db.permissions,
+    };
+    const record = editor.record;
+    if (!record) {
+      setSnapshot(editor);
+      return;
+    }
+    void tables[editor.kind]
+      .get(record.id)
+      .then((latest) => {
+        if (!active) return;
+        if (!latest)
+          setLoadError(
+            "This record no longer exists. Close this editor and review the latest workspace.",
+          );
+        else setSnapshot({ ...editor, record: latest } as Editor);
+      })
+      .catch(() => {
+        if (active)
+          setLoadError(
+            "Could not read this record. Check browser storage and try again.",
+          );
+      });
+    return () => {
+      active = false;
+    };
+  }, [db, editor]);
+  if (loadError)
+    return (
+      <Modal title="Record unavailable" onClose={onClose}>
+        <p role="alert">{loadError}</p>
+      </Modal>
+    );
+  if (!snapshot)
+    return (
+      <Modal title="Opening record" onClose={onClose}>
+        <p role="status">Reading the latest saved record…</p>
+      </Modal>
+    );
   if (
-    editor.kind === "opportunity" ||
-    editor.kind === "restriction" ||
-    editor.kind === "permission"
+    snapshot.kind === "opportunity" ||
+    snapshot.kind === "restriction" ||
+    snapshot.kind === "permission"
   )
-    return <RecordEditorModal editor={editor} onClose={onClose} />;
-  return <BasicEditorModal editor={editor} onClose={onClose} />;
+    return <RecordEditorModal editor={snapshot} onClose={onClose} />;
+  return <BasicEditorModal editor={snapshot} onClose={onClose} />;
 }
+
 function BasicEditorModal({
   editor,
   onClose,
@@ -115,21 +168,25 @@ function BasicEditorModal({
         if (website && !/^https?:\/\//i.test(website))
           throw new Error("Website must start with https:// or http://.");
         action = () =>
-          saveOrganization(db, {
-            ...stamp(),
-            ...current,
-            name: str("name"),
-            industry: str("industry"),
-            website,
-            location: str("location"),
-            description: str("description"),
-            avatar: current?.avatar || "",
-            tags: str("tags")
-              .split(",")
-              .map((v) => v.trim())
-              .filter(Boolean),
-            customFields: current?.customFields || {},
-          });
+          saveOrganization(
+            db,
+            {
+              ...stamp(),
+              ...current,
+              name: str("name"),
+              industry: str("industry"),
+              website,
+              location: str("location"),
+              description: str("description"),
+              avatar: current?.avatar || "",
+              tags: str("tags")
+                .split(",")
+                .map((v) => v.trim())
+                .filter(Boolean),
+              customFields: current?.customFields || {},
+            },
+            current?.updatedAt,
+          );
       } else if (editor.kind === "contact") {
         const current = editor.record;
         const timeout = str("timeout");
@@ -147,67 +204,81 @@ function BasicEditorModal({
         )
           throw new Error("A contact with this email already exists.");
         action = () =>
-          saveContact(db, {
-            ...stamp(),
-            ...current,
-            name: str("name"),
-            preferredName: str("preferredName"),
-            role: str("role"),
-            organizationId: str("organizationId") || null,
-            emails: [
-              ...(email ? [email] : []),
-              ...(current?.emails.slice(1) || []),
-            ],
-            phones: [
-              ...(str("phone") ? [str("phone")] : []),
-              ...(current?.phones.slice(1) || []),
-            ],
-            links: current?.links || [],
-            avatar: current?.avatar || "",
-            category: str("category") as Contact["category"],
-            stage: str("stage") as Contact["stage"],
-            priority: str("priority") as Contact["priority"],
-            availability: availability as Contact["availability"],
-            timeoutUntil:
-              availability === "Temporarily unavailable" && timeout
-                ? new Date(timeout + "T23:59:59").toISOString()
-                : null,
-            tags: str("tags")
-              .split(",")
-              .map((v) => v.trim())
-              .filter(Boolean),
-            nextFollowUp: current?.nextFollowUp || null,
-          });
+          saveContact(
+            db,
+            {
+              ...stamp(),
+              ...current,
+              name: str("name"),
+              preferredName: str("preferredName"),
+              role: str("role"),
+              organizationId: str("organizationId") || null,
+              emails: [
+                ...(email ? [email] : []),
+                ...(current?.emails.slice(1) || []),
+              ],
+              phones: [
+                ...(str("phone") ? [str("phone")] : []),
+                ...(current?.phones.slice(1) || []),
+              ],
+              links: current?.links || [],
+              avatar: current?.avatar || "",
+              category: str("category") as Contact["category"],
+              stage: str("stage") as Contact["stage"],
+              priority: str("priority") as Contact["priority"],
+              availability: availability as Contact["availability"],
+              timeoutUntil:
+                availability === "Temporarily unavailable" && timeout
+                  ? new Date(timeout + "T23:59:59").toISOString()
+                  : null,
+              tags: str("tags")
+                .split(",")
+                .map((v) => v.trim())
+                .filter(Boolean),
+              nextFollowUp: current?.nextFollowUp || null,
+            },
+            current?.updatedAt,
+          );
       } else if (editor.kind === "interaction") {
         action = () =>
-          (editor.record ? updateInteraction : addInteraction)(db, {
-            ...stamp(),
-            ...editor.record,
-            contactId: str("contactId") || null,
-            organizationId: str("organizationId") || null,
-            type: str("type") as "Note",
-            occurredAt: new Date(str("occurredAt")).toISOString(),
-            summary: str("summary"),
-            outcome: str("outcome"),
-            opportunityId: str("opportunityId") || null,
-            followUpId: str("followUpId") || null,
-          });
+          (editor.record ? updateInteraction : addInteraction)(
+            db,
+            {
+              ...stamp(),
+              ...editor.record,
+              contactId: str("contactId") || null,
+              organizationId: str("organizationId") || null,
+              type: str("type") as "Note",
+              occurredAt: new Date(str("occurredAt")).toISOString(),
+              summary: str("summary"),
+              outcome: str("outcome"),
+              opportunityId: str("opportunityId") || null,
+              followUpId: str("followUpId") || null,
+            },
+            editor.record?.updatedAt,
+          );
       } else {
         action = () =>
-          saveTask(db, {
-            ...stamp(),
-            ...editor.record,
-            title: str("title"),
-            description: str("description"),
-            contactId: str("contactId") || null,
-            organizationId: str("organizationId") || null,
-            dueAt: new Date(str("dueAt")).toISOString(),
-            completedAt: editor.record?.completedAt || null,
-            priority: str("priority") as Contact["priority"],
-            reminderMinutes: 60,
-          });
+          saveTask(
+            db,
+            {
+              ...stamp(),
+              ...editor.record,
+              title: str("title"),
+              description: str("description"),
+              contactId: str("contactId") || null,
+              organizationId: str("organizationId") || null,
+              dueAt: new Date(str("dueAt")).toISOString(),
+              completedAt: editor.record?.completedAt || null,
+              priority: str("priority") as Contact["priority"],
+              reminderMinutes: 60,
+            },
+            editor.record?.updatedAt,
+          );
       }
-      if (await run(action, "Saved to your workspace")) onClose();
+      const result = await action();
+      await run(async () => result, "Saved to your workspace");
+      onClose();
     } catch (err) {
       setError(
         err instanceof Error

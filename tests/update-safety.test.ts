@@ -55,3 +55,42 @@ it("distinguishes missing application files from ordinary application errors", (
   expect(isChunkFailure(new Error("Database write failed"))).toBe(false);
   expect(isChunkFailure(new Error("fetch request failed"))).toBe(false);
 });
+it("internal navigation can be cancelled without losing dirty work", () => {
+  const cleanup = installEditProtection();
+  document.body.innerHTML = '<form><input /></form><a href="#/network">Go</a>';
+  document
+    .querySelector("input")!
+    .dispatchEvent(new Event("input", { bubbles: true }));
+  const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+  const click = new MouseEvent("click", { bubbles: true, cancelable: true });
+  document.querySelector("a")!.dispatchEvent(click);
+  expect(click.defaultPrevented).toBe(true);
+  expect(hasUnsavedWork()).toBe(true);
+  confirm.mockReturnValue(true);
+  const next = new MouseEvent("click", { bubbles: true, cancelable: true });
+  // Prevent jsdom navigation, while still exercising capture protection.
+  document
+    .querySelector("a")!
+    .addEventListener("click", (e) => e.preventDefault());
+  document.querySelector("a")!.dispatchEvent(next);
+  expect(hasUnsavedWork()).toBe(false);
+  cleanup();
+});
+it("dialog dismissal preserves edits on cancellation and clears only its own scope on approval", async () => {
+  const { confirmDialogClose } = await import("../src/app/update-safety");
+  const cleanup = installEditProtection();
+  document.body.innerHTML =
+    '<dialog><form><input /></form></dialog><form id="other"><input /></form>';
+  document
+    .querySelectorAll("input")
+    .forEach((el) => el.dispatchEvent(new Event("input", { bubbles: true })));
+  const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+  expect(confirmDialogClose(document.querySelector("dialog"))).toBe(false);
+  expect(hasUnsavedWork()).toBe(true);
+  confirm.mockReturnValue(true);
+  expect(confirmDialogClose(document.querySelector("dialog"))).toBe(true);
+  expect(hasUnsavedWork()).toBe(true);
+  markSaved(document.querySelector("#other"));
+  expect(hasUnsavedWork()).toBe(false);
+  cleanup();
+});
