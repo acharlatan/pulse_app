@@ -122,6 +122,9 @@ export function Shell({ children }: { children: ReactNode }) {
             Relationship Review
           </NavLink>
         </nav>
+        <Link className="nav-item" to="/focus">
+          My Focus
+        </Link>
         <div className="sidebar-bottom">
           <div className="sidebar-note">
             <span className="little-spark">✳</span>

@@ -1,3 +1,4 @@
+import { BulkTags } from "../components/bulk-tags";
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -12,7 +13,11 @@ import {
 import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
-import { builtInLists, listMatcher } from "../services/smart-lists";
+import {
+  builtInLists,
+  listMatcher,
+  companyListMatcher,
+} from "../services/smart-lists";
 import { priorities, stages, availabilities, categories } from "../data/models";
 export function Network() {
   const p = usePulse();
@@ -85,11 +90,16 @@ export function Network() {
           ? b.updatedAt.localeCompare(a.updatedAt)
           : a.name.localeCompare(b.name),
     );
+  const companyMatcher = companyListMatcher(p);
   const companies = organizations
-    .filter((o) =>
-      `${o.name} ${o.industry} ${o.location} ${o.tags.join(" ")}`
-        .toLowerCase()
-        .includes(query),
+    .filter(
+      (o) =>
+        `${o.name} ${o.industry} ${o.location} ${o.tags.join(" ")}`
+          .toLowerCase()
+          .includes(query) &&
+        (typeof smartList === "string" ||
+          smartList.entityType !== "organization" ||
+          companyMatcher(o, smartList)),
     )
     .sort((a, b) =>
       sort === "recent"
@@ -128,23 +138,32 @@ export function Network() {
         <Link className="button ghost" to="/import">
           Import contacts
         </Link>
-        {tab === "people" && (
+        {
           <label className="field">
             <span>Smart List</span>
             <select value={smart} onChange={(e) => setSmart(e.target.value)}>
-              {builtInLists.map(([id, name]) => (
+              {(tab === "people"
+                ? builtInLists
+                : [["all", "All companies"]]
+              ).map(([id, name]) => (
                 <option key={id} value={id}>
                   {name}
                 </option>
               ))}
-              {p.smartLists.map((l) => (
-                <option value={l.id} key={l.id}>
-                  {l.name}
-                </option>
-              ))}
+              {p.smartLists
+                .filter(
+                  (l) =>
+                    (l.entityType || "contact") ===
+                    (tab === "people" ? "contact" : "organization"),
+                )
+                .map((l) => (
+                  <option value={l.id} key={l.id}>
+                    {l.name}
+                  </option>
+                ))}
             </select>
           </label>
-        )}
+        }
       </div>
       <div className="directory-toolbar">
         <div
@@ -288,6 +307,10 @@ export function Network() {
           </button>
         </div>
       )}
+      <BulkTags
+        type={tab === "people" ? "contact" : "organization"}
+        records={tab === "people" ? people : companies}
+      />
       <div className="results-label">
         <span>
           {tab === "people" ? people.length : companies.length}{" "}

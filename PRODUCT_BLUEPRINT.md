@@ -84,3 +84,8 @@ Directory state is URL-backed with safe internal return links. Shared visual tok
 ## Iteration 07 candidate
 
 Personal onboarding derives steps from current saved records, with workspace settings for hiding/reopening and download-request time. These additive settings use DB/backup v3; older settings default safely. Help covers real workflows, recovery, installation and disabled AI. Internal links, workspace switches and dialog dismissal warn on tracked edits. Editors read fresh snapshots and compare versions transactionally for people, companies, tasks, opportunities and conversations; stale saves fail without overwriting newer data. Browser Back is not universally guarded, and settings/other editors have no universal conflict resolution. No persistent draft recovery is claimed. Stable release is gated by RELEASE_CHECKLIST.md. Teams, commerce, sync, OAuth and encrypted backup are post-release expansions.
+
+
+## Iteration 08 — current expansion
+
+Iteration 08 implements customizable pipeline/stage records, separate outcome categories, typed relationship fields, deliberate My Focus selections and company segmentation. These remain local, workspace-isolated records. Existing social profiles, conversations, permissions, optional progress and disabled-by-default AI are preserved. Full JSON export is the transfer format for customization; no synchronization is implied.

@@ -81,7 +81,9 @@ export function validatePipelineGraph(graph: PipelineGraph) {
 
 // JSON tuple encoding prevents collisions between arbitrary pipeline IDs and names.
 export const legacyStageId = (pipelineId: string, stage: string) =>
-  `legacy:${JSON.stringify([pipelineId, stage])}`;
+  pipelineId === "default"
+    ? stage
+    : `legacy:${JSON.stringify([pipelineId, stage])}`;
 
 /** Prepare the full migration before writing anything. Calling again on the same
  * legacy input produces identical output, including IDs and original timestamps.

@@ -14,12 +14,24 @@ import { defaults, settingsSchema, type Workspace } from "../data/models";
 import { updateSettings } from "../data/repository";
 import { analyzeRelationships } from "../services/recommendations";
 import { ensureProgress, ensureDailyQuests } from "../data/progress-repository";
+import { calendarDay } from "../services/progress";
 import { deriveProgress } from "../services/progress";
 import type { PulseDB } from "../data/db";
 function useWorkspaceData(db: PulseDB) {
   return useLiveQuery(
     async () =>
       db.transaction("r", db.tables, async () => ({
+        pipelines: (await db.pipelines.toArray()).sort(
+          (a, b) => a.position - b.position,
+        ),
+        pipelineStages: (await db.pipelineStages.toArray()).sort(
+          (a, b) => a.position - b.position,
+        ),
+        fieldDefinitions: (await db.fieldDefinitions.toArray()).sort(
+          (a, b) => a.position - b.position,
+        ),
+        fieldValues: await db.fieldValues.toArray(),
+        focusItems: await db.focusItems.toArray(),
         rewards: await db.rewards.toArray(),
         rewardChanges: (await db.rewardChanges.toArray()).sort(
           (a, b) =>
@@ -182,6 +194,32 @@ export function WorkspaceProvider({
         ),
       );
   }, [ready, db, data, clock]);
+  useEffect(() => {
+    if (
+      !ready ||
+      !data?.settings.focus.reminders ||
+      document.visibilityState === "hidden"
+    )
+      return;
+    const day = calendarDay(Date.now(), data.settings.timezone);
+    const pending = data.focusItems.filter(
+      (f) =>
+        f.today === day &&
+        f.entityType === "task" &&
+        data.tasks.some((t) => t.id === f.recordId && !t.completedAt),
+    ).length;
+    try {
+      const key = `pulse-focus-reminder:${workspace}:${day}`;
+      if (pending && !sessionStorage.getItem(key)) {
+        setToast(
+          `${pending} selected focus tasks remain today. Open My Focus to review.`,
+        );
+        sessionStorage.setItem(key, "1");
+      }
+    } catch {
+      /* Optional reminder hint only. */
+    }
+  }, [ready, data, clock, workspace]);
   if (error)
     return (
       <div className="startup">

@@ -68,3 +68,8 @@ Welcome, Home, Network, profiles, Pipeline, Activity/Progress, Review, Smart Lis
 ## Release candidate guidance
 
 Getting Started reuses surface, text-link and primary/secondary button patterns. Steps have text descriptions and current-record completion indicators; no fabricated progress or XP. Help uses native details/summary with 44px summary targets, shared semantic surfaces and lazy route loading. Empty Personal Home avoids zero-value statistics.
+
+
+## Iteration 08 — current expansion
+
+Iteration 08 retains semantic light/dark tokens, native form controls, clear stage category labels and reusable modal forms. Stage color is only a border accent; meaning remains textual. Pipeline boards use readable stage groups and bounded card batches. Customization lives behind Manage Pipelines/Personalize PULSE. Focus cards distinguish personal choices and underlying task completion. Mobile customization actions wrap as complete buttons, and checkboxes retain compact native dimensions.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0-rc.1 — customization expansion
+
+- Multiple pipelines, templates, stable stages, outcome categories and safe impact mappings.
+- Typed custom fields for people, companies and opportunities; legacy company data preserved.
+- My Focus pins, daily priorities, shared task completion and Home preferences.
+- Company segments, pipeline/custom/pin conditions and selected bulk administration.
+- Dexie/backup v4 with historical restore support and no reward replay.
+- Release candidate; physical-device and native assistive-technology gates remain open.
+
 ## 1.0.0-rc.1 — release candidate
 
 - Optional Personal guide reflects saved records; skip/revisit through Help.

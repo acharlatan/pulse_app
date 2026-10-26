@@ -1,10 +1,22 @@
+import {
+  pipelineSchema,
+  pipelineStageSchema,
+  planLegacyPipelines,
+  type PipelineDefinition,
+  type PipelineStage,
+} from "../services/pipelines";
+import type {
+  FieldDefinition,
+  FieldValue,
+  FocusItem,
+} from "./expansion-models";
 import type {
   Reward,
   RewardChange,
   ProgressState,
   DailyQuest,
 } from "./progress-models";
-import { settingsSchema } from "./models";
+import { settingsSchema, defaults } from "./models";
 import Dexie, { type Table } from "dexie";
 import type {
   Organization,
@@ -24,6 +36,11 @@ import type {
   ImportBatch,
 } from "./models";
 export class PulseDB extends Dexie {
+  pipelines!: Table<PipelineDefinition>;
+  pipelineStages!: Table<PipelineStage>;
+  fieldDefinitions!: Table<FieldDefinition>;
+  fieldValues!: Table<FieldValue>;
+  focusItems!: Table<FocusItem>;
   rewards!: Table<Reward>;
   rewardChanges!: Table<RewardChange>;
   progressState!: Table<ProgressState>;
@@ -85,6 +102,33 @@ export class PulseDB extends Dexie {
           .modify((s) => {
             s.progress = settingsSchema.parse(s).progress;
           });
+      });
+    this.version(4)
+      .stores({
+        pipelines: "id,position,isDefault",
+        pipelineStages: "id,pipelineId,position",
+        opportunities: "id,organizationId,stageId,pipelineId",
+        fieldDefinitions: "id,entityType",
+        fieldValues: "id,fieldId,recordId,&[fieldId+recordId]",
+        focusItems: "id,recordId,&[entityType+recordId]",
+      })
+      .upgrade(async (tx) => {
+        const settings = settingsSchema.parse(
+          (await tx.table("settings").get("settings")) || defaults,
+        );
+        const graph = planLegacyPipelines(
+          settings,
+          await tx.table("opportunities").toArray(),
+          new Date().toISOString(),
+        );
+        await tx
+          .table("pipelines")
+          .bulkPut(graph.pipelines.map((p) => pipelineSchema.parse(p)));
+        await tx
+          .table("pipelineStages")
+          .bulkPut(graph.stages.map((s) => pipelineStageSchema.parse(s)));
+        await tx.table("opportunities").bulkPut(graph.opportunities);
+        // Legacy filters refer to names. Default pipeline identities retain those exact IDs.
       });
   }
 }

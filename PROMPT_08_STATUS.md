@@ -1,25 +1,13 @@
-# Prompt 08 implementation checkpoint
+# Prompt 08 — PULSE 1.1 candidate
 
-Base: main 534511d, PULSE 1.0.0-rc.1. Stable 1.0 gates remain open.
+Base: 534511d (1.0.0-rc.1). Implemented in the feature branch; deployment evidence is recorded in QA_REPORT.md and the delivery message. Never infer a stable release from a published candidate.
 
-## Architecture assessment
+Implemented: multiple stable-ID pipelines and outcome stages; templates; rename/reorder/color/default/archive; transactional used-stage mappings with confirmation and stale-configuration rejection; explicit cross-pipeline editing; stage-authoritative outcomes; typed custom definitions and values for people/companies/opportunities; My Focus pins and dated priorities; company Smart Lists and advanced typed filters; bounded bulk add/remove tags, contact priority, pin/unpin; Home layout/landing/reminder/progress preferences; v4 database and backup with v1–v3 compatibility.
 
-Opportunity.stageId is a fixed enum independent of contact.stage lifecycle. Settings contains one pipeline. Pipeline.tsx and opportunity editors present fixed stages. repository.ts normalizes outcome in save and backup validation and moveOpportunity delegates to save. Smart Lists persist legacy stage values. Progress sourceRule consumes authoritative status; syncReward is called within CRM transactions and must never run during configuration or migration. Backups v1–v3 validate before atomic replacement. Organization.customFields is an existing string map that must survive future definition-based fields. Editors have fresh-snapshot stale-save checks; keep these.
+Source checkpoints from the previous foundation are superseded. Pipeline planning is now connected to persistence, editors and live views. Historical organization string fields remain intact alongside new typed fields.
 
-## Implemented, isolated foundation
+Migration: Dexie v4 upgrades legacy opportunities atomically; default pipeline stage identities preserve old values, and other legacy pipelines use deterministic tuple IDs. Editable labels never change those IDs. Original opportunity IDs, dates, links and values remain unchanged. No CRM events or reward grants are replayed during upgrade/restore. Configuration remapping corrects existing rewards without granting new ones. Contact lifecycle remains independent.
 
-src/services/pipelines.ts defines stable-ID pipeline/stage schemas, limits (12 active pipelines, 24 stages each), graph integrity checks, deterministic legacy mapping, explicit destination/reopening rules and stage-removal impact planning. Planning is pure: no database writes, events or reward replay. Tests exercise preservation, retry determinism, custom outcome labels, identity stability, orphan prevention and cancellation-by-discarding-preview.
+Limits: 12 active pipelines; 24 stages per pipeline; 30 fields per entity; 30 choices per select; short text 300 characters, long text 10,000, finite numbers within ±1e12; 100 pins; 20 priorities per day; 200 selected bulk records. Daily choices retain their chosen dates and pins never auto-expire. Pipeline cards render in batches of 30 per stage.
 
-This module is **not connected to production storage or UI**. Database and backup remain v3. This checkpoint is not a 1.1 release candidate and does not satisfy all Prompt 08 acceptance criteria.
-
-## Next implementation sequence
-
-1. Add versioned Dexie migration and v4 backup validation/export/restore together. Execute the pure mapping inside an upgrade transaction; map Smart List opportunity-stage conditions while preserving contact lifecycle conditions. Validate full graph before commit. Test actual v3 upgrades, retries, rollback, reward ledger preservation and all historical backup fixtures. New-workspace seeding and reset must initialize pipeline records too.
-2. Connect graph validation to transactional repository saves/moves. Reuse reward corrections only for genuine CRM transitions; configuration mappings must not award XP. Add stale configuration checks and transactional impact confirmations.
-3. Expose live pipeline/stage records through context, integrate all opportunity editors/cards/profile views, then implement pipeline management/templates, explicit destination mappings, archive/default operations, currency-separated totals and bounded mobile rendering.
-4. Implement custom field definitions/typed values, My Focus, company segmentation, safe bulk actions and Home preferences, including complete backup coverage.
-5. Run browser, accessibility, offline, Worker dry run, subpath build and actual migration/performance checks; update release documentation with observed evidence. Forward fixes only after schema activation; older v3 clients cannot safely open a v4 database. No production migration/deployment until integrated gates pass.
-
-## Checkpoint validation
-
-TypeScript and ESLint passed. All 132 tests passed across 10 test files, including 8 new pure pipeline tests. These are not database migration or browser acceptance results. Production build outcome is recorded in the delivery message. No Worker code or configuration changed. No production deployment requested by this checkpoint.
+Boundaries: no automated messaging, cloud sync, paid infrastructure or newly enabled AI. Bulk deletion and bulk opportunity outcome changes are intentionally not offered. CSV contact import retains its established mapping and consent safeguards; typed custom data transfers through full JSON backups. Physical iOS/Android and native assistive-technology verification remain stable-release gates. Forward fixes after v4; older clients cannot open a newer IndexedDB schema.

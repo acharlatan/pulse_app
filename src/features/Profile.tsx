@@ -1,3 +1,5 @@
+import { FocusButton } from "../components/focus";
+import { CustomFields } from "../components/custom-fields";
 import { CommunicationHandoff } from "../components/communication";
 import { outreachReasons } from "../ai/context";
 import { useState } from "react";
@@ -257,6 +259,21 @@ export function Profile({ company = false }: { company?: boolean }) {
           </details>
         </div>
       </section>
+      <FocusButton type={company ? "organization" : "contact"} id={record.id} />
+      <CustomFields
+        type={company ? "organization" : "contact"}
+        id={record.id}
+      />
+      {company && org && Object.keys(org.customFields).length > 0 && (
+        <section className="surface">
+          <h2>Legacy company details</h2>
+          {Object.entries(org.customFields).map(([k, v]) => (
+            <p key={k}>
+              <strong>{k}:</strong> {v}
+            </p>
+          ))}
+        </section>
+      )}
       <nav className="profile-section-nav" aria-label="Profile sections">
         {[
           "overview",

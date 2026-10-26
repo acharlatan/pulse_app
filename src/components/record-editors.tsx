@@ -2,7 +2,6 @@ import { useState, type ReactNode, type FormEvent } from "react";
 import { usePulse } from "../app/context";
 import { Modal } from "./ui";
 import {
-  stages,
   availabilities,
   stamp,
   type Contact,
@@ -174,6 +173,14 @@ export function RecordEditorModal({
             : editor.contact.availability)
       : "Available",
   );
+  const [pipelineId, setPipelineId] = useState(
+    editor.kind === "opportunity"
+      ? editor.record?.pipelineId ||
+          p.settings.focus.lastPipelineId ||
+          p.pipelines.find((x) => x.isDefault)?.id ||
+          "default"
+      : "",
+  );
   const str = (d: FormData, k: string) => String(d.get(k) || "").trim();
   const iso = (d: FormData, k: string) =>
     str(d, k) ? new Date(str(d, k)).toISOString() : null;
@@ -194,7 +201,7 @@ export function RecordEditorModal({
               title: str(d, "title"),
               organizationId: organizationId || null,
               contactIds: d.getAll("contactIds").map(String),
-              pipelineId: p.settings.pipeline.id,
+              pipelineId,
               stageId: str(d, "stageId") as Opportunity["stageId"],
               status: "open",
               value: str(d, "value") === "" ? null : Number(str(d, "value")),
@@ -276,13 +283,46 @@ export function RecordEditorModal({
           </small>
         </fieldset>
         <Field label="Pipeline">
-          <input readOnly value={p.settings.pipeline.name} />
+          <select
+            value={pipelineId}
+            onChange={(e) => setPipelineId(e.target.value)}
+          >
+            {p.pipelines
+              .filter((x) => !x.archived || x.id === o?.pipelineId)
+              .map((x) => (
+                <option key={x.id} value={x.id}>
+                  {x.name}
+                  {x.archived ? " (archived)" : ""}
+                </option>
+              ))}
+          </select>
         </Field>
         <Field label="Stage / outcome">
-          <select name="stageId" defaultValue={o?.stageId || "New"}>
-            {stages.map((s) => (
-              <option key={s}>{s}</option>
-            ))}
+          <select
+            key={pipelineId}
+            name="stageId"
+            required
+            defaultValue={
+              o?.pipelineId === pipelineId
+                ? o.stageId
+                : o
+                  ? ""
+                  : p.pipelineStages.find(
+                      (s) =>
+                        s.pipelineId === pipelineId && s.category === "open",
+                    )?.id || ""
+            }
+          >
+            <option value="" disabled>
+              Choose a destination stage
+            </option>
+            {p.pipelineStages
+              .filter((s) => s.pipelineId === pipelineId)
+              .map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name} · {s.category}
+                </option>
+              ))}
           </select>
           <small>
             Won and Lost close the deal. Select an active stage to reopen it.

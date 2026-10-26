@@ -1,6 +1,8 @@
+import { FocusSummary } from "../components/focus";
+import { useNavigate } from "react-router-dom";
 import { GettingStarted } from "../components/GettingStarted";
 import { ProgressSummary } from "../components/progress";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -31,6 +33,19 @@ import { completeTask } from "../data/repository";
 import { overdue } from "../services/recommendations";
 export function Home() {
   const p = usePulse();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (p.settings.focus.landing !== "focus") return;
+    try {
+      const key = `pulse-home-visited:${p.workspace}`;
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        navigate("/focus", { replace: true });
+      }
+    } catch {
+      /* Optional hint; Home remains available if session storage is denied. */
+    }
+  }, [navigate, p.workspace, p.settings.focus.landing]);
   const { date, money } = useFormat();
   const [editor, setEditor] = useState<Editor | null>(null);
   const recs = p.intelligence.queue
@@ -51,7 +66,9 @@ export function Home() {
     })
     .slice(0, 5);
   return (
-    <div className="page home-page page-enter">
+    <div
+      className={`page home-page page-enter home-${p.settings.focus.homeLayout}`}
+    >
       <div className="page-heading">
         <div>
           <p className="eyebrow date-label">
@@ -79,6 +96,7 @@ export function Home() {
           New connection
         </button>
       </div>
+      {p.settings.focus.shortcuts && <FocusSummary />}
       <GettingStarted />
       {p.contacts.length > 0 ||
       p.organizations.length > 0 ||

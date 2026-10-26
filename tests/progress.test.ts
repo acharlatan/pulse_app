@@ -397,7 +397,7 @@ it("current backups roundtrip ledger and quests without replaying awards", async
   await ensureDailyQuests(db);
   await completeTask(db, t.id);
   const b = await exportBackup(db);
-  expect(b.version).toBe(3);
+  expect(b.version).toBe(4);
   await restoreBackup(db, b);
   await ensureDailyQuests(db);
   await completeTask(db, t.id);
@@ -446,7 +446,13 @@ it("CSV import and repeat restore do not create reward events", async () => {
     ),
     map = suggestMapping(csv.headers),
     inspected = inspectCsv(csv, map, [], []);
-  const plan = buildImportPlan(inspected, [c], [], [], "test.csv");
+  const plan = buildImportPlan(
+    inspected,
+    await db.contacts.toArray(),
+    [],
+    [],
+    "test.csv",
+  );
   await commitImport(db, plan);
   expect(await db.rewards.count()).toBe(0);
   const b = await exportBackup(db);
@@ -492,7 +498,7 @@ it("upgrades a real v2 database without replaying historical task completions", 
     .add({ ...task(), completedAt: new Date().toISOString() });
   old.close();
   await db.open();
-  expect(db.verno).toBe(3);
+  expect(db.verno).toBe(4);
   expect(await db.contacts.count()).toBe(1);
   expect(await db.tasks.count()).toBe(1);
   expect(await db.rewards.count()).toBe(0);

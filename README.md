@@ -1,6 +1,6 @@
 # PULSE
 
-**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small businesses. Release candidate 1.0.0-rc.1 (iteration 07 of 07); stable release gates remain open.
+**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small businesses. Release candidate 1.1.0-rc.1 (iteration 08); stable release gates remain open.
 
 ## Run
 
@@ -42,7 +42,7 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 
 ## Storage and privacy
 
-Dexie schema version 3 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
+Dexie schema version 4 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
 
 No mandatory account, analytics, external fonts or external avatars. Records remain local unless you export them, open a reviewed external communication handoff, or explicitly approve selected context for optional Gemini processing. AI is off by default and production generation remains unconfigured. Provider keys are never entered in the frontend. IndexedDB is **not application-level encryption**; browser-profile access permits data access. Browser clearing/eviction and device loss can erase data. Back up important records. Workspace data is scoped to an origin: preview, GitHub Pages and hosted deployments do not share records. Export/import to move between them. Databases are not yet namespaced for multiple PULSE deployments on the same origin.
 
@@ -58,7 +58,7 @@ Deleting a company **detaches and preserves** its people, conversations, tasks, 
 
 ## Limits and next work
 
-No synchronization, hosted CRM accounts or team permissions. Google OAuth integrations remain planned/disconnected. Optional protected AI and manual communication/calendar handoffs are described below. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Custom pipelines, advanced directory pagination and broader external integrations are deferred. Relationship stories render 20 entries at a time. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
+No synchronization, hosted CRM accounts or team permissions. Google OAuth integrations remain planned/disconnected. Optional protected AI and manual communication/calendar handoffs are described below. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Advanced directory pagination and broader external integrations are deferred. Relationship stories render 20 entries at a time. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
 
 ## License
 
@@ -78,7 +78,7 @@ For a preinstalled test browser, set `PULSE_CHROMIUM_PATH` when running `npm run
 
 Open **Relationship Review** from Home, Network, or the desktop navigation. Reviews are rules based, with no AI inference. Health uses actual logged conversation dates or explicitly sourced imported last-contact dates. Notes and creation/import times never count as conversations. Unknown history stays unknown. Thresholds, inclusion preferences, default snooze and Home limits live in Settings → Relationship rhythm → Relationship intelligence settings. Snooze defers one evidence-specific recommendation; dismiss hides unchanged evidence; neither completes tasks nor changes communication eligibility.
 
-Smart Lists save filter definitions, not copied people. ALL/ANY conditions combine stage, category, priority, effective availability, company, tags, known days since contact, health, follow-up state, and opportunity state. Unknown history never satisfies a days-since comparison. A deleted-company criterion matches no contacts. Company-only custom segments are not yet available.
+Smart Lists save filter definitions, not copied people. ALL/ANY conditions combine stage, category, priority, effective availability, company, tags, known days since contact, health, follow-up state, and opportunity state. Unknown history never satisfies a days-since comparison. A deleted-company criterion matches no contacts. Company Smart Lists are available in iteration 08.
 
 **Import contacts** is accessible from Network or Privacy & data. UTF-8 CSV supports quoted commas/newlines and BOM. Map full name or first name (last name optional), email(s separated by semicolons), phone, role, company, company details, category/stage/priority, tags (semicolon or |), notes and optional last-contact date. Full name takes precedence over first/last names. Date-only values represent the start of the date in device time; timestamps must include a timezone. Imported dates carry provenance; imported notes are labeled and never create false conversations.
 
@@ -145,3 +145,18 @@ See [Getting started](GETTING_STARTED.md), [Installation](INSTALLATION.md), [Bac
 ## Release candidate hardening
 
 The candidate includes first-run guidance, Help, installation/recovery guides, guarded dialog dismissal and editor snapshot checks for people, companies, tasks, opportunities and conversations. Stale edits fail with instructions rather than overwriting a newer or deleted record. Settings and other edits are not a conflict-free multi-user system. Save before browser Back; no persistent draft recovery is provided. Chromium desktop automation and mobile viewport checks are the verified environments; physical iOS/Android, Firefox/WebKit, native screen readers and literal browser zoom remain unverified. See RELEASE_CHECKLIST.md for the exact release boundary.
+
+
+## Iteration 08 — your workflows, your focus
+
+PULSE 1.1.0-rc.1 adds **Pipeline → Manage Pipelines**, **Settings → Personalize PULSE**, and **My Focus**. Choose Sales, Partnerships, Recruitment, Client Projects or Blank templates; edit stage names, order, colors and open/won/lost categories. Stable IDs preserve associations on rename. Used-stage removal requires replacement mapping and an impact confirmation. Archive pipelines to retain historical records, and choose another active default before archiving the default. Opportunity editors support explicit pipeline and destination-stage selection. Values remain separated by currency and outcome.
+
+Define six custom-field types (short text, long text, number, date, checkbox and single select) for people, companies and opportunities. Edit values under Additional details. Rename/reorder/hide/archive definitions without losing values; deleting shows the saved-value count and requires confirmation. Types cannot be changed in place. Existing organization string fields remain readable as Legacy company details. Custom fields are excluded from AI context.
+
+Pin relationships/deals/tasks and choose up to 20 priorities for a date in My Focus. Completing a selected task uses the existing task/reward transaction. Pinning and configuration earn no XP. Pins persist until removed, while daily selections stay on the selected date. Focused Home shows pinned relationships; Balanced retains the existing dashboard; Compact reduces spacing. Landing screen, shortcuts, in-app reminders and progress visibility are workspace preferences.
+
+Smart Lists now distinguish people and companies. Company rules include industry, tags, historical conversation age (unknown excluded), representative priority, active-representative absence, follow-ups, upcoming deal deadlines, pipeline/stage/outcome, custom values and pins. Custom numeric comparisons use numbers. Archived/deleted custom fields match nothing and show an invalid-condition notice. Network company views can apply saved company segments.
+
+Network → Bulk add tag opens explicit selection and review for adding/removing tags, contact priority and Focus pin/unpin (up to 200 filtered visible records). All selected records must still match their saved timestamps. Failure rolls back the batch. Restrictions, permissions, interaction history and rewards are not modified by administrative bulk actions.
+
+Database/JSON backup **v4** adds pipelines, stages, definitions, typed values and focus selections. Previous v1/v2/v3 backups are normalized before atomic replacement. There is no database downgrade: retain v4-compatible code for forward fixes. Export a backup before adopting a schema update. See BACKUP_AND_RECOVERY.md and QA_REPORT.md for evidence and limits.

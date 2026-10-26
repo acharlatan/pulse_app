@@ -37,3 +37,8 @@ Read README.md, PRODUCT_BLUEPRINT.md, DESIGN_SYSTEM.md, DEVELOPMENT_ROADMAP.md a
 - Typography tokens have a 12px metadata floor, 13px labels and 15px body; mobile controls use 16px. Retain unique dialog titles, focus boundaries/restoration, safe areas, URL-backed directory context and reduced-motion behavior. Run axe/keyboard checks as well as screenshots and overflow checks. Use a clean production output for offline/update tests and report physical-device/screen-reader limitations.
 
 - Editors must load a fresh saved snapshot on opening and pass its updatedAt to transactional stale-save checks for people, companies, tasks, opportunities and conversations. Never bypass a mismatch to overwrite newer/deleted data. Keep save failures visible inside the active modal. Preserve legacy settings defaults when changing validation libraries, and run historical backup fixtures.
+
+
+## Iteration 08 — current expansion
+
+DB/backup v4 adds pipelines, pipelineStages, fieldDefinitions, fieldValues and focusItems. Preserve v1–v3 restore compatibility and legacy organization customFields. Contact.stage remains lifecycle; Opportunity.stageId references a stage whose category is authoritative. New stage IDs are stable UUIDs; legacy default IDs retain their deterministic legacy values after label changes. Pipeline configuration writes require stale snapshots and explicit impact mappings, and must never grant XP. Custom-field types are immutable; references/types are validated on save/restore. Focus task completion reuses completeTask. Bulk administration validates selected snapshots and commits atomically without changing restrictions/permissions. Never roll migrated devices back to older DB schema support.

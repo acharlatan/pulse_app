@@ -14,7 +14,6 @@ export default defineConfig({
             "--no-zygote",
             "--use-gl=angle",
             "--use-angle=swiftshader",
-            "--in-process-gpu",
           ],
         }
       : undefined,

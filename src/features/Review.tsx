@@ -1,3 +1,4 @@
+import { FocusButton } from "../components/focus";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -110,6 +111,9 @@ export function Review() {
           </select>
         </label>
       </div>
+      <Link className="button secondary" to="/focus">
+        My Focus
+      </Link>
       <p className="muted">
         {rows.length} {view.toLowerCase()} reviews · Snooze defers a suggestion.
         Dismiss hides unchanged evidence. Neither changes a task, availability
@@ -130,7 +134,11 @@ export function Review() {
                 <div>
                   <h2>{c?.name || o?.title}</h2>
                   <p className="muted">
-                    {org?.name || (c ? "Independent" : o?.stageId)}
+                    {org?.name ||
+                      (c
+                        ? "Independent"
+                        : p.pipelineStages.find((s) => s.id === o?.stageId)
+                            ?.name)}
                     {c ? ` · ${c.stage} · ${c.priority}` : ""}
                   </p>
                 </div>
@@ -152,6 +160,8 @@ export function Review() {
                 </p>
               )}
               <div className="record-actions">
+                {c && <FocusButton type="contact" id={c.id} />}
+                {o && <FocusButton type="opportunity" id={o.id} />}
                 {c && (
                   <>
                     <Link

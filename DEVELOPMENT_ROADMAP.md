@@ -86,3 +86,8 @@ No confirmed P0 defect remains from the exercised journeys. Device/assistive-tec
 ## Iteration 07 candidate
 
 Personal onboarding derives steps from current saved records, with workspace settings for hiding/reopening and download-request time. These additive settings use DB/backup v3; older settings default safely. Help covers real workflows, recovery, installation and disabled AI. Internal links, workspace switches and dialog dismissal warn on tracked edits. Editors read fresh snapshots and compare versions transactionally for people, companies, tasks, opportunities and conversations; stale saves fail without overwriting newer data. Browser Back is not universally guarded, and settings/other editors have no universal conflict resolution. No persistent draft recovery is claimed. Stable release is gated by RELEASE_CHECKLIST.md. Teams, commerce, sync, OAuth and encrypted backup are post-release expansions.
+
+
+## Iteration 08 — current expansion
+
+Iteration 08 is the first post-release expansion candidate, 1.1.0-rc.1. Pipeline customization, custom fields, My Focus, company segmentation, limited bulk administration and Home preferences are implemented. Stable certification still requires the manual platform gates. Next work: physical-device/assistive-technology verification, richer field-aware CSV mapping, directory pagination and carefully scoped future integrations; no new paid services are enabled.

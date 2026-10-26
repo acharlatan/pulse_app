@@ -1,3 +1,4 @@
+import { planLegacyPipelines } from "../services/pipelines";
 import type { PulseDB } from "./db";
 import { defaults, stamp, stages, type Contact } from "./models";
 const day = (offset: number) =>
@@ -5,6 +6,11 @@ const day = (offset: number) =>
 export async function initialize(db: PulseDB) {
   await db.transaction("rw", db.tables, async () => {
     if (await db.settings.get("settings")) return;
+    if (!(await db.pipelines.count())) {
+      const graph = planLegacyPipelines(defaults, [], new Date().toISOString());
+      await db.pipelines.bulkPut(graph.pipelines);
+      await db.pipelineStages.bulkPut(graph.stages);
+    }
     await db.settings.put({
       ...defaults,
       name: db.workspace === "demo" ? "Alex" : "",
@@ -117,65 +123,59 @@ export async function initialize(db: PulseDB) {
       ]),
     );
     await db.tasks.bulkAdd(
-      contacts
-        .slice(0, 7)
-        .map((c, i) => ({
-          ...stamp(),
-          id: `task-${i}`,
-          title: [
-            "Send the updated proposal",
-            "Check in on the spring launch",
-            "Share partnership ideas",
-            "Schedule a discovery call",
-            "Follow up on the project scope",
-            "Prepare meeting notes",
-            "Review the creative brief",
-          ][i],
-          description: "A thoughtful next step for this relationship.",
-          contactId: c.id,
-          organizationId: c.organizationId,
-          dueAt: day([-1, 0, 1, 0, 3, 5, 10][i]),
-          completedAt: i === 5 ? day(0) : null,
-          priority: c.priority,
-          reminderMinutes: 60,
-        })),
+      contacts.slice(0, 7).map((c, i) => ({
+        ...stamp(),
+        id: `task-${i}`,
+        title: [
+          "Send the updated proposal",
+          "Check in on the spring launch",
+          "Share partnership ideas",
+          "Schedule a discovery call",
+          "Follow up on the project scope",
+          "Prepare meeting notes",
+          "Review the creative brief",
+        ][i],
+        description: "A thoughtful next step for this relationship.",
+        contactId: c.id,
+        organizationId: c.organizationId,
+        dueAt: day([-1, 0, 1, 0, 3, 5, 10][i]),
+        completedAt: i === 5 ? day(0) : null,
+        priority: c.priority,
+        reminderMinutes: 60,
+      })),
     );
     await db.opportunities.bulkAdd(
-      orgs
-        .slice(0, 6)
-        .map((o, i) => ({
-          ...stamp(),
-          title: [
-            "Brand identity refresh",
-            "Launch partnership",
-            "Annual creative retainer",
-            "Growth strategy",
-            "Platform collaboration",
-            "Customer experience project",
-          ][i],
-          organizationId: o.id,
-          contactIds: [`contact-${i}`],
-          pipelineId: "default",
-          stageId: stages[[5, 4, 3, 6, 2, 5][i]],
-          value: [8500, 12000, 24000, 6500, 18000, 9000][i],
-          currency: "USD",
-          status: "open" as const,
-          probability: null,
-          expectedCloseAt: day(30),
-          notes: "Fictional demo opportunity.",
-        })),
+      orgs.slice(0, 6).map((o, i) => ({
+        ...stamp(),
+        title: [
+          "Brand identity refresh",
+          "Launch partnership",
+          "Annual creative retainer",
+          "Growth strategy",
+          "Platform collaboration",
+          "Customer experience project",
+        ][i],
+        organizationId: o.id,
+        contactIds: [`contact-${i}`],
+        pipelineId: "default",
+        stageId: stages[[5, 4, 3, 6, 2, 5][i]],
+        value: [8500, 12000, 24000, 6500, 18000, 9000][i],
+        currency: "USD",
+        status: "open" as const,
+        probability: null,
+        expectedCloseAt: day(30),
+        notes: "Fictional demo opportunity.",
+      })),
     );
     await db.events.bulkAdd(
-      contacts
-        .slice(0, 8)
-        .map((c, i) => ({
-          ...stamp(),
-          createdAt: day(-i / 5),
-          category: "interaction",
-          contactId: c.id,
-          organizationId: c.organizationId,
-          summary: `${i % 2 ? "Call with" : "Meeting with"} ${c.name} · next steps agreed`,
-        })),
+      contacts.slice(0, 8).map((c, i) => ({
+        ...stamp(),
+        createdAt: day(-i / 5),
+        category: "interaction",
+        contactId: c.id,
+        organizationId: c.organizationId,
+        summary: `${i % 2 ? "Call with" : "Meeting with"} ${c.name} · next steps agreed`,
+      })),
     );
   });
 }
