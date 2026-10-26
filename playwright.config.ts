@@ -1,6 +1,8 @@
 import { defineConfig } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests/browser",
+  // Shared CI hosts can take longer to render lazy routes; retain all assertions.
+  expect: { timeout: 15000 },
   use: {
     baseURL: process.env.PULSE_TEST_URL || "http://127.0.0.1:5173",
     launchOptions: process.env.PULSE_CHROMIUM_PATH

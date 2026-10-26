@@ -7,7 +7,30 @@ const run = vi.fn(async (fn: () => Promise<unknown>) => {
 });
 vi.mock("../src/app/context", () => ({
   usePulse: () => ({
-    db: {},
+    db: {
+      contacts: {
+        get: async () => ({
+          id: "1",
+          name: "A Person",
+          preferredName: "A",
+          role: "Founder",
+          organizationId: null,
+          emails: [],
+          phones: [],
+          links: [],
+          avatar: "",
+          category: "Prospect",
+          stage: "New",
+          availability: "Available",
+          timeoutUntil: null,
+          priority: "Normal",
+          tags: [],
+          nextFollowUp: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        }),
+      },
+    },
     organizations: [],
     settings: { followUpDays: 7, timeoutDays: 30 },
     run,
@@ -57,7 +80,7 @@ describe("accessible profile editing", () => {
         onClose={close}
       />,
     );
-    fireEvent.change(screen.getByLabelText("Full name"), {
+    fireEvent.change(await screen.findByLabelText("Full name"), {
       target: { value: "Updated Person" },
     });
     fireEvent.change(screen.getByLabelText("Stage"), {
@@ -71,4 +94,25 @@ describe("accessible profile editing", () => {
     });
     expect(close).toHaveBeenCalled();
   });
+});
+
+it("keeps a failed save open and announces its error inside the editing dialog", async () => {
+  const { cleanup } = await import("@testing-library/react");
+  cleanup();
+  saveContact.mockRejectedValueOnce(
+    new Error("Storage is full. Export existing records before retrying."),
+  );
+  const close = vi.fn();
+  render(<EditorModal editor={{ kind: "contact" }} onClose={close} />);
+  fireEvent.change(await screen.findByLabelText("Full name"), {
+    target: { value: "Fictional failure case" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Save person" }));
+  await waitFor(() =>
+    expect(screen.getByRole("dialog")).toContainElement(
+      screen.getByRole("alert"),
+    ),
+  );
+  expect(screen.getByRole("alert")).toHaveTextContent("Storage is full");
+  expect(close).not.toHaveBeenCalled();
 });

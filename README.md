@@ -1,6 +1,6 @@
 # PULSE
 
-**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small teams. Release candidate 1.0.0-rc.1 (iteration 07 of 07); stable release gates remain open.
+**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small businesses. Release candidate 1.0.0-rc.1 (iteration 07 of 07); stable release gates remain open.
 
 ## Run
 
@@ -141,3 +141,7 @@ Welcome now defers the CRM workspace code until selection. The only large Home a
 ## Release candidate guides
 
 See [Getting started](GETTING_STARTED.md), [Installation](INSTALLATION.md), [Backup and recovery](BACKUP_AND_RECOVERY.md), [Changelog](CHANGELOG.md) and [Release gates](RELEASE_CHECKLIST.md). Personal Home has an optional saved-record guide; Help can reopen it. No stable 1.0 or physical-device certification is claimed.
+
+## Release candidate hardening
+
+The candidate includes first-run guidance, Help, installation/recovery guides, guarded dialog dismissal and editor snapshot checks for people, companies, tasks, opportunities and conversations. Stale edits fail with instructions rather than overwriting a newer or deleted record. Settings and other edits are not a conflict-free multi-user system. Save before browser Back; no persistent draft recovery is provided. Chromium desktop automation and mobile viewport checks are the verified environments; physical iOS/Android, Firefox/WebKit, native screen readers and literal browser zoom remain unverified. See RELEASE_CHECKLIST.md for the exact release boundary.

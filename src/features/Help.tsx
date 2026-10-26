@@ -39,7 +39,7 @@ const topics = [
   ],
   [
     "Updates and unfinished work",
-    "Save edits before adopting an update. Update & reload asks before discarding tracked edits; another editing tab stays open. Internal links and workspace switching warn about tracked unfinished work. Browser Back and modal cancellation are not persistent draft recovery. Keep one editing tab per record: there is no conflict-resolution system.",
+    "Save edits before adopting an update. Update & reload asks before discarding tracked edits; another editing tab stays open. Internal links and workspace switching warn about tracked unfinished work. Dialog dismissal also warns about tracked edits. Person, company, follow-up, opportunity and conversation editors reject stale saves after another tab changes the record. Keep one editing tab per record; settings and other editors have no universal conflict resolution. Browser Back is not universally guarded. There is no persistent draft recovery.",
   ],
   [
     "Troubleshooting",

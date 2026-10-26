@@ -1,9 +1,9 @@
-# Candidate dependency review
+# Release candidate dependency review
 
-`npm audit --json` reports seven affected package nodes: @vitest/mocker, tinypool, vitest, miniflare, undici, wrangler and zod (two critical, two high, three moderate). This is not a clean audit and stable release approval remains open.
+The final remediation audit (`npm audit --json`, 26 October 2026) reports **zero known vulnerabilities**, including development dependencies. This is an advisory snapshot, not a guarantee of total security.
 
-- Zod (<4.6.6): constrained oversized collection validation may exhaust memory. This is a runtime dependency. PULSE bounds JSON restore files to 10 MB, CSV to 2 MB/2,000 rows/40 columns and Worker payload sizes, reducing exposure but not proving immunity. Do not load untrusted backups casually. Migrating the existing v3 schema API to patched v4 needs compatibility and adversarial validation tests before stable release.
-- Vitest/mocker/tinypool: development tooling path traversal, mock registration and worker-option prototype-pollution findings. They are not bundled into the static app or Worker; do not expose test/development servers publicly. Upgrade the toolchain with regression testing rather than force arbitrary major changes.
-- Undici via Miniflare/Wrangler: EventSource memory, integrity token and content-encoding failure advisories concern Node development/deployment tooling. The deployed Worker uses workerd fetch rather than this Node package. Update supported tooling versions and rerun Worker tests; do not downgrade Wrangler/Durable Object migrations based on npm's suggested historical downgrade.
+- Migrated Zod 3 to patched Zod 4.6.7. Record schemas now declare key and value types explicitly. Nested legacy settings use `prefault` so missing objects still pass through their field defaults. Existing CRM, backup, import, AI-contract and Worker tests exercise the migration.
+- Updated Vitest to 4.1.12, replacing the affected mocker and tinypool dependency graph. Existing assertions were retained.
+- Overrode Undici to compatible patched 7.30.1+ for the Miniflare/Wrangler development tools; package-lock pins the tested resolution. Worker runtime and dry-run tests remain required after any override update. No Wrangler downgrade or Durable Object migration change was made.
 
-Exact advisory references are in the npm audit output. This review does not establish total security or resolve the runtime Zod finding. Keep the prerelease label until the applicable findings are addressed and release gates are reviewed.
+Production AI stays disabled. No real provider request was made for testing. Do not expose development/test servers publicly. Re-run the audit when updating the lockfile.

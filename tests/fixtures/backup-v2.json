@@ -1,0 +1,1386 @@
+{
+  "format": "pulse-backup",
+  "version": 2,
+  "metadata": {
+    "appVersion": "0.3.0",
+    "exportedAt": "2026-10-26T13:48:54.884Z",
+    "workspace": "demo"
+  },
+  "smartLists": [],
+  "recommendationActions": [],
+  "importBatches": [],
+  "organizations": [
+    {
+      "id": "org-0",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Forma Studio",
+      "industry": "Design & creative",
+      "location": "Portland, OR",
+      "website": "https://company-0.example",
+      "description": "A thoughtful team building a better future through design & creative. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Key account"
+      ],
+      "customFields": {}
+    },
+    {
+      "id": "org-1",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Northstar Labs",
+      "industry": "Technology",
+      "location": "Austin, TX",
+      "website": "https://company-1.example",
+      "description": "A thoughtful team building a better future through technology. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Potential partner"
+      ],
+      "customFields": {}
+    },
+    {
+      "id": "org-2",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Evergreen Collective",
+      "industry": "Sustainability",
+      "location": "Denver, CO",
+      "website": "https://company-2.example",
+      "description": "A thoughtful team building a better future through sustainability. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Key account"
+      ],
+      "customFields": {}
+    },
+    {
+      "id": "org-3",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Bloom & Co.",
+      "industry": "Marketing",
+      "location": "Brooklyn, NY",
+      "website": "https://company-3.example",
+      "description": "A thoughtful team building a better future through marketing. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Potential partner"
+      ],
+      "customFields": {}
+    },
+    {
+      "id": "org-4",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Orbit Works",
+      "industry": "Software",
+      "location": "Seattle, WA",
+      "website": "https://company-4.example",
+      "description": "A thoughtful team building a better future through software. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Key account"
+      ],
+      "customFields": {}
+    },
+    {
+      "id": "org-5",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Goodkind",
+      "industry": "Consumer goods",
+      "location": "Chicago, IL",
+      "website": "https://company-5.example",
+      "description": "A thoughtful team building a better future through consumer goods. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Potential partner"
+      ],
+      "customFields": {}
+    },
+    {
+      "id": "org-6",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Sonder Health",
+      "industry": "Healthcare",
+      "location": "Boston, MA",
+      "website": "https://company-6.example",
+      "description": "A thoughtful team building a better future through healthcare. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Key account"
+      ],
+      "customFields": {}
+    },
+    {
+      "id": "org-7",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Meridian Partners",
+      "industry": "Consulting",
+      "location": "Atlanta, GA",
+      "website": "https://company-7.example",
+      "description": "A thoughtful team building a better future through consulting. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Potential partner"
+      ],
+      "customFields": {}
+    },
+    {
+      "id": "org-8",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Sunday Supply",
+      "industry": "Retail",
+      "location": "San Diego, CA",
+      "website": "https://company-8.example",
+      "description": "A thoughtful team building a better future through retail. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Key account"
+      ],
+      "customFields": {}
+    },
+    {
+      "id": "org-9",
+      "createdAt": "2026-10-26T13:48:54.842Z",
+      "updatedAt": "2026-10-26T13:48:54.842Z",
+      "name": "Fieldwork",
+      "industry": "Architecture",
+      "location": "Minneapolis, MN",
+      "website": "https://company-9.example",
+      "description": "A thoughtful team building a better future through architecture. Exploring a long-term partnership and new ways to work together.",
+      "avatar": "",
+      "tags": [
+        "Potential partner"
+      ],
+      "customFields": {}
+    }
+  ],
+  "contacts": [
+    {
+      "id": "contact-0",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Olivia Chen",
+      "preferredName": "Olivia",
+      "role": "Creative Director",
+      "organizationId": "org-0",
+      "emails": [
+        "olivia.chen@company-0.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Active client",
+      "stage": "Proposal",
+      "priority": "VIP",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-1",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Marcus Johnson",
+      "preferredName": "Marcus",
+      "role": "Head of Partnerships",
+      "organizationId": "org-1",
+      "emails": [
+        "marcus.johnson@company-1.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Discovery",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-10",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Chloe Bennett",
+      "preferredName": "Chloe",
+      "role": "Operations Director",
+      "organizationId": "org-0",
+      "emails": [
+        "chloe.bennett@company-0.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Negotiation",
+      "priority": "VIP",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-11",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Daniel Kim",
+      "preferredName": "Daniel",
+      "role": "Account Manager",
+      "organizationId": "org-1",
+      "emails": [
+        "daniel.kim@company-1.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Researching",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-12",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Zoe Mitchell",
+      "preferredName": "Zoe",
+      "role": "Creative Director",
+      "organizationId": "org-2",
+      "emails": [
+        "zoe.mitchell@company-2.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Active client",
+      "stage": "Proposal",
+      "priority": "High",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-13",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Leo Santos",
+      "preferredName": "Leo",
+      "role": "Head of Partnerships",
+      "organizationId": "org-3",
+      "emails": [
+        "leo.santos@company-3.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Discovery",
+      "priority": "Normal",
+      "availability": "Temporarily unavailable",
+      "timeoutUntil": "2026-11-09T13:48:54.846Z",
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-14",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Ava Thompson",
+      "preferredName": "Ava",
+      "role": "Founder & CEO",
+      "organizationId": "org-4",
+      "emails": [
+        "ava.thompson@company-4.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Engaged",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-15",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Elijah Wright",
+      "preferredName": "Elijah",
+      "role": "Marketing Lead",
+      "organizationId": "org-5",
+      "emails": [
+        "elijah.wright@company-5.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Active client",
+      "stage": "Contacted",
+      "priority": "VIP",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-16",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Nora Anderson",
+      "preferredName": "Nora",
+      "role": "Operations Director",
+      "organizationId": "org-6",
+      "emails": [
+        "nora.anderson@company-6.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Negotiation",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-17",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Liam Foster",
+      "preferredName": "Liam",
+      "role": "Account Manager",
+      "organizationId": "org-7",
+      "emails": [
+        "liam.foster@company-7.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Researching",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-18",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Grace Lee",
+      "preferredName": "Grace",
+      "role": "Creative Director",
+      "organizationId": "org-8",
+      "emails": [
+        "grace.lee@company-8.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Active client",
+      "stage": "Proposal",
+      "priority": "High",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-19",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Theo Morgan",
+      "preferredName": "Theo",
+      "role": "Head of Partnerships",
+      "organizationId": "org-9",
+      "emails": [
+        "theo.morgan@company-9.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Discovery",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-2",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Sofia Rivera",
+      "preferredName": "Sofia",
+      "role": "Founder & CEO",
+      "organizationId": "org-2",
+      "emails": [
+        "sofia.rivera@company-2.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Engaged",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-20",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Aria Collins",
+      "preferredName": "Aria",
+      "role": "Founder & CEO",
+      "organizationId": "org-0",
+      "emails": [
+        "aria.collins@company-0.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Engaged",
+      "priority": "VIP",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-21",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Owen Hayes",
+      "preferredName": "Owen",
+      "role": "Marketing Lead",
+      "organizationId": "org-1",
+      "emails": [
+        "owen.hayes@company-1.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Active client",
+      "stage": "Contacted",
+      "priority": "High",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-22",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Luna Scott",
+      "preferredName": "Luna",
+      "role": "Operations Director",
+      "organizationId": "org-2",
+      "emails": [
+        "luna.scott@company-2.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Negotiation",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-23",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Kai Nguyen",
+      "preferredName": "Kai",
+      "role": "Account Manager",
+      "organizationId": "org-3",
+      "emails": [
+        "kai.nguyen@company-3.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Researching",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-3",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "James Park",
+      "preferredName": "James",
+      "role": "Marketing Lead",
+      "organizationId": "org-3",
+      "emails": [
+        "james.park@company-3.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Active client",
+      "stage": "Contacted",
+      "priority": "High",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-4",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Amara Okafor",
+      "preferredName": "Amara",
+      "role": "Operations Director",
+      "organizationId": "org-4",
+      "emails": [
+        "amara.okafor@company-4.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Negotiation",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-5",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Ethan Brooks",
+      "preferredName": "Ethan",
+      "role": "Account Manager",
+      "organizationId": "org-5",
+      "emails": [
+        "ethan.brooks@company-5.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Researching",
+      "priority": "VIP",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-6",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Isabella Rossi",
+      "preferredName": "Isabella",
+      "role": "Creative Director",
+      "organizationId": "org-6",
+      "emails": [
+        "isabella.rossi@company-6.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Active client",
+      "stage": "Proposal",
+      "priority": "High",
+      "availability": "Temporarily unavailable",
+      "timeoutUntil": "2026-11-09T13:48:54.846Z",
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-7",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Noah Williams",
+      "preferredName": "Noah",
+      "role": "Head of Partnerships",
+      "organizationId": "org-7",
+      "emails": [
+        "noah.williams@company-7.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Discovery",
+      "priority": "Normal",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-8",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Mia Patel",
+      "preferredName": "Mia",
+      "role": "Founder & CEO",
+      "organizationId": "org-8",
+      "emails": [
+        "mia.patel@company-8.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Prospect",
+      "stage": "Engaged",
+      "priority": "Normal",
+      "availability": "Do not contact",
+      "timeoutUntil": null,
+      "tags": [
+        "Creative"
+      ],
+      "nextFollowUp": null
+    },
+    {
+      "id": "contact-9",
+      "createdAt": "2026-09-16T13:48:54.846Z",
+      "updatedAt": "2026-10-26T13:48:54.846Z",
+      "name": "Lucas Reed",
+      "preferredName": "Lucas",
+      "role": "Marketing Lead",
+      "organizationId": "org-9",
+      "emails": [
+        "lucas.reed@company-9.example"
+      ],
+      "phones": [],
+      "links": [],
+      "avatar": "",
+      "category": "Active client",
+      "stage": "Contacted",
+      "priority": "High",
+      "availability": "Available",
+      "timeoutUntil": null,
+      "tags": [
+        "Partnership"
+      ],
+      "nextFollowUp": null
+    }
+  ],
+  "interactions": [
+    {
+      "id": "interaction-0",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-0",
+      "organizationId": "org-0",
+      "type": "Meeting",
+      "occurredAt": "2026-10-01T13:48:54.867Z",
+      "summary": "Discussed the brand refresh. Olivia is excited about a thoughtful, long-term collaboration. Send over the updated proposal.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-1",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-1",
+      "organizationId": "org-1",
+      "type": "Call",
+      "occurredAt": "2026-10-24T13:48:54.867Z",
+      "summary": "Great discovery call. Their team is growing and needs support with the next launch.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-10",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-10",
+      "organizationId": "org-0",
+      "type": "Meeting",
+      "occurredAt": "2026-09-25T13:48:54.868Z",
+      "summary": "Great discovery call. Their team is growing and needs support with the next launch.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-11",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-11",
+      "organizationId": "org-1",
+      "type": "Call",
+      "occurredAt": "2026-10-22T13:48:54.868Z",
+      "summary": "Explored partnership goals and agreed to reconnect after their planning session.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-12",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-12",
+      "organizationId": "org-2",
+      "type": "Meeting",
+      "occurredAt": "2026-10-01T13:48:54.868Z",
+      "summary": "Discussed the brand refresh. Olivia is excited about a thoughtful, long-term collaboration. Send over the updated proposal.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-13",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-13",
+      "organizationId": "org-3",
+      "type": "Call",
+      "occurredAt": "2026-10-24T13:48:54.868Z",
+      "summary": "Great discovery call. Their team is growing and needs support with the next launch.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-14",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-14",
+      "organizationId": "org-4",
+      "type": "Meeting",
+      "occurredAt": "2026-10-17T13:48:54.868Z",
+      "summary": "Explored partnership goals and agreed to reconnect after their planning session.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-15",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-15",
+      "organizationId": "org-5",
+      "type": "Call",
+      "occurredAt": "2026-10-25T13:48:54.868Z",
+      "summary": "Discussed the brand refresh. Olivia is excited about a thoughtful, long-term collaboration. Send over the updated proposal.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-16",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-16",
+      "organizationId": "org-6",
+      "type": "Meeting",
+      "occurredAt": "2026-09-25T13:48:54.868Z",
+      "summary": "Great discovery call. Their team is growing and needs support with the next launch.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-17",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-17",
+      "organizationId": "org-7",
+      "type": "Call",
+      "occurredAt": "2026-10-22T13:48:54.868Z",
+      "summary": "Explored partnership goals and agreed to reconnect after their planning session.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-18",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-18",
+      "organizationId": "org-8",
+      "type": "Meeting",
+      "occurredAt": "2026-10-01T13:48:54.868Z",
+      "summary": "Discussed the brand refresh. Olivia is excited about a thoughtful, long-term collaboration. Send over the updated proposal.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-19",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-19",
+      "organizationId": "org-9",
+      "type": "Call",
+      "occurredAt": "2026-10-24T13:48:54.868Z",
+      "summary": "Great discovery call. Their team is growing and needs support with the next launch.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-2",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-2",
+      "organizationId": "org-2",
+      "type": "Meeting",
+      "occurredAt": "2026-10-17T13:48:54.867Z",
+      "summary": "Explored partnership goals and agreed to reconnect after their planning session.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-20",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-20",
+      "organizationId": "org-0",
+      "type": "Meeting",
+      "occurredAt": "2026-10-17T13:48:54.868Z",
+      "summary": "Explored partnership goals and agreed to reconnect after their planning session.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-21",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-21",
+      "organizationId": "org-1",
+      "type": "Call",
+      "occurredAt": "2026-10-25T13:48:54.868Z",
+      "summary": "Discussed the brand refresh. Olivia is excited about a thoughtful, long-term collaboration. Send over the updated proposal.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-22",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-22",
+      "organizationId": "org-2",
+      "type": "Meeting",
+      "occurredAt": "2026-09-25T13:48:54.868Z",
+      "summary": "Great discovery call. Their team is growing and needs support with the next launch.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-23",
+      "createdAt": "2026-10-26T13:48:54.868Z",
+      "updatedAt": "2026-10-26T13:48:54.868Z",
+      "contactId": "contact-23",
+      "organizationId": "org-3",
+      "type": "Call",
+      "occurredAt": "2026-10-22T13:48:54.868Z",
+      "summary": "Explored partnership goals and agreed to reconnect after their planning session.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-3",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-3",
+      "organizationId": "org-3",
+      "type": "Call",
+      "occurredAt": "2026-10-25T13:48:54.867Z",
+      "summary": "Discussed the brand refresh. Olivia is excited about a thoughtful, long-term collaboration. Send over the updated proposal.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-4",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-4",
+      "organizationId": "org-4",
+      "type": "Meeting",
+      "occurredAt": "2026-09-25T13:48:54.867Z",
+      "summary": "Great discovery call. Their team is growing and needs support with the next launch.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-5",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-5",
+      "organizationId": "org-5",
+      "type": "Call",
+      "occurredAt": "2026-10-22T13:48:54.867Z",
+      "summary": "Explored partnership goals and agreed to reconnect after their planning session.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-6",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-6",
+      "organizationId": "org-6",
+      "type": "Meeting",
+      "occurredAt": "2026-10-01T13:48:54.867Z",
+      "summary": "Discussed the brand refresh. Olivia is excited about a thoughtful, long-term collaboration. Send over the updated proposal.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-7",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-7",
+      "organizationId": "org-7",
+      "type": "Call",
+      "occurredAt": "2026-10-24T13:48:54.867Z",
+      "summary": "Great discovery call. Their team is growing and needs support with the next launch.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-8",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-8",
+      "organizationId": "org-8",
+      "type": "Meeting",
+      "occurredAt": "2026-10-17T13:48:54.867Z",
+      "summary": "Explored partnership goals and agreed to reconnect after their planning session.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    },
+    {
+      "id": "interaction-9",
+      "createdAt": "2026-10-26T13:48:54.867Z",
+      "updatedAt": "2026-10-26T13:48:54.867Z",
+      "contactId": "contact-9",
+      "organizationId": "org-9",
+      "type": "Call",
+      "occurredAt": "2026-10-25T13:48:54.868Z",
+      "summary": "Discussed the brand refresh. Olivia is excited about a thoughtful, long-term collaboration. Send over the updated proposal.",
+      "outcome": "Next steps agreed",
+      "opportunityId": null,
+      "followUpId": null
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task-0",
+      "createdAt": "2026-10-26T13:48:54.870Z",
+      "updatedAt": "2026-10-26T13:48:54.870Z",
+      "title": "Send the updated proposal",
+      "description": "A thoughtful next step for this relationship.",
+      "contactId": "contact-0",
+      "organizationId": "org-0",
+      "dueAt": "2026-10-25T13:48:54.870Z",
+      "completedAt": null,
+      "priority": "VIP",
+      "reminderMinutes": 60
+    },
+    {
+      "id": "task-1",
+      "createdAt": "2026-10-26T13:48:54.870Z",
+      "updatedAt": "2026-10-26T13:48:54.870Z",
+      "title": "Check in on the spring launch",
+      "description": "A thoughtful next step for this relationship.",
+      "contactId": "contact-1",
+      "organizationId": "org-1",
+      "dueAt": "2026-10-26T13:48:54.870Z",
+      "completedAt": null,
+      "priority": "Normal",
+      "reminderMinutes": 60
+    },
+    {
+      "id": "task-2",
+      "createdAt": "2026-10-26T13:48:54.870Z",
+      "updatedAt": "2026-10-26T13:48:54.870Z",
+      "title": "Share partnership ideas",
+      "description": "A thoughtful next step for this relationship.",
+      "contactId": "contact-2",
+      "organizationId": "org-2",
+      "dueAt": "2026-10-27T13:48:54.870Z",
+      "completedAt": null,
+      "priority": "Normal",
+      "reminderMinutes": 60
+    },
+    {
+      "id": "task-3",
+      "createdAt": "2026-10-26T13:48:54.870Z",
+      "updatedAt": "2026-10-26T13:48:54.870Z",
+      "title": "Schedule a discovery call",
+      "description": "A thoughtful next step for this relationship.",
+      "contactId": "contact-3",
+      "organizationId": "org-3",
+      "dueAt": "2026-10-26T13:48:54.870Z",
+      "completedAt": null,
+      "priority": "High",
+      "reminderMinutes": 60
+    },
+    {
+      "id": "task-4",
+      "createdAt": "2026-10-26T13:48:54.870Z",
+      "updatedAt": "2026-10-26T13:48:54.870Z",
+      "title": "Follow up on the project scope",
+      "description": "A thoughtful next step for this relationship.",
+      "contactId": "contact-4",
+      "organizationId": "org-4",
+      "dueAt": "2026-10-29T13:48:54.870Z",
+      "completedAt": null,
+      "priority": "Normal",
+      "reminderMinutes": 60
+    },
+    {
+      "id": "task-5",
+      "createdAt": "2026-10-26T13:48:54.870Z",
+      "updatedAt": "2026-10-26T13:48:54.870Z",
+      "title": "Prepare meeting notes",
+      "description": "A thoughtful next step for this relationship.",
+      "contactId": "contact-5",
+      "organizationId": "org-5",
+      "dueAt": "2026-10-31T13:48:54.870Z",
+      "completedAt": "2026-10-26T13:48:54.870Z",
+      "priority": "VIP",
+      "reminderMinutes": 60
+    },
+    {
+      "id": "task-6",
+      "createdAt": "2026-10-26T13:48:54.870Z",
+      "updatedAt": "2026-10-26T13:48:54.870Z",
+      "title": "Review the creative brief",
+      "description": "A thoughtful next step for this relationship.",
+      "contactId": "contact-6",
+      "organizationId": "org-6",
+      "dueAt": "2026-11-05T13:48:54.870Z",
+      "completedAt": null,
+      "priority": "High",
+      "reminderMinutes": 60
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "24f7f87c-b7b3-41c1-bf3b-141b3802e031",
+      "createdAt": "2026-10-26T13:48:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "title": "Customer experience project",
+      "organizationId": "org-5",
+      "contactIds": [
+        "contact-5"
+      ],
+      "pipelineId": "default",
+      "stageId": "Proposal",
+      "value": 9000,
+      "currency": "USD",
+      "status": "open",
+      "probability": null,
+      "expectedCloseAt": "2026-11-25T13:48:54.879Z",
+      "notes": "Fictional demo opportunity."
+    },
+    {
+      "id": "25e9969e-99b2-4f81-b430-00d94869439f",
+      "createdAt": "2026-10-26T13:48:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "title": "Annual creative retainer",
+      "organizationId": "org-2",
+      "contactIds": [
+        "contact-2"
+      ],
+      "pipelineId": "default",
+      "stageId": "Engaged",
+      "value": 24000,
+      "currency": "USD",
+      "status": "open",
+      "probability": null,
+      "expectedCloseAt": "2026-11-25T13:48:54.879Z",
+      "notes": "Fictional demo opportunity."
+    },
+    {
+      "id": "58d8c77d-675f-4fca-841c-a3ed9dd929c7",
+      "createdAt": "2026-10-26T13:48:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "title": "Platform collaboration",
+      "organizationId": "org-4",
+      "contactIds": [
+        "contact-4"
+      ],
+      "pipelineId": "default",
+      "stageId": "Contacted",
+      "value": 18000,
+      "currency": "USD",
+      "status": "open",
+      "probability": null,
+      "expectedCloseAt": "2026-11-25T13:48:54.879Z",
+      "notes": "Fictional demo opportunity."
+    },
+    {
+      "id": "6533bbbf-5fe7-4ae5-801b-293c78262801",
+      "createdAt": "2026-10-26T13:48:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "title": "Launch partnership",
+      "organizationId": "org-1",
+      "contactIds": [
+        "contact-1"
+      ],
+      "pipelineId": "default",
+      "stageId": "Discovery",
+      "value": 12000,
+      "currency": "USD",
+      "status": "open",
+      "probability": null,
+      "expectedCloseAt": "2026-11-25T13:48:54.879Z",
+      "notes": "Fictional demo opportunity."
+    },
+    {
+      "id": "98056552-c6ab-4bd2-91b1-e82e80f0cd89",
+      "createdAt": "2026-10-26T13:48:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "title": "Growth strategy",
+      "organizationId": "org-3",
+      "contactIds": [
+        "contact-3"
+      ],
+      "pipelineId": "default",
+      "stageId": "Negotiation",
+      "value": 6500,
+      "currency": "USD",
+      "status": "open",
+      "probability": null,
+      "expectedCloseAt": "2026-11-25T13:48:54.879Z",
+      "notes": "Fictional demo opportunity."
+    },
+    {
+      "id": "d81fd8af-bccc-4b6d-bfaf-e40f07fc4def",
+      "createdAt": "2026-10-26T13:48:54.878Z",
+      "updatedAt": "2026-10-26T13:48:54.878Z",
+      "title": "Brand identity refresh",
+      "organizationId": "org-0",
+      "contactIds": [
+        "contact-0"
+      ],
+      "pipelineId": "default",
+      "stageId": "Proposal",
+      "value": 8500,
+      "currency": "USD",
+      "status": "open",
+      "probability": null,
+      "expectedCloseAt": "2026-11-25T13:48:54.879Z",
+      "notes": "Fictional demo opportunity."
+    }
+  ],
+  "events": [
+    {
+      "id": "2236b7a9-0fee-4991-8c08-5dc0b172f9c4",
+      "createdAt": "2026-10-25T13:48:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "category": "interaction",
+      "contactId": "contact-5",
+      "organizationId": "org-5",
+      "summary": "Call with Ethan Brooks · next steps agreed"
+    },
+    {
+      "id": "26d7d998-05e6-40d2-ac90-3f0c662c918e",
+      "createdAt": "2026-10-25T23:24:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "category": "interaction",
+      "contactId": "contact-3",
+      "organizationId": "org-3",
+      "summary": "Call with James Park · next steps agreed"
+    },
+    {
+      "id": "49ff3469-fc03-4a38-b770-67965a6b9815",
+      "createdAt": "2026-10-26T04:12:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "category": "interaction",
+      "contactId": "contact-2",
+      "organizationId": "org-2",
+      "summary": "Meeting with Sofia Rivera · next steps agreed"
+    },
+    {
+      "id": "7c13e93b-8a4f-45af-ab60-6b71ad9e0605",
+      "createdAt": "2026-10-25T04:12:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "category": "interaction",
+      "contactId": "contact-7",
+      "organizationId": "org-7",
+      "summary": "Call with Noah Williams · next steps agreed"
+    },
+    {
+      "id": "a77ddadc-cd1a-4c8f-ac94-47effb40f566",
+      "createdAt": "2026-10-25T09:00:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "category": "interaction",
+      "contactId": "contact-6",
+      "organizationId": "org-6",
+      "summary": "Meeting with Isabella Rossi · next steps agreed"
+    },
+    {
+      "id": "b61718c5-5bdf-4cf7-b700-2ef3e5c4b6fb",
+      "createdAt": "2026-10-26T13:48:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "category": "interaction",
+      "contactId": "contact-0",
+      "organizationId": "org-0",
+      "summary": "Meeting with Olivia Chen · next steps agreed"
+    },
+    {
+      "id": "ec49e189-415c-46cc-b056-2bf3812bbcfa",
+      "createdAt": "2026-10-26T09:00:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "category": "interaction",
+      "contactId": "contact-1",
+      "organizationId": "org-1",
+      "summary": "Call with Marcus Johnson · next steps agreed"
+    },
+    {
+      "id": "f61a8c6e-08d3-4c2a-982e-105933f66b05",
+      "createdAt": "2026-10-25T18:36:54.879Z",
+      "updatedAt": "2026-10-26T13:48:54.879Z",
+      "category": "interaction",
+      "contactId": "contact-4",
+      "organizationId": "org-4",
+      "summary": "Meeting with Amara Okafor · next steps agreed"
+    }
+  ],
+  "settings": [
+    {
+      "id": "settings",
+      "theme": "system",
+      "name": "Alex",
+      "locale": "en-US",
+      "timezone": "Asia/Seoul",
+      "reconnectDays": 21,
+      "priorityDays": 7,
+      "followUpDays": 7,
+      "timeoutDays": 30,
+      "alerts": {
+        "followUps": true,
+        "tasks": true,
+        "relationships": true
+      },
+      "gamification": true,
+      "reducedMotion": false,
+      "dismissed": [],
+      "intelligence": {
+        "coolingDays": 30,
+        "dormantDays": 90,
+        "stalledDays": 21,
+        "closingDays": 7,
+        "enabled": true,
+        "opportunities": true,
+        "noHistory": true,
+        "timeoutReviews": true,
+        "snoozeDays": 7,
+        "homeLimit": 3
+      },
+      "pipeline": {
+        "id": "default",
+        "name": "Relationship pipeline",
+        "stages": [
+          "New",
+          "Researching",
+          "Contacted",
+          "Engaged",
+          "Discovery",
+          "Proposal",
+          "Negotiation",
+          "Won",
+          "Lost"
+        ],
+        "currency": "USD"
+      }
+    }
+  ],
+  "restrictions": [],
+  "permissions": [],
+  "gamification": [],
+  "integrations": []
+}

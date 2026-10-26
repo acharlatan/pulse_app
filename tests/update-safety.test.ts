@@ -76,3 +76,21 @@ it("internal navigation can be cancelled without losing dirty work", () => {
   expect(hasUnsavedWork()).toBe(false);
   cleanup();
 });
+it("dialog dismissal preserves edits on cancellation and clears only its own scope on approval", async () => {
+  const { confirmDialogClose } = await import("../src/app/update-safety");
+  const cleanup = installEditProtection();
+  document.body.innerHTML =
+    '<dialog><form><input /></form></dialog><form id="other"><input /></form>';
+  document
+    .querySelectorAll("input")
+    .forEach((el) => el.dispatchEvent(new Event("input", { bubbles: true })));
+  const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+  expect(confirmDialogClose(document.querySelector("dialog"))).toBe(false);
+  expect(hasUnsavedWork()).toBe(true);
+  confirm.mockReturnValue(true);
+  expect(confirmDialogClose(document.querySelector("dialog"))).toBe(true);
+  expect(hasUnsavedWork()).toBe(true);
+  markSaved(document.querySelector("#other"));
+  expect(hasUnsavedWork()).toBe(false);
+  cleanup();
+});

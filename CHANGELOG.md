@@ -6,6 +6,9 @@
 - Expanded in-app help and installation/recovery documentation.
 - Tracked internal-link and workspace-switch warnings; optional localStorage hints tolerate denial.
 - Honest backup download-request feedback. Database/backup remain v3.
+- Guarded dialog dismissal, fresh record loading and transactional stale-editor checks.
+- Patched validator/test-tool dependencies and development HTTP dependency override; zero known audit findings at verification.
+- Historical v1/v2 export fixtures, storage-denial/quota and multi-tab regression coverage.
 - Stable 1.0 is gated on RELEASE_CHECKLIST.md; unexecuted environments are not certified.
 
 ## 0.6.0

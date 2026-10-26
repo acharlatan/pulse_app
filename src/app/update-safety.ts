@@ -104,3 +104,19 @@ export function confirmLeave() {
   dirty.clear();
   return true;
 }
+
+// Discard only the dialog being closed, preserving any other active editor.
+export function confirmDialogClose(root: Element | null) {
+  const edits = [...dirty].filter(
+    (el) => root && (el === root || root.contains(el)),
+  );
+  if (!edits.length) return true;
+  if (
+    !window.confirm(
+      "Discard unfinished edits in this dialog? Cancel to keep editing.",
+    )
+  )
+    return false;
+  for (const el of edits) dirty.delete(el);
+  return true;
+}
