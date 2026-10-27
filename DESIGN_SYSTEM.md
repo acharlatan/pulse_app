@@ -90,3 +90,9 @@ Report sections use shared surfaces, labeled filters and keyboard-operable chart
 ## Iteration 11 integration controls
 
 Show provider configuration and session status honestly. Review and confirmation precede external creation or local import; errors remain visible, and local handoffs remain available offline. Never represent a mailto link as a connected Gmail integration.
+
+## PULSE Studio visual layer
+
+`src/studio.css` extends the existing tokens with an ink-colored navigation rail, periwinkle selection, a cooler workspace canvas, illustrated editorial headers and portrait-style directory cards. `BrandArt` is static code-native decoration, never a representation of CRM associations or performance. Saved profile media remains authoritative; orbital fallback covers appear only without a rendered cover image. User-selected accents remain in content controls and headers.
+
+Desktop Pipeline uses an internally scrollable, keyboard-focusable board. Stage-overview buttons and Activity due-state controls expose the existing filters. Mobile retains stacked columns. Preserve native dialog behavior, keyboard outlines, reduced motion, readable badges and directory list mode when extending this layer.

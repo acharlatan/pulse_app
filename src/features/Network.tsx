@@ -1,3 +1,4 @@
+import { BrandArt } from "../components/BrandArt";
 import { BulkTags } from "../components/bulk-tags";
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -108,8 +109,9 @@ export function Network() {
         : a.name.localeCompare(b.name),
     );
   return (
-    <div className="page">
-      <div className="page-heading">
+    <div className="page network-page">
+      <div className="page-heading studio-heading">
+        <BrandArt motif="orbit" />
         <div>
           <p className="eyebrow">PEOPLE FIRST. ALWAYS.</p>
           <h1>
@@ -129,6 +131,27 @@ export function Network() {
           Add {tab === "people" ? "person" : "company"}
         </button>
       </div>
+      <section className="directory-ledger" aria-label="Workspace records">
+        <div>
+          <Users size={18} />
+          <strong>{contacts.length}</strong> people
+        </div>
+        <div>
+          <Building2 size={18} />
+          <strong>{organizations.length}</strong> companies
+        </div>
+        <div>
+          <strong>
+            {
+              p.focusItems.filter(
+                (f) =>
+                  f.entityType === "contact" || f.entityType === "organization",
+              ).length
+            }
+          </strong>{" "}
+          pinned relationships
+        </div>
+      </section>
       <div className="review-toolbar">
         <Link className="button secondary" to="/orbit">
           Relationship Orbit
@@ -332,6 +355,9 @@ export function Network() {
           Compact list
         </button>
       </div>
+      <h2 className="directory-section-title">
+        {tab === "people" ? "People in your orbit" : "Companies in your orbit"}
+      </h2>
       <div className="results-label">
         <span>
           {tab === "people" ? people.length : companies.length}{" "}

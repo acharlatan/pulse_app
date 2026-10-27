@@ -1,3 +1,4 @@
+import { BrandArt } from "../components/BrandArt";
 import { clearGoogleSession } from "../services/google-session";
 import { clearGoogleImport } from "../services/google-api";
 import { GoogleContacts } from "../components/google-contacts";
@@ -107,16 +108,8 @@ export function Settings() {
   }
   return (
     <div className="page settings-page">
-      <Link className="button secondary" to="/customize">
-        Personalize PULSE · Pipelines & custom fields
-      </Link>
-      <Link className="button ghost" to="/focus">
-        My Focus
-      </Link>
-      <Link className="button secondary" to="/help">
-        Help & getting started
-      </Link>
-      <div className="page-heading">
+      <div className="page-heading studio-heading">
+        <BrandArt motif="orbit" />
         <div>
           <p className="eyebrow">MAKE YOURSELF AT HOME</p>
           <h1>
@@ -131,6 +124,17 @@ export function Settings() {
           Local-first, always
         </Badge>
       </div>
+      <nav className="settings-shortcuts" aria-label="Workspace tools">
+        <Link className="button secondary" to="/customize">
+          Personalize PULSE · Pipelines & custom fields
+        </Link>
+        <Link className="button ghost" to="/focus">
+          My Focus
+        </Link>
+        <Link className="button secondary" to="/help">
+          Help & getting started
+        </Link>
+      </nav>
       <div className="settings-layout">
         <nav className="settings-tabs" aria-label="Settings categories">
           {tabs.map(([key, label]) => (
@@ -739,7 +743,8 @@ export function Settings() {
                 eyebrow="INTEGRATIONS"
               />
               <p className="section-description">
-                Core CRM features work offline without an account. Google connections require explicit authorization.
+                Core CRM features work offline without an account. Google
+                connections require explicit authorization.
               </p>
               <AISettings key={JSON.stringify(p.settings.ai)} />
               <p className="inline-notice">
@@ -749,8 +754,14 @@ export function Settings() {
               </p>
               <GoogleContacts />
               {[
-                ["Google Calendar", "Available from follow-up and meeting calendar review after setup"],
-                ["Gmail API drafts", "Unavailable pending Google approval · email composer handoff available"],
+                [
+                  "Google Calendar",
+                  "Available from follow-up and meeting calendar review after setup",
+                ],
+                [
+                  "Gmail API drafts",
+                  "Unavailable pending Google approval · email composer handoff available",
+                ],
               ].map(([name, status]) => (
                 <div className="integration-row" key={name}>
                   <span className="soft-icon">

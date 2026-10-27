@@ -1,3 +1,4 @@
+import { BrandArt } from "../components/BrandArt";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -95,7 +96,8 @@ export function Home() {
     <div
       className={`page home-page experience-home home-${p.settings.focus.homeLayout}`}
     >
-      <header className="home-editorial">
+      <header className="home-editorial studio-home-hero">
+        <BrandArt motif="orbit" />
         <div>
           <p className="eyebrow">
             {date(new Date().toISOString(), {
@@ -118,24 +120,33 @@ export function Home() {
                 : "Your next connection starts here."}
           </p>
         </div>
-        <div className="home-identity">
-          <Avatar
-            name={
-              p.settings.identity.workspaceName ||
-              p.settings.name ||
-              "My workspace"
-            }
-            mediaId={p.settings.identity.avatarMediaId}
-            size="xl"
-          />
-          <span>
-            {p.settings.identity.workspaceName || "My workspace"}
-            <small>
-              {p.workspace === "demo"
-                ? "Demo · a space to explore"
-                : "Private · on this device"}
-            </small>
-          </span>
+        <div className="home-hero-side">
+          <div className="hero-brand-seal" aria-hidden="true">
+            <AudioLines size={46} />
+            <span>
+              PULSE<span className="seal-dot">.</span>
+            </span>
+            <small>EVERY RELATIONSHIP HAS A STORY</small>
+          </div>
+          <div className="home-identity">
+            <Avatar
+              name={
+                p.settings.identity.workspaceName ||
+                p.settings.name ||
+                "My workspace"
+              }
+              mediaId={p.settings.identity.avatarMediaId}
+              size="xl"
+            />
+            <span>
+              {p.settings.identity.workspaceName || "My workspace"}
+              <small>
+                {p.workspace === "demo"
+                  ? "Demo · a space to explore"
+                  : "Private · on this device"}
+              </small>
+            </span>
+          </div>
         </div>
       </header>
       <nav className="home-actions" aria-label="Quick actions">
