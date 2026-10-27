@@ -5,7 +5,7 @@ async function demo(page: import("@playwright/test").Page) {
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await expect(
-    page.getByRole("heading", { name: "A good day to connect." }),
+    page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ }),
   ).toBeVisible();
 }
 test("custom pipeline, stable rename, custom company field, segmentation and focus persist", async ({

@@ -16,6 +16,7 @@ import { FocusSummary } from "../components/focus";
 import { EditorModal, type Editor } from "../components/forms";
 import { completeTask } from "../data/repository";
 import { taskState } from "../services/recommendations";
+import { calendarDay } from "../services/progress";
 export function Home() {
   const p = usePulse(),
     { date } = useFormat(),
@@ -44,9 +45,34 @@ export function Home() {
       /* Home remains available without the optional session hint. */
     }
   }, [navigate, p.workspace, p.settings.focus.landing]);
+  const today = calendarDay(Date.now(), p.settings.timezone);
+  const focusedTasks = new Set(
+    p.focusItems
+      .filter((f) => f.entityType === "task" && f.today === today)
+      .map((f) => f.recordId),
+  );
   const tasks = p.tasks
     .filter((t) => !t.completedAt)
-    .sort((a, b) => a.dueAt.localeCompare(b.dueAt));
+    .sort((a, b) => {
+      const rank = (id: string, dueAt: string) =>
+        Date.parse(dueAt) <= Date.now() ? 0 : focusedTasks.has(id) ? 1 : 2;
+      return (
+        rank(a.id, a.dueAt) - rank(b.id, b.dueAt) ||
+        a.dueAt.localeCompare(b.dueAt)
+      );
+    });
+  const dueToday = tasks.filter((t) =>
+    ["Overdue", "Due today"].includes(taskState(t, p.settings.timezone)),
+  ).length;
+  const hour = Number(
+    new Intl.DateTimeFormat("en", {
+      hour: "numeric",
+      hourCycle: "h23",
+      timeZone: p.settings.timezone,
+    }).format(new Date()),
+  );
+  const greeting =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const recs = p.intelligence.queue
     .filter((r) => r.contactId)
     .slice(0, p.settings.intelligence.homeLimit);
@@ -73,11 +99,16 @@ export function Home() {
             · YOUR DAILY PULSE
           </p>
           <h1>
-            A good day to connect<span className="accent">.</span>
+            {greeting}
+            {p.settings.name ? `, ${p.settings.name}` : ""}
+            <span className="accent">.</span>
           </h1>
           <p>
-            Welcome{p.settings.name ? ` back, ${p.settings.name}` : ""}. Make
-            room for what matters.
+            {dueToday
+              ? `${dueToday} ${dueToday === 1 ? "follow-up needs" : "follow-ups need"} your attention today.`
+              : tasks.length
+                ? `${tasks.length} open ${tasks.length === 1 ? "follow-up" : "follow-ups"} on your radar.`
+                : "Your next connection starts here."}
           </p>
         </div>
         <div className="home-identity">
@@ -140,6 +171,12 @@ export function Home() {
             >
               Add a company
             </button>
+            <button
+              className="button secondary"
+              onClick={() => setEditor({ kind: "opportunity" })}
+            >
+              Create opportunity
+            </button>
             <Link className="button secondary" to="/import">
               Import contacts
             </Link>
@@ -150,24 +187,6 @@ export function Home() {
         </section>
       ) : (
         <>
-          <div className="home-facts">
-            <Link to="/network">
-              <strong>{p.contacts.length}</strong>
-              <span>People in your network</span>
-            </Link>
-            <Link to="/activity">
-              <strong>{tasks.length}</strong>
-              <span>Open next steps</span>
-            </Link>
-            <Link to="/pipeline">
-              <strong>
-                {p.opportunities.filter((o) => o.status === "open").length}
-              </strong>
-              <span>Open opportunities</span>
-            </Link>
-          </div>
-          {p.settings.focus.shortcuts &&
-            p.settings.focus.homeLayout === "focused" && <FocusSummary />}
           {reminders.length > 0 && (
             <section className="surface">
               <h2>Recent local reminders</h2>
@@ -193,7 +212,7 @@ export function Home() {
               <div className="section-heading">
                 <div>
                   <p className="eyebrow">A LITTLE INTENTION</p>
-                  <h2>On your radar</h2>
+                  <h2>Today’s priorities</h2>
                 </div>
                 <Link className="text-link" to="/activity">
                   View all <ArrowUpRight size={16} />
@@ -215,14 +234,28 @@ export function Home() {
                     <Check size={16} />
                   </button>
                   <div>
-                    <strong>{t.title}</strong>
+                    <button
+                      className="home-task-title"
+                      onClick={() => setEditor({ kind: "task", record: t })}
+                    >
+                      {t.title}
+                    </button>
                     {t.contactId && (
                       <Link to={`/network/people/${t.contactId}`}>
                         {p.contacts.find((c) => c.id === t.contactId)?.name}
                       </Link>
                     )}
+                    {t.organizationId && (
+                      <Link to={`/network/companies/${t.organizationId}`}>
+                        {
+                          p.organizations.find((o) => o.id === t.organizationId)
+                            ?.name
+                        }
+                      </Link>
+                    )}
                     <small>
                       {date(t.dueAt)} · {taskState(t, p.settings.timezone)}
+                      {focusedTasks.has(t.id) ? " · My Focus" : ""}
                     </small>
                   </div>
                   <Badge
@@ -331,58 +364,41 @@ export function Home() {
                   ))}
             </div>
           </section>
-          <div className="home-support-grid">
-            <section className="surface">
-              <div className="section-heading">
-                <h2>Conversations in motion</h2>
-                <Link className="text-link" to="/activity">
-                  View activity
-                </Link>
+          <section className="surface home-opportunities">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">MOVING FORWARD</p>
+                <h2>Opportunity snapshot</h2>
               </div>
-              {p.events.slice(0, 3).map((e) => (
-                <div className="editorial-event" key={e.id}>
-                  <small>{date(e.createdAt)}</small>
-                  <p>{e.summary}</p>
-                </div>
-              ))}
-              {!p.events.length && (
-                <p className="muted">Your story begins with a conversation.</p>
-              )}
-            </section>
-            <section className="surface">
-              <div className="section-heading">
-                <h2>Opportunities to review</h2>
-                <Link to="/pipeline" className="text-link">
-                  Pipeline
-                </Link>
-              </div>
-              {p.intelligence.opportunities
-                .filter((i) => i.flags.length)
-                .slice(0, 3)
-                .map((i) => {
-                  const o = p.opportunities.find(
-                    (o) => o.id === i.opportunityId,
-                  );
-                  return o ? (
-                    <button
-                      className="opportunity-review-link"
-                      key={o.id}
-                      onClick={() =>
-                        setEditor({ kind: "opportunity", record: o })
-                      }
-                    >
-                      <strong>{o.title}</strong>
-                      <span>{i.flags[0]}</span>
-                    </button>
-                  ) : null;
-                })}
-              <Link className="button ghost" to="/assistant">
-                Open PULSE Intelligence · optional AI
+              <Link to="/pipeline" className="text-link">
+                View pipeline <ArrowUpRight size={16} />
               </Link>
-            </section>
-          </div>
-          {p.settings.focus.shortcuts &&
-            p.settings.focus.homeLayout !== "focused" && <FocusSummary />}
+            </div>
+            {p.opportunities
+              .filter((o) => o.status === "open")
+              .slice(0, 4)
+              .map((o) => (
+                <button
+                  className="opportunity-review-link"
+                  key={o.id}
+                  onClick={() => setEditor({ kind: "opportunity", record: o })}
+                >
+                  <strong>{o.title}</strong>
+                  <span>
+                    {p.pipelineStages.find((s) => s.id === o.stageId)?.name ||
+                      "Open"}{" "}
+                    · Open
+                    {o.expectedCloseAt
+                      ? ` · Expected ${date(o.expectedCloseAt)}`
+                      : ""}
+                  </span>
+                </button>
+              ))}
+            {!p.opportunities.some((o) => o.status === "open") && (
+              <p className="muted">No active opportunities yet.</p>
+            )}
+          </section>
+          {p.settings.focus.shortcuts && <FocusSummary />}
           <ProgressSummary />
         </>
       )}

@@ -94,3 +94,17 @@ it("dialog dismissal preserves edits on cancellation and clears only its own sco
   expect(hasUnsavedWork()).toBe(false);
   cleanup();
 });
+it("ignores search typing while preserving protection for actual edits", () => {
+  const cleanup = installEditProtection();
+  document.body.innerHTML =
+    "<dialog open><input data-non-editing></dialog><form><input></form>";
+  const search = document.querySelector("dialog input")!;
+  search.dispatchEvent(new Event("input", { bubbles: true }));
+  expect(hasUnsavedWork()).toBe(false);
+  document
+    .querySelector("form input")!
+    .dispatchEvent(new Event("input", { bubbles: true }));
+  search.dispatchEvent(new Event("input", { bubbles: true }));
+  expect(hasUnsavedWork()).toBe(true);
+  cleanup();
+});

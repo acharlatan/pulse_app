@@ -24,6 +24,7 @@ import { Avatar, Modal } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
 import { useEffect, useRef } from "react";
 import { overdue } from "../services/recommendations";
+import { CommandPalette } from "../components/CommandPalette";
 const nav = [
   { to: "/", label: "Daily Pulse", short: "Home", icon: Home },
   { to: "/network", label: "My network", short: "Network", icon: Users },
@@ -36,6 +37,22 @@ export function Shell({ children }: { children: ReactNode }) {
   const [add, setAdd] = useState(false);
   const [more, setMore] = useState(false);
   const [alerts, setAlerts] = useState(false);
+  const [search, setSearch] = useState(false);
+  useEffect(() => {
+    const shortcut = (event: KeyboardEvent) => {
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        !event.altKey &&
+        event.key.toLowerCase() === "k" &&
+        !document.querySelector("dialog[open]")
+      ) {
+        event.preventDefault();
+        setSearch(true);
+      }
+    };
+    window.addEventListener("keydown", shortcut);
+    return () => window.removeEventListener("keydown", shortcut);
+  }, []);
 
   const location = useLocation();
   const firstRoute = useRef(true);
@@ -221,13 +238,15 @@ export function Shell({ children }: { children: ReactNode }) {
               <i />
               {workspace === "demo" ? "Demo workspace" : "Saved on this device"}
             </span>
-            <Link
-              to="/network"
+            <button
+              type="button"
               className="icon-button"
-              aria-label="Search network"
+              aria-label="Search PULSE"
+              aria-haspopup="dialog"
+              onClick={() => setSearch(true)}
             >
               <Search size={19} />
-            </Link>
+            </button>
             <button
               className="icon-button notification"
               aria-label="Open in-app alerts"
@@ -345,6 +364,9 @@ export function Shell({ children }: { children: ReactNode }) {
             ))}
           </div>
         </Modal>
+      )}
+      {search && (
+        <CommandPalette onClose={() => setSearch(false)} onEdit={setEditor} />
       )}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
