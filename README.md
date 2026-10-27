@@ -176,3 +176,8 @@ DB/backup **v5** adds a media Blob store and additive identity/cover fields. Res
 Analytics derives reports from records stored in this workspace. Conversation counts exclude notes and future entries; company history uses the company captured on each conversation. Opportunity totals are current snapshots, currencies remain separate, and stage duration is shown only after actual recorded moves. Use the date, person, company, priority and category filters and export the displayed report as local CSV.
 
 Automation rules are local, initially disabled and require explicit enabling. Triggers cover entering a stage, a closing date, an upcoming or overdue follow-up, and inactivity after a recorded conversation. Actions create an administrative follow-up or an in-app reminder; they never send messages. Checks run only while PULSE is open, on a bounded schedule and after relevant changes. Restrictions and permissions are checked before action. The execution ledger prevents repeated actions across tabs and restores set a replay boundary. See RELEASE_1_3.md for definitions and limitations.
+
+
+## Iteration 11: reviewed Google actions
+
+Google Calendar event creation and Google Contacts selection/import require a configured public OAuth web client ID and explicit user authorization. See GOOGLE_INTEGRATIONS.md. Tokens remain in memory only. Gmail API drafts are not enabled; the reviewed email-composer handoff remains available. No automatic sending or background synchronization is performed.

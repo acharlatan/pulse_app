@@ -56,3 +56,8 @@ Orbit is a bounded derived view of saved associations, not authoritative relatio
 DB/backup v6 adds prospective opportunity transition snapshots, typed automation rules, execution ledger and replay control. Preserve v1–v5 imports, media, tombstones and atomic replacement. Never infer pre-v6 stage history, convert currencies implicitly, or count notes as conversations. Record actual stage moves in the same transaction as the opportunity, retain historical labels and avoid executing automation on configuration remaps.
 
 Rules start disabled; changing a rule disables it. Recheck restrictions and permissions inside the action transaction. Stable occurrence keys serialize tabs; restore/resume advances the replay boundary. Scheduled checks are bounded and foreground-only. Never automatically send communications, execute arbitrary rule code, award creation XP, or silently replay imported/restored history.
+
+
+## Iteration 11 — reviewed Google connections
+
+Google OAuth access tokens remain in memory and are never included in records, backups, URLs or logs. Clear sessions and pending contact data on workspace switches and successful restores/resets. Keep Google actions user initiated and scope-specific; never send messages or run external actions from local automations. Contacts use reviewed transactional import decisions and preserve restrictions and permissions. Calendar event descriptions must be user-selected; stable event IDs prevent blind retries. Never claim a live provider connection based on mocks.

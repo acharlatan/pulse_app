@@ -85,3 +85,8 @@ Home separates commitments, relationship brief, familiar faces, opportunities/hi
 ## Analytics and automation patterns
 
 Report sections use shared surfaces, labeled filters and keyboard-operable chart buttons that select the underlying records. Automation forms preview the trigger and action and save disabled drafts. History explains completed, blocked and skipped actions. Use theme tokens, readable wrapping and the existing modal focus behavior at narrow widths.
+
+
+## Iteration 11 integration controls
+
+Show provider configuration and session status honestly. Review and confirmation precede external creation or local import; errors remain visible, and local handoffs remain available offline. Never represent a mailto link as a connected Gmail integration.

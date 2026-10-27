@@ -103,3 +103,8 @@ Prompt 10 can build advanced analytics, historical reporting, deterministic rule
 ## Iteration 10 foundation
 
 Analytics and local rules extend the existing CRM without external integrations. Future optional Calendar, Contacts and Gmail draft handoffs require explicit user authorization and separate integration/security work; they are not implemented by the local automation engine.
+
+
+## Iteration 11 — final planned major expansion
+
+Calendar and Contacts are reviewed, user-initiated integration paths; Gmail remains an email handoff. Provider verification, physical-device and native assistive-technology checks must be reported separately from mocked tests. Further work should focus on verified defects and user feedback.

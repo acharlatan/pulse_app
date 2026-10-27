@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { GoogleCalendar } from "./google-calendar";
 import { Modal } from "./ui";
 import { calendarEvent, downloadText } from "../services/handoffs";
 export function CalendarHandoff({
@@ -12,6 +13,7 @@ export function CalendarHandoff({
   description: string;
   start: string;
 }) {
+  const form = useRef<HTMLFormElement>(null);
   const [open, setOpen] = useState(false),
     [error, setError] = useState("");
   return (
@@ -22,6 +24,7 @@ export function CalendarHandoff({
       {open && (
         <Modal title="Review calendar event" onClose={() => setOpen(false)}>
           <form
+            ref={form}
             onSubmit={(e) => {
               e.preventDefault();
               try {
@@ -83,9 +86,10 @@ export function CalendarHandoff({
               <input type="checkbox" name="allDay" />
             </label>
             <p className="muted">
-              Downloads an event for review in your calendar. No account
-              connection, synchronization, invitations or task completion.
+              The .ics download works without an account. It does not synchronize,
+              invite attendees or complete the follow-up.
             </p>
+            <GoogleCalendar id={id} form={form} />
             {error && <p role="alert">{error}</p>}
             <div className="form-actions">
               <button

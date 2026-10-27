@@ -43,3 +43,8 @@ Use Photo & cover or Logo & cover on a profile to replace/remove images, or Work
 ## Iteration 10: version 6
 
 DB/backup v6 adds prospective opportunity transitions, automation rules, execution ledger and scheduling control. Existing v1–v5 backups remain supported. Version 6 exports preserve local media and the new records; import validates references and replaces the workspace atomically. A restore advances the automation replay boundary so old time-based conditions are not newly executed. Deleted sources/results retain ledger tombstones. Exported backups contain private relationship history and should be protected like the workspace itself.
+
+
+## Iteration 11 — connections
+
+The schema remains DB/backup v6. OAuth access tokens and Google session state are memory-only and excluded from backups. Restores and workspace resets clear the active session; reconnect explicitly when needed. No external action is replayed on restore.

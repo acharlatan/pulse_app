@@ -1,0 +1,17 @@
+# Google integration setup
+
+PULSE can be built with an optional **public OAuth web client ID** in `VITE_GOOGLE_CLIENT_ID`. A client ID is not a client secret; never add a Google client secret or refresh token to browser code, repository files, backups or screenshots. With no ID configured, connection controls are disabled and the CRM, .ics exports and email composer continue working.
+
+1. In Google Cloud, use a project you control. Enable Google Calendar API and People API.
+2. Configure the OAuth consent screen and audience. If the app is in testing, add authorized test users. Google may require additional verification before wider use, depending on requested scopes and publishing state.
+3. Create a **Web application** OAuth client. Add the exact HTTPS origin `https://pulse.icareaboutyoufam.workers.dev` to authorized JavaScript origins, along with any separately approved development origin. Origins do not include a path or trailing slash.
+4. Supply the web client ID as the Cloudflare build environment variable `VITE_GOOGLE_CLIENT_ID`, then rebuild and deploy. Do not configure a client secret in the browser build. For local testing, set the same variable in a non-committed environment file.
+5. Open the Personal workspace and explicitly choose a Google action. Calendar requests the `calendar.events.owned` scope; this permission permits viewing, editing and deleting events on owned calendars, although PULSE uses it only for reviewed creation and duplicate lookup. Contacts requests `contacts.readonly`. Authorization is in memory and must be repeated after reload or workspace switch. Choose the intended Google account each time. Disconnect clears the local session and requests revocation when supported; imported PULSE records remain.
+
+Calendar creates an event only after the reviewed action, using the primary calendar and device timezone. No attendees are invited and there is no two-way sync. The Google description starts empty so saved CRM notes are not shared automatically. Stable event IDs prevent blind duplicate retries; create another event is a separate deliberate action. The .ics download remains available offline.
+
+Contacts reads names, email, phone and organization fields only, then requires selection and the existing local duplicate/matching review before an atomic import. No Google contacts are modified. No photos or permission grants are imported. Gmail API draft creation is not enabled; use the existing reviewed email-composer or copy handoff. PULSE never sends a message automatically.
+
+Google API access requires an internet connection. PULSE does not persist tokens or include them in backups. Google connections are not available in the fictional Demo workspace. Test against an authorized test account before claiming a live integration. References: https://developers.google.com/identity/oauth2/web/guides/use-token-model and https://developers.google.com/people/api/rest/v1/people.connections/list and https://developers.google.com/workspace/calendar/api/guides/create-events.
+
+For local provider mocks, build with `VITE_GOOGLE_CLIENT_ID=test-client` and run the integration browser tests against that build with `PULSE_TEST_GOOGLE_MOCK=1`. The flag is only for test selection; the browser tests intercept provider calls and use fictional data. A normal unconfigured build keeps the Google buttons disabled and skips those mock-only browser cases.

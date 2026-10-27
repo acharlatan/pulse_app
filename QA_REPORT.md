@@ -439,3 +439,8 @@ Release disposition: automated candidate integration gates complete; ready for t
 ## Iteration 10 test coverage
 
 New unit coverage includes prospective stage history, rollback, cross-tab idempotency, permission/restriction blocks, restore replay boundaries, deletion tombstones, local calendar boundaries, currency separation, inactivity reminders and historical company attribution. Browser scenarios cover analytics, CSV, rule creation, restricted sources, backup restore, responsive layouts and axe. Offline tests exercise the installed service-worker build. Record exact release results and any unresolved checks in RELEASE_1_3.md.
+
+
+## Iteration 11 release candidate
+
+Google Calendar and Contacts have scoped mock-provider tests and reviewed UI flows. A full 182-test unit run passed. Existing browser regression passed 61/62 under contention, and the remaining desktop Settings reload passed in isolation on the final build. Six mock-provider browser cases passed; root offline/PWA tests passed 12 cases and scoped-subpath checks passed two cases. See RELEASE_1_4.md and the release PR for deployment and actual-provider verification status. No real Google account was connected.

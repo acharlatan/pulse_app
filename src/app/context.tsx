@@ -1,3 +1,5 @@
+import { clearGoogleSession } from "../services/google-session";
+import { clearGoogleImport } from "../services/google-api";
 import { confirmLeave, markSaved } from "./update-safety";
 import {
   createContext,
@@ -92,6 +94,7 @@ export function WorkspaceProvider({
   children: ReactNode;
 }) {
   const db = database(workspace);
+  useEffect(() => () => { clearGoogleSession(); clearGoogleImport(); }, [workspace]);
   const data = useWorkspaceData(db);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
