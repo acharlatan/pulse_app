@@ -1,3 +1,4 @@
+import { BrandArt } from "../components/BrandArt";
 import { useState, type FormEvent } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Link } from "react-router-dom";
@@ -113,7 +114,8 @@ export function Automations() {
     );
   return (
     <div className="page automations-page">
-      <div className="page-heading">
+      <div className="page-heading studio-heading">
+        <BrandArt motif="wave" />
         <div>
           <p className="eyebrow">LESS ADMIN, MORE TIME FOR PEOPLE</p>
           <h1>

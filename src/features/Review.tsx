@@ -1,3 +1,4 @@
+import { BrandArt } from "../components/BrandArt";
 import { FocusButton } from "../components/focus";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -61,7 +62,8 @@ export function Review() {
   }
   return (
     <div className="page review-page">
-      <div className="page-heading">
+      <div className="page-heading studio-heading">
+        <BrandArt motif="orbit" />
         <div>
           <p className="eyebrow">A LITTLE INTENTION, EVERY DAY</p>
           <h1>

@@ -1,3 +1,4 @@
+import { BrandArt } from "../components/BrandArt";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -27,8 +28,9 @@ export function Pipeline() {
       totals.set(key, (totals.get(key) || 0) + o.value);
     }
   return (
-    <div className="page">
-      <div className="page-heading">
+    <div className="page pipeline-page">
+      <div className="page-heading studio-heading">
+        <BrandArt motif="steps" />
         <div>
           <p className="eyebrow">POSSIBILITY, WITH DIRECTION</p>
           <h1>
@@ -113,7 +115,30 @@ export function Pipeline() {
           </Badge>
         ))}
       </section>
-      <div className="pipeline-grid">
+      <h2 className="pipeline-section-title">
+        {selected?.name || "Your pipeline"}
+      </h2>
+      <nav className="pipeline-stage-map" aria-label="Pipeline stage overview">
+        {stages.map((stage) => (
+          <button
+            key={stage.id}
+            aria-pressed={filter === stage.id}
+            onClick={() => {
+              setFilter(filter === stage.id ? "All" : stage.id);
+              setLimit(30);
+            }}
+          >
+            <span>{stage.name}</span>
+            <strong>{rows.filter((o) => o.stageId === stage.id).length}</strong>
+          </button>
+        ))}
+      </nav>
+      <div
+        className="pipeline-grid"
+        role="region"
+        aria-label="Opportunity board"
+        tabIndex={0}
+      >
         {active.map((stage) => {
           const deals = rows.filter((o) => o.stageId === stage.id);
           return (

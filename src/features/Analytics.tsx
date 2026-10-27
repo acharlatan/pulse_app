@@ -1,3 +1,4 @@
+import { BrandArt } from "../components/BrandArt";
 import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Link, useSearchParams } from "react-router-dom";
@@ -134,7 +135,8 @@ export function Analytics() {
   }
   return (
     <div className="page analytics-page">
-      <div className="page-heading">
+      <div className="page-heading studio-heading">
+        <BrandArt motif="steps" />
         <div>
           <p className="eyebrow">YOUR WORK, IN CONTEXT</p>
           <h1>
@@ -428,7 +430,7 @@ export function Analytics() {
                       key={d}
                       className="analytics-bar"
                       aria-pressed={selectedDay === d}
-                      aria-label={`${d}: ${n} conversations`}
+                      title={`${n} conversations on ${d}`}
                       onClick={() => {
                         setSelectedDay(selectedDay === d ? "" : d);
                         setSection("Relationships");

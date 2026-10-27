@@ -16,6 +16,10 @@ import {
   Settings,
   Users,
   Workflow,
+  Orbit,
+  ChartNoAxesCombined,
+  Target,
+  ListFilter,
   X,
 } from "lucide-react";
 import { OfflineStatus } from "../components/OfflineStatus";
@@ -90,7 +94,7 @@ export function Shell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <aside className="sidebar">
+      <aside className="sidebar" aria-label="Workspace navigation">
         <Link to="/" className="wordmark">
           <span className="brand-mark">
             <AudioLines size={25} />
@@ -114,6 +118,11 @@ export function Shell({ children }: { children: ReactNode }) {
             </small>
           </div>
         </div>
+        <button className="sidebar-search" onClick={() => setSearch(true)}>
+          <Search size={18} />
+          <span>Search</span>
+          <kbd>⌘ / Ctrl K</kbd>
+        </button>
         <p className="nav-label">WORKSPACE</p>
         <nav aria-label="Main navigation">
           {nav.map(({ to, label, icon: Icon }) => (
@@ -158,6 +167,16 @@ export function Shell({ children }: { children: ReactNode }) {
                 "nav-item " + (isActive ? "active" : "")
               }
             >
+              {(() => {
+                const Icon = {
+                  "/analytics": ChartNoAxesCombined,
+                  "/automations": Workflow,
+                  "/focus": Target,
+                  "/orbit": Orbit,
+                  "/lists": ListFilter,
+                }[to];
+                return Icon ? <Icon size={19} /> : null;
+              })()}
               {label}
             </NavLink>
           ))}

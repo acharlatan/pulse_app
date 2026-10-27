@@ -1,3 +1,4 @@
+import { BrandArt } from "../components/BrandArt";
 import { useState } from "react";
 import { ProgressDetails } from "../components/progress";
 import { Link, useSearchParams } from "react-router-dom";
@@ -50,8 +51,9 @@ export function Activity() {
             : a.dueAt.localeCompare(b.dueAt)) || a.id.localeCompare(b.id),
     );
   return (
-    <div className="page">
-      <div className="page-heading">
+    <div className="page activity-page">
+      <div className="page-heading studio-heading">
+        <BrandArt motif="wave" />
         <div>
           <p className="eyebrow">ONE THOUGHTFUL STEP AT A TIME</p>
           <h1>
@@ -69,6 +71,32 @@ export function Activity() {
           Plan a follow-up
         </button>
       </div>
+      <nav className="activity-ledger" aria-label="Follow-up overview">
+        {[
+          ["overdue", "Overdue"],
+          ["today", "Due today"],
+          ["upcoming", "Upcoming"],
+        ].map(([value, label]) => (
+          <button
+            key={value}
+            aria-pressed={tab === "tasks" && filter === value}
+            onClick={() => {
+              setTab("tasks");
+              setFilter(value);
+              setLimit(40);
+            }}
+          >
+            <strong>
+              {
+                p.tasks.filter(
+                  (t) => taskState(t, p.settings.timezone) === label,
+                ).length
+              }
+            </strong>
+            {label}
+          </button>
+        ))}
+      </nav>
       <div className="directory-toolbar">
         <div className="tabs">
           <button
