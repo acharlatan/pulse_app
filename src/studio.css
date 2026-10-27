@@ -738,3 +738,8 @@
 .command-result {
   transition: box-shadow 160ms;
 }
+/* Theme changes are immediate. Restrict shared microinteractions to geometry
+   and elevation so text cannot inherit a new theme over an old surface. */
+:root .app-shell * {
+  transition-property: transform, box-shadow;
+}
