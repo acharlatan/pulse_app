@@ -101,3 +101,8 @@ Orbit derives namespaced person/company/opportunity nodes and only saved members
 ## Iteration 10 intelligence
 
 Analytics describes actual local CRM records and distinguishes current snapshots from observed period activity. Stage duration starts only at a witnessed stage entry; currencies are grouped rather than converted. Automation Studio provides typed conditions and local actions with explicit activation, transactional duplicate prevention and current restriction checks. It is not a background service or a messaging integration.
+
+
+## Iteration 11 — reviewed external actions
+
+Optional Google Calendar creation and Contacts import require user initiation, a public web client ID, consent and a live short-lived token. The local CRM and backups remain independent. Gmail uses the reviewed email handoff until restricted-scope approval exists.

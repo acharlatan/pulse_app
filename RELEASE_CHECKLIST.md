@@ -66,3 +66,8 @@ Final browser/PWA/publication evidence is recorded in QA_REPORT.md and RELEASE_1
 ## Iteration 10 release gates
 
 Verify stage transitions and configuration remaps, disabled drafts, eligibility/restrictions, duplicate suppression across tabs, failed-write rollback, no replay after restore, legacy backups and v6 media round trips. Check analytics date/timezone boundaries, historical company attribution, separate currencies and safe CSV; test foreground and offline behavior, responsive views, axe, production build and Worker smoke. Do not present a Worker HTTP response alone as deployment verification.
+
+
+## Iteration 11 release checks
+
+Validate scope isolation, token expiry and clearing, reviewed event creation and stable duplicate recovery, selected Contacts import and duplicate decisions, no automatic sending, v6 backups and offline operation. Distinguish mocked-provider tests from real authorized Google tests and report all deployment evidence.

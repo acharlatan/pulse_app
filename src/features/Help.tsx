@@ -49,7 +49,7 @@ const topics = [
 export function Help() {
   return (
     <div className="page">
-      <p className="eyebrow">PULSE · 1.3.0-rc.1</p>
+      <p className="eyebrow">PULSE · 1.4.0-rc.1</p>
       <h1>A little guidance.</h1>
       <p className="subtitle">
         People, conversations, opportunities and follow-ups in one local

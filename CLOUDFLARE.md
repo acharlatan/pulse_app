@@ -79,3 +79,8 @@ The experience/media/Orbit release uses the existing automatic main build and Wo
 ## Iteration 10
 
 Analytics and automation evaluation run locally in the browser; they require no new Worker endpoints, credentials, paid services or server-side scheduler. Keep the existing Worker configuration, AI access controls and Git-triggered deployment. Verify the deployed release metadata and functional workflows after the main-branch build.
+
+
+## Iteration 11 Google configuration
+
+The optional `VITE_GOOGLE_CLIENT_ID` is a public web client ID injected at build time; it is not a secret. Do not place a client secret in frontend assets. See GOOGLE_INTEGRATIONS.md for consent, authorized origin and verification steps. No server token storage or additional paid service is introduced.

@@ -1,3 +1,6 @@
+import { clearGoogleSession } from "../services/google-session";
+import { clearGoogleImport } from "../services/google-api";
+import { GoogleContacts } from "../components/google-contacts";
 import { MediaControls } from "../components/media-controls";
 import { Avatar } from "../components/ui";
 import { AISettings } from "../components/ai-settings";
@@ -736,8 +739,7 @@ export function Settings() {
                 eyebrow="INTEGRATIONS"
               />
               <p className="section-description">
-                Core CRM features work offline, without an account or a paid
-                service. OAuth account connections remain unavailable.
+                Core CRM features work offline without an account. Google connections require explicit authorization.
               </p>
               <AISettings key={JSON.stringify(p.settings.ai)} />
               <p className="inline-notice">
@@ -745,19 +747,17 @@ export function Settings() {
                 email composer and WhatsApp draft handoffs. Gemini is available
                 only after provider and protected operator configuration.
               </p>
+              <GoogleContacts />
               {[
-                "Google Calendar synchronization",
-                "Gmail",
-                "Google Contacts",
-                "LinkedIn profile links",
-                "Shopify & WooCommerce",
-              ].map((name) => (
+                ["Google Calendar", "Available from follow-up and meeting calendar review after setup"],
+                ["Gmail API drafts", "Unavailable pending Google approval · email composer handoff available"],
+              ].map(([name, status]) => (
                 <div className="integration-row" key={name}>
                   <span className="soft-icon">
                     <Plug size={18} />
                   </span>
                   <strong>{name}</strong>
-                  <Badge>Planned · disconnected</Badge>
+                  <Badge>{status}</Badge>
                 </div>
               ))}
               <div className="integration-row">
@@ -810,6 +810,8 @@ export function Settings() {
               confirm === "restore" ? "Backup restored" : "Workspace reset",
             );
             if (ok) {
+              clearGoogleSession();
+              clearGoogleImport();
               setConfirm(null);
               setBackup(null);
             }

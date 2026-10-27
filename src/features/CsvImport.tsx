@@ -1,5 +1,6 @@
+import { takeGoogleImport, clearGoogleImport } from "../services/google-api";
 import { markSaved } from "../app/update-safety";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { Badge, Empty } from "../components/ui";
@@ -37,10 +38,11 @@ const fieldNames: Partial<Record<ImportField, string>> = {
 };
 export function CsvImport() {
   const p = usePulse(),
-    [step, setStep] = useState(0),
-    [csv, setCsv] = useState<CsvData | null>(null),
-    [mapping, setMapping] = useState<ImportField[]>([]),
-    [file, setFile] = useState({ name: "", size: 0 }),
+    [googleData] = useState(() => takeGoogleImport(p.workspace)),
+    [step, setStep] = useState(googleData ? 1 : 0),
+    [csv, setCsv] = useState<CsvData | null>(googleData || null),
+    [mapping, setMapping] = useState<ImportField[]>(googleData ? suggestMapping(googleData.headers) : []),
+    [file, setFile] = useState({ name: googleData ? "Google Contacts" : "", size: googleData ? new TextEncoder().encode(JSON.stringify(googleData)).length : 0 }),
     [analysis, setAnalysis] = useState<ReturnType<typeof inspectCsv> | null>(
       null,
     ),
@@ -52,6 +54,7 @@ export function CsvImport() {
     [busy, setBusy] = useState(false),
     [fill, setFill] = useState(false),
     [confirmed, setConfirmed] = useState(false);
+  useEffect(() => { if (googleData) clearGoogleImport(); }, [googleData]);
   async function perform(fn: () => Promise<void> | void) {
     if (busy) return;
     setBusy(true);

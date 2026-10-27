@@ -47,3 +47,10 @@ CRM foundation; social profiles and complete task/opportunity/interaction workfl
 - Began prospective, transactionally recorded opportunity stage history without inventing earlier transitions.
 - Added explicitly enabled local automation rules, restriction checks, bounded foreground scheduling and cross-tab deduplication; no automatic messaging.
 - Added additive DB/backup v6 with replay-safe restore and retained prior backup compatibility.
+
+
+## 1.4.0-rc.1 — iteration 11
+
+- Added optional, session-only Google OAuth with separate Calendar and read-only Contacts scopes, and reviewed Calendar event creation and selected Contacts import.
+- Retained local .ics and email handoffs; no Gmail API sending or background sync.
+- Kept DB/backup v6 and excluded Google credentials from stored records.

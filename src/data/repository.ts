@@ -446,7 +446,7 @@ export async function exportBackup(db: PulseDB) {
     format: "pulse-backup",
     version: 6,
     metadata: {
-      appVersion: "1.3.0-rc.1",
+      appVersion: "1.4.0-rc.1",
       exportedAt: new Date().toISOString(),
       workspace: db.workspace,
     },
