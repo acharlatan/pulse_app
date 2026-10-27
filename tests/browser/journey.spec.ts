@@ -5,7 +5,7 @@ test("demo acceptance journey persists CRM records and appearance", async ({
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await expect(
-    page.getByRole("heading", { name: "A good day to connect." }),
+    page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ }),
   ).toBeVisible();
   await page
     .getByRole("link", { name: "Explore your network", exact: true })

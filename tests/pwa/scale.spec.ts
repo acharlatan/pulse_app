@@ -14,13 +14,11 @@ for (const size of [100, 1000])
         (_, i) =>
           `Fictional Person ${String(i).padStart(4, "0")},fixture${i}@example.com,Partnership Director,Fictional Company ${i % 20}`,
       ).join("\n");
-    await page
-      .getByLabel("Contact CSV file")
-      .setInputFiles({
-        name: "synthetic-scale.csv",
-        mimeType: "text/csv",
-        buffer: Buffer.from(csv),
-      });
+    await page.getByLabel("Contact CSV file").setInputFiles({
+      name: "synthetic-scale.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(csv),
+    });
     for (const name of [
       "Continue to mapping",
       "Validate rows",
@@ -59,12 +57,35 @@ for (const size of [100, 1000])
       `Fictional Person ${String(size - 1).padStart(4, "0")}`,
     );
     const searchActionMs = Date.now() - search;
+    await page.getByRole("button", { name: "Search PULSE" }).click();
+    const palette = page.getByRole("dialog", { name: "Search PULSE" });
+    const globalStart = Date.now();
+    await palette
+      .getByRole("combobox", { name: "Search records and actions" })
+      .fill(`Fictional Person ${String(size - 1).padStart(4, "0")}`);
+    await expect(
+      palette.getByRole("option", {
+        name: new RegExp(
+          `Fictional Person ${String(size - 1).padStart(4, "0")}`,
+        ),
+      }),
+    ).toBeVisible();
+    const globalSearchMs = Date.now() - globalStart;
+    await page.context().setOffline(true);
+    await palette
+      .getByRole("combobox", { name: "Search records and actions" })
+      .fill("Fictional Person 0000");
+    await expect(
+      palette.getByRole("option", { name: /Fictional Person 0000/ }),
+    ).toBeVisible();
+    await page.context().setOffline(false);
     const measures = {
       size,
       project: info.project.name,
       importMs,
       directoryMs,
       searchActionMs,
+      globalSearchMs,
     };
     console.log("Scale measurements", JSON.stringify(measures));
     await info.attach("browser-scale.json", {

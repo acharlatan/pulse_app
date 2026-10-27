@@ -12,7 +12,7 @@ export function markSaved(root: Element | null) {
 export function installEditProtection() {
   const changed = (event: Event) => {
     const el = event.target;
-    if (!(el instanceof Element)) return;
+    if (!(el instanceof Element) || el.closest("[data-non-editing]")) return;
     const root = el.closest(
       "form, dialog, [data-edit-scope], .assistant-page, .import-page",
     );
