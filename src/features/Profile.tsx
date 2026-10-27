@@ -285,6 +285,12 @@ export function Profile({ company = false }: { company?: boolean }) {
         />
         <Link
           className="button ghost"
+          to={`/analytics?${company ? "company" : "person"}=${encodeURIComponent(record.id)}`}
+        >
+          View relationship analytics
+        </Link>
+        <Link
+          className="button ghost"
           to={`/orbit?${company ? "company" : "person"}=${record.id}`}
         >
           View in Relationship Orbit

@@ -169,3 +169,10 @@ PULSE 1.2.0-rc.1 adds an editorial Home led by commitments, Cards/Compact direct
 Relationship Orbit maps actual company memberships and opportunity associations, with search, filters, person/company scopes, selection details and record navigation. Desktop Map starts fitted and bounded to 24 records; mobile starts in List (60 records), with an optional 18-record map. Search or focus a record to explore larger networks. No interpersonal relationships are inferred.
 
 DB/backup **v5** adds a media Blob store and additive identity/cover fields. Restore accepts v1–v5. Inputs: JPEG/PNG/WebP ≤8 MB/24 MP; optimized portraits/logos 320×320, covers 1280×480, ≤512 KB each. Local media is capped at 128 images/12 MB; backups use bounded base64 JSON (32 MB intake). No image hosting, cloud sync or AI media transfer. See EXPERIENCE_09.md, RELEASE_1_2.md and QA_REPORT.md for architecture and verified limits. After upgrading, use a v5-compatible forward fix rather than older database clients.
+
+
+## Iteration 10: local analytics and automations
+
+Analytics derives reports from records stored in this workspace. Conversation counts exclude notes and future entries; company history uses the company captured on each conversation. Opportunity totals are current snapshots, currencies remain separate, and stage duration is shown only after actual recorded moves. Use the date, person, company, priority and category filters and export the displayed report as local CSV.
+
+Automation rules are local, initially disabled and require explicit enabling. Triggers cover entering a stage, a closing date, an upcoming or overdue follow-up, and inactivity after a recorded conversation. Actions create an administrative follow-up or an in-app reminder; they never send messages. Checks run only while PULSE is open, on a bounded schedule and after relevant changes. Restrictions and permissions are checked before action. The execution ledger prevents repeated actions across tabs and restores set a replay boundary. See RELEASE_1_3.md for definitions and limitations.

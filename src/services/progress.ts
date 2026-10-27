@@ -12,13 +12,21 @@ import type {
   Reward,
 } from "../data/progress-models";
 import { eligible } from "./recommendations";
+const calendarFormatters = new Map<string, Intl.DateTimeFormat>();
 export function calendarDay(at: string | number, timezone: string) {
-  const p = new Intl.DateTimeFormat("en-CA", {
-    timeZone: timezone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date(at));
+  let formatter = calendarFormatters.get(timezone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    // Bound the cache even if imported data contains many distinct time zones.
+    if (calendarFormatters.size >= 32) calendarFormatters.clear();
+    calendarFormatters.set(timezone, formatter);
+  }
+  const p = formatter.formatToParts(new Date(at));
   return ["year", "month", "day"]
     .map((k) => p.find((v) => v.type === k)!.value)
     .join("-");

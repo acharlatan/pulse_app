@@ -1,3 +1,10 @@
+import {
+  transitionSchema,
+  automationRuleSchema,
+  automationExecutionSchema,
+  automationControlSchema,
+} from "./intelligence-models";
+import { onOpportunityTransition } from "./automation-repository";
 import Dexie from "dexie";
 import { cleanMedia } from "./media-repository";
 import {
@@ -261,6 +268,22 @@ export async function completeTask(db: PulseDB, id: string) {
     return feedback;
   });
 }
+async function markAutomationSourceDeleted(
+  db: PulseDB,
+  type: "contact" | "task" | "opportunity",
+  id: string,
+) {
+  await db.automationExecutions
+    .where("sourceId")
+    .equals(id)
+    .filter((e) => e.sourceType === type)
+    .modify({ sourceDeleted: true });
+  if (type === "task")
+    await db.automationExecutions
+      .where("resultId")
+      .equals(id)
+      .modify({ resultDeleted: true });
+}
 export async function deleteContact(db: PulseDB, id: string) {
   await db.transaction("rw", db.tables, async () => {
     const c = await db.contacts.get(id);
@@ -268,6 +291,9 @@ export async function deleteContact(db: PulseDB, id: string) {
     const removedTaskIds = new Set(
       (await db.tasks.where("contactId").equals(id).toArray()).map((t) => t.id),
     );
+    await markAutomationSourceDeleted(db, "contact", id);
+    for (const taskId of removedTaskIds)
+      await markAutomationSourceDeleted(db, "task", taskId);
     for (const i of await db.interactions.toArray())
       if (
         i.followUpId &&
@@ -311,9 +337,6 @@ export async function deleteContact(db: PulseDB, id: string) {
       .delete();
     await db.contacts.delete(id);
     await cleanMedia(db);
-    for (const pin of await db.focusItems.toArray())
-      if (pin.entityType === "task" && !(await db.tasks.get(pin.recordId)))
-        await db.focusItems.delete(pin.id);
     for (const table of [
       db.interactions,
       db.tasks,
@@ -321,6 +344,9 @@ export async function deleteContact(db: PulseDB, id: string) {
       db.permissions,
     ])
       await table.where("contactId").equals(id).delete();
+    for (const pin of await db.focusItems.toArray())
+      if (pin.entityType === "task" && !(await db.tasks.get(pin.recordId)))
+        await db.focusItems.delete(pin.id);
     await db.events.where("contactId").equals(id).delete();
     for (const o of await db.opportunities.toArray())
       if (o.contactIds.includes(id)) {
@@ -377,6 +403,7 @@ export const backupSchema = z.object({
     z.literal(3),
     z.literal(4),
     z.literal(5),
+    z.literal(6),
   ]),
   metadata: z
     .object({
@@ -385,6 +412,10 @@ export const backupSchema = z.object({
       workspace: z.enum(["demo", "personal"]),
     })
     .optional(),
+  transitions: z.array(transitionSchema).default([]),
+  automationRules: z.array(automationRuleSchema).default([]),
+  automationExecutions: z.array(automationExecutionSchema).default([]),
+  automationControl: z.array(automationControlSchema).max(1).default([]),
   media: z.array(mediaBackupSchema).default([]),
   pipelines: z.array(pipelineSchema).default([]),
   pipelineStages: z.array(pipelineStageSchema).default([]),
@@ -413,12 +444,16 @@ export const backupSchema = z.object({
 export async function exportBackup(db: PulseDB) {
   return db.transaction("r", db.tables, async () => ({
     format: "pulse-backup",
-    version: 5,
+    version: 6,
     metadata: {
-      appVersion: "1.2.0-rc.1",
+      appVersion: "1.3.0-rc.1",
       exportedAt: new Date().toISOString(),
       workspace: db.workspace,
     },
+    transitions: await db.transitions.toArray(),
+    automationRules: await db.automationRules.toArray(),
+    automationExecutions: await db.automationExecutions.toArray(),
+    automationControl: await db.automationControl.toArray(),
     media: await Dexie.waitFor(
       Promise.all(
         (await db.media.toArray()).map(async (a) => {
@@ -546,6 +581,10 @@ export function validateBackup(input: unknown) {
     contacts = new Set(b.contacts.map((v) => v.id));
   for (const records of [
     b.media,
+    b.transitions,
+    b.automationRules,
+    b.automationExecutions,
+    b.automationControl,
     b.pipelines,
     b.pipelineStages,
     b.fieldDefinitions,
@@ -587,6 +626,42 @@ export function validateBackup(input: unknown) {
   ])
     if (r.contactId && !contacts.has(r.contactId))
       throw new Error("Backup references a missing contact.");
+  const opportunityIds = new Set(b.opportunities.map((o) => o.id));
+  const ruleIds = new Set(b.automationRules.map((r) => r.id));
+  const stageRows = new Map(b.pipelineStages.map((x) => [x.id, x]));
+  const pipelineIds = new Set(b.pipelines.map((x) => x.id));
+  for (const t of b.transitions)
+    if (!opportunityIds.has(t.opportunityId))
+      throw new Error("Transition references a missing opportunity.");
+  for (const r of b.automationRules)
+    if (
+      !r.archived &&
+      r.trigger === "stage" &&
+      (!pipelineIds.has(r.pipelineId) ||
+        stageRows.get(r.stageId)?.pipelineId !== r.pipelineId)
+    )
+      throw new Error("Automation references a missing stage.");
+  const sources = {
+    contact: new Set(b.contacts.map((x) => x.id)),
+    task: new Set(b.tasks.map((x) => x.id)),
+    opportunity: opportunityIds,
+  };
+  for (const r of b.automationRules)
+    if (
+      !r.archived &&
+      r.trigger === "closing" &&
+      r.pipelineId &&
+      !pipelineIds.has(r.pipelineId)
+    )
+      throw new Error("Automation references a missing pipeline.");
+  for (const e of b.automationExecutions)
+    if (
+      !ruleIds.has(e.ruleId) ||
+      e.id !== JSON.stringify([e.ruleId, e.occurrenceId]) ||
+      (!e.sourceDeleted && !sources[e.sourceType].has(e.sourceId)) ||
+      (e.resultId && !e.resultDeleted && !sources.task.has(e.resultId))
+    )
+      throw new Error("Invalid automation execution identity or reference.");
   for (const o of b.opportunities)
     if (o.contactIds.some((id) => !contacts.has(id)))
       throw new Error("Opportunity references a missing contact.");
@@ -713,6 +788,10 @@ export async function restoreBackup(db: PulseDB, input: unknown) {
     await db.media.clear();
     await db.media.bulkAdd(assets);
     for (const key of [
+      "transitions",
+      "automationRules",
+      "automationExecutions",
+      "automationControl",
       "pipelines",
       "pipelineStages",
       "fieldDefinitions",
@@ -740,6 +819,13 @@ export async function restoreBackup(db: PulseDB, input: unknown) {
       await db[key].clear();
       await db.table(key).bulkAdd(b[key]);
     }
+    // Restored rule occurrences never replay historical conditions.
+    const control = b.automationControl[0];
+    await db.automationControl.put({
+      id: "automation",
+      paused: control?.paused || false,
+      replayAfter: new Date().toISOString(),
+    });
   });
 }
 
@@ -856,6 +942,7 @@ export async function deleteTask(db: PulseDB, id: string) {
       .equals(id)
       .filter((v) => fields.has(v.fieldId))
       .delete();
+    await markAutomationSourceDeleted(db, "task", id);
     await db.tasks.delete(id);
     await db.dailyQuests
       .where("taskId")
@@ -929,6 +1016,43 @@ export async function saveOpportunity(
     assertEditorVersion(previous, expectedUpdatedAt);
     if (previous) parsed.createdAt = previous.createdAt;
     await db.opportunities.put(parsed);
+    if (
+      previous &&
+      (previous.stageId !== parsed.stageId ||
+        previous.pipelineId !== parsed.pipelineId ||
+        previous.status !== parsed.status)
+    ) {
+      const previousStage = await db.pipelineStages.get(previous.stageId);
+      const previousPipeline = await db.pipelines.get(previous.pipelineId);
+      if (!previousStage || !previousPipeline)
+        throw new Error("Previous pipeline history is unavailable.");
+      const existingTransitions = await db.transitions
+        .where("opportunityId")
+        .equals(parsed.id)
+        .toArray();
+      const lastAt = Math.max(
+        0,
+        ...existingTransitions.map((t) => Date.parse(t.occurredAt)),
+      );
+      const transition = transitionSchema.parse({
+        id: stamp().id,
+        opportunityId: parsed.id,
+        occurredAt: new Date(Math.max(Date.now(), lastAt + 1)).toISOString(),
+        previousPipelineId: previous.pipelineId,
+        pipelineId: parsed.pipelineId,
+        previousStageId: previous.stageId,
+        stageId: parsed.stageId,
+        previousPipelineName: previousPipeline.name,
+        pipelineName: pipeline.name,
+        previousStageName: previousStage.name,
+        stageName: stage.name,
+        previousOutcome: previous.status,
+        outcome: parsed.status,
+        source: "user",
+      });
+      await db.transitions.add(transition);
+      await onOpportunityTransition(db, transition, parsed);
+    }
     const feedback = await syncReward(
       db,
       "opportunity",
@@ -975,6 +1099,8 @@ export async function deleteOpportunity(db: PulseDB, id: string) {
       .equals(id)
       .filter((v) => fields.has(v.fieldId))
       .delete();
+    await markAutomationSourceDeleted(db, "opportunity", id);
+    await db.transitions.where("opportunityId").equals(id).delete();
     await db.opportunities.delete(id);
     await syncReward(db, "opportunity", o.id, false, true);
     await event(

@@ -4,6 +4,12 @@ import { WorkspaceProvider } from "./context";
 import { Shell } from "./Shell";
 import { ErrorBoundary } from "./Recovery";
 import type { Workspace } from "../data/models";
+const Analytics = lazy(() =>
+  import("../features/Analytics").then((m) => ({ default: m.Analytics })),
+);
+const Automations = lazy(() =>
+  import("../features/Automations").then((m) => ({ default: m.Automations })),
+);
 const Orbit = lazy(() =>
   import("../features/Orbit").then((m) => ({ default: m.Orbit })),
 );
@@ -74,6 +80,8 @@ export function WorkspaceApp({
               }
             >
               <Routes>
+                <Route path="/analytics" element={<Analytics />} />
+                <Route path="/automations" element={<Automations />} />
                 <Route path="/orbit" element={<Orbit />} />
                 <Route path="/focus" element={<Focus />} />
                 <Route path="/customize" element={<Customize />} />

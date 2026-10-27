@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useLiveQuery } from "dexie-react-hooks";
 import {
   ArrowUpRight,
   Plus,
@@ -20,6 +21,17 @@ export function Home() {
     { date } = useFormat(),
     navigate = useNavigate(),
     [editor, setEditor] = useState<Editor | null>(null);
+  const reminders =
+    useLiveQuery(
+      () =>
+        p.db.automationExecutions
+          .orderBy("at")
+          .reverse()
+          .filter((e) => e.action === "reminder" && e.status === "completed")
+          .limit(5)
+          .toArray(),
+      [p.db],
+    ) || [];
   useEffect(() => {
     if (p.settings.focus.landing !== "focus") return;
     try {
@@ -156,6 +168,26 @@ export function Home() {
           </div>
           {p.settings.focus.shortcuts &&
             p.settings.focus.homeLayout === "focused" && <FocusSummary />}
+          {reminders.length > 0 && (
+            <section className="surface">
+              <h2>Recent local reminders</h2>
+              {reminders.map((r) => (
+                <p key={r.id}>
+                  {(r.sourceType === "contact"
+                    ? p.contacts.find((c) => c.id === r.sourceId)?.name
+                    : r.sourceType === "task"
+                      ? p.tasks.find((t) => t.id === r.sourceId)?.title
+                      : p.opportunities.find((o) => o.id === r.sourceId)
+                          ?.title) || "Record removed"}{" "}
+                  ·{" "}
+                  {new Date(r.at).toLocaleString(p.settings.locale, {
+                    timeZone: p.settings.timezone,
+                  })}
+                </p>
+              ))}
+              <Link to="/automations">Open automation history</Link>
+            </section>
+          )}
           <div className="daily-work-grid">
             <section className="surface today-panel">
               <div className="section-heading">

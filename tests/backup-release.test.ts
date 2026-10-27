@@ -33,7 +33,15 @@ it.each([1, 2])(
       await restoreBackup(db, migrated);
       const roundtrip = await exportBackup(db);
       for (const key of Object.keys(migrated)) {
-        if (key !== "metadata")
+        if (key === "automationControl") {
+          expect(roundtrip.automationControl[0]?.paused).toBe(
+            migrated.automationControl[0]?.paused,
+          );
+          expect(
+            roundtrip.automationControl[0]?.replayAfter >=
+              migrated.automationControl[0]!.replayAfter,
+          ).toBe(true);
+        } else if (key !== "metadata")
           expect(roundtrip[key as keyof typeof roundtrip], key).toEqual(
             migrated[key as keyof typeof migrated],
           );

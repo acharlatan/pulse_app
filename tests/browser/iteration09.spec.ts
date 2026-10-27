@@ -122,7 +122,7 @@ test("local profile portraits, company logo/cover, workspace identity and v5 bac
   await page.getByRole("button", { name: "Export", exact: true }).click();
   const path = await (await download).path();
   const backup = JSON.parse(fs.readFileSync(path!, "utf8"));
-  expect(backup.version).toBe(5);
+  expect(backup.version).toBe(6);
   expect(backup.media).toHaveLength(5);
   expect(
     backup.media.every((m: { bytes: number }) => m.bytes < 512 * 1024),
@@ -134,7 +134,7 @@ test("local profile portraits, company logo/cover, workspace identity and v5 bac
   await other.getByRole("button", { name: /Create My Workspace/ }).click();
   await other.goto("/#/settings?section=data");
   await other.locator("input[type=file]").setInputFiles(path!);
-  await expect(other.getByRole("dialog")).toContainText("Compatible backup v5");
+  await expect(other.getByRole("dialog")).toContainText("Compatible backup v6");
   await other
     .getByRole("button", { name: "Validate & restore", exact: true })
     .click();

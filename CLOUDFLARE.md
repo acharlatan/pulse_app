@@ -74,3 +74,8 @@ Dependency remediation, onboarding/help and stale-editor safeguards preserve the
 ## Iteration 09 — unchanged hosting boundary
 
 The experience/media/Orbit release uses the existing automatic main build and Worker. No paid storage, image service, new binding or provider request is required. Photos stay in IndexedDB; only optimized images explicitly exported in a backup leave browser storage. AI_ENABLED remains false and Access/quota/SQLite protections are unchanged. Database clients move to v5; any rollback must be a compatible forward fix. Save active edits before adopting the service-worker update. See RELEASE_1_2.md for exact deployment evidence.
+
+
+## Iteration 10
+
+Analytics and automation evaluation run locally in the browser; they require no new Worker endpoints, credentials, paid services or server-side scheduler. Keep the existing Worker configuration, AI access controls and Git-triggered deployment. Verify the deployed release metadata and functional workflows after the main-branch build.

@@ -80,3 +80,8 @@ Iteration 08 retains semantic light/dark tokens, native form controls, clear sta
 `src/experience.css` extends the semantic system: warm paper/deep charcoal, periwinkle/forest/coral/blue accent presets, expressive headings, 12px metadata/13px labels/15px body floors and 16px mobile inputs. Inactive buttons use quiet filled surfaces; selection/focus states remain distinct. Ambient color stays behind readable surfaces; profile names/actions sit off cover photography. Reusable Avatar/LocalMedia and lazy MediaControls retain deterministic initials/ambient fallbacks. Photo and logo editing is adjacent to profile actions rather than nested in the record form, keeping record/media transactions and stale snapshots explicit.
 
 Home separates commitments, relationship brief, familiar faces, opportunities/history and optional progress. Directories offer Cards/Compact; Focus selection is progressive disclosure. Desktop Discover and mobile More expose secondary routes. Orbit uses semantic buttons/SVG edges and an equivalent searchable list, fitted bounded maps, a mobile details sheet and reduced-motion-safe interactions. No graph animation or inferred connections. Native inputs, existing editors and theme tokens remain shared across pipeline, Activity, Review, Lists, Customize, Settings, Import, Help and Assistant.
+
+
+## Analytics and automation patterns
+
+Report sections use shared surfaces, labeled filters and keyboard-operable chart buttons that select the underlying records. Automation forms preview the trigger and action and save disabled drafts. History explains completed, blocked and skipped actions. Use theme tokens, readable wrapping and the existing modal focus behavior at narrow widths.

@@ -445,6 +445,12 @@ export function Orbit() {
                   >
                     Person orbit
                   </button>
+                  <Link
+                    className="button ghost"
+                    to={`/analytics?person=${encodeURIComponent(person.id)}`}
+                  >
+                    View person analytics
+                  </Link>
                   <FocusButton type="contact" id={person.id} />
                 </>
               )}
@@ -473,6 +479,12 @@ export function Orbit() {
                   >
                     Company orbit
                   </button>
+                  <Link
+                    className="button ghost"
+                    to={`/analytics?company=${encodeURIComponent(company.id)}`}
+                  >
+                    View company analytics
+                  </Link>
                   <FocusButton type="organization" id={company.id} />
                 </>
               )}

@@ -221,6 +221,62 @@ export function WorkspaceProvider({
       /* Optional reminder hint only. */
     }
   }, [ready, data, clock, workspace]);
+  useEffect(() => {
+    if (!ready) return;
+    let active = true,
+      running = false;
+    const check = async () => {
+      if (!active || running || document.visibilityState === "hidden") return;
+      running = true;
+      try {
+        const { evaluateScheduledAutomations } =
+          await import("../data/automation-repository");
+        if (!active) return;
+        const count = await evaluateScheduledAutomations(db);
+        if (active && count)
+          setToast(
+            `${count} local automation checks recorded. Open Automations for details.`,
+          );
+      } catch {
+        if (active)
+          setToast(
+            "Local automation check could not finish. Your records were not partially changed.",
+          );
+      } finally {
+        running = false;
+      }
+    };
+    const initial = setTimeout(check, 1500);
+    const timer = setInterval(check, 300000);
+    window.addEventListener("focus", check);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      active = false;
+      clearTimeout(initial);
+      clearInterval(timer);
+      window.removeEventListener("focus", check);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [ready, db]);
+  useEffect(() => {
+    if (!ready || !data) return;
+    let active = true;
+    const timer = setTimeout(() => {
+      if (document.visibilityState !== "hidden")
+        void import("../data/automation-repository")
+          .then((m) => (active ? m.evaluateScheduledAutomations(db) : 0))
+          .catch(() => {
+            if (active)
+              setToast(
+                "Local automation check could not finish. Your records were not partially changed.",
+              );
+          });
+    }, 5000);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [ready, db, data?.tasks, data?.opportunities, data?.interactions]);
   if (error)
     return (
       <div className="startup">
