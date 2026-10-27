@@ -34,3 +34,27 @@ test("search opens globally, navigates records and opens existing editors", asyn
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
 });
+test("Home task completion persists through the shared activity flow", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Explore Demo/ }).click();
+  const task = page.locator(".daily-task").first();
+  const title = await task.locator(".home-task-title").innerText();
+  await task.getByRole("button", { name: `Complete ${title}` }).click();
+  await expect(
+    page.locator(".daily-task").filter({ hasText: title }),
+  ).toHaveCount(0);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ }),
+  ).toBeVisible();
+  await expect(
+    page.locator(".daily-task").filter({ hasText: title }),
+  ).toHaveCount(0);
+  await page.goto("/#/activity");
+  await page
+    .getByRole("combobox", { name: "Filter tasks" })
+    .selectOption({ label: "Completed" });
+  await expect(page.getByText(title, { exact: true }).first()).toBeVisible();
+});
