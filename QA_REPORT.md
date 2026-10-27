@@ -434,3 +434,8 @@ Deployment source and live evidence: [PR #3](https://github.com/acharlatan/pulse
 Final compiled helper captured person/company avatar and cover crop previews, saved person/company profiles and Welcome. Four active crop-editor axe analyses passed. A fictional company avatar Blob was then removed directly from the isolated test database; after reload the saved profile remained readable and rendered FS initials, with no broken image. Reviewed `crop-company-avatar.png` and `saved-person.png`, plus the earlier directory/company/Home/fitted-Orbit light/dark captures. Output remains in ignored `.codex/visual09`; no test database or browser binary is distributed. Functional upload/restore/offline assertions remain in the committed browser/PWA suites.
 
 Release disposition: automated candidate integration gates complete; ready for the owner's authorized expected-head merge, automatic Cloudflare build and live verification. Physical-platform/assistive-technology gates remain open. Actual production disposition is recorded in PR #3 after deployment.
+
+
+## Iteration 10 test coverage
+
+New unit coverage includes prospective stage history, rollback, cross-tab idempotency, permission/restriction blocks, restore replay boundaries, deletion tombstones, local calendar boundaries, currency separation, inactivity reminders and historical company attribution. Browser scenarios cover analytics, CSV, rule creation, restricted sources, backup restore, responsive layouts and axe. Offline tests exercise the installed service-worker build. Record exact release results and any unresolved checks in RELEASE_1_3.md.

@@ -94,9 +94,12 @@ test("backup transfers real linked demo records into an isolated Personal profil
     const original = JSON.parse(fs.readFileSync(path!, "utf8"));
     const restored = JSON.parse(fs.readFileSync(restoredPath!, "utf8"));
     for (const key of Object.keys(original)) {
-      if (Array.isArray(original[key]) && key !== "settings")
+      if (Array.isArray(original[key]) && key !== "settings" && key !== "automationControl")
         expect(restored[key], key).toEqual(original[key]);
     }
+    expect(restored.automationControl).toHaveLength(1);
+    expect(restored.automationControl[0].paused).toBe(original.automationControl[0]?.paused ?? false);
+    expect(Date.parse(restored.automationControl[0].replayAfter)).toBeGreaterThanOrEqual(Date.parse(original.automationControl[0]?.replayAfter ?? "1970-01-01T00:00:00.000Z"));
   } finally {
     await destination.close();
   }

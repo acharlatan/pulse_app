@@ -39,3 +39,11 @@ Protected optional selected-context AI architecture (generation disabled), revie
 ## Earlier iterations
 
 CRM foundation; social profiles and complete task/opportunity/interaction workflows; relationship intelligence, Smart Lists and safe CSV import; optional meaningful XP, quests, goals, streaks and correction ledger.
+
+
+## 1.3.0-rc.1 — iteration 10
+
+- Added local Analytics Studio with timezone-aware activity, relationship, opportunity, productivity and data-quality views, evidence links and CSV export.
+- Began prospective, transactionally recorded opportunity stage history without inventing earlier transitions.
+- Added explicitly enabled local automation rules, restriction checks, bounded foreground scheduling and cross-tab deduplication; no automatic messaging.
+- Added additive DB/backup v6 with replay-safe restore and retained prior backup compatibility.

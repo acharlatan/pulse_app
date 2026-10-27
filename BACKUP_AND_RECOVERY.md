@@ -38,3 +38,8 @@ Current export/DB version is **5**; accepted backups are **1–5**. Optimized po
 Restore validates metadata, content signatures/dimensions, decoded bytes, duplicate IDs, total limits and image references, then browser-decodes every image before one atomic replacement. Invalid images reject without changing current data. Export/restore JPEG/PNG/WebP-derived images was exercised in isolated browser contexts with reload; decoder failure and injected write/storage failures preserve current records/photos. Photos are local browser data and may be lost to device clearing/eviction; retain an export outside the browser. No encryption/cloud recovery is implied.
 
 Use Photo & cover or Logo & cover on a profile to replace/remove images, or Workspace photo in Appearance. Unsupported HEIC/SVG or >8 MB/24 MP inputs need conversion/resizing first. Storage-full feedback keeps the original image intact; export a backup, remove unneeded images and retry. After v5 upgrade, recovery must use a v5-compatible forward fix; older clients cannot open the upgraded database.
+
+
+## Iteration 10: version 6
+
+DB/backup v6 adds prospective opportunity transitions, automation rules, execution ledger and scheduling control. Existing v1–v5 backups remain supported. Version 6 exports preserve local media and the new records; import validates references and replaces the workspace atomically. A restore advances the automation replay boundary so old time-based conditions are not newly executed. Deleted sources/results retain ledger tombstones. Exported backups contain private relationship history and should be protected like the workspace itself.

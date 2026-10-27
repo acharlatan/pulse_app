@@ -503,7 +503,7 @@ it("roundtrips v2 tables and old v1 backups; failed restore leaves all data inta
     conditions: [{ field: "category", operator: "is", value: "Prospect" }],
   });
   const backup = await exportBackup(db);
-  expect(backup.version).toBe(5);
+  expect(backup.version).toBe(6);
   expect(validateBackup(backup).smartLists).toHaveLength(1);
   await restoreBackup(db, backup);
   expect(await db.smartLists.count()).toBe(1);
@@ -555,7 +555,7 @@ it("upgrades a real version-one database without dropping CRM records", async ()
   expect((await db.settings.get("settings"))?.intelligence.coolingDays).toBe(
     30,
   );
-  expect(db.verno).toBe(5);
+  expect(db.verno).toBe(6);
 });
 it("supports 10, 100 and 1000-contact imports and intelligence without fabricated history", async () => {
   for (const size of [10, 100, 1000]) {

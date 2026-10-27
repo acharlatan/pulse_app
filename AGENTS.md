@@ -49,3 +49,10 @@ DB/backup v4 adds pipelines, pipelineStages, fieldDefinitions, fieldValues and f
 DB/backup v5 adds bounded media Blobs. Preserve v1–v4 restore compatibility, stable media references, workspace isolation, reference-aware cleanup and atomic rollback. Validate input signatures/dimensions before decode and optimized data/references before restore; browser-decode restored media before the replacement transaction. Never include media in AI context, remote image requests or logs. Revoke object URLs, keep image editors lazy and preserve full accessible initials/cover fallback. Media saves grant no XP and must not overwrite stale image slots or bypass record stale-save guards. Forward fixes must retain v5 DB compatibility.
 
 Orbit is a bounded derived view of saved associations, not authoritative relationship inference. Keep deterministic namespaced IDs, semantic list/navigation equivalents, explicit saved-edge meaning, mobile default List and bounded map/list rendering. Do not add unbounded simulation or infer interpersonal links. Keep identity text off covers and both theme/accent palettes readable. See EXPERIENCE_09.md for caps and architecture.
+
+
+## Iteration 10 — analytics and local automations
+
+DB/backup v6 adds prospective opportunity transition snapshots, typed automation rules, execution ledger and replay control. Preserve v1–v5 imports, media, tombstones and atomic replacement. Never infer pre-v6 stage history, convert currencies implicitly, or count notes as conversations. Record actual stage moves in the same transaction as the opportunity, retain historical labels and avoid executing automation on configuration remaps.
+
+Rules start disabled; changing a rule disables it. Recheck restrictions and permissions inside the action transaction. Stable occurrence keys serialize tabs; restore/resume advances the replay boundary. Scheduled checks are bounded and foreground-only. Never automatically send communications, execute arbitrary rule code, award creation XP, or silently replay imported/restored history.

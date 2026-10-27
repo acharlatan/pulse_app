@@ -96,3 +96,8 @@ Iteration 08 implements customizable pipeline/stage records, separate outcome ca
 DB/backup v5 adds validated optimized media Blobs, stable local references, optional person/company coverMediaId, and identity defaults for workspace name/avatar/accent. Media operations and orphan cleanup are transactional, workspace-isolated and unrewarded. A separate live media component revokes ephemeral object URLs; media is excluded from AI context. Backup v1–v5 validation rejects corrupted/duplicate/dangling media before atomic restore, including browser decoding before any replacement.
 
 Orbit derives namespaced person/company/opportunity nodes and only saved membership/representative/company-opportunity edges. Deterministic bounded layout has Map/List, filters, scopes, details, record navigation and keyboard pan/zoom controls. Desktop map24/mobile18/list60/hard80; larger networks use scoped/search views. Shared editorial tokens govern the redesigned Home/navigation/directories/profiles and secondary surfaces. Analytics, rule automation, external integrations and explicit person-person links remain future work.
+
+
+## Iteration 10 intelligence
+
+Analytics describes actual local CRM records and distinguishes current snapshots from observed period activity. Stage duration starts only at a witnessed stage entry; currencies are grouped rather than converted. Automation Studio provides typed conditions and local actions with explicit activation, transactional duplicate prevention and current restriction checks. It is not a background service or a messaging integration.

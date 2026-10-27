@@ -397,7 +397,7 @@ it("current backups roundtrip ledger and quests without replaying awards", async
   await ensureDailyQuests(db);
   await completeTask(db, t.id);
   const b = await exportBackup(db);
-  expect(b.version).toBe(5);
+  expect(b.version).toBe(6);
   await restoreBackup(db, b);
   await ensureDailyQuests(db);
   await completeTask(db, t.id);
@@ -498,7 +498,7 @@ it("upgrades a real v2 database without replaying historical task completions", 
     .add({ ...task(), completedAt: new Date().toISOString() });
   old.close();
   await db.open();
-  expect(db.verno).toBe(5);
+  expect(db.verno).toBe(6);
   expect(await db.contacts.count()).toBe(1);
   expect(await db.tasks.count()).toBe(1);
   expect(await db.rewards.count()).toBe(0);

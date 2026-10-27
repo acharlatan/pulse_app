@@ -61,3 +61,8 @@ Final browser/PWA/publication evidence is recorded in QA_REPORT.md and RELEASE_1
 - [x] Color-transition contrast defect fixed, test startup readiness strengthened, assertions retained.
 - [x] Comprehensive A–O report in RELEASE_1_2.md; exact release/live deployment record in PR #3.
 - [x] Active image-editor axe checks, actual saved-media screenshot review and missing-Blob fallback verified.
+
+
+## Iteration 10 release gates
+
+Verify stage transitions and configuration remaps, disabled drafts, eligibility/restrictions, duplicate suppression across tabs, failed-write rollback, no replay after restore, legacy backups and v6 media round trips. Check analytics date/timezone boundaries, historical company attribution, separate currencies and safe CSV; test foreground and offline behavior, responsive views, axe, production build and Worker smoke. Do not present a Worker HTTP response alone as deployment verification.

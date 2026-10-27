@@ -19,7 +19,13 @@ export function Activity() {
     setParams(value === "tasks" ? {} : { view: value });
   const [sort, setSort] = useState("due");
   const [limit, setLimit] = useState(40);
-  const [filter, setFilter] = useState("open");
+  const [filter, setFilter] = useState(() =>
+    ["all", "complete", "overdue", "today", "upcoming"].includes(
+      params.get("filter") || "",
+    )
+      ? params.get("filter")!
+      : "open",
+  );
   const [editor, setEditor] = useState<Editor | null>(null);
   const tasks = p.tasks
     .filter(

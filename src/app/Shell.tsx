@@ -128,6 +128,8 @@ export function Shell({ children }: { children: ReactNode }) {
         <nav aria-label="Discover">
           <p className="nav-label">DISCOVER</p>
           {[
+            ["/analytics", "Analytics"],
+            ["/automations", "Automations"],
             ["/focus", "My Focus"],
             ["/orbit", "Relationship Orbit"],
             ["/lists", "Smart Lists"],
@@ -198,6 +200,8 @@ export function Shell({ children }: { children: ReactNode }) {
                       : location.pathname === "/assistant"
                         ? "PULSE Intelligence"
                         : {
+                            "/analytics": "Analytics",
+                            "/automations": "Automations",
                             "/orbit": "Relationship Orbit",
                             "/focus": "My Focus",
                             "/customize": "Personalize PULSE",
@@ -273,6 +277,8 @@ export function Shell({ children }: { children: ReactNode }) {
         <Modal title="Explore your workspace" onClose={() => setMore(false)}>
           <nav className="explore-menu" aria-label="More destinations">
             {[
+              ["/analytics", "Analytics"],
+              ["/automations", "Automations"],
               ["/focus", "My Focus"],
               ["/orbit", "Relationship Orbit"],
               ["/review", "Relationship Review"],

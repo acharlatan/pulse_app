@@ -1,0 +1,129 @@
+.analytics-filters .form-grid {
+  align-items: end;
+}
+.analytics-tabs {
+  margin-block: 24px;
+}
+.analytics-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 175px), 1fr));
+  gap: 14px;
+  margin-block: 20px;
+}
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+  min-height: 140px;
+  color: var(--text);
+}
+.metric-card strong {
+  font-size: 30px;
+  line-height: 1;
+  color: var(--primary-text);
+}
+.metric-card small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.analytics-bars {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-block: 16px;
+}
+.analytics-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  gap: 6px;
+  min-width: 74px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--surface-secondary);
+  color: var(--text);
+  cursor: pointer;
+}
+.analytics-bar[aria-pressed="true"] {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+.analytics-bar-fill {
+  width: 28px;
+  min-height: 8px;
+  border-radius: 8px 8px 3px 3px;
+  background: var(--primary);
+}
+.analytics-bar small {
+  font-size: 12px;
+}
+.analytics-records li {
+  margin-block: 10px;
+}
+.automation-templates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.automation-rule,
+.automation-history {
+  border-top: 1px solid var(--border);
+  padding-block: 18px;
+}
+.automation-rule .form-actions {
+  flex-wrap: wrap;
+}
+.automation-rule .form-actions .button {
+  flex: 1 1 110px;
+  min-width: 110px;
+}
+.automation-preview {
+  margin-block: 20px;
+  background: var(--surface-secondary);
+  padding: 18px;
+  border-radius: 16px;
+}
+@media (max-width: 600px) {
+  .analytics-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .metric-card {
+    padding: 16px;
+  }
+  .analytics-bar {
+    min-width: 68px;
+  }
+}
+@media print {
+  .sidebar,
+  .topbar,
+  .bottom-nav,
+  .floating-add,
+  .analytics-filters,
+  .analytics-tabs,
+  .analytics-page .form-actions,
+  .skip-link {
+    display: none !important;
+  }
+  .workspace-main,
+  main,
+  .page {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+  .surface,
+  .metric-card {
+    box-shadow: none !important;
+    border: 1px solid #aaa;
+    break-inside: avoid;
+  }
+  .analytics-bars {
+    display: flex;
+  }
+}

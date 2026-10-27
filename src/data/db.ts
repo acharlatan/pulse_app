@@ -1,3 +1,9 @@
+import type {
+  OpportunityTransition,
+  AutomationRule,
+  AutomationExecution,
+  AutomationControl,
+} from "./intelligence-models";
 import type { MediaAsset } from "./media-models";
 import {
   pipelineSchema,
@@ -37,6 +43,10 @@ import type {
   ImportBatch,
 } from "./models";
 export class PulseDB extends Dexie {
+  transitions!: Table<OpportunityTransition>;
+  automationRules!: Table<AutomationRule>;
+  automationExecutions!: Table<AutomationExecution>;
+  automationControl!: Table<AutomationControl>;
   media!: Table<MediaAsset>;
   pipelines!: Table<PipelineDefinition>;
   pipelineStages!: Table<PipelineStage>;
@@ -142,6 +152,12 @@ export class PulseDB extends Dexie {
             s.identity = settingsSchema.parse(s).identity;
           });
       });
+    this.version(6).stores({
+      transitions: "id,opportunityId,occurredAt,stageId,pipelineId",
+      automationRules: "id,enabled,trigger,updatedAt",
+      automationExecutions: "id,ruleId,at,sourceId,resultId",
+      automationControl: "id",
+    });
   }
 }
 const instances = new Map<Workspace, PulseDB>();

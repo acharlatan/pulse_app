@@ -1,3 +1,4 @@
+import { transitionSchema } from "./intelligence-models";
 import type { PulseDB } from "./db";
 import { stamp, type Opportunity } from "./models";
 import {
@@ -61,6 +62,23 @@ export async function savePipeline(
         updatedAt: pipeline.updatedAt,
       }),
     );
+    const activeRules = (await db.automationRules.toArray()).filter(
+      (r) =>
+        !r.archived && r.trigger === "stage" && r.pipelineId === pipeline.id,
+    );
+    if (
+      pipeline.archived &&
+      (await db.automationRules.toArray()).some(
+        (r) => !r.archived && r.enabled && r.pipelineId === pipeline.id,
+      )
+    )
+      throw new Error(
+        "Disable automations using this pipeline before archiving it.",
+      );
+    if (activeRules.some((r) => !stageRows.some((s) => s.id === r.stageId)))
+      throw new Error(
+        "Remove or edit automation rules using a stage before deleting it.",
+      );
     const others = (await db.pipelines.toArray())
       .filter((p) => p.id !== pipeline.id)
       .map((p) =>
@@ -107,6 +125,40 @@ export async function savePipeline(
     for (const o of opportunities) {
       const old = await db.opportunities.get(o.id);
       if (old?.updatedAt !== o.updatedAt) {
+        if (old && (old.stageId !== o.stageId || old.status !== o.status)) {
+          const from = oldStages.find((s) => s.id === old.stageId),
+            to = stageRows.find((s) => s.id === o.stageId);
+          if (!from || !to || !previous)
+            throw new Error("Stage history is unavailable.");
+          const prior = await db.transitions
+            .where("opportunityId")
+            .equals(o.id)
+            .toArray();
+          const lastAt = Math.max(
+            0,
+            ...prior.map((t) => Date.parse(t.occurredAt)),
+          );
+          await db.transitions.add(
+            transitionSchema.parse({
+              id: stamp().id,
+              opportunityId: o.id,
+              occurredAt: new Date(
+                Math.max(Date.parse(pipeline.updatedAt), lastAt + 1),
+              ).toISOString(),
+              previousPipelineId: old.pipelineId,
+              pipelineId: o.pipelineId,
+              previousStageId: old.stageId,
+              stageId: o.stageId,
+              previousPipelineName: previous.name,
+              pipelineName: pipeline.name,
+              previousStageName: from.name,
+              stageName: to.name,
+              previousOutcome: old.status,
+              outcome: o.status,
+              source: "configuration",
+            }),
+          );
+        }
         await db.opportunities.put(o as Opportunity);
         await syncReward(db, "opportunity", o.id, false); // corrections only, never new grants
       }
@@ -136,6 +188,14 @@ export async function deletePipeline(
     )
       throw new Error(
         "Choose another default and move opportunities first, or archive this pipeline.",
+      );
+    if (
+      (await db.automationRules.toArray()).some(
+        (r) => !r.archived && r.pipelineId === id,
+      )
+    )
+      throw new Error(
+        "Remove or edit automation rules using this pipeline first.",
       );
     await db.pipelineStages.where("pipelineId").equals(id).delete();
     await db.pipelines.delete(id);

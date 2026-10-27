@@ -85,7 +85,7 @@ it("rejects stale image changes and rolls back quota failure, preserving the ori
 it("exports binary media as a bounded v5 payload and rejects corruption before replacement", async () => {
   await saveMedia(db, "contact", "contact-0", "avatar", asset(), null);
   const b = await exportBackup(db);
-  expect(b.version).toBe(5);
+  expect(b.version).toBe(6);
   expect(b.media[0].encoded).toBe(png);
   expect(decodeMedia(b.media[0]).bytes).toBe(asset().bytes);
   const broken = structuredClone(b);
@@ -127,7 +127,7 @@ it("upgrades a real v4 workspace without rewriting CRM records", async () => {
     orgs = await db.organizations.toArray();
   const schema = Object.fromEntries(
     db.tables
-      .filter((t) => t.name !== "media")
+      .filter((t) => !["media", "transitions", "automationRules", "automationExecutions", "automationControl"].includes(t.name))
       .map((t) => [
         t.name,
         [t.schema.primKey.src, ...t.schema.indexes.map((i) => i.src)].join(","),
@@ -141,7 +141,7 @@ it("upgrades a real v4 workspace without rewriting CRM records", async () => {
   await old.table("organizations").bulkPut(orgs);
   old.close();
   await db.open();
-  expect(db.verno).toBe(5);
+  expect(db.verno).toBe(6);
   expect(await db.contacts.toArray()).toEqual(contacts);
   expect(await db.media.count()).toBe(0);
 });

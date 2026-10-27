@@ -52,7 +52,12 @@ export function TaskRow({
           </small>
         )}
         {t.description && <p>{t.description}</p>}
-        {t.source && <small className="muted">Source: {t.source}</small>}
+        {t.source && (
+          <small className="muted">
+            Source:{" "}
+            {t.source.startsWith("automation:") ? "Local automation" : t.source}
+          </small>
+        )}
         <span>
           <Badge tone={state === "Overdue" ? "red" : ""}>{state}</Badge>{" "}
           <time>
