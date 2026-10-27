@@ -7,6 +7,13 @@ import {
   Check,
   ArrowRight,
   AudioLines,
+  Users,
+  Building2,
+  BriefcaseBusiness,
+  CalendarClock,
+  Orbit,
+  ChartNoAxesCombined,
+  Workflow,
 } from "lucide-react";
 import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty, useFormat } from "../components/ui";
@@ -207,6 +214,65 @@ export function Home() {
               <Link to="/automations">Open automation history</Link>
             </section>
           )}
+          <section
+            className="pulse-overview"
+            aria-label="Your workspace at a glance"
+          >
+            <div className="pulse-overview-intro">
+              <span className="pulse-overview-mark">
+                <AudioLines size={20} />
+              </span>
+              <div>
+                <p className="eyebrow">YOUR WORLD AT A GLANCE</p>
+                <h2>Your relationships, in motion.</h2>
+                <p>A clear view of the people and work you’re keeping close.</p>
+              </div>
+            </div>
+            <div className="pulse-overview-stats">
+              <Link to="/network">
+                <span className="pulse-stat-icon">
+                  <Users size={19} />
+                </span>
+                <span>
+                  <strong>{p.contacts.length}</strong>
+                  <small>People</small>
+                </span>
+                <ArrowUpRight size={16} />
+              </Link>
+              <Link to="/network">
+                <span className="pulse-stat-icon">
+                  <Building2 size={19} />
+                </span>
+                <span>
+                  <strong>{p.organizations.length}</strong>
+                  <small>Companies</small>
+                </span>
+                <ArrowUpRight size={16} />
+              </Link>
+              <Link to="/pipeline">
+                <span className="pulse-stat-icon">
+                  <BriefcaseBusiness size={19} />
+                </span>
+                <span>
+                  <strong>
+                    {p.opportunities.filter((o) => o.status === "open").length}
+                  </strong>
+                  <small>Active opportunities</small>
+                </span>
+                <ArrowUpRight size={16} />
+              </Link>
+              <Link to="/activity">
+                <span className="pulse-stat-icon">
+                  <CalendarClock size={19} />
+                </span>
+                <span>
+                  <strong>{tasks.length}</strong>
+                  <small>Open follow-ups</small>
+                </span>
+                <ArrowUpRight size={16} />
+              </Link>
+            </div>
+          </section>
           <div className="daily-work-grid">
             <section className="surface today-panel">
               <div className="section-heading">
@@ -401,6 +467,88 @@ export function Home() {
           {p.settings.focus.shortcuts && <FocusSummary />}
           <ProgressSummary />
         </>
+      )}
+      {p.settings.focus.shortcuts && (
+        <section
+          className="workspace-collection"
+          aria-label="Explore your workspace"
+        >
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">MORE FROM YOUR WORKSPACE</p>
+              <h2>See the bigger picture.</h2>
+            </div>
+          </div>
+          <div className="workspace-collection-grid">
+            <Link to="/orbit" className="workspace-feature feature-orbit">
+              <div className="feature-art" aria-hidden="true">
+                <span className="orbit-line" />
+                <span className="orbit-line orbit-line-inner" />
+                <Orbit size={40} />
+                <i />
+                <i />
+                <i />
+              </div>
+              <span className="feature-caption">DISCOVER CONNECTIONS</span>
+              <h3>Relationship Orbit</h3>
+              <p>
+                Explore the people, companies and opportunities connected
+                through your saved records.
+              </p>
+              <span className="feature-open">
+                Explore your orbit <ArrowUpRight size={17} />
+              </span>
+            </Link>
+            <Link
+              to="/analytics"
+              className="workspace-feature feature-analytics"
+            >
+              <div className="feature-art" aria-hidden="true">
+                <span className="art-bars">
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <ChartNoAxesCombined size={32} />
+              </div>
+              <span className="feature-caption">UNDERSTAND YOUR WORK</span>
+              <h3>A clearer perspective</h3>
+              <p>
+                Review pipeline movement, conversations and follow-through in
+                Analytics.
+              </p>
+              <span className="feature-open">
+                Open Analytics <ArrowUpRight size={17} />
+              </span>
+            </Link>
+            <Link
+              to="/automations"
+              className="workspace-feature feature-automation"
+            >
+              <div className="feature-art" aria-hidden="true">
+                <span className="art-flow">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <Workflow size={36} />
+              </div>
+              <span className="feature-caption">
+                MAKE ROOM FOR WHAT MATTERS
+              </span>
+              <h3>Your quiet support system</h3>
+              <p>
+                Build local reminders and follow-up rules, with every action
+                under your control.
+              </p>
+              <span className="feature-open">
+                Explore Automations <ArrowUpRight size={17} />
+              </span>
+            </Link>
+          </div>
+        </section>
       )}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
