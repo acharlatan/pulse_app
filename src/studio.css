@@ -732,3 +732,9 @@
     padding: 10px 12px;
   }
 }
+/* State colors change together: never interpolate through unreadable contrast. */
+.sidebar .nav-item,
+.topbar .icon-button,
+.command-result {
+  transition: box-shadow 160ms;
+}

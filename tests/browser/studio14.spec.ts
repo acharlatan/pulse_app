@@ -60,3 +60,28 @@ test("Studio branding, responsive screens and contextual controls", async ({
     page.getByRole("combobox", { name: "Filter tasks" }),
   ).toHaveValue("overdue");
 });
+test("branded welcome and an empty personal workspace remain usable", async ({
+  page,
+}, info) => {
+  await page.goto("/");
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    if ([390, 1440].includes(width))
+      await page.screenshot({
+        path: `/tmp/studio14-welcome-${info.project.name}-${width}.png`,
+        fullPage: true,
+      });
+  }
+  await expect(
+    page.getByRole("button", { name: /Create My Workspace/ }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /Create My Workspace/ }).click();
+  await expect(page.locator("main h1")).toBeVisible();
+  await expect(page.locator(".home-empty")).toBeVisible();
+  await expect(page.locator(".pulse-overview")).toHaveCount(0);
+});
