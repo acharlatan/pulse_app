@@ -1,4 +1,4 @@
-import { BrandArt } from "../components/BrandArt";
+import { ArrowRight, Workflow, CalendarClock, Users, Bell } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Link } from "react-router-dom";
@@ -114,14 +114,13 @@ export function Automations() {
     );
   return (
     <div className="page automations-page">
-      <div className="page-heading studio-heading">
-        <BrandArt motif="wave" />
+      <div className="page-heading editorial-masthead insight-masthead">
         <div>
           <p className="eyebrow">LESS ADMIN, MORE TIME FOR PEOPLE</p>
           <h1>
             Automations<span className="accent">.</span>
           </h1>
-          <p className="subtitle">
+          <p className="editorial-deck">
             Choose a trigger and a safe local action. You stay in control.
           </p>
         </div>
@@ -130,6 +129,49 @@ export function Automations() {
         </Link>
       </div>
       <section className="surface">
+        <h2>Start with a template</h2>
+        <p className="muted">
+          Templates open as disabled drafts. Review and enable each rule
+          yourself.
+        </p>
+        <div className="automation-templates">
+          {(["stage", "closing", "inactive", "overdue"] as const).map((k) => (
+            <button
+              key={k}
+              className="automation-template"
+              onClick={() => {
+                setError("");
+                setEdit(draft(k));
+              }}
+            >
+              {(() => {
+                const Icon = {
+                  stage: Workflow,
+                  closing: CalendarClock,
+                  inactive: Users,
+                  overdue: Bell,
+                }[k];
+                return <Icon size={26} />;
+              })()}
+              <h3>{draft(k).name}</h3>
+              <span className="template-trigger">{triggers[k]}</span>
+              <ArrowRight className="template-arrow" size={20} />
+              <span className="template-action">
+                {k === "stage" || k === "closing"
+                  ? "Create a local follow-up"
+                  : "Record a local reminder"}
+              </span>
+              <small>Configure a disabled draft →</small>
+            </button>
+          ))}
+        </div>
+      </section>
+      <p className="automation-local-note">
+        Local checks while PULSE is open. Nothing is sent automatically;
+        templates are saved disabled.
+      </p>
+      <details className="automation-operation">
+        <summary>Execution & safety</summary>
         <h2>Runs when PULSE is open</h2>
         <p>
           Local checks run on opening, when you return to the app, and
@@ -170,28 +212,7 @@ export function Automations() {
             ? "All rules are paused."
             : "Rules run only after you enable them. The latest 30 days of eligible missed checks may be considered; conditions before enabling, resuming or restoring never replay."}
         </p>
-      </section>
-      <section className="surface">
-        <h2>Start with a template</h2>
-        <p className="muted">
-          Templates open as disabled drafts. Review and enable each rule
-          yourself.
-        </p>
-        <div className="automation-templates">
-          {(["stage", "closing", "inactive", "overdue"] as const).map((k) => (
-            <button
-              key={k}
-              className="button secondary"
-              onClick={() => {
-                setError("");
-                setEdit(draft(k));
-              }}
-            >
-              {draft(k).name}
-            </button>
-          ))}
-        </div>
-      </section>
+      </details>
       <section className="surface">
         <h2>Your rules</h2>
         {!visible.length && (
@@ -201,13 +222,32 @@ export function Automations() {
           <article className="automation-rule" key={r.id}>
             <div>
               <h3>{r.name}</h3>
-              <p>
-                {triggers[r.trigger]} ·{" "}
-                {r.action === "task"
-                  ? "Create a follow-up"
-                  : "Record an in-app reminder"}{" "}
-                · {r.enabled ? "Enabled" : "Disabled draft"}
-              </p>
+              <span className="rule-state">
+                {r.enabled ? "Enabled" : "Disabled draft"}
+              </span>
+              <div className="rule-sequence">
+                <span>
+                  <small>WHEN</small>
+                  {triggers[r.trigger]}
+                  <br />
+                  {r.trigger === "stage"
+                    ? `${p.pipelines.find((x) => x.id === r.pipelineId)?.name || "Pipeline"} / ${p.pipelineStages.find((x) => x.id === r.stageId)?.name || "Stage"}`
+                    : r.trigger === "overdue"
+                      ? "Saved due time has passed"
+                      : `${r.days} elapsed days`}
+                </span>
+                <ArrowRight size={17} />
+                <span>
+                  <small>IF</small>
+                  {[r.priority, r.category].filter(Boolean).join(" · ") ||
+                    "Any matching record"}
+                </span>
+                <ArrowRight size={17} />
+                <span>
+                  <small>THEN</small>
+                  {r.action === "task" ? "Create follow-up" : "Record reminder"}
+                </span>
+              </div>
               <small>{r.description}</small>
             </div>
             <div className="form-actions">
