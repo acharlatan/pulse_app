@@ -3,9 +3,17 @@ import { CustomFields } from "./custom-fields";
 import { CalendarHandoff } from "./calendar";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Phone, Mail, Calendar, MessageCircle, StickyNote } from "lucide-react";
+import {
+  Phone,
+  Mail,
+  Calendar,
+  MessageCircle,
+  StickyNote,
+  Check,
+  RotateCcw,
+} from "lucide-react";
 import { usePulse } from "../app/context";
-import { Badge, Empty, SectionHeading, useFormat } from "./ui";
+import { Avatar, Badge, Empty, SectionHeading, useFormat } from "./ui";
 import type { Editor } from "./forms";
 import type { Interaction, Opportunity, Task, Contact } from "../data/models";
 import { completeTask, reopenTask } from "../data/repository";
@@ -13,9 +21,11 @@ import { taskState, restrictionReasons } from "../services/recommendations";
 export function TaskRow({
   task: t,
   onEdit,
+  compact = false,
 }: {
   task: Task;
   onEdit: (editor: Editor) => void;
+  compact?: boolean;
 }) {
   const p = usePulse(),
     { date } = useFormat();
@@ -29,6 +39,120 @@ export function TaskRow({
   const reward = p.rewards.find(
     (r) => r.sourceType === "task" && r.sourceId === t.id,
   );
+  if (compact)
+    return (
+      <article
+        className={`managed-task agenda-task ${t.completedAt ? "agenda-completed" : ""}`}
+        aria-labelledby={`agenda-title-${t.id}`}
+      >
+        <div className="agenda-task-main">
+          <button
+            className="agenda-complete"
+            disabled={busy}
+            onClick={async () => {
+              setBusy(true);
+              await p.run(
+                () =>
+                  t.completedAt
+                    ? reopenTask(p.db, t.id)
+                    : completeTask(p.db, t.id),
+                t.completedAt ? "Follow-up reopened" : "Follow-up completed",
+              );
+              setBusy(false);
+            }}
+          >
+            {t.completedAt ? <RotateCcw size={19} /> : <Check size={19} />}
+            <span>{t.completedAt ? "Reopen" : "Complete"}</span>
+          </button>
+          <div className="agenda-task-copy">
+            <h3 id={`agenda-title-${t.id}`}>
+              <button
+                className="agenda-task-title"
+                onClick={() => onEdit({ kind: "task", record: t })}
+              >
+                {t.title}
+              </button>
+            </h3>
+            {(c || org) && (
+              <Link
+                className="agenda-person"
+                to={`/network/${c ? "people" : "companies"}/${(c || org)!.id}`}
+              >
+                <Avatar
+                  name={(c || org)!.name}
+                  mediaId={(c || org)!.avatar}
+                  size="small"
+                />
+                <span>
+                  {(c || org)!.name}
+                  {c && org ? ` · ${org.name}` : ""}
+                </span>
+              </Link>
+            )}
+            <div className="agenda-task-meta">
+              <time dateTime={t.dueAt}>
+                {date(t.dueAt, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}
+              </time>
+              <Badge
+                tone={
+                  state === "Overdue" ? "red" : t.completedAt ? "green" : ""
+                }
+              >
+                {state}
+              </Badge>
+              <span>{t.priority} priority</span>
+            </div>
+            {restrictions.length > 0 && (
+              <p className="restriction-note">
+                Outreach restricted. Completing this task does not override
+                availability or permissions.
+              </p>
+            )}
+          </div>
+          <button
+            className="button ghost agenda-edit"
+            onClick={() => onEdit({ kind: "task", record: t })}
+          >
+            Edit task
+          </button>
+        </div>
+        <details className="agenda-task-details">
+          <summary>Details & tools</summary>
+          <div>
+            {t.description && <p>{t.description}</p>}
+            {t.source && (
+              <small className="muted">
+                Source:{" "}
+                {t.source.startsWith("automation:")
+                  ? "Local automation"
+                  : t.source}
+              </small>
+            )}
+            {p.settings.gamification &&
+              p.settings.progress.enabled &&
+              reward && (
+                <small className="muted">
+                  {reward.active ? "5 XP recorded" : "Original reward inactive"}
+                </small>
+              )}
+            <div className="record-actions">
+              <FocusButton type="task" id={t.id} />
+              <CalendarHandoff
+                id={t.id}
+                title={t.title}
+                description={t.description}
+                start={t.dueAt}
+              />
+            </div>
+          </div>
+        </details>
+      </article>
+    );
   return (
     <article className="managed-task">
       <div className="record-main">

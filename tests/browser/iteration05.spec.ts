@@ -182,6 +182,11 @@ test("selected context, cancel, grounded summary, scoped QA, editable draft, acc
   await page
     .locator(".managed-task")
     .filter({ hasText: "Prepare the revised proposal" })
+    .getByText("Details & tools", { exact: true })
+    .click();
+  await page
+    .locator(".managed-task")
+    .filter({ hasText: "Prepare the revised proposal" })
     .getByRole("button", { name: "Calendar export", exact: true })
     .click();
   await page

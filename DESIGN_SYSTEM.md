@@ -100,3 +100,7 @@ Desktop Pipeline uses an internally scrollable, keyboard-focusable board. Stage-
 ## PULSE Editorial compositions
 
 `src/editorial.css` follows the Studio layer. Daily Pulse, Network and profiles use open compositions, restrained separators, display-scale headings and smaller corner radii. One contextual commitment anchors Home; directory rows use recorded relationship context; the profile story owns the main column. The labeled desktop rail is 208px; the canvas grows to 1600px. Mobile preserves safe areas and existing navigation, stacks agenda beneath the primary commitment and opens full profiles instead of duplicating a context panel. Saved media and semantic user accents remain authoritative. See EDITORIAL_15.md for scope and verification boundaries.
+
+## Pipeline and Activity workspaces
+
+`src/workspaces.css` extends the editorial system with an ink commercial value strip, stage-volume controls and compact company-centered opportunity cards. Activity uses open chronological groups, immediately available completion/editing and progressive task tools; recent conversation excerpts supply a different secondary rhythm. Counts and currency values derive from records. Empty stages are optional; any stage remains explicitly selectable. Both compositions preserve semantic theme/accent tokens, initial avatars/saved local media, keyboard controls and the shared editor/repository paths. See WORKSPACES_16.md.
