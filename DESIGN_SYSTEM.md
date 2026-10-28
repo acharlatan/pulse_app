@@ -96,3 +96,7 @@ Show provider configuration and session status honestly. Review and confirmation
 `src/studio.css` extends the existing tokens with an ink-colored navigation rail, periwinkle selection, a cooler workspace canvas, illustrated editorial headers and portrait-style directory cards. `BrandArt` is static code-native decoration, never a representation of CRM associations or performance. Saved profile media remains authoritative; orbital fallback covers appear only without a rendered cover image. User-selected accents remain in content controls and headers.
 
 Desktop Pipeline uses an internally scrollable, keyboard-focusable board. Stage-overview buttons and Activity due-state controls expose the existing filters. Mobile retains stacked columns. Preserve native dialog behavior, keyboard outlines, reduced motion, readable badges and directory list mode when extending this layer.
+
+## PULSE Editorial compositions
+
+`src/editorial.css` follows the Studio layer. Daily Pulse, Network and profiles use open compositions, restrained separators, display-scale headings and smaller corner radii. One contextual commitment anchors Home; directory rows use recorded relationship context; the profile story owns the main column. The labeled desktop rail is 208px; the canvas grows to 1600px. Mobile preserves safe areas and existing navigation, stacks agenda beneath the primary commitment and opens full profiles instead of duplicating a context panel. Saved media and semantic user accents remain authoritative. See EDITORIAL_15.md for scope and verification boundaries.

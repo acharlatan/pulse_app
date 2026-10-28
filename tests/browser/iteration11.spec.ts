@@ -51,7 +51,7 @@ test("reviewed Google contact selection uses the existing import wizard", async 
   );
   await page.goto("/");
   await page.getByRole("button", { name: /Create My Workspace/i }).click();
-  await expect(page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Today\./ })).toBeVisible();
   await page.goto("/#/settings?section=integrations");
   await page
     .getByRole("button", { name: "Connect and preview contacts" })
@@ -153,7 +153,7 @@ test("Calendar creates only the reviewed event and recognizes its stable duplica
   });
   await page.goto("/");
   await page.getByRole("button", { name: /Create My Workspace/i }).click();
-  await expect(page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Today\./ })).toBeVisible();
   await page.goto("/#/network");
   await page
     .locator(".page-heading")
@@ -197,7 +197,7 @@ test("integration controls fit documented widths and themes", async ({
   test.setTimeout(120000);
   await page.goto("/");
   await page.getByRole("button", { name: /Create My Workspace/i }).click();
-  await expect(page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Today\./ })).toBeVisible();
   for (const width of [320, 375, 390, 430, 768, 1024, 1280, 1440])
     for (const theme of ["light", "dark"]) {
       await page.setViewportSize({ width, height: 900 });
@@ -236,7 +236,7 @@ test("unconfigured Google controls stay disabled while local handoffs remain ava
   test.skip(process.env.PULSE_TEST_GOOGLE_MOCK === "1", "Requires the unconfigured build.");
   await page.goto("/");
   await page.getByRole("button", { name: /Create My Workspace/i }).click();
-  await expect(page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Today\./ })).toBeVisible();
   await page.goto("/#/settings?section=integrations");
   await expect(
     page.getByRole("button", { name: "Connect and preview contacts" }),
@@ -292,7 +292,7 @@ test("closing Calendar review during authorization prevents event creation", asy
   });
   await page.goto("/");
   await page.getByRole("button", { name: /Create My Workspace/i }).click();
-  await expect(page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Today\./ })).toBeVisible();
   await page.goto("/#/network");
   await page
     .locator(".page-heading")

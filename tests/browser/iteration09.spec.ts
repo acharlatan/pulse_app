@@ -5,7 +5,7 @@ test.use({ actionTimeout: 20000 });
 async function demo(page: import("@playwright/test").Page) {
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
-  await page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ }).waitFor();
+  await page.getByRole("heading", { name: /^Today\./ }).waitFor();
   page.on("dialog", (d) => d.accept());
 }
 async function image(

@@ -1,4 +1,3 @@
-import { BrandArt } from "../components/BrandArt";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -8,13 +7,6 @@ import {
   Check,
   ArrowRight,
   AudioLines,
-  Users,
-  Building2,
-  BriefcaseBusiness,
-  CalendarClock,
-  Orbit,
-  ChartNoAxesCombined,
-  Workflow,
 } from "lucide-react";
 import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty, useFormat } from "../components/ui";
@@ -23,13 +15,14 @@ import { ProgressSummary } from "../components/progress";
 import { FocusSummary } from "../components/focus";
 import { EditorModal, type Editor } from "../components/forms";
 import { completeTask } from "../data/repository";
-import { taskState } from "../services/recommendations";
+import { taskState, restrictionReasons } from "../services/recommendations";
 import { calendarDay } from "../services/progress";
 export function Home() {
   const p = usePulse(),
     { date } = useFormat(),
-    navigate = useNavigate(),
-    [editor, setEditor] = useState<Editor | null>(null);
+    navigate = useNavigate();
+  const [editor, setEditor] = useState<Editor | null>(null);
+  const [busy, setBusy] = useState(false);
   const reminders =
     useLiveQuery(
       () =>
@@ -62,28 +55,41 @@ export function Home() {
   const tasks = p.tasks
     .filter((t) => !t.completedAt)
     .sort((a, b) => {
-      const rank = (id: string, dueAt: string) =>
-        Date.parse(dueAt) <= Date.now() ? 0 : focusedTasks.has(id) ? 1 : 2;
+      const rank = (id: string, due: string) =>
+        Date.parse(due) <= Date.now() ? 0 : focusedTasks.has(id) ? 1 : 2;
       return (
         rank(a.id, a.dueAt) - rank(b.id, b.dueAt) ||
         a.dueAt.localeCompare(b.dueAt)
       );
     });
+  const priority = tasks[0];
+  const person = p.contacts.find((c) => c.id === priority?.contactId);
+  const company = p.organizations.find(
+    (o) => o.id === (priority?.organizationId || person?.organizationId),
+  );
+  const conversation = person
+    ? p.interactions
+        .filter(
+          (i) =>
+            i.contactId === person.id &&
+            i.type !== "Note" &&
+            Date.parse(i.occurredAt) <= Date.now(),
+        )
+        .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))[0]
+    : undefined;
+  const restrictions = person
+    ? restrictionReasons(person, p.permissions, p.restrictions)
+    : [];
   const dueToday = tasks.filter((t) =>
     ["Overdue", "Due today"].includes(taskState(t, p.settings.timezone)),
   ).length;
-  const hour = Number(
-    new Intl.DateTimeFormat("en", {
-      hour: "numeric",
-      hourCycle: "h23",
-      timeZone: p.settings.timezone,
-    }).format(new Date()),
-  );
-  const greeting =
-    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
   const recs = p.intelligence.queue
-    .filter((r) => r.contactId)
-    .slice(0, p.settings.intelligence.homeLimit);
+    .filter(
+      (r) =>
+        r.contactId &&
+        !tasks.slice(0, 5).some((t) => t.contactId === r.contactId),
+    )
+    .slice(0, 3);
   const pins = p.focusItems
     .filter((f) => ["contact", "organization"].includes(f.entityType))
     .slice(0, 5);
@@ -94,10 +100,9 @@ export function Home() {
     p.tasks.length;
   return (
     <div
-      className={`page home-page experience-home home-${p.settings.focus.homeLayout}`}
+      className={`page home-page editorial-home home-${p.settings.focus.homeLayout}`}
     >
-      <header className="home-editorial studio-home-hero">
-        <BrandArt motif="orbit" />
+      <header className="editorial-masthead">
         <div>
           <p className="eyebrow">
             {date(new Date().toISOString(), {
@@ -105,68 +110,33 @@ export function Home() {
               month: "long",
               day: "numeric",
             })}{" "}
-            · YOUR DAILY PULSE
+            · DAILY PULSE
           </p>
           <h1>
-            {greeting}
-            {p.settings.name ? `, ${p.settings.name}` : ""}
-            <span className="accent">.</span>
+            Today<span className="accent">.</span>
           </h1>
-          <p>
+          <p className="editorial-deck">
             {dueToday
-              ? `${dueToday} ${dueToday === 1 ? "follow-up needs" : "follow-ups need"} your attention today.`
-              : tasks.length
-                ? `${tasks.length} open ${tasks.length === 1 ? "follow-up" : "follow-ups"} on your radar.`
-                : "Your next connection starts here."}
+              ? `${dueToday} follow-up${dueToday === 1 ? " needs" : "s need"} your attention.`
+              : "A little space to move a relationship forward."}
           </p>
         </div>
-        <div className="home-hero-side">
-          <div className="hero-brand-seal" aria-hidden="true">
-            <AudioLines size={46} />
-            <span>
-              PULSE<span className="seal-dot">.</span>
-            </span>
-            <small>EVERY RELATIONSHIP HAS A STORY</small>
-          </div>
-          <div className="home-identity">
-            <Avatar
-              name={
-                p.settings.identity.workspaceName ||
-                p.settings.name ||
-                "My workspace"
-              }
-              mediaId={p.settings.identity.avatarMediaId}
-              size="xl"
-            />
-            <span>
-              {p.settings.identity.workspaceName || "My workspace"}
-              <small>
-                {p.workspace === "demo"
-                  ? "Demo · a space to explore"
-                  : "Private · on this device"}
-              </small>
-            </span>
-          </div>
+        <div className="editorial-create">
+          <button
+            className="button secondary"
+            onClick={() => setEditor({ kind: "contact" })}
+          >
+            <Plus size={17} />
+            New connection
+          </button>
+          <button
+            className="button ghost"
+            onClick={() => setEditor({ kind: "task" })}
+          >
+            Plan a follow-up
+          </button>
         </div>
       </header>
-      <nav className="home-actions" aria-label="Quick actions">
-        <button
-          className="button primary"
-          onClick={() => setEditor({ kind: "contact" })}
-        >
-          <Plus size={18} />
-          New connection
-        </button>
-        <button
-          className="button secondary"
-          onClick={() => setEditor({ kind: "task" })}
-        >
-          Plan a follow-up
-        </button>
-        <Link className="button ghost" to="/orbit">
-          Explore Relationship Orbit <ArrowUpRight size={18} />
-        </Link>
-      </nav>
       <GettingStarted />
       {!active ? (
         <section className="surface home-empty">
@@ -205,98 +175,133 @@ export function Home() {
         </section>
       ) : (
         <>
-          {reminders.length > 0 && (
-            <section className="surface">
-              <h2>Recent local reminders</h2>
-              {reminders.map((r) => (
-                <p key={r.id}>
-                  {(r.sourceType === "contact"
-                    ? p.contacts.find((c) => c.id === r.sourceId)?.name
-                    : r.sourceType === "task"
-                      ? p.tasks.find((t) => t.id === r.sourceId)?.title
-                      : p.opportunities.find((o) => o.id === r.sourceId)
-                          ?.title) || "Record removed"}{" "}
-                  ·{" "}
-                  {new Date(r.at).toLocaleString(p.settings.locale, {
-                    timeZone: p.settings.timezone,
-                  })}
+          <div className="editorial-daily-grid">
+            <section
+              className="priority-feature"
+              aria-label="Your next commitment"
+            >
+              <div className="priority-kicker">
+                <span className="pulse-tick" aria-hidden="true" />
+                <p className="eyebrow">
+                  {priority ? "START HERE" : "ROOM FOR WHAT’S NEXT"}
                 </p>
-              ))}
-              <Link to="/automations">Open automation history</Link>
-            </section>
-          )}
-          <section
-            className="pulse-overview"
-            aria-label="Your workspace at a glance"
-          >
-            <div className="pulse-overview-intro">
-              <span className="pulse-overview-mark">
-                <AudioLines size={20} />
-              </span>
-              <div>
-                <p className="eyebrow">YOUR WORLD AT A GLANCE</p>
-                <h2>Your relationships, in motion.</h2>
-                <p>A clear view of the people and work you’re keeping close.</p>
+                {priority && (
+                  <Badge
+                    tone={
+                      taskState(priority, p.settings.timezone) === "Overdue"
+                        ? "red"
+                        : "purple"
+                    }
+                  >
+                    {taskState(priority, p.settings.timezone)}
+                  </Badge>
+                )}
               </div>
-            </div>
-            <div className="pulse-overview-stats">
-              <Link to="/network">
-                <span className="pulse-stat-icon">
-                  <Users size={19} />
-                </span>
-                <span>
-                  <strong>{p.contacts.length}</strong>
-                  <small>People</small>
-                </span>
-                <ArrowUpRight size={16} />
-              </Link>
-              <Link to="/network">
-                <span className="pulse-stat-icon">
-                  <Building2 size={19} />
-                </span>
-                <span>
-                  <strong>{p.organizations.length}</strong>
-                  <small>Companies</small>
-                </span>
-                <ArrowUpRight size={16} />
-              </Link>
-              <Link to="/pipeline">
-                <span className="pulse-stat-icon">
-                  <BriefcaseBusiness size={19} />
-                </span>
-                <span>
-                  <strong>
-                    {p.opportunities.filter((o) => o.status === "open").length}
-                  </strong>
-                  <small>Active opportunities</small>
-                </span>
-                <ArrowUpRight size={16} />
-              </Link>
-              <Link to="/activity">
-                <span className="pulse-stat-icon">
-                  <CalendarClock size={19} />
-                </span>
-                <span>
-                  <strong>{tasks.length}</strong>
-                  <small>Open follow-ups</small>
-                </span>
-                <ArrowUpRight size={16} />
-              </Link>
-            </div>
-          </section>
-          <div className="daily-work-grid">
-            <section className="surface today-panel">
+              {priority ? (
+                <>
+                  <h2>{priority.title}</h2>
+                  {(person || company) && (
+                    <Link
+                      className="priority-person"
+                      to={`/network/${person ? "people" : "companies"}/${person?.id || company?.id}`}
+                    >
+                      <Avatar
+                        name={(person || company)!.name}
+                        mediaId={(person || company)!.avatar}
+                        size="large"
+                      />
+                      <span>
+                        <strong>{(person || company)!.name}</strong>
+                        <small>
+                          {person?.role}
+                          {person?.role && company ? " · " : ""}
+                          {company?.name}
+                        </small>
+                      </span>
+                      <ArrowUpRight size={19} />
+                    </Link>
+                  )}
+                  {conversation ? (
+                    <div className="priority-evidence">
+                      <span className="eyebrow">
+                        LAST CONVERSATION · {date(conversation.occurredAt)}
+                      </span>
+                      <p>
+                        {conversation.summary.length > 240
+                          ? conversation.summary.slice(0, 240) + "…"
+                          : conversation.summary}
+                      </p>
+                    </div>
+                  ) : priority.description ? (
+                    <p className="priority-description">
+                      {priority.description}
+                    </p>
+                  ) : (
+                    <p className="muted">
+                      Due {date(priority.dueAt)}. Open this commitment to review
+                      its details.
+                    </p>
+                  )}
+                  {restrictions.length > 0 && (
+                    <p className="restriction-note">
+                      Outreach restricted. Review availability and permissions
+                      on the profile; completing a task does not grant
+                      permission.
+                    </p>
+                  )}
+                  <div className="priority-actions">
+                    <button
+                      className="button primary"
+                      onClick={() =>
+                        setEditor({ kind: "task", record: priority })
+                      }
+                    >
+                      Open commitment <ArrowRight size={17} />
+                    </button>
+                    <button
+                      className="button ghost"
+                      disabled={busy}
+                      onClick={async () => {
+                        setBusy(true);
+                        await p.run(
+                          () => completeTask(p.db, priority.id),
+                          "Follow-up completed",
+                        );
+                        setBusy(false);
+                      }}
+                    >
+                      <Check size={17} />
+                      Mark complete
+                    </button>
+                  </div>
+                  <span className="priority-footnote">
+                    Saved follow-up · Due {date(priority.dueAt)}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <h2>Make room for a good conversation.</h2>
+                  <p>
+                    Your follow-ups are clear. Choose someone from your network
+                    or plan a next step.
+                  </p>
+                  <Link className="button primary" to="/network">
+                    Find a connection <ArrowRight size={17} />
+                  </Link>
+                </>
+              )}
+            </section>
+            <section className="editorial-agenda">
               <div className="section-heading">
                 <div>
-                  <p className="eyebrow">A LITTLE INTENTION</p>
-                  <h2>Today’s priorities</h2>
+                  <p className="eyebrow">ON YOUR RADAR</p>
+                  <h2>Next in line</h2>
                 </div>
                 <Link className="text-link" to="/activity">
-                  View all <ArrowUpRight size={16} />
+                  All tasks <ArrowUpRight size={16} />
                 </Link>
               </div>
-              <p className="muted">Your next commitments, in order.</p>
-              {tasks.slice(0, 4).map((t) => (
+              {tasks.slice(1, 5).map((t) => (
                 <article className="daily-task" key={t.id}>
                   <button
                     className="task-check"
@@ -304,7 +309,7 @@ export function Home() {
                     onClick={() =>
                       void p.run(
                         () => completeTask(p.db, t.id),
-                        "One thoughtful step, complete.",
+                        "Follow-up completed",
                       )
                     }
                   >
@@ -322,99 +327,46 @@ export function Home() {
                         {p.contacts.find((c) => c.id === t.contactId)?.name}
                       </Link>
                     )}
-                    {t.organizationId && (
-                      <Link to={`/network/companies/${t.organizationId}`}>
-                        {
-                          p.organizations.find((o) => o.id === t.organizationId)
-                            ?.name
-                        }
-                      </Link>
-                    )}
-                    <small>
-                      {date(t.dueAt)} · {taskState(t, p.settings.timezone)}
+                    <small
+                      className={
+                        taskState(t, p.settings.timezone) === "Overdue"
+                          ? "agenda-overdue"
+                          : ""
+                      }
+                    >
+                      {taskState(t, p.settings.timezone)} · {date(t.dueAt)}
                       {focusedTasks.has(t.id) ? " · My Focus" : ""}
                     </small>
                   </div>
-                  <Badge
-                    tone={
-                      taskState(t, p.settings.timezone) === "Overdue"
-                        ? "red"
-                        : ""
-                    }
-                  >
-                    {taskState(t, p.settings.timezone)}
-                  </Badge>
                 </article>
               ))}
-              {!tasks.length && (
-                <Empty
-                  title="A little breathing room"
-                  body="No open follow-ups. Choose a relationship to move forward."
-                />
+              {tasks.length <= 1 && (
+                <p className="muted">
+                  No other open commitments. You have room to focus.
+                </p>
               )}
-            </section>
-            <section className="surface relationship-brief">
-              <div className="section-heading">
-                <div>
-                  <p className="eyebrow">PEOPLE BEFORE PAPERWORK</p>
-                  <h2>Today’s relationship focus</h2>
-                </div>
-                <Link className="text-link" to="/review">
-                  Review <ArrowUpRight size={16} />
-                </Link>
-              </div>
-              {recs.map((r) => {
-                const c = p.contacts.find((c) => c.id === r.contactId);
-                if (!c) return null;
-                return (
-                  <article className="connection-brief" key={r.key}>
-                    <Link
-                      className="person-summary"
-                      to={`/network/people/${c.id}`}
-                    >
-                      <Avatar name={c.name} mediaId={c.avatar} />
-                      <div>
-                        <strong>{c.name}</strong>
-                        <span>
-                          {p.organizations.find(
-                            (o) => o.id === c.organizationId,
-                          )?.name || "Independent"}
-                        </span>
-                      </div>
-                    </Link>
-                    <p>{r.reason}</p>
-                    <button
-                      className="button secondary small-button"
-                      onClick={() =>
-                        setEditor({ kind: "interaction", contact: c })
-                      }
-                    >
-                      Log a touchpoint <ArrowUpRight size={14} />
-                    </button>
-                  </article>
-                );
-              })}
-              {!recs.length && (
-                <p className="muted">No relationship reviews due right now.</p>
-              )}
-              <Link className="surface-footer" to="/review">
-                Open Relationship Review <ArrowRight size={16} />
-              </Link>
+              <button
+                className="agenda-add"
+                onClick={() => setEditor({ kind: "task" })}
+              >
+                <Plus size={16} />
+                Plan a follow-up
+              </button>
             </section>
           </div>
-          <section className="relationship-shelf">
+          <section className="editorial-people">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">CLOSE TO YOUR WORK</p>
+                <p className="eyebrow">KEEP CLOSE</p>
                 <h2>
-                  {pins.length ? "Your pinned relationships" : "Familiar faces"}
+                  {pins.length ? "Your pinned relationships" : "Your people"}
                 </h2>
               </div>
               <Link className="text-link" to="/network">
-                Explore your network <ArrowUpRight size={16} />
+                Open network <ArrowUpRight size={16} />
               </Link>
             </div>
-            <div className="relationship-shelf-items">
+            <div className="editorial-people-strip">
               {pins.length
                 ? pins.map((f) => {
                     const c =
@@ -427,139 +379,115 @@ export function Home() {
                         to={`/network/${f.entityType === "contact" ? "people" : "companies"}/${c.id}`}
                       >
                         <Avatar name={c.name} mediaId={c.avatar} size="large" />
-                        <strong>{c.name}</strong>
-                        <small>Pinned by you</small>
+                        <span>
+                          <strong>{c.name}</strong>
+                          <small>Pinned by you</small>
+                        </span>
                       </Link>
                     ) : null;
                   })
-                : p.contacts.slice(0, 5).map((c) => (
+                : p.contacts.slice(0, 4).map((c) => (
                     <Link key={c.id} to={`/network/people/${c.id}`}>
                       <Avatar name={c.name} mediaId={c.avatar} size="large" />
-                      <strong>{c.name}</strong>
-                      <small>{c.role || "Person"}</small>
+                      <span>
+                        <strong>{c.name}</strong>
+                        <small>{c.role || "Person"}</small>
+                      </span>
                     </Link>
                   ))}
             </div>
           </section>
-          <section className="surface home-opportunities">
-            <div className="section-heading">
-              <div>
-                <p className="eyebrow">MOVING FORWARD</p>
-                <h2>Opportunity snapshot</h2>
+          <div className="editorial-bottom-grid">
+            <section className="editorial-reviews">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">RELATIONSHIP NOTES</p>
+                  <h2>Worth a closer look</h2>
+                </div>
+                <Link className="text-link" to="/review">
+                  Review <ArrowUpRight size={16} />
+                </Link>
               </div>
-              <Link to="/pipeline" className="text-link">
-                View pipeline <ArrowUpRight size={16} />
-              </Link>
-            </div>
-            {p.opportunities
-              .filter((o) => o.status === "open")
-              .slice(0, 4)
-              .map((o) => (
-                <button
-                  className="opportunity-review-link"
-                  key={o.id}
-                  onClick={() => setEditor({ kind: "opportunity", record: o })}
-                >
-                  <strong>{o.title}</strong>
-                  <span>
-                    {p.pipelineStages.find((s) => s.id === o.stageId)?.name ||
-                      "Open"}{" "}
-                    · Open
-                    {o.expectedCloseAt
-                      ? ` · Expected ${date(o.expectedCloseAt)}`
-                      : ""}
-                  </span>
-                </button>
+              {recs.map((r) => {
+                const c = p.contacts.find((c) => c.id === r.contactId);
+                return c ? (
+                  <Link
+                    className="editorial-review"
+                    key={r.key}
+                    to={`/network/people/${c.id}`}
+                  >
+                    <Avatar name={c.name} mediaId={c.avatar} />
+                    <span>
+                      <strong>{c.name}</strong>
+                      <small>{r.reason}</small>
+                    </span>
+                    <ArrowUpRight size={16} />
+                  </Link>
+                ) : null;
+              })}
+              {!recs.length && (
+                <p className="muted">
+                  No other relationship reviews due right now.
+                </p>
+              )}
+            </section>
+            <section className="editorial-opportunities">
+              <div className="section-heading">
+                <div>
+                  <p className="eyebrow">MOVING FORWARD</p>
+                  <h2>Open opportunities</h2>
+                </div>
+                <Link className="text-link" to="/pipeline">
+                  Pipeline <ArrowUpRight size={16} />
+                </Link>
+              </div>
+              {p.opportunities
+                .filter((o) => o.status === "open")
+                .slice(0, 3)
+                .map((o) => (
+                  <button
+                    className="opportunity-review-link"
+                    key={o.id}
+                    onClick={() =>
+                      setEditor({ kind: "opportunity", record: o })
+                    }
+                  >
+                    <strong>{o.title}</strong>
+                    <span>
+                      {p.pipelineStages.find((s) => s.id === o.stageId)?.name ||
+                        "Open"}
+                      {o.expectedCloseAt
+                        ? ` · Expected ${date(o.expectedCloseAt)}`
+                        : ""}
+                    </span>
+                  </button>
+                ))}
+              {!p.opportunities.some((o) => o.status === "open") && (
+                <p className="muted">No active opportunities yet.</p>
+              )}
+            </section>
+          </div>
+          {reminders.length > 0 && (
+            <details className="editorial-reminders">
+              <summary>Recent local reminders</summary>
+              {reminders.map((r) => (
+                <p key={r.id}>
+                  {(r.sourceType === "contact"
+                    ? p.contacts.find((c) => c.id === r.sourceId)?.name
+                    : r.sourceType === "task"
+                      ? p.tasks.find((t) => t.id === r.sourceId)?.title
+                      : p.opportunities.find((o) => o.id === r.sourceId)
+                          ?.title) || "Record removed"}{" "}
+                  · {date(r.at)}
+                </p>
               ))}
-            {!p.opportunities.some((o) => o.status === "open") && (
-              <p className="muted">No active opportunities yet.</p>
-            )}
-          </section>
-          {p.settings.focus.shortcuts && <FocusSummary />}
+              <Link to="/automations">Open automation history</Link>
+            </details>
+          )}
+          {p.settings.focus.shortcuts &&
+            p.focusItems.some((f) => f.today === today) && <FocusSummary />}
           <ProgressSummary />
         </>
-      )}
-      {p.settings.focus.shortcuts && (
-        <section
-          className="workspace-collection"
-          aria-label="Explore your workspace"
-        >
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">MORE FROM YOUR WORKSPACE</p>
-              <h2>See the bigger picture.</h2>
-            </div>
-          </div>
-          <div className="workspace-collection-grid">
-            <Link to="/orbit" className="workspace-feature feature-orbit">
-              <div className="feature-art" aria-hidden="true">
-                <span className="orbit-line" />
-                <span className="orbit-line orbit-line-inner" />
-                <Orbit size={40} />
-                <i />
-                <i />
-                <i />
-              </div>
-              <span className="feature-caption">DISCOVER CONNECTIONS</span>
-              <h3>Relationship Orbit</h3>
-              <p>
-                Explore the people, companies and opportunities connected
-                through your saved records.
-              </p>
-              <span className="feature-open">
-                Explore your orbit <ArrowUpRight size={17} />
-              </span>
-            </Link>
-            <Link
-              to="/analytics"
-              className="workspace-feature feature-analytics"
-            >
-              <div className="feature-art" aria-hidden="true">
-                <span className="art-bars">
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                  <i />
-                </span>
-                <ChartNoAxesCombined size={32} />
-              </div>
-              <span className="feature-caption">UNDERSTAND YOUR WORK</span>
-              <h3>A clearer perspective</h3>
-              <p>
-                Review pipeline movement, conversations and follow-through in
-                Analytics.
-              </p>
-              <span className="feature-open">
-                Open Analytics <ArrowUpRight size={17} />
-              </span>
-            </Link>
-            <Link
-              to="/automations"
-              className="workspace-feature feature-automation"
-            >
-              <div className="feature-art" aria-hidden="true">
-                <span className="art-flow">
-                  <i />
-                  <i />
-                  <i />
-                </span>
-                <Workflow size={36} />
-              </div>
-              <span className="feature-caption">
-                MAKE ROOM FOR WHAT MATTERS
-              </span>
-              <h3>Your quiet support system</h3>
-              <p>
-                Build local reminders and follow-up rules, with every action
-                under your control.
-              </p>
-              <span className="feature-open">
-                Explore Automations <ArrowUpRight size={17} />
-              </span>
-            </Link>
-          </div>
-        </section>
       )}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />

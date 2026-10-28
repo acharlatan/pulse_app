@@ -5,7 +5,7 @@ async function demo(page: Page) {
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await expect(
-    page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ }),
+    page.getByRole("heading", { name: /^Today\./ }),
   ).toBeVisible();
   page.on("dialog", (d) => d.accept());
 }

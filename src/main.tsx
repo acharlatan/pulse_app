@@ -5,6 +5,7 @@ import "./styles.css";
 import "./experience.css";
 import "./intelligence.css";
 import "./studio.css";
+import "./editorial.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

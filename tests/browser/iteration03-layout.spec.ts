@@ -15,7 +15,7 @@ test("CSV mapping, duplicate comparison and confirm screens fit mobile/desktop i
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await expect(
-    page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/, exact: true }),
+    page.getByRole("heading", { name: /^Today\./, exact: true }),
   ).toBeVisible();
   for (const theme of ["light", "dark"]) {
     await page.goto("/#/settings");

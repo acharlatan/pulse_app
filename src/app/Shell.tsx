@@ -182,18 +182,6 @@ export function Shell({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <div className="sidebar-note">
-            <span className="little-spark">✳</span>
-            <h3>
-              Small moments.
-              <br />
-              Stronger connections.
-            </h3>
-            <p>A thoughtful follow-up can make someone's day.</p>
-            <Link to="/network">
-              Find your next connection <ArrowUpRight size={16} />
-            </Link>
-          </div>
           <NavLink
             to="/settings"
             className={({ isActive }) =>

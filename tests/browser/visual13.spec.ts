@@ -6,7 +6,7 @@ test("visual workspace additions fit both themes and navigate to working feature
   test.setTimeout(120000);
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
-  await expect(page.getByRole("heading", { name: /^Good / })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Today\./ })).toBeVisible();
   for (const theme of ["light", "dark"]) {
     await page.evaluate((t) => {
       document.documentElement.dataset.theme = t;
@@ -28,7 +28,10 @@ test("visual workspace additions fit both themes and navigate to working feature
     expect(results.violations).toEqual([]);
   }
   await page
-    .getByRole("link", { name: /Discover connections.*Relationship Orbit/i })
+    .getByRole("link", { name: "Open network", exact: true })
     .click();
+  await expect(page).toHaveURL(/network/);
+  await page.getByText("Directory tools", {exact:true}).click();
+  await page.locator(".network-tools").getByRole("link", {name:"Relationship Orbit", exact:true}).click();
   await expect(page).toHaveURL(/orbit/);
 });
