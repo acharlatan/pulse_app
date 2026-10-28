@@ -5,7 +5,7 @@ import {
 } from "../services/analytics-guidance";
 import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { usePulse } from "../app/context";
 import {
   calculateAnalytics,
@@ -25,6 +25,18 @@ const sections = [
   "Data quality",
 ] as const;
 export function Analytics() {
+  const navigationState = useLocation().state as {
+    profileReturn?: unknown;
+    networkReturn?: unknown;
+    reviewReturn?: unknown;
+  } | null;
+  const profileReturn =
+    typeof navigationState?.profileReturn === "string" &&
+    /^\/network\/(people|companies)\/[^/?#]+$/.test(
+      navigationState.profileReturn,
+    )
+      ? navigationState.profileReturn
+      : null;
   const p = usePulse(),
     [params] = useSearchParams(),
     transitions = useLiveQuery(() => p.db.transitions.toArray(), [p.db]) || [];
@@ -154,6 +166,18 @@ export function Analytics() {
   }
   return (
     <div className="page analytics-page">
+      {profileReturn && (
+        <Link
+          className="text-link connected-return"
+          to={profileReturn}
+          state={{
+            networkReturn: navigationState?.networkReturn,
+            reviewReturn: navigationState?.reviewReturn,
+          }}
+        >
+          ← Return to profile
+        </Link>
+      )}
       <div className="page-heading editorial-masthead insight-masthead">
         <div>
           <p className="eyebrow">YOUR WORK, IN CONTEXT</p>

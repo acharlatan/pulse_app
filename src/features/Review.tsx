@@ -1,6 +1,6 @@
 import { FocusButton } from "../components/focus";
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty, useFormat } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
@@ -13,13 +13,38 @@ import {
 import type { Recommendation } from "../services/recommendations";
 export function Review() {
   const p = usePulse(),
-    { date } = useFormat();
-  const [view, setView] = useState("For You"),
-    [sort, setSort] = useState("urgency"),
+    { date } = useFormat(),
+    [params, setParams] = useSearchParams();
+  const requestedView = params.get("view") || "For You";
+  const requestedSort = params.get("sort") || "urgency";
+  const [view, setView] = useState(
+      [
+        "For You",
+        "Overdue",
+        "Reconnect",
+        "Opportunities",
+        "Paused",
+        "Snoozed",
+      ].includes(requestedView)
+        ? requestedView
+        : "For You",
+    ),
+    [sort, setSort] = useState(
+      ["urgency", "priority", "oldest", "changed"].includes(requestedSort)
+        ? requestedSort
+        : "urgency",
+    ),
     [editor, setEditor] = useState<Editor | null>(null),
     [snooze, setSnooze] = useState<Recommendation | null>(null),
     [days, setDays] = useState(String(p.settings.intelligence.snoozeDays)),
     [limit, setLimit] = useState(20);
+  useEffect(() => {
+    const next = new URLSearchParams();
+    if (view !== "For You") next.set("view", view);
+    if (sort !== "urgency") next.set("sort", sort);
+    if (next.toString() !== params.toString())
+      setParams(next, { replace: true });
+  }, [view, sort, params, setParams]);
   const rows = p.intelligence.all.filter((r) =>
     view === "Paused"
       ? r.blocked
@@ -169,6 +194,11 @@ export function Review() {
                     <Link
                       className="button secondary"
                       to={`/network/people/${c.id}`}
+                      state={{
+                        reviewReturn:
+                          "/review" +
+                          (params.size ? "?" + params.toString() : ""),
+                      }}
                     >
                       Open profile
                     </Link>

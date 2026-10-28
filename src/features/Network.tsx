@@ -654,6 +654,9 @@ export function Network() {
           <NetworkContext
             contact={people.find((c) => c.id === selectedId) || people[0]}
             onEdit={setEditor}
+            networkReturn={
+              "/network" + (params.size ? "?" + params.toString() : "")
+            }
           />
         )}
       </div>
