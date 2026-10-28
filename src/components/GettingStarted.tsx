@@ -19,6 +19,11 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
       kind: "company" as const,
     },
     {
+      label: "Create your first opportunity",
+      done: p.opportunities.length > 0,
+      kind: "opportunity" as const,
+    },
+    {
       label: "Record a conversation or note",
       done: p.interactions.length > 0,
       to: "/network",
@@ -47,27 +52,80 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
         cross-device sync. Export important work and keep the file somewhere you
         trust.
       </p>
-      <ul>
-        {steps.map((step) => (
-          <li key={step.label}>
-            <span aria-label={step.done ? "Completed" : "Not yet completed"}>
-              {step.done ? "✓" : "○"}
-            </span>{" "}
-            {step.kind ? (
+      <p className="getting-started-progress">
+        {steps.filter((step) => step.done).length} of {steps.length} foundations
+        in place · optional, at your pace
+      </p>
+      {!always && steps.find((step) => !step.done) && (
+        <div className="getting-started-next">
+          <span className="eyebrow">YOUR NEXT FOUNDATION</span>
+          {(() => {
+            const step = steps.find((step) => !step.done)!;
+            return step.kind ? (
               <button
-                className="text-link"
+                className="button primary"
                 onClick={() => setEditor({ kind: step.kind })}
               >
                 {step.label}
               </button>
             ) : (
-              <Link className="text-link" to={step.to!}>
+              <Link className="button primary" to={step.to!}>
                 {step.label}
               </Link>
-            )}
-          </li>
-        ))}
-      </ul>
+            );
+          })()}
+        </div>
+      )}
+      {always ? (
+        <ul>
+          {steps.map((step) => (
+            <li key={step.label}>
+              <span aria-label={step.done ? "Completed" : "Not yet completed"}>
+                {step.done ? "✓" : "○"}
+              </span>{" "}
+              {step.kind ? (
+                <button
+                  className="text-link"
+                  onClick={() => setEditor({ kind: step.kind })}
+                >
+                  {step.label}
+                </button>
+              ) : (
+                <Link className="text-link" to={step.to!}>
+                  {step.label}
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <details className="getting-started-steps">
+          <summary>Explore all setup steps</summary>{" "}
+          <ul>
+            {steps.map((step) => (
+              <li key={step.label}>
+                <span
+                  aria-label={step.done ? "Completed" : "Not yet completed"}
+                >
+                  {step.done ? "✓" : "○"}
+                </span>{" "}
+                {step.kind ? (
+                  <button
+                    className="text-link"
+                    onClick={() => setEditor({ kind: step.kind })}
+                  >
+                    {step.label}
+                  </button>
+                ) : (
+                  <Link className="text-link" to={step.to!}>
+                    {step.label}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
       <p className="field-help">
         Steps reflect current saved records. A requested download does not prove
         the file was retained. These steps earn no XP.

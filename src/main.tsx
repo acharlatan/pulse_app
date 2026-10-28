@@ -8,6 +8,7 @@ import "./studio.css";
 import "./editorial.css";
 import "./workspaces.css";
 import "./insights.css";
+import "./daily.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
