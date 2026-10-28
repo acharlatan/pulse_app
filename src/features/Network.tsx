@@ -138,6 +138,49 @@ export function Network() {
           Add {tab === "people" ? "person" : "company"}
         </button>
       </header>
+      <section className="network-orientation" aria-label="Network overview">
+        <div>
+          <p className="eyebrow">YOUR RELATIONSHIP LANDSCAPE</p>
+          <h2>Every connection has a next chapter.</h2>
+          <p>
+            Find a person or company, revisit the context, and choose a
+            thoughtful next step.
+          </p>
+        </div>
+        <div className="network-orientation-facts">
+          <div>
+            <strong>{contacts.length}</strong>
+            <span>saved people</span>
+          </div>
+          <div>
+            <strong>{organizations.length}</strong>
+            <span>saved companies</span>
+          </div>
+          <div>
+            <strong>
+              {
+                p.focusItems.filter(
+                  (f) =>
+                    f.entityType === "contact" ||
+                    f.entityType === "organization",
+                ).length
+              }
+            </strong>
+            <span>pinned connections</span>
+          </div>
+        </div>
+        <div className="network-orientation-links">
+          <Link to="/review">
+            Review relationships <ArrowUpRight size={16} />
+          </Link>
+          <Link to="/orbit">
+            Explore Orbit <ArrowUpRight size={16} />
+          </Link>
+          <Link to="/analytics">
+            Understand your network <ArrowUpRight size={16} />
+          </Link>
+        </div>
+      </section>
       <div className="directory-toolbar">
         <div
           className="tabs"
