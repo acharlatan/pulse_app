@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { GettingStarted } from "../components/GettingStarted";
 const topics = [
+  [
+    "When information is missing",
+    "A person with no logged conversations has unknown history, not a bad relationship. Open their profile to record a real conversation or import a sourced last-contact date. Analytics counts logged conversations and explains gaps; notes and future events do not count as past conversations.",
+  ],
   [
     "People, companies and conversations",
     "Companies connect representatives. Open a profile to record a conversation, note or follow-up. Stages describe relationship progress; priority helps you sort. Moving a person preserves the historical company on earlier conversations.",
@@ -47,6 +52,10 @@ const topics = [
   ],
 ];
 export function Help() {
+  const [what, setWhat] = useState("");
+  const [expected, setExpected] = useState("");
+  const [copyStatus, setCopyStatus] = useState("");
+  const feedback = `What happened: ${what}\nWhat I expected: ${expected}`;
   return (
     <div className="page">
       <p className="eyebrow">PULSE · 1.5.0-rc.1</p>
@@ -56,6 +65,26 @@ export function Help() {
         workspace.
       </p>
       <GettingStarted always />
+      <section className="surface pulse-map">
+        <p className="eyebrow">A QUICK MAP</p>
+        <h2>Find your next step.</h2>
+        <p>
+          Home plans today; Network keeps the people and context; Review
+          explains what needs a look. Choose priorities in Focus, explore
+          patterns in Analytics, and see saved connections in Orbit.
+        </p>
+        <div className="form-actions">
+          <Link className="button secondary" to="/">
+            Daily Pulse
+          </Link>
+          <Link className="button secondary" to="/network">
+            Network
+          </Link>
+          <Link className="button secondary" to="/analytics">
+            Analytics
+          </Link>
+        </div>
+      </section>
       <section className="surface help-content">
         <h2>Work at your own rhythm</h2>
         {topics.map(([title, body]) => (
@@ -67,6 +96,54 @@ export function Help() {
         <Link className="button secondary" to="/settings?section=data">
           Open Privacy & data
         </Link>
+      </section>
+      <section className="surface beta-feedback">
+        <p className="eyebrow">HELP SHAPE PULSE</p>
+        <h2>Share feedback in your own words.</h2>
+        <p>
+          Describe a problem or idea. Nothing is sent automatically; copy the
+          text and share it with the person running your beta. Avoid including
+          private contact details.
+        </p>
+        <label className="field">
+          <span>What happened or felt confusing?</span>
+          <textarea
+            value={what}
+            onChange={(e) => setWhat(e.target.value)}
+            rows={3}
+          />
+        </label>
+        <label className="field">
+          <span>What did you expect instead?</span>
+          <textarea
+            value={expected}
+            onChange={(e) => setExpected(e.target.value)}
+            rows={3}
+          />
+        </label>
+        <button
+          className="button secondary"
+          disabled={!what.trim() && !expected.trim()}
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(feedback);
+              setCopyStatus(
+                "Copied. Share it where you normally send beta feedback.",
+              );
+            } catch {
+              setCopyStatus(
+                "Copy unavailable. Select and copy the text below.",
+              );
+            }
+          }}
+        >
+          Copy feedback
+        </button>
+        <p role="status">{copyStatus}</p>
+        <label className="field">
+          <span>Feedback text for manual copying</span>
+          <textarea readOnly value={feedback} rows={3} />
+        </label>
       </section>
       <p className="muted">
         Release candidate: automated Chromium checks are not physical-device or

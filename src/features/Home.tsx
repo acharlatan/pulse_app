@@ -82,6 +82,33 @@ export function Home() {
         </div>
       </header>
 
+      {p.workspace === "personal" &&
+        p.contacts.length +
+          p.organizations.length +
+          p.tasks.length +
+          p.opportunities.length >
+          0 &&
+        (() => {
+          const last = p.settings.onboarding.exportInitiatedAt;
+          const stale = !last || Date.now() - Date.parse(last) >= 30 * 86400000;
+          return stale ? (
+            <aside className="backup-nudge" aria-label="Backup reminder">
+              <div>
+                <strong>Keep a copy of your work.</strong>
+                <p>
+                  {last
+                    ? `Last backup download requested ${date(last)}.`
+                    : "No backup download has been requested yet."}{" "}
+                  Records live in this browser. Check your downloaded file and
+                  keep it somewhere safe.
+                </p>
+              </div>
+              <Link className="button secondary" to="/settings?section=data">
+                Review backups
+              </Link>
+            </aside>
+          ) : null;
+        })()}
       <GettingStarted />
       {active ? (
         <>

@@ -26,7 +26,7 @@ import {
   Upload,
 } from "lucide-react";
 import { usePulse } from "../app/context";
-import { Badge, Confirm, SectionHeading } from "../components/ui";
+import { Badge, Confirm, SectionHeading, useFormat } from "../components/ui";
 import {
   exportBackup,
   restoreBackup,
@@ -44,6 +44,7 @@ function download(content: string, name: string, type = "application/json") {
 }
 export function Settings() {
   const p = usePulse();
+  const { date } = useFormat();
   const [params, setParams] = useSearchParams();
   const requested = params.get("section");
   const section = [
@@ -545,6 +546,12 @@ export function Settings() {
                   <strong>Export a workspace backup</strong>
                   <small>
                     JSON · All CRM records and preferences for this workspace.
+                  </small>
+                  <small>
+                    {p.settings.onboarding.exportInitiatedAt
+                      ? `Last download requested ${date(p.settings.onboarding.exportInitiatedAt)}.`
+                      : "No backup download requested yet."}{" "}
+                    Check that the downloaded file is retained safely.
                   </small>
                 </div>
                 <button

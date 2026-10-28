@@ -209,3 +209,106 @@
     padding: 18px;
   }
 }
+.workspace-switcher {
+  position: relative;
+}
+.workspace-switcher summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+}
+.workspace-switcher summary::-webkit-details-marker {
+  display: none;
+}
+.workspace-switcher-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: min(300px, calc(100vw - 30px));
+  padding: 18px;
+  z-index: 100;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 14px 36px #0003;
+}
+.workspace-switcher-menu p,
+.workspace-switcher-menu small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  display: block;
+}
+.workspace-switcher-menu .button {
+  margin: 8px 0;
+}
+.backup-nudge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 0 24px;
+  padding: 20px 24px;
+  border-left: 4px solid var(--primary);
+  background: var(--primary-soft);
+}
+.backup-nudge p {
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 7px 0 0;
+  font-size: 13px;
+}
+.pulse-map,
+.beta-feedback {
+  margin: 24px 0;
+}
+.beta-feedback .field {
+  margin: 15px 0;
+}
+@media (max-width: 767px) {
+  .backup-nudge {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .workspace-switcher summary {
+    padding: 0 7px;
+    font-size: 12px;
+  }
+}
+@media (max-width: 767px) {
+  .topbar-actions .local-indicator {
+    display: none;
+  }
+}
+@media (max-width: 767px) {
+  .workspace-switcher-menu {
+    position: fixed;
+    top: calc(70px + env(safe-area-inset-top, 0px));
+    right: 15px;
+  }
+}
+@media (max-width: 350px) {
+  .mobile-brand svg {
+    display: none;
+  }
+  .mobile-brand {
+    font-size: 19px;
+    letter-spacing: 0;
+  }
+}
+@media (max-width: 350px) {
+  .topbar {
+    padding-inline: 10px;
+  }
+}
