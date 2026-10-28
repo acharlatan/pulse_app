@@ -42,10 +42,14 @@ test("working board preserves currency, stage and agenda edit/complete/reopen jo
   await expect(page.locator(".pipeline-money")).toContainText("EUR");
   await expect(page.locator(".pipeline-money")).toContainText("USD");
   await card.getByLabel("Move to stage / reopen").selectOption("Won");
-  await expect(card).toContainText("Won · won");
+  await expect(card.locator(".board-card-kicker .badge")).toHaveText(
+    "Won · won",
+  );
   await expect(page.locator(".pipeline-money")).not.toContainText("EUR");
   await card.getByLabel("Move to stage / reopen").selectOption("Proposal");
-  await expect(card).toContainText("Proposal · open");
+  await expect(card.locator(".board-card-kicker .badge")).toHaveText(
+    "Proposal · open",
+  );
   await page.reload();
   await expect(card).toBeVisible();
   await expect(page.locator(".pipeline-money")).toContainText("EUR");
@@ -64,6 +68,17 @@ test("working board preserves currency, stage and agenda edit/complete/reopen jo
     .getByRole("combobox", { name: "Filter tasks" })
     .selectOption("upcoming");
   await page.reload();
+  await expect(
+    page.getByRole("combobox", { name: "Filter tasks" }),
+  ).toHaveValue("upcoming");
+  await page
+    .getByRole("navigation", { name: "Follow-up overview" })
+    .getByRole("button", { name: /Overdue/ })
+    .click();
+  await expect(
+    page.getByRole("combobox", { name: "Filter tasks" }),
+  ).toHaveValue("overdue");
+  await page.goBack();
   await expect(
     page.getByRole("combobox", { name: "Filter tasks" }),
   ).toHaveValue("upcoming");

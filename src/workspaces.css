@@ -1065,3 +1065,12 @@
 .stage-empty p {
   font-size: 15px;
 }
+/* Stage labels stay readable; the full stage selector remains available above. */
+.pipeline-page .pipeline-stage-map {
+  display: grid;
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(148px, 1fr);
+  overflow-x: auto;
+  padding-bottom: 8px;
+}

@@ -91,7 +91,6 @@ export function Activity() {
             key={value}
             aria-pressed={tab === "tasks" && filter === value}
             onClick={() => {
-              setTab("tasks");
               setFilter(value);
               setLimit(40);
             }}
