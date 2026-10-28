@@ -159,7 +159,7 @@ test("Orbit uses saved connections, supports focused views, keyboard/list access
   await page.goto("/#/orbit?company=org-0");
   await page.getByRole("heading", { name: "Relationship Orbit." }).waitFor();
   await page.getByRole("button", { name: "List", exact: true }).click();
-  await page.getByRole("button", { name: /Forma Studio.*company/ }).click();
+  await page.locator(".orbit-list-item").filter({hasText: "Forma Studio"}).click();
   const detail = page.getByRole("complementary", {
     name: "Selected relationship",
   });
@@ -171,7 +171,7 @@ test("Orbit uses saved connections, supports focused views, keyboard/list access
   await page.getByRole("link", { name: "View in Relationship Orbit" }).click();
   await page.getByRole("button", { name: "Reset view" }).click();
   await page.getByRole("textbox", { name: "Search Orbit" }).fill("Olivia");
-  await page.getByRole("button", { name: /Olivia Chen/ }).click();
+  await page.locator(".orbit-list-item").filter({hasText: "Olivia Chen"}).click();
   await expect(detail).toContainText("Creative Director");
   await page.getByRole("button", { name: "Map", exact: true }).click();
   await page.getByRole("button", { name: "Zoom in", exact: true }).click();

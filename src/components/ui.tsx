@@ -1,36 +1,133 @@
 import { LocalMedia } from "./local-media";
 import { useEffect, useRef, useId, type ReactNode } from "react";
 import { confirmDialogClose } from "../app/update-safety";
-import { X, ArrowUpRight, Users } from "lucide-react";
+import {
+  X,
+  ArrowUpRight,
+  Users,
+  Hexagon,
+  Star,
+  Leaf,
+  Flower2,
+  Orbit,
+  Sun,
+  HeartPulse,
+  Mountain,
+  ShoppingBag,
+  Blocks,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
 import demoPortraits from "../demo-portraits.webp";
-const demoNames = ["Olivia Chen", "Marcus Johnson", "Sofia Rivera", "James Park", "Amara Okafor", "Ethan Brooks", "Isabella Rossi", "Noah Williams", "Mia Patel", "Lucas Reed", "Chloe Bennett", "Daniel Kim", "Zoe Mitchell", "Leo Santos", "Ava Thompson", "Elijah Wright"];
+import demoMichelle from "../demo-michelle.webp";
+const demoNames = [
+  "Olivia Chen",
+  "Marcus Johnson",
+  "Sofia Rivera",
+  "James Park",
+  "Amara Okafor",
+  "Ethan Brooks",
+  "Isabella Rossi",
+  "Noah Williams",
+  "Mia Patel",
+  "Lucas Reed",
+  "Chloe Bennett",
+  "Daniel Kim",
+  "Zoe Mitchell",
+  "Leo Santos",
+  "Ava Thompson",
+  "Elijah Wright",
+];
 const portraitSlots = [0, 10, 3, 8, 5, 9, 6, 15, 7, 11, 1, 14, 2, 12, 4, 13];
+const demoCompanies = [
+  "Forma Studio",
+  "Northstar Labs",
+  "Evergreen Collective",
+  "Bloom & Co.",
+  "Orbit Works",
+  "Goodkind",
+  "Sonder Health",
+  "Meridian Partners",
+  "Sunday Supply",
+  "Fieldwork",
+];
+const companyIcons = [
+  Hexagon,
+  Star,
+  Leaf,
+  Flower2,
+  Orbit,
+  Sun,
+  HeartPulse,
+  Mountain,
+  ShoppingBag,
+  Blocks,
+];
 export function Avatar({
   name,
   size = "",
   company = false,
   mediaId,
+  workspaceIdentity = false,
 }: {
   name: string;
   size?: string;
   company?: boolean;
   mediaId?: string;
+  workspaceIdentity?: boolean;
 }) {
   const p = usePulse();
   const colors = ["lavender", "peach", "sage", "blue", "pink"];
   const n = [...name].reduce((v, c) => v + c.charCodeAt(0), 0);
   const demoIndex = demoNames.indexOf(name);
   const matching = p.contacts.filter((contact) => contact.name === name);
-  const demoPortrait = !company && !mediaId && p.workspace === "demo" && demoIndex >= 0 && matching.length === 1 && matching[0].id === `contact-${demoIndex}` ? portraitSlots[demoIndex] : -1;
+  const demoPortrait =
+    !company &&
+    !mediaId &&
+    p.workspace === "demo" &&
+    demoIndex >= 0 &&
+    matching.length === 1 &&
+    matching[0].id === `contact-${demoIndex}`
+      ? portraitSlots[demoIndex]
+      : -1;
+  const demoProfile =
+    workspaceIdentity &&
+    !mediaId &&
+    p.workspace === "demo" &&
+    p.settings.name === "Michelle";
+  const companyIndex = demoCompanies.indexOf(name);
+  const organizations = p.organizations.filter((item) => item.name === name);
+  const CompanyIcon =
+    !mediaId &&
+    p.workspace === "demo" &&
+    companyIndex >= 0 &&
+    organizations.length === 1 &&
+    organizations[0].id === `org-${companyIndex}`
+      ? companyIcons[companyIndex]
+      : null;
   return (
     <span
       aria-hidden="true"
       className={`avatar ${size} ${company ? "company" : ""} ${colors[n % colors.length]}`}
-      style={demoPortrait >= 0 ? { backgroundImage: `url(${demoPortraits})`, backgroundSize: "400% 400%", backgroundPosition: `${(demoPortrait % 4) * 100 / 3}% ${Math.floor(demoPortrait / 4) * 100 / 3}%` } : undefined}
+      style={
+        demoProfile
+          ? {
+              backgroundImage: `url(${demoMichelle})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }
+          : demoPortrait >= 0
+            ? {
+                backgroundImage: `url(${demoPortraits})`,
+                backgroundSize: "400% 400%",
+                backgroundPosition: `${((demoPortrait % 4) * 100) / 3}% ${(Math.floor(demoPortrait / 4) * 100) / 3}%`,
+              }
+            : undefined
+      }
     >
-      {demoPortrait >= 0 ? null : mediaId?.startsWith("media-") ? (
+      {demoProfile || demoPortrait >= 0 ? null : CompanyIcon ? (
+        <CompanyIcon size="55%" strokeWidth={2.1} />
+      ) : mediaId?.startsWith("media-") ? (
         <LocalMedia
           id={mediaId}
           fallback={name

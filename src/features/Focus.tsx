@@ -70,19 +70,99 @@ export function Focus() {
           step; there is no automatic prioritization.
         </p>
       </div>
-      {p.workspace === "demo" && p.focusItems.length === 0 && (p.contacts.some((item) => item.id === "contact-0") || p.tasks.some((item) => item.id === "task-0") || p.opportunities.length > 0) && (
-        <aside className="surface demo-focus-examples">
-          <div><strong>See My Focus in action</strong><p>Try a few fictional priorities from this demo workspace. You can change or remove them anytime.</p></div>
-          <button className="button primary" onClick={() => void p.run(() => p.db.transaction("rw", p.db.tables, async () => {
-            const contact = p.contacts.find((item) => item.id === "contact-0");
-            const task = p.tasks.find((item) => item.id === "task-0");
-            const opportunity = p.opportunities[0];
-            if (contact) await setFocus(p.db, "contact", contact.id, "today", day);
-            if (task) await setFocus(p.db, "task", task.id, "pin");
-            if (opportunity) await setFocus(p.db, "opportunity", opportunity.id, "pin");
-          }), "Demo priorities added")}>Add example priorities</button>
-        </aside>
-      )}
+      {p.workspace === "demo" &&
+        p.focusItems.length === 0 &&
+        (p.contacts.some((item) => item.id === "contact-0") ||
+          p.tasks.some((item) => item.id === "task-0") ||
+          p.opportunities.length > 0) && (
+          <aside className="surface demo-focus-examples">
+            <div>
+              <strong>Example priorities</strong>
+              <p>
+                Preview how your focus can look. These fictional examples are
+                not yet pinned.
+              </p>
+              <div className="demo-focus-preview">
+                {p.contacts.find((item) => item.id === "contact-0") && (
+                  <div>
+                    <Avatar
+                      name={
+                        p.contacts.find((item) => item.id === "contact-0")!.name
+                      }
+                      mediaId={
+                        p.contacts.find((item) => item.id === "contact-0")!
+                          .avatar
+                      }
+                    />
+                    <span>
+                      <strong>
+                        {
+                          p.contacts.find((item) => item.id === "contact-0")!
+                            .name
+                        }
+                      </strong>
+                      <small>Example relationship</small>
+                    </span>
+                  </div>
+                )}
+                {p.tasks.find((item) => item.id === "task-0") && (
+                  <div>
+                    <span className="demo-focus-symbol">✓</span>
+                    <span>
+                      <strong>
+                        {p.tasks.find((item) => item.id === "task-0")!.title}
+                      </strong>
+                      <small>Example follow-up</small>
+                    </span>
+                  </div>
+                )}
+                {p.opportunities[0] && (
+                  <div>
+                    <span className="demo-focus-symbol">↗</span>
+                    <span>
+                      <strong>{p.opportunities[0].title}</strong>
+                      <small>Example opportunity</small>
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+            <button
+              className="button primary"
+              onClick={() =>
+                void p.run(
+                  () =>
+                    p.db.transaction("rw", p.db.tables, async () => {
+                      const contact = p.contacts.find(
+                        (item) => item.id === "contact-0",
+                      );
+                      const task = p.tasks.find((item) => item.id === "task-0");
+                      const opportunity = p.opportunities[0];
+                      if (contact)
+                        await setFocus(
+                          p.db,
+                          "contact",
+                          contact.id,
+                          "today",
+                          day,
+                        );
+                      if (task) await setFocus(p.db, "task", task.id, "pin");
+                      if (opportunity)
+                        await setFocus(
+                          p.db,
+                          "opportunity",
+                          opportunity.id,
+                          "pin",
+                        );
+                    }),
+                  "Demo priorities added",
+                )
+              }
+            >
+              Add example priorities
+            </button>
+          </aside>
+        )}
       <details className="surface focus-picker">
         <summary>Add a priority</summary>
         <div className="form-grid">

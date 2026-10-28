@@ -131,7 +131,7 @@ test("Orbit explains company context and keeps map/list/profile journeys working
     .getByRole("link", { name: "View in Relationship Orbit", exact: true })
     .click();
   await page.getByRole("button", { name: "Map", exact: true }).click();
-  await page.getByRole("button", { name: /Forma Studio.*company/ }).click();
+  await page.locator(".orbit-node.company").filter({hasText: "Forma Studio"}).click();
   await expect(page.locator(".orbit-active-edge")).not.toHaveCount(0);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole("button", { name: "Fit network", exact: true }).click();
@@ -139,7 +139,7 @@ test("Orbit explains company context and keeps map/list/profile journeys working
     .getByRole("button", { name: "Close selection", exact: true })
     .click();
   await page.getByRole("button", { name: "List", exact: true }).click();
-  await page.getByRole("button", { name: /Forma Studio.*company/ }).click();
+  await page.locator(".orbit-list-item").filter({hasText: "Forma Studio"}).click();
   await expect(
     panel.getByRole("link", { name: "Open Company", exact: true }),
   ).toBeVisible();

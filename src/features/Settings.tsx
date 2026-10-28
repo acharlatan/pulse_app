@@ -160,6 +160,7 @@ export function Settings() {
                 </p>
               </div>
               <Avatar
+                workspaceIdentity
                 name={p.settings.identity.workspaceName || "My workspace"}
                 mediaId={p.settings.identity.avatarMediaId}
                 size="xl"
