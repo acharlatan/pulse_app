@@ -1,0 +1,101 @@
+/* Orbit puts the relationship map first; browsing and accessible list follow. */
+.orbit-layout.orbit-no-selection {
+  grid-template-columns: minmax(0, 1fr);
+}
+.orbit-layout.orbit-no-selection > .orbit-detail {
+  display: none;
+}
+.orbit-page .orbit-map-panel {
+  border: 1px solid var(--border);
+}
+.orbit-page .orbit-viewport {
+  height: clamp(460px, 60vw, 680px);
+}
+.orbit-browse {
+  padding: 24px;
+  border-top: 1px solid var(--border);
+  scroll-margin-top: 80px;
+}
+.orbit-browse-heading {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.orbit-browse-heading h2 {
+  font-size: 24px;
+  margin: 5px 0;
+}
+.orbit-browse-heading p:not(.eyebrow) {
+  color: var(--muted);
+  margin: 5px 0 12px;
+}
+.orbit-browse .orbit-list-intro {
+  padding: 16px 0;
+}
+.orbit-browse .orbit-record-list {
+  max-height: 420px;
+  overflow: auto;
+}
+.orbit-page .orbit-legend {
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 767px) {
+  .orbit-page .orbit-viewport {
+    height: 440px;
+  }
+  .orbit-browse {
+    padding: 18px;
+  }
+  .orbit-browse-heading {
+    align-items: flex-start;
+  }
+}
+.demo-focus-examples {
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.demo-focus-preview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+.demo-focus-preview > div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 14px;
+}
+.demo-focus-preview span:not(.avatar):not(.demo-focus-symbol) {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+.demo-focus-preview strong {
+  overflow-wrap: anywhere;
+}
+.demo-focus-preview small {
+  color: var(--muted);
+}
+.demo-focus-symbol {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--primary-text);
+  background: var(--primary-soft);
+  font-weight: 700;
+}
+@media (max-width: 767px) {
+  .demo-focus-preview {
+    grid-template-columns: 1fr;
+  }
+}

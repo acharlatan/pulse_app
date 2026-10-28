@@ -33,19 +33,21 @@ test("saved profile photos remain local and render after offline reload", async 
     return c.toDataURL("image/png");
   });
   const d = page.getByRole("dialog");
-  await d
-    .getByLabel("Choose image", { exact: false })
-    .setInputFiles({
-      name: "local.png",
-      mimeType: "image/png",
-      buffer: Buffer.from(data.split(",")[1], "base64"),
-    });
+  await d.getByLabel("Choose image", { exact: false }).setInputFiles({
+    name: "local.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(data.split(",")[1], "base64"),
+  });
   await d.getByRole("button", { name: "Save image", exact: true }).click();
   await expect(d).toHaveCount(0);
   await expect(page.locator(".profile-identity .avatar img")).toBeVisible();
   const remoteImages: string[] = [];
   page.on("request", (r) => {
-    if (r.resourceType() === "image" && /^https?:/.test(r.url()))
+    if (
+      r.resourceType() === "image" &&
+      /^https?:/.test(r.url()) &&
+      new URL(r.url()).origin !== new URL(page.url()).origin
+    )
       remoteImages.push(r.url());
   });
   await context.setOffline(true);

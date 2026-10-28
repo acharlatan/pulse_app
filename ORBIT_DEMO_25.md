@@ -1,0 +1,3 @@
+# Orbit and demo update
+
+Orbit presents a bounded relationship map first, with its searchable list and company exploration below. The graph only displays saved associations and the list remains available as a semantic alternative. The demo includes fictional company marks and a reference-inspired Michelle workspace portrait. Existing user-provided photos take precedence. Existing default demo name Alex is updated to Michelle; other names and personal workspaces are retained. When Focus is empty, the demo displays labeled previews using saved demo records, without writing priorities until the user selects the action.

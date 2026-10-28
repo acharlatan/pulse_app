@@ -5,7 +5,12 @@ const day = (offset: number) =>
   new Date(Date.now() + offset * 86400000).toISOString();
 export async function initialize(db: PulseDB) {
   await db.transaction("rw", db.tables, async () => {
-    if (await db.settings.get("settings")) return;
+    const existing = await db.settings.get("settings");
+    if (existing) {
+      if (db.workspace === "demo" && existing.name === "Alex")
+        await db.settings.put({ ...existing, name: "Michelle" });
+      return;
+    }
     if (!(await db.pipelines.count())) {
       const graph = planLegacyPipelines(defaults, [], new Date().toISOString());
       await db.pipelines.bulkPut(graph.pipelines);
@@ -13,7 +18,7 @@ export async function initialize(db: PulseDB) {
     }
     await db.settings.put({
       ...defaults,
-      name: db.workspace === "demo" ? "Alex" : "",
+      name: db.workspace === "demo" ? "Michelle" : "",
     });
     if (db.workspace === "personal") return;
     const companies = [

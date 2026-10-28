@@ -28,14 +28,13 @@ export function Orbit() {
     [search, setSearch] = useState(""),
     [type, setType] = useState(""),
     [priority, setPriority] = useState(""),
-    [view, setView] = useState(() =>
-      matchMedia("(max-width:600px)").matches ? "list" : "guide",
-    ),
+    [view, setView] = useState("list"),
     [selected, setSelected] = useState(""),
     [zoom, setZoom] = useState(1),
     [pan, setPan] = useState({ x: 0, y: 0 }),
     [editor, setEditor] = useState<Editor | null>(null),
     viewport = useRef<HTMLDivElement>(null),
+    detail = useRef<HTMLElement>(null),
     drag = useRef<{
       x: number;
       y: number;
@@ -50,17 +49,25 @@ export function Orbit() {
         priority,
         company: params.get("company") || "",
         person: params.get("person") || "",
-        limit:
-          view === "map"
-            ? matchMedia("(max-width:600px)").matches
-              ? 18
-              : 24
-            : 60,
+        limit: matchMedia("(max-width:600px)").matches ? 18 : 24,
       }),
-    [p, search, type, priority, params, view],
+    [p, search, type, priority, params],
   );
-  const node = graph.nodes.find((n) => n.id === selected),
-    byId = new Map(graph.nodes.map((n) => [n.id, n]));
+  const fullGraph = useMemo(
+    () =>
+      deriveOrbit(p, {
+        search,
+        type,
+        priority,
+        company: params.get("company") || "",
+        person: params.get("person") || "",
+        limit: 60,
+      }),
+    [p, search, type, priority, params],
+  );
+  const node = fullGraph.nodes.find((n) => n.id === selected),
+    byId = new Map(graph.nodes.map((n) => [n.id, n])),
+    allById = new Map(fullGraph.nodes.map((n) => [n.id, n]));
   const person =
       node?.kind === "person"
         ? p.contacts.find((c) => c.id === node.recordId)
@@ -104,13 +111,20 @@ export function Orbit() {
     setPan({ x: 0, y: 0 });
   }
   useEffect(() => {
-    if (view !== "map" || !viewport.current) return;
+    if (!viewport.current) return;
     const observer = new ResizeObserver(() => fit());
     observer.observe(viewport.current);
     return () => observer.disconnect();
-  }, [view, graph.nodes.length]);
+  }, [graph.nodes.length]);
   function select(n: OrbitNode) {
     setSelected(n.id);
+  }
+  function selectFromBrowse(n: OrbitNode) {
+    select(n);
+    if (matchMedia("(max-width:767px)").matches)
+      requestAnimationFrame(() =>
+        detail.current?.scrollIntoView({ block: "start", behavior: "instant" }),
+      );
   }
   return (
     <div className="page orbit-page">
@@ -180,23 +194,6 @@ export function Orbit() {
             ))}
           </select>
         </label>
-        <div className="tabs" aria-label="Orbit presentation">
-          <button
-            aria-pressed={view === "guide"}
-            onClick={() => setView("guide")}
-          >
-            Explore
-          </button>
-          <button aria-pressed={view === "map"} onClick={() => setView("map")}>
-            Map
-          </button>
-          <button
-            aria-pressed={view === "list"}
-            onClick={() => setView("list")}
-          >
-            List
-          </button>
-        </div>
       </div>
       {params.size > 0 && (
         <p className="orbit-scope">
@@ -219,14 +216,16 @@ export function Orbit() {
           </button>
         </p>
       )}
-      <div className="orbit-layout">
+      <div
+        className={`orbit-layout ${node ? "orbit-has-selection" : "orbit-no-selection"}`}
+      >
         <section className="orbit-map-panel">
           <div className="orbit-toolbar">
             <strong>
               {graph.nodes.length} of {graph.total} matching records
             </strong>
             <div className="form-actions">
-              {view === "map" && (
+              {
                 <>
                   <button
                     className="icon-button"
@@ -247,7 +246,7 @@ export function Orbit() {
                     Fit network
                   </button>
                 </>
-              )}
+              }
               <button
                 className="button ghost"
                 onClick={() => {
@@ -261,12 +260,15 @@ export function Orbit() {
               >
                 Reset view
               </button>
-              {node && view === "map" && (
+              {node && graph.nodes.some((n) => n.id === node.id) && (
                 <button
                   className="button secondary"
                   onClick={() => {
                     setZoom(1);
-                    setPan({ x: 500 - node.x, y: 380 - node.y });
+                    const mapNode = graph.nodes.find(
+                      (item) => item.id === node.id,
+                    )!;
+                    setPan({ x: 500 - mapNode.x, y: 380 - mapNode.y });
                   }}
                 >
                   Center selected
@@ -290,59 +292,6 @@ export function Orbit() {
                 </Link>
               }
             />
-          ) : view === "guide" ? (
-            <OrbitGuide
-              graph={graph}
-              scoped={params.has("company") || params.has("person")}
-              search={search}
-              selected={selected}
-              onSelect={select}
-              onCompany={(id) => {
-                setParams({ company: id }, { state: navigationState });
-                setSearch("");
-                setType("");
-                setPriority("");
-                setSelected("");
-              }}
-            />
-          ) : view === "list" ? (
-            <>
-              <div className="orbit-list-intro">
-                <strong>Choose a starting point.</strong>
-                <p>
-                  List finds individual records. Explore organizes a company’s
-                  saved people and opportunities; Map shows their explicit
-                  links.
-                </p>
-                <button
-                  className="button secondary"
-                  onClick={() => setView("guide")}
-                >
-                  Explore by company
-                </button>
-              </div>
-              <div className="orbit-record-list">
-                {graph.nodes.map((n) => (
-                  <button
-                    key={n.id}
-                    className={`orbit-list-item ${selected === n.id ? "selected" : ""}`}
-                    onClick={() => select(n)}
-                    aria-pressed={selected === n.id}
-                  >
-                    <Avatar
-                      name={n.label}
-                      mediaId={n.mediaId}
-                      company={n.kind === "company"}
-                    />
-                    <span>
-                      <strong>{n.label}</strong>
-                      <small>{n.kind}</small>
-                    </span>
-                    <span aria-hidden="true">↗</span>
-                  </button>
-                ))}
-              </div>
-            </>
           ) : (
             <>
               <div
@@ -443,13 +392,111 @@ export function Orbit() {
                 ))}
                 <button
                   className="button ghost"
-                  onClick={() => setView("list")}
+                  onClick={() => {
+                    setView("list");
+                    document
+                      .querySelector(".orbit-browse")
+                      ?.scrollIntoView({ block: "start", behavior: "instant" });
+                  }}
                 >
-                  Use searchable list instead
+                  Browse matching records
                 </button>
               </div>
             </>
           )}
+          <section
+            className="orbit-browse"
+            aria-label="Explore connections below the map"
+          >
+            <div className="orbit-browse-heading">
+              <div>
+                <p className="eyebrow">EXPLORE YOUR NETWORK</p>
+                <h2>Find a starting point</h2>
+                <p>
+                  Browse saved records or explore by company. Select any item to
+                  see its context.
+                </p>
+              </div>
+              <div className="tabs" aria-label="Orbit presentation">
+                <button
+                  aria-pressed={view === "guide"}
+                  onClick={() => setView("guide")}
+                >
+                  Explore
+                </button>
+                <button
+                  onClick={() => {
+                    viewport.current?.scrollIntoView({
+                      block: "center",
+                      behavior: "instant",
+                    });
+                  }}
+                >
+                  Map
+                </button>
+                <button
+                  aria-pressed={view === "list"}
+                  onClick={() => setView("list")}
+                >
+                  List
+                </button>
+              </div>{" "}
+            </div>
+            {view === "guide" ? (
+              <OrbitGuide
+                graph={fullGraph}
+                scoped={params.has("company") || params.has("person")}
+                search={search}
+                selected={selected}
+                onSelect={selectFromBrowse}
+                onCompany={(id) => {
+                  setParams({ company: id }, { state: navigationState });
+                  setSearch("");
+                  setType("");
+                  setPriority("");
+                  setSelected("");
+                }}
+              />
+            ) : (
+              <>
+                <div className="orbit-list-intro">
+                  <strong>Choose a starting point.</strong>
+                  <p>
+                    List finds individual records. Explore organizes a company’s
+                    saved people and opportunities; Map shows their explicit
+                    links.
+                  </p>
+                  <button
+                    className="button secondary"
+                    onClick={() => setView("guide")}
+                  >
+                    Explore by company
+                  </button>
+                </div>
+                <div className="orbit-record-list">
+                  {fullGraph.nodes.map((n) => (
+                    <button
+                      key={n.id}
+                      className={`orbit-list-item ${selected === n.id ? "selected" : ""}`}
+                      onClick={() => selectFromBrowse(n)}
+                      aria-pressed={selected === n.id}
+                    >
+                      <Avatar
+                        name={n.label}
+                        mediaId={n.mediaId}
+                        company={n.kind === "company"}
+                      />
+                      <span>
+                        <strong>{n.label}</strong>
+                        <small>{n.kind}</small>
+                      </span>
+                      <span aria-hidden="true">↗</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
           <div className="orbit-legend">
             <span>◯ Person</span>
             <span>▢ Company</span>
@@ -462,6 +509,7 @@ export function Orbit() {
           </div>
         </section>
         <aside
+          ref={detail}
           className={`orbit-detail surface ${node ? "has-selection" : ""}`}
           aria-label="Selected relationship"
         >
@@ -614,10 +662,12 @@ export function Orbit() {
               )}
               <details className="orbit-saved-links">
                 <summary>Saved connections in this view</summary>
-                {graph.edges
+                {fullGraph.edges
                   .filter((e) => e.from === node.id || e.to === node.id)
                   .map((e) => {
-                    const other = byId.get(e.from === node.id ? e.to : e.from)!;
+                    const other = allById.get(
+                      e.from === node.id ? e.to : e.from,
+                    )!;
                     return (
                       <button
                         key={e.id}
@@ -629,7 +679,7 @@ export function Orbit() {
                       </button>
                     );
                   })}
-                {!graph.edges.some(
+                {!fullGraph.edges.some(
                   (e) => e.from === node.id || e.to === node.id,
                 ) && (
                   <p>
