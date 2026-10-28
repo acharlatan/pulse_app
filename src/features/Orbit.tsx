@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { usePulse } from "../app/context";
-import { Avatar, Badge, Empty } from "../components/ui";
+import { Avatar, Badge, Empty, useFormat } from "../components/ui";
 import { deriveOrbit, type OrbitNode } from "../services/orbit";
 import { EditorModal, type Editor } from "../components/forms";
 import {
@@ -9,6 +9,7 @@ import {
   effectiveAvailability,
 } from "../services/recommendations";
 import { FocusButton } from "../components/focus";
+import { OrbitGuide } from "./OrbitGuide";
 export function Orbit() {
   const p = usePulse(),
     [params, setParams] = useSearchParams(),
@@ -16,7 +17,7 @@ export function Orbit() {
     [type, setType] = useState(""),
     [priority, setPriority] = useState(""),
     [view, setView] = useState(() =>
-      matchMedia("(max-width:600px)").matches ? "list" : "map",
+      matchMedia("(max-width:600px)").matches ? "list" : "guide",
     ),
     [selected, setSelected] = useState(""),
     [zoom, setZoom] = useState(1),
@@ -28,6 +29,7 @@ export function Orbit() {
       y: number;
       start: { x: number; y: number };
     } | null>(null);
+  const { date } = useFormat();
   const graph = useMemo(
     () =>
       deriveOrbit(p, {
@@ -100,15 +102,14 @@ export function Orbit() {
   }
   return (
     <div className="page orbit-page">
-      <div className="page-heading">
+      <div className="page-heading editorial-masthead insight-masthead">
         <div>
           <p className="eyebrow">YOUR CONNECTIONS, IN CONTEXT</p>
           <h1>
             Relationship Orbit<span className="accent">.</span>
           </h1>
-          <p className="subtitle">
-            A living map of the people, companies and opportunities you have
-            saved.
+          <p className="editorial-deck">
+            Start with a familiar record. Understand what connects it.
           </p>
         </div>
         <Link className="button secondary" to="/network">
@@ -156,6 +157,12 @@ export function Orbit() {
           </select>
         </label>
         <div className="tabs" aria-label="Orbit presentation">
+          <button
+            aria-pressed={view === "guide"}
+            onClick={() => setView("guide")}
+          >
+            Explore
+          </button>
           <button aria-pressed={view === "map"} onClick={() => setView("map")}>
             Map
           </button>
@@ -169,7 +176,14 @@ export function Orbit() {
       </div>
       {params.size > 0 && (
         <p className="orbit-scope">
-          Focused {params.has("company") ? "company" : "person"} view{" "}
+          <strong>
+            {params.has("company")
+              ? p.organizations.find((o) => o.id === params.get("company"))
+                  ?.name || "Company"
+              : p.contacts.find((c) => c.id === params.get("person"))?.name ||
+                "Person"}
+          </strong>{" "}
+          · Focused {params.has("company") ? "company" : "person"} view{" "}
           <button
             className="button ghost"
             onClick={() => {
@@ -188,24 +202,28 @@ export function Orbit() {
               {graph.nodes.length} of {graph.total} matching records
             </strong>
             <div className="form-actions">
-              <button
-                className="icon-button"
-                aria-label="Zoom out"
-                onClick={() => setZoom(Math.max(0.35, zoom - 0.15))}
-              >
-                −
-              </button>
-              <span>{Math.round(zoom * 100)}%</span>
-              <button
-                className="icon-button"
-                aria-label="Zoom in"
-                onClick={() => setZoom(Math.min(2, zoom + 0.15))}
-              >
-                +
-              </button>
-              <button className="button ghost" onClick={fit}>
-                Fit network
-              </button>
+              {view === "map" && (
+                <>
+                  <button
+                    className="icon-button"
+                    aria-label="Zoom out"
+                    onClick={() => setZoom(Math.max(0.35, zoom - 0.15))}
+                  >
+                    −
+                  </button>
+                  <span>{Math.round(zoom * 100)}%</span>
+                  <button
+                    className="icon-button"
+                    aria-label="Zoom in"
+                    onClick={() => setZoom(Math.min(2, zoom + 0.15))}
+                  >
+                    +
+                  </button>
+                  <button className="button ghost" onClick={fit}>
+                    Fit network
+                  </button>
+                </>
+              )}
               <button
                 className="button ghost"
                 onClick={() => {
@@ -219,7 +237,7 @@ export function Orbit() {
               >
                 Reset view
               </button>
-              {node && (
+              {node && view === "map" && (
                 <button
                   className="button secondary"
                   onClick={() => {
@@ -248,28 +266,59 @@ export function Orbit() {
                 </Link>
               }
             />
+          ) : view === "guide" ? (
+            <OrbitGuide
+              graph={graph}
+              scoped={params.has("company") || params.has("person")}
+              search={search}
+              selected={selected}
+              onSelect={select}
+              onCompany={(id) => {
+                setParams({ company: id });
+                setSearch("");
+                setType("");
+                setPriority("");
+                setSelected("");
+              }}
+            />
           ) : view === "list" ? (
-            <div className="orbit-record-list">
-              {graph.nodes.map((n) => (
+            <>
+              <div className="orbit-list-intro">
+                <strong>Choose a starting point.</strong>
+                <p>
+                  List finds individual records. Explore organizes a company’s
+                  saved people and opportunities; Map shows their explicit
+                  links.
+                </p>
                 <button
-                  key={n.id}
-                  className={`orbit-list-item ${selected === n.id ? "selected" : ""}`}
-                  onClick={() => select(n)}
-                  aria-pressed={selected === n.id}
+                  className="button secondary"
+                  onClick={() => setView("guide")}
                 >
-                  <Avatar
-                    name={n.label}
-                    mediaId={n.mediaId}
-                    company={n.kind === "company"}
-                  />
-                  <span>
-                    <strong>{n.label}</strong>
-                    <small>{n.kind}</small>
-                  </span>
-                  <span aria-hidden="true">↗</span>
+                  Explore by company
                 </button>
-              ))}
-            </div>
+              </div>
+              <div className="orbit-record-list">
+                {graph.nodes.map((n) => (
+                  <button
+                    key={n.id}
+                    className={`orbit-list-item ${selected === n.id ? "selected" : ""}`}
+                    onClick={() => select(n)}
+                    aria-pressed={selected === n.id}
+                  >
+                    <Avatar
+                      name={n.label}
+                      mediaId={n.mediaId}
+                      company={n.kind === "company"}
+                    />
+                    <span>
+                      <strong>{n.label}</strong>
+                      <small>{n.kind}</small>
+                    </span>
+                    <span aria-hidden="true">↗</span>
+                  </button>
+                ))}
+              </div>
+            </>
           ) : (
             <>
               <div
@@ -304,13 +353,23 @@ export function Orbit() {
                     role="img"
                     aria-label="Lines show only saved company membership and opportunity associations"
                   >
-                    <circle cx="500" cy="380" r="220" />
-                    <circle cx="500" cy="380" r="310" />
                     {graph.edges.map((e) => {
                       const a = byId.get(e.from)!,
                         b = byId.get(e.to)!;
                       return (
-                        <line key={e.id} x1={a.x} y1={a.y} x2={b.x} y2={b.y}>
+                        <line
+                          className={
+                            selected &&
+                            (e.from === selected || e.to === selected)
+                              ? "orbit-active-edge"
+                              : ""
+                          }
+                          key={e.id}
+                          x1={a.x}
+                          y1={a.y}
+                          x2={b.x}
+                          y2={b.y}
+                        >
                           <title>
                             {a.label} → {b.label}: {e.label}
                           </title>
@@ -324,7 +383,6 @@ export function Orbit() {
                       className={`orbit-node ${n.kind} ${n.id === selected ? "selected" : ""}`}
                       style={{ left: n.x, top: n.y }}
                       title={`${n.label} · ${n.kind}`}
-                      aria-label={`${n.kind}: ${n.label}`}
                       aria-pressed={n.id === selected}
                       onClick={() => select(n)}
                     >
@@ -425,9 +483,7 @@ export function Orbit() {
                   <p>
                     Last conversation:{" "}
                     {lastInteraction(person.id, p.interactions)
-                      ? new Date(
-                          lastInteraction(person.id, p.interactions)!,
-                        ).toLocaleDateString(p.settings.locale)
+                      ? date(lastInteraction(person.id, p.interactions)!)
                       : "Not recorded"}
                   </p>
                   <Link
@@ -526,6 +582,33 @@ export function Orbit() {
                     ))}
                 </>
               )}
+              <details className="orbit-saved-links">
+                <summary>Saved connections in this view</summary>
+                {graph.edges
+                  .filter((e) => e.from === node.id || e.to === node.id)
+                  .map((e) => {
+                    const other = byId.get(e.from === node.id ? e.to : e.from)!;
+                    return (
+                      <button
+                        key={e.id}
+                        className="orbit-related"
+                        onClick={() => select(other)}
+                      >
+                        <strong>{other.label}</strong>
+                        <small>{e.label}</small>
+                      </button>
+                    );
+                  })}
+                {!graph.edges.some(
+                  (e) => e.from === node.id || e.to === node.id,
+                ) && (
+                  <p>
+                    No saved connection is visible with these filters. Clear
+                    filters or open a scoped company/person view to inspect
+                    more.
+                  </p>
+                )}
+              </details>
               <h3>Linked opportunities</h3>
               {related.slice(0, 10).map((o) => (
                 <button
@@ -540,8 +623,7 @@ export function Orbit() {
               <h3>Next actions</h3>
               {tasks.slice(0, 5).map((t) => (
                 <p key={t.id}>
-                  {t.title} ·{" "}
-                  {new Date(t.dueAt).toLocaleDateString(p.settings.locale)}
+                  {t.title} · {date(t.dueAt)}
                 </p>
               ))}
               {!tasks.length && <p className="muted">No open follow-ups.</p>}

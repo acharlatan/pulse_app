@@ -240,6 +240,8 @@ export function calculateAnalytics(
   }
   return {
     range,
+    asOf: now,
+    contacts: filteredContacts,
     interactions,
     previousInteractions,
     completed,
@@ -288,3 +290,5 @@ export function safeCsv(rows: (string | number | null)[][]) {
     )
     .join("\r\n");
 }
+
+export type AnalyticsReport = ReturnType<typeof calculateAnalytics>;

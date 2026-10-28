@@ -1,4 +1,8 @@
-import { BrandArt } from "../components/BrandArt";
+import { AnalyticsBrief } from "./AnalyticsBrief";
+import {
+  analyticsDisplayTrend,
+  inAnalyticsBucket,
+} from "../services/analytics-guidance";
 import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Link, useSearchParams } from "react-router-dom";
@@ -25,7 +29,7 @@ export function Analytics() {
     [params] = useSearchParams(),
     transitions = useLiveQuery(() => p.db.transitions.toArray(), [p.db]) || [];
   const today = calendarDay(Date.now(), p.settings.timezone);
-  const [filter, setFilter] = useState<ReportFilter>({
+  const [filter, setFilterState] = useState<ReportFilter>({
     preset: "30",
     personId: params.get("person") || "",
     start: shiftDay(today, -29),
@@ -38,10 +42,25 @@ export function Analytics() {
     category: "",
     outcome: "",
   });
-  const [section, setSection] = useState<(typeof sections)[number]>("Overview"),
+  const [section, setSectionState] =
+      useState<(typeof sections)[number]>("Overview"),
     [selectedDay, setSelectedDay] = useState(""),
     [selectedStage, setSelectedStage] = useState(""),
     [editor, setEditor] = useState<Editor | null>(null);
+  const setSection = (next: (typeof sections)[number]) => {
+    // Overview counts all conversation types; its drill-down must preserve that cohort.
+    if (section === "Overview" && next === "Relationships")
+      setFilterState((previous) => ({ ...previous, interactionType: "" }));
+    setSectionState(next);
+  };
+  const [filtersOpen, setFiltersOpen] = useState(
+    !!params.get("person") || !!params.get("company"),
+  );
+  const setFilter = (next: ReportFilter) => {
+    setFilterState(next);
+    setSelectedDay("");
+    setSelectedStage("");
+  };
   const filters = {
     ...filter,
     timezone: p.settings.timezone,
@@ -73,12 +92,8 @@ export function Analytics() {
       ["Report", "Record", "Date or stage", "Value", "Currency"],
     ];
     if (section === "Overview" || section === "Relationships")
-      for (const i of report.interactions.filter(
-        (i) =>
-          !selectedDay ||
-          calendarDay(i.occurredAt, p.settings.timezone).startsWith(
-            selectedDay,
-          ),
+      for (const i of report.interactions.filter((i) =>
+        inAnalyticsBucket(i.occurredAt, selectedDay, p.settings.timezone),
       ))
         rows.push([
           "Meaningful interaction",
@@ -99,12 +114,8 @@ export function Analytics() {
           o.currency,
         ]);
     else if (section === "Productivity")
-      for (const t of report.completed.filter(
-        (t) =>
-          !selectedDay ||
-          calendarDay(t.completedAt!, p.settings.timezone).startsWith(
-            selectedDay,
-          ),
+      for (const t of report.completed.filter((t) =>
+        inAnalyticsBucket(t.completedAt!, selectedDay, p.settings.timezone),
       ))
         rows.push(["Completed follow-up", t.title, t.completedAt, "", ""]);
     else {
@@ -135,15 +146,14 @@ export function Analytics() {
   }
   return (
     <div className="page analytics-page">
-      <div className="page-heading studio-heading">
-        <BrandArt motif="steps" />
+      <div className="page-heading editorial-masthead insight-masthead">
         <div>
           <p className="eyebrow">YOUR WORK, IN CONTEXT</p>
           <h1>
             Analytics<span className="accent">.</span>
           </h1>
           <p className="subtitle">
-            Understand what you have recorded and find the next useful step.
+            Less noise. Clear evidence. A useful next move.
           </p>
         </div>
         <div className="form-actions">
@@ -159,10 +169,7 @@ export function Analytics() {
           </button>
         </div>
       </div>
-      <section
-        className="surface analytics-filters"
-        aria-label="Report filters"
-      >
+      <section className="analytics-filters" aria-label="Report filters">
         <div className="form-grid">
           <label className="field">
             <span>Date range</span>
@@ -205,122 +212,156 @@ export function Analytics() {
               </label>
             </>
           )}
-          <label className="field">
-            <span>Company</span>
-            <select
-              value={filter.organizationId}
-              onChange={(e) =>
-                setFilter({ ...filter, organizationId: e.target.value })
-              }
-            >
-              <option value="">All companies</option>
-              {p.organizations.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span>Person</span>
-            <select
-              value={filter.personId}
-              onChange={(e) =>
-                setFilter({ ...filter, personId: e.target.value })
-              }
-            >
-              <option value="">All people</option>
-              {p.contacts.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span>Contact priority</span>
-            <select
-              value={filter.priority}
-              onChange={(e) =>
-                setFilter({ ...filter, priority: e.target.value })
-              }
-            >
-              <option value="">All priorities</option>
-              {priorities.map((x) => (
-                <option key={x}>{x}</option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span>Contact category</span>
-            <select
-              value={filter.category}
-              onChange={(e) =>
-                setFilter({ ...filter, category: e.target.value })
-              }
-            >
-              <option value="">All categories</option>
-              {categories.map((x) => (
-                <option key={x}>{x}</option>
-              ))}
-            </select>
-          </label>
-          {section === "Opportunities" && (
-            <>
+          <details
+            className="analytics-scope"
+            open={filtersOpen}
+            onToggle={(e) => setFiltersOpen(e.currentTarget.open)}
+          >
+            <summary>
+              Refine report
+              {filter.personId ||
+              filter.organizationId ||
+              filter.priority ||
+              filter.category
+                ? " · scoped"
+                : ""}
+            </summary>
+            <div className="form-grid">
               <label className="field">
-                <span>Pipeline</span>
+                <span>Company</span>
                 <select
-                  value={filter.pipelineId}
+                  value={filter.organizationId}
                   onChange={(e) =>
-                    setFilter({ ...filter, pipelineId: e.target.value })
+                    setFilter({ ...filter, organizationId: e.target.value })
                   }
                 >
-                  <option value="">All pipelines</option>
-                  {p.pipelines.map((x) => (
-                    <option key={x.id} value={x.id}>
-                      {x.name}
+                  <option value="">All companies</option>
+                  {p.organizations.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.name}
                     </option>
                   ))}
                 </select>
               </label>
               <label className="field">
-                <span>Current outcome</span>
+                <span>Person</span>
                 <select
-                  value={filter.outcome}
+                  value={filter.personId}
                   onChange={(e) =>
-                    setFilter({ ...filter, outcome: e.target.value })
+                    setFilter({ ...filter, personId: e.target.value })
                   }
                 >
-                  <option value="">All outcomes</option>
-                  <option value="open">Open</option>
-                  <option value="won">Won</option>
-                  <option value="lost">Lost</option>
+                  <option value="">All people</option>
+                  {p.contacts.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
                 </select>
               </label>
-            </>
-          )}
-          {section === "Relationships" && (
-            <label className="field">
-              <span>Interaction type</span>
-              <select
-                value={filter.interactionType}
-                onChange={(e) =>
-                  setFilter({ ...filter, interactionType: e.target.value })
-                }
-              >
-                <option value="">All conversations</option>
-                {["Call", "Email", "Meeting", "Message"].map((x) => (
-                  <option key={x}>{x}</option>
-                ))}
-              </select>
-            </label>
-          )}
+              <label className="field">
+                <span>Contact priority</span>
+                <select
+                  value={filter.priority}
+                  onChange={(e) =>
+                    setFilter({ ...filter, priority: e.target.value })
+                  }
+                >
+                  <option value="">All priorities</option>
+                  {priorities.map((x) => (
+                    <option key={x}>{x}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="field">
+                <span>Contact category</span>
+                <select
+                  value={filter.category}
+                  onChange={(e) =>
+                    setFilter({ ...filter, category: e.target.value })
+                  }
+                >
+                  <option value="">All categories</option>
+                  {categories.map((x) => (
+                    <option key={x}>{x}</option>
+                  ))}
+                </select>
+              </label>
+              {section === "Opportunities" && (
+                <>
+                  <label className="field">
+                    <span>Pipeline</span>
+                    <select
+                      value={filter.pipelineId}
+                      onChange={(e) =>
+                        setFilter({ ...filter, pipelineId: e.target.value })
+                      }
+                    >
+                      <option value="">All pipelines</option>
+                      {p.pipelines.map((x) => (
+                        <option key={x.id} value={x.id}>
+                          {x.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="field">
+                    <span>Current outcome</span>
+                    <select
+                      value={filter.outcome}
+                      onChange={(e) =>
+                        setFilter({ ...filter, outcome: e.target.value })
+                      }
+                    >
+                      <option value="">All outcomes</option>
+                      <option value="open">Open</option>
+                      <option value="won">Won</option>
+                      <option value="lost">Lost</option>
+                    </select>
+                  </label>
+                </>
+              )}
+              {section === "Relationships" && (
+                <label className="field">
+                  <span>Interaction type</span>
+                  <select
+                    value={filter.interactionType}
+                    onChange={(e) =>
+                      setFilter({ ...filter, interactionType: e.target.value })
+                    }
+                  >
+                    <option value="">All conversations</option>
+                    {["Call", "Email", "Meeting", "Message"].map((x) => (
+                      <option key={x}>{x}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </div>
+            <button
+              className="button ghost"
+              onClick={() =>
+                setFilter({
+                  ...filter,
+                  personId: "",
+                  organizationId: "",
+                  priority: "",
+                  category: "",
+                  pipelineId: "",
+                  outcome: "",
+                  interactionType: "",
+                })
+              }
+            >
+              Clear record filters
+            </button>
+            <p className="muted">
+              Calendar dates in {p.settings.timezone}. Company activity follows
+              the company saved on each conversation. Pipeline/outcome filters
+              apply to opportunities; interaction type applies to conversations.
+            </p>
+          </details>
         </div>
-        <p className="muted">
-          Calendar dates in {p.settings.timezone}. Company activity follows the
-          company saved on each conversation. Pipeline/outcome filters apply to
-          opportunities; interaction type applies to conversations.
-        </p>
       </section>
       <nav className="tabs analytics-tabs" aria-label="Analytics sections">
         {sections.map((s) => (
@@ -350,64 +391,56 @@ export function Analytics() {
           </p>
           {section === "Overview" && (
             <>
-              <div className="analytics-metrics">
-                <button
-                  className="surface metric-card"
-                  onClick={() => setSection("Relationships")}
-                >
-                  <strong>{report.interactions.length}</strong>
-                  <span>Meaningful conversations</span>
-                  <small>
-                    {report.previousInteractions.length
-                      ? `${Math.round(((report.interactions.length - report.previousInteractions.length) / report.previousInteractions.length) * 100)}% vs previous period`
-                      : "No previous-period activity recorded"}
-                  </small>
-                </button>
-                <button
-                  className="surface metric-card"
-                  onClick={() => setSection("Productivity")}
-                >
-                  <strong>{report.completed.length}</strong>
-                  <span>Follow-ups completed</span>
-                </button>
-                <Link
-                  className="surface metric-card"
-                  to="/activity?filter=overdue"
-                >
-                  <strong>{report.overdue.length}</strong>
-                  <span>Currently overdue</span>
-                </Link>
-                <button
-                  className="surface metric-card"
-                  onClick={() => setSection("Opportunities")}
-                >
-                  <strong>{report.active.length}</strong>
-                  <span>Currently open opportunities</span>
-                </button>
-                <button
-                  className="surface metric-card"
-                  onClick={() => setSection("Opportunities")}
-                >
-                  <strong>{report.won.length}</strong>
-                  <span>Currently won</span>
-                </button>
-                <Link className="surface metric-card" to="/review">
-                  <strong>
-                    {
-                      p.intelligence.queue.filter(
-                        (r) => r.contactId && !r.blocked,
-                      ).length
-                    }
-                  </strong>
-                  <span>Review items now · all contacts</span>
-                </Link>
-              </div>
-              <p className="muted">
-                Meaningful conversations exclude notes, imported last-contact
-                metadata and future-dated entries. Period completion counts use
-                saved completion timestamps. Current counts are snapshots, not
-                historical outcomes.
-              </p>
+              <AnalyticsBrief
+                report={report}
+                onEdit={setEditor}
+                onSection={setSection}
+                onCompany={(id) => {
+                  setFilter({ ...filter, organizationId: id, personId: "" });
+                  setFiltersOpen(true);
+                }}
+              />
+              <section className="analytics-period-pulse">
+                <div className="section-heading">
+                  <div>
+                    <p className="eyebrow">WHAT HAPPENED · SELECTED PERIOD</p>
+                    <h2>Your recorded rhythm.</h2>
+                  </div>
+                </div>
+                <div className="analytics-metrics">
+                  <button
+                    className="metric-card"
+                    onClick={() => setSection("Relationships")}
+                  >
+                    <strong>{report.interactions.length}</strong>
+                    <span>Meaningful conversations</span>
+                    <small>
+                      {report.previousInteractions.length
+                        ? `${report.interactions.length - report.previousInteractions.length >= 0 ? "+" : ""}${report.interactions.length - report.previousInteractions.length} vs previous ${report.range.days} days`
+                        : "No previous-period activity recorded"}
+                    </small>
+                  </button>
+                  <button
+                    className="metric-card"
+                    onClick={() => setSection("Productivity")}
+                  >
+                    <strong>{report.completed.length}</strong>
+                    <span>Follow-ups completed</span>
+                    <small>By saved completion date</small>
+                  </button>
+                  <button
+                    className="metric-card"
+                    onClick={() => setSection("Relationships")}
+                  >
+                    <strong>{report.previousInteractions.length}</strong>
+                    <span>Previous-period conversations</span>
+                    <small>
+                      {report.range.previousStart} through{" "}
+                      {report.range.previousEnd}
+                    </small>
+                  </button>
+                </div>
+              </section>
             </>
           )}
           {(section === "Overview" || section === "Relationships") && (
@@ -417,20 +450,26 @@ export function Analytics() {
                 Select a bar to inspect its underlying conversations.{" "}
                 {report.range.days > 90
                   ? "Grouped by month."
-                  : "Grouped by workspace calendar day."}
+                  : section === "Overview" && report.range.days > 14
+                    ? "Seven-day groups starting at the report’s first date. Select one to inspect its exact records."
+                    : "Grouped by workspace calendar day."}
               </p>
-              {report.trend.length ? (
+              {report.interactions.length ? (
                 <div
                   className="analytics-bars"
                   role="group"
                   aria-label="Conversation activity by date"
                 >
-                  {report.trend.map(([d, n]) => (
+                  {analyticsDisplayTrend(
+                    report,
+                    section === "Overview",
+                    p.settings.timezone,
+                  ).map(([d, n]) => (
                     <button
                       key={d}
                       className="analytics-bar"
                       aria-pressed={selectedDay === d}
-                      title={`${n} conversations on ${d}`}
+                      title={`${n} conversations · ${d.replace("..", " through ")}`}
                       onClick={() => {
                         setSelectedDay(selectedDay === d ? "" : d);
                         setSection("Relationships");
@@ -439,11 +478,17 @@ export function Analytics() {
                       <span
                         className="analytics-bar-fill"
                         style={{
-                          height: `${Math.max(8, (n / Math.max(...report.trend.map((x) => x[1]))) * 110)}px`,
+                          height: `${n ? Math.max(8, (n / Math.max(1, ...analyticsDisplayTrend(report, section === "Overview", p.settings.timezone).map((x) => x[1]))) * 110) : 0}px`,
                         }}
                       />
                       <strong>{n}</strong>
-                      <small>{d}</small>
+                      <small>
+                        {d.includes("..")
+                          ? `${d.slice(5, 10)} – ${d.slice(17)}`
+                          : d.length === 10
+                            ? d.slice(5)
+                            : d}
+                      </small>
                     </button>
                   ))}
                 </div>
@@ -486,18 +531,25 @@ export function Analytics() {
               <section className="surface">
                 <h2>
                   {selectedDay
-                    ? `Conversations · ${selectedDay}`
+                    ? `Conversations · ${selectedDay.replace("..", " through ")}`
                     : "Conversations in this period"}
                 </h2>
+                {selectedDay && (
+                  <button
+                    className="button ghost"
+                    onClick={() => setSelectedDay("")}
+                  >
+                    Clear date selection
+                  </button>
+                )}
                 <ul className="analytics-records">
                   {report.interactions
-                    .filter(
-                      (i) =>
-                        !selectedDay ||
-                        calendarDay(
-                          i.occurredAt,
-                          p.settings.timezone,
-                        ).startsWith(selectedDay),
+                    .filter((i) =>
+                      inAnalyticsBucket(
+                        i.occurredAt,
+                        selectedDay,
+                        p.settings.timezone,
+                      ),
                     )
                     .slice(0, 100)
                     .map((i) => (
@@ -523,6 +575,15 @@ export function Analytics() {
                 {!report.interactions.length && (
                   <p>No saved conversations match.</p>
                 )}
+                {selectedDay &&
+                  report.interactions.length > 0 &&
+                  !report.interactions.some((i) =>
+                    inAnalyticsBucket(
+                      i.occurredAt,
+                      selectedDay,
+                      p.settings.timezone,
+                    ),
+                  ) && <p>No conversations recorded for this selected date.</p>}
               </section>
             </>
           )}
@@ -639,9 +700,9 @@ export function Analytics() {
               <section className="surface">
                 <h2>Recorded stage movements</h2>
                 <p className="muted">
-                  Tracking begins with this release. Earlier stage entry and
-                  duration are unknown. Names below were captured when each
-                  movement occurred.
+                  Tracking begins with saved stage transitions. Earlier stage
+                  entry and duration are unknown. Names below were captured when
+                  each movement occurred.
                 </p>
                 {report.transitions.length ? (
                   <ul>
@@ -831,13 +892,12 @@ export function Analytics() {
               <section className="surface">
                 <h2>Completed in this period</h2>
                 {report.completed
-                  .filter(
-                    (t) =>
-                      !selectedDay ||
-                      calendarDay(
-                        t.completedAt!,
-                        p.settings.timezone,
-                      ).startsWith(selectedDay),
+                  .filter((t) =>
+                    inAnalyticsBucket(
+                      t.completedAt!,
+                      selectedDay,
+                      p.settings.timezone,
+                    ),
                   )
                   .slice(0, 100)
                   .map((t) => (

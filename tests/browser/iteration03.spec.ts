@@ -151,6 +151,11 @@ test("review snoozes persist and Smart List membership follows task completion",
   await page
     .locator(".review-card")
     .first()
+    .getByText("More review actions", { exact: true })
+    .click();
+  await page
+    .locator(".review-card")
+    .first()
     .getByRole("button", { name: "Snooze", exact: true })
     .click();
   await page.getByLabel("Snooze for").selectOption("7");
@@ -159,6 +164,10 @@ test("review snoozes persist and Smart List membership follows task completion",
   await page.reload();
   await page.getByRole("button", { name: "Snoozed", exact: true }).click();
   await expect(page.locator(".review-card")).toContainText(name);
+  await page
+    .locator(".review-card")
+    .getByText("More review actions", { exact: true })
+    .click();
   await page
     .locator(".review-card")
     .getByRole("button", { name: "Unsnooze", exact: true })

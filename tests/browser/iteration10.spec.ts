@@ -4,9 +4,7 @@ import fs from "node:fs";
 async function demo(page: Page) {
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
-  await expect(
-    page.getByRole("heading", { name: /^Today\./ }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Today\./ })).toBeVisible();
   page.on("dialog", (d) => d.accept());
 }
 async function createDeal(
@@ -66,7 +64,9 @@ test("analytics uses real records, scoped filters, accessible charts and local C
     page.getByRole("link", { name: "View relationship analytics" }),
   ).toBeVisible();
   await page.getByRole("link", { name: "View relationship analytics" }).click();
-  await expect(page.getByRole("combobox", { name: "Person", exact: true })).not.toHaveValue("");
+  await expect(
+    page.getByRole("combobox", { name: "Person", exact: true }),
+  ).not.toHaveValue("");
   await page.goto("/#/analytics");
   await page
     .getByRole("button", { name: "Opportunities", exact: true })
@@ -93,9 +93,7 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
   test.setTimeout(180000);
   await demo(page);
   await page.goto("/#/automations");
-  await page
-    .getByRole("button", { name: "Proposal follow-up", exact: true })
-    .click();
+  await page.getByRole("button", { name: /^Proposal follow-up/ }).click();
   const d = page.getByRole("dialog");
   await expect(d.getByText("Review before saving")).toBeVisible();
   await expect(d).toContainText("No email or message is sent");
@@ -136,6 +134,7 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
   ).toHaveCount(1);
   const second = await context.newPage();
   await second.goto("/#/automations");
+  await second.getByText("Execution & safety", { exact: true }).click();
   await second
     .getByRole("button", { name: "Check eligible conditions now" })
     .click();
@@ -177,6 +176,7 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
     .click();
   await expect(other.getByRole("dialog")).toHaveCount(0);
   await other.goto("/#/automations");
+  await other.getByText("Execution & safety", { exact: true }).click();
   await other
     .getByRole("button", { name: "Check eligible conditions now" })
     .click();
@@ -193,9 +193,7 @@ test("restricted person blocks automated action and the rule builder fits respon
   test.setTimeout(180000);
   await demo(page);
   await page.goto("/#/automations");
-  await page
-    .getByRole("button", { name: "Proposal follow-up", exact: true })
-    .click();
+  await page.getByRole("button", { name: /^Proposal follow-up/ }).click();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Save disabled draft" })
@@ -204,7 +202,12 @@ test("restricted person blocks automated action and the rule builder fits respon
     .locator(".automation-rule")
     .getByRole("button", { name: "Enable", exact: true })
     .click();
-  await createDeal(page, "Restricted verification", "Sunday Supply", "Mia Patel");
+  await createDeal(
+    page,
+    "Restricted verification",
+    "Sunday Supply",
+    "Mia Patel",
+  );
   const card = page
     .locator(".pipeline-deal")
     .filter({ hasText: "Restricted verification" });
@@ -249,9 +252,7 @@ test("restricted person blocks automated action and the rule builder fits respon
     }
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto("/#/automations");
-  await page
-    .getByRole("button", { name: "Closing soon review", exact: true })
-    .click();
+  await page.getByRole("button", { name: /^Closing soon review/ }).click();
   const d = page.getByRole("dialog");
   await expect(d).toBeVisible();
   expect(

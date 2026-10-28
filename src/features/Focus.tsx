@@ -4,12 +4,16 @@ import { usePulse } from "../app/context";
 import { calendarDay } from "../services/progress";
 import { setFocus } from "../data/expansion-repository";
 import { completeTask } from "../data/repository";
-import { FocusSummary } from "../components/focus";
+import { Avatar, Badge, Empty, useFormat } from "../components/ui";
+import { EditorModal, type Editor } from "../components/forms";
+import { taskState } from "../services/recommendations";
 import { ProgressSummary } from "../components/progress";
 import type { FocusItem } from "../data/expansion-models";
 export function Focus() {
   const p = usePulse(),
     day = calendarDay(Date.now(), p.settings.timezone);
+  const { date, money } = useFormat();
+  const [editor, setEditor] = useState<Editor | null>(null);
   const [type, setType] = useState<FocusItem["entityType"]>("contact"),
     [id, setId] = useState(""),
     [search, setSearch] = useState("");
@@ -36,18 +40,36 @@ export function Focus() {
   };
   return (
     <div className="page focus-page">
-      <div className="page-heading">
+      <div className="page-heading editorial-masthead insight-masthead">
         <div>
           <p className="eyebrow">CHOSEN BY YOU</p>
           <h1>
             My Focus<span className="accent">.</span>
           </h1>
-          <p className="subtitle">
+          <p className="editorial-deck">
             Keep relationships close. Choose what to move forward today.
           </p>
         </div>
       </div>
-      <FocusSummary />
+      <div className="focus-day-brief">
+        <span className="eyebrow">TODAY · CHOSEN BY YOU</span>
+        <strong>
+          {p.focusItems.filter((f) => f.today === day).length}
+          <small>selected</small>
+        </strong>
+        <p>
+          {
+            p.focusItems.filter(
+              (f) =>
+                f.today === day &&
+                f.entityType === "task" &&
+                p.tasks.some((t) => t.id === f.recordId && t.completedAt),
+            ).length
+          }{" "}
+          completed follow-ups in today’s selections. Choose a manageable next
+          step; there is no automatic prioritization.
+        </p>
+      </div>
       <details className="surface focus-picker">
         <summary>Add a priority</summary>
         <div className="form-grid">
@@ -140,22 +162,79 @@ export function Focus() {
             ? f.today === day && !done
             : section === "Recently completed"
               ? !!done
-              : section === "Pinned relationships"
-                ? ["contact", "organization"].includes(f.entityType)
-                : section === "Opportunities in focus"
-                  ? f.entityType === "opportunity"
-                  : f.entityType === "task" && !done;
+              : f.today === day
+                ? false
+                : section === "Pinned relationships"
+                  ? ["contact", "organization"].includes(f.entityType)
+                  : section === "Opportunities in focus"
+                    ? f.entityType === "opportunity"
+                    : f.entityType === "task" && !done;
         });
+        if (!items.length && section !== "Today") return null;
         return (
-          <section className="surface" key={section}>
+          <section
+            className={`surface focus-collection ${section === "Today" ? "focus-today" : ""}`}
+            key={section}
+          >
             <h2>{section}</h2>
             {!items.length && (
-              <p className="muted">Nothing selected here yet.</p>
+              <Empty
+                title="Give today a little direction."
+                body="Open Add a priority to choose a person, company, opportunity or follow-up. Your other pins stay below until you select them for today."
+              />
             )}
             {items.slice(0, 100).map((f) => (
               <article className="focus-row" key={f.id}>
                 <div>
-                  <strong>{name(label(f)!)}</strong>
+                  <div className="focus-record-identity">
+                    {(f.entityType === "contact" ||
+                      f.entityType === "organization") && (
+                      <Avatar
+                        name={name(label(f)!)}
+                        mediaId={(label(f) as { avatar?: string })?.avatar}
+                        company={f.entityType === "organization"}
+                        size="large"
+                      />
+                    )}
+                    <strong>{name(label(f)!)}</strong>
+                  </div>
+                  {f.entityType === "opportunity" &&
+                    (() => {
+                      const o = p.opportunities.find(
+                        (o) => o.id === f.recordId,
+                      )!;
+                      return (
+                        <p className="focus-deal-context">
+                          <strong>
+                            {o.value === null
+                              ? "Value not set"
+                              : money(o.value, o.currency)}
+                          </strong>
+                          <Badge tone="purple">
+                            {p.pipelineStages.find((s) => s.id === o.stageId)
+                              ?.name || "Stage"}{" "}
+                            · {o.status}
+                          </Badge>
+                        </p>
+                      );
+                    })()}
+                  {f.entityType === "task" &&
+                    (() => {
+                      const t = p.tasks.find((t) => t.id === f.recordId)!;
+                      return (
+                        <p className="focus-task-context">
+                          {taskState(t, p.settings.timezone)} · {date(t.dueAt)}{" "}
+                          <button
+                            className="text-link"
+                            onClick={() =>
+                              setEditor({ kind: "task", record: t })
+                            }
+                          >
+                            Edit task
+                          </button>
+                        </p>
+                      );
+                    })()}
                   <p className="muted">
                     {f.entityType} · Personally pinned{" "}
                     {f.today === day
@@ -173,7 +252,11 @@ export function Focus() {
                     </Link>
                   ) : (
                     <Link
-                      to={f.entityType === "task" ? "/activity" : "/pipeline"}
+                      to={
+                        f.entityType === "task"
+                          ? `/activity?filter=${p.tasks.find((t) => t.id === f.recordId)?.completedAt ? "complete" : "open"}`
+                          : "/pipeline"
+                      }
                     >
                       Open {f.entityType}
                     </Link>
@@ -229,6 +312,9 @@ export function Focus() {
           </section>
         );
       })}
+      {editor && (
+        <EditorModal editor={editor} onClose={() => setEditor(null)} />
+      )}
       {p.settings.focus.progress && p.settings.gamification && (
         <ProgressSummary />
       )}

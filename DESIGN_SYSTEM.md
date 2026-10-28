@@ -104,3 +104,9 @@ Desktop Pipeline uses an internally scrollable, keyboard-focusable board. Stage-
 ## Pipeline and Activity workspaces
 
 `src/workspaces.css` extends the editorial system with an ink commercial value strip, stage-volume controls and compact company-centered opportunity cards. Activity uses open chronological groups, immediately available completion/editing and progressive task tools; recent conversation excerpts supply a different secondary rhythm. Counts and currency values derive from records. Empty stages are optional; any stage remains explicitly selectable. Both compositions preserve semantic theme/accent tokens, initial avatars/saved local media, keyboard controls and the shared editor/repository paths. See WORKSPACES_16.md.
+
+## Insights and deliberate workspaces
+
+`src/insights.css` extends the shared editorial system. Analytics uses a dark focus briefing, three explicit evidence lanes, source-record inspection, restrained coverage/value perspectives and expandable company comparisons. Default trends group dense date ranges; their source predicate is shared with CSV. Current snapshots remain visibly distinct from period activity. Scope controls are disclosed rather than dominating the report.
+
+Orbit opens a guided company explorer on desktop, with mobile List preserved and Explore clearly available. Map lines mean saved associations only; selected edges are highlighted and their record names/meanings are inspectable. Review reduces visible actions, Focus avoids duplicate records and empty panels, and automation templates teach their trigger/action before opening a reviewed disabled draft. Semantic light/dark/accent tokens, native disclosures, visible focus, local images and existing transactional controls remain shared. See INSIGHTS_17.md.

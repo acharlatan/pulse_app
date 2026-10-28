@@ -151,6 +151,7 @@ test("Northstar relationship workflow persists and all new editors work", async 
     await noOverflow(page);
     await page.getByRole("button", { name: "Edit task", exact: true }).click();
     await noOverflow(page);
+    await expect(page.getByRole("dialog")).toBeVisible();
     const bounds = await page.getByRole("dialog").boundingBox();
     expect(bounds!.x).toBeGreaterThanOrEqual(0);
     expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);

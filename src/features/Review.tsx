@@ -1,4 +1,3 @@
-import { BrandArt } from "../components/BrandArt";
 import { FocusButton } from "../components/focus";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -62,8 +61,7 @@ export function Review() {
   }
   return (
     <div className="page review-page">
-      <div className="page-heading studio-heading">
-        <BrandArt motif="orbit" />
+      <div className="page-heading editorial-masthead insight-masthead">
         <div>
           <p className="eyebrow">A LITTLE INTENTION, EVERY DAY</p>
           <h1>
@@ -116,7 +114,7 @@ export function Review() {
       <Link className="button secondary" to="/focus">
         My Focus
       </Link>
-      <p className="muted">
+      <p className="review-queue-label">
         {rows.length} {view.toLowerCase()} reviews · Snooze defers a suggestion.
         Dismiss hides unchanged evidence. Neither changes a task, availability
         or permission.
@@ -131,6 +129,7 @@ export function Review() {
               <div className="review-identity">
                 <Avatar
                   name={c?.name || o?.title || "Opportunity"}
+                  mediaId={c?.avatar}
                   company={!c}
                 />
                 <div>
@@ -150,7 +149,10 @@ export function Review() {
               >
                 {r.category}
               </Badge>
-              <p className="review-reason">{r.reason}</p>
+              <div className="review-evidence">
+                <span className="eyebrow">WHY THIS IS HERE</span>
+                <p className="review-reason">{r.reason}</p>
+              </div>
               {r.action?.until && (
                 <p className="muted">
                   Snoozed until{" "}
@@ -162,8 +164,6 @@ export function Review() {
                 </p>
               )}
               <div className="record-actions">
-                {c && <FocusButton type="contact" id={c.id} />}
-                {o && <FocusButton type="opportunity" id={o.id} />}
                 {c && (
                   <>
                     <Link
@@ -193,14 +193,6 @@ export function Review() {
                             ? "Reschedule follow-up"
                             : "Schedule follow-up"}
                         </button>
-                        <button
-                          className="button ghost"
-                          onClick={() =>
-                            setEditor({ kind: "interaction", contact: c })
-                          }
-                        >
-                          Log interaction
-                        </button>
                       </>
                     )}
                   </>
@@ -215,39 +207,56 @@ export function Review() {
                     Review opportunity
                   </button>
                 )}
-                {!r.blocked &&
-                  (r.action ? (
+              </div>
+              <details className="review-secondary">
+                <summary>More review actions</summary>
+                <div className="record-actions">
+                  {c && <FocusButton type="contact" id={c.id} />}
+                  {o && <FocusButton type="opportunity" id={o.id} />}
+                  {c && !r.blocked && (
                     <button
                       className="button ghost"
                       onClick={() =>
-                        p.run(
-                          () => clearRecommendationAction(p.db, r.action!.id),
-                          "Review returned to the queue",
-                        )
+                        setEditor({ kind: "interaction", contact: c })
                       }
                     >
-                      Unsnooze
+                      Log interaction
                     </button>
-                  ) : (
-                    <>
+                  )}
+                  {!r.blocked &&
+                    (r.action ? (
                       <button
                         className="button ghost"
-                        onClick={() => {
-                          setSnooze(r);
-                          setDays(String(p.settings.intelligence.snoozeDays));
-                        }}
+                        onClick={() =>
+                          p.run(
+                            () => clearRecommendationAction(p.db, r.action!.id),
+                            "Review returned to the queue",
+                          )
+                        }
                       >
-                        Snooze
+                        Unsnooze
                       </button>
-                      <button
-                        className="button ghost"
-                        onClick={() => dismiss(r)}
-                      >
-                        Dismiss
-                      </button>
-                    </>
-                  ))}
-              </div>
+                    ) : (
+                      <>
+                        <button
+                          className="button ghost"
+                          onClick={() => {
+                            setSnooze(r);
+                            setDays(String(p.settings.intelligence.snoozeDays));
+                          }}
+                        >
+                          Snooze
+                        </button>
+                        <button
+                          className="button ghost"
+                          onClick={() => dismiss(r)}
+                        >
+                          Dismiss
+                        </button>
+                      </>
+                    ))}
+                </div>
+              </details>
             </article>
           );
         })}
