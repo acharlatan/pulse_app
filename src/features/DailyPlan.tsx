@@ -203,138 +203,6 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
   );
   const workspace = (
     <section className="daily-workspace" aria-label="Your daily plan">
-      <div className="daily-chosen">
-        {p.settings.focus.shortcuts ? (
-          <>
-            <div className="section-heading">
-              <div>
-                <p className="eyebrow">CHOSEN BY YOU</p>
-                  <h2>Your priorities</h2>
-              </div>
-              <Link className="text-link" to="/focus">
-                My Focus <ArrowUpRight size={16} />
-              </Link>
-            </div>
-            <p className="muted">
-              Select a record to work here. Completion only applies to saved
-              follow-ups.
-            </p>
-            {plan.chosen.length === 0 ? (
-              <div className="daily-chosen-empty">
-                <Target size={30} />
-                <h3>Give today a little direction.</h3>
-                <p>
-                  Choose a suggestion, or select your own priorities in My
-                  Focus. Nothing is assigned automatically.
-                </p>
-                <Link className="button secondary" to="/focus">
-                  Choose your own priorities
-                </Link>
-              </div>
-            ) : (
-              <ol className="daily-chosen-list">
-                {(showAll ? plan.chosen : plan.chosen.slice(0, 4)).map((f) => {
-                  const done =
-                    f.entityType === "task" &&
-                    p.tasks.some((t) => t.id === f.recordId && t.completedAt);
-                  return (
-                    <li key={f.id}>
-                      <button
-                        className="daily-chosen-record"
-                        aria-pressed={
-                          active?.type === f.entityType &&
-                          active.id === f.recordId
-                        }
-                        onClick={() =>
-                          inspect({ type: f.entityType, id: f.recordId })
-                        }
-                      >
-                        <span className="daily-chosen-icon" aria-hidden="true">
-                          {done ? <Check size={18} /> : <Target size={18} />}
-                        </span>
-                        <span>
-                          <strong>{label(f)}</strong>
-                          <small>
-                            {done
-                              ? "Completed follow-up"
-                              : f.entityType === "task"
-                                ? "Follow-up"
-                                : f.entityType === "contact"
-                                  ? "Person"
-                                  : f.entityType === "organization"
-                                    ? "Company"
-                                    : "Opportunity"}
-                          </small>
-                        </span>
-                        <ArrowRight size={15} />
-                      </button>
-                      <button
-                        className="daily-remove"
-                        disabled={busy}
-                        aria-label={`Remove from today: ${label(f)}`}
-                        onClick={() =>
-                          void p.run(
-                            () =>
-                              setFocus(
-                                p.db,
-                                f.entityType,
-                                f.recordId,
-                                "removeToday",
-                              ),
-                            "Removed from today; pin kept",
-                          )
-                        }
-                      >
-                        Remove from today
-                      </button>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-            {plan.chosen.length > 4 && (
-              <button
-                className="button ghost"
-                onClick={() => setShowAll(!showAll)}
-              >
-                {showAll
-                  ? "Show fewer priorities"
-                  : `Show all ${plan.chosen.length} priorities`}
-              </button>
-            )}
-          </>
-        ) : (
-          <div className="section-heading">
-            <h2>Your schedule</h2>
-            <Link className="text-link" to="/focus">
-              Open My Focus <ArrowUpRight size={16} />
-            </Link>
-          </div>
-        )}
-        <details className="daily-later">
-          <summary>
-            What can wait? · {plan.later.length} scheduled later
-          </summary>
-          <p>
-            These saved follow-ups are due after today in your workspace
-            timezone. This is their schedule, not a judgment of importance.
-          </p>
-          {plan.later.slice(0, 3).map((t) => (
-            <button
-              className="daily-later-record"
-              key={t.id}
-              onClick={() => inspect({ type: "task", id: t.id })}
-            >
-              <strong>{t.title}</strong>
-              <span>{date(t.dueAt)}</span>
-            </button>
-          ))}
-          {!plan.later.length && <p>No later follow-ups scheduled.</p>}
-          <Link className="text-link" to="/activity?filter=upcoming">
-            All upcoming follow-ups <ArrowUpRight size={15} />
-          </Link>
-        </details>
-      </div>
       <section
         className="priority-feature daily-inspector"
         aria-label="Your next commitment"
@@ -517,6 +385,138 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
           then return here.
         </small>
       </section>
+      <div className="daily-chosen">
+        {p.settings.focus.shortcuts ? (
+          <>
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">CHOSEN BY YOU</p>
+                  <h2>Your priorities</h2>
+              </div>
+              <Link className="text-link" to="/focus">
+                My Focus <ArrowUpRight size={16} />
+              </Link>
+            </div>
+            <p className="muted">
+              Select a record to work here. Completion only applies to saved
+              follow-ups.
+            </p>
+            {plan.chosen.length === 0 ? (
+              <div className="daily-chosen-empty">
+                <Target size={30} />
+                <h3>Give today a little direction.</h3>
+                <p>
+                  Choose a suggestion, or select your own priorities in My
+                  Focus. Nothing is assigned automatically.
+                </p>
+                <Link className="button secondary" to="/focus">
+                  Choose your own priorities
+                </Link>
+              </div>
+            ) : (
+              <ol className="daily-chosen-list">
+                {(showAll ? plan.chosen : plan.chosen.slice(0, 4)).map((f) => {
+                  const done =
+                    f.entityType === "task" &&
+                    p.tasks.some((t) => t.id === f.recordId && t.completedAt);
+                  return (
+                    <li key={f.id}>
+                      <button
+                        className="daily-chosen-record"
+                        aria-pressed={
+                          active?.type === f.entityType &&
+                          active.id === f.recordId
+                        }
+                        onClick={() =>
+                          inspect({ type: f.entityType, id: f.recordId })
+                        }
+                      >
+                        <span className="daily-chosen-icon" aria-hidden="true">
+                          {done ? <Check size={18} /> : <Target size={18} />}
+                        </span>
+                        <span>
+                          <strong>{label(f)}</strong>
+                          <small>
+                            {done
+                              ? "Completed follow-up"
+                              : f.entityType === "task"
+                                ? "Follow-up"
+                                : f.entityType === "contact"
+                                  ? "Person"
+                                  : f.entityType === "organization"
+                                    ? "Company"
+                                    : "Opportunity"}
+                          </small>
+                        </span>
+                        <ArrowRight size={15} />
+                      </button>
+                      <button
+                        className="daily-remove"
+                        disabled={busy}
+                        aria-label={`Remove from today: ${label(f)}`}
+                        onClick={() =>
+                          void p.run(
+                            () =>
+                              setFocus(
+                                p.db,
+                                f.entityType,
+                                f.recordId,
+                                "removeToday",
+                              ),
+                            "Removed from today; pin kept",
+                          )
+                        }
+                      >
+                        Remove from today
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+            {plan.chosen.length > 4 && (
+              <button
+                className="button ghost"
+                onClick={() => setShowAll(!showAll)}
+              >
+                {showAll
+                  ? "Show fewer priorities"
+                  : `Show all ${plan.chosen.length} priorities`}
+              </button>
+            )}
+          </>
+        ) : (
+          <div className="section-heading">
+            <h2>Your schedule</h2>
+            <Link className="text-link" to="/focus">
+              Open My Focus <ArrowUpRight size={16} />
+            </Link>
+          </div>
+        )}
+        <details className="daily-later">
+          <summary>
+            What can wait? · {plan.later.length} scheduled later
+          </summary>
+          <p>
+            These saved follow-ups are due after today in your workspace
+            timezone. This is their schedule, not a judgment of importance.
+          </p>
+          {plan.later.slice(0, 3).map((t) => (
+            <button
+              className="daily-later-record"
+              key={t.id}
+              onClick={() => inspect({ type: "task", id: t.id })}
+            >
+              <strong>{t.title}</strong>
+              <span>{date(t.dueAt)}</span>
+            </button>
+          ))}
+          {!plan.later.length && <p>No later follow-ups scheduled.</p>}
+          <Link className="text-link" to="/activity?filter=upcoming">
+            All upcoming follow-ups <ArrowUpRight size={15} />
+          </Link>
+        </details>
+      </div>
     </section>
   );
   return (
@@ -549,6 +549,33 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
         </div>
       </section>
       {workspace}
+      <section className="daily-extra-grid" aria-label="More from your workspace">
+        <article className="daily-extra-panel">
+          <div className="section-heading"><h2>Coming up</h2><Link className="text-link" to="/activity?filter=upcoming">View follow-ups <ArrowUpRight size={16} /></Link></div>
+          {plan.later.length ? plan.later.slice(0, 3).map((item) => (
+            <button className="daily-extra-row" key={item.id} onClick={() => inspect({ type: "task", id: item.id })}>
+              <CalendarDays size={20} /><span><strong>{item.title}</strong><small>{date(item.dueAt)}</small></span><ArrowRight size={16} />
+            </button>
+          )) : <p className="muted">No later follow-ups scheduled yet.</p>}
+        </article>
+        <article className="daily-extra-panel">
+          <div className="section-heading"><h2>Recent conversations</h2><Link className="text-link" to="/activity">View activity <ArrowUpRight size={16} /></Link></div>
+          {p.interactions.filter((item) => item.type !== "Note" && Date.parse(item.occurredAt) <= Date.now()).slice(0, 3).map((item) => {
+            const contact = p.contacts.find((person) => person.id === item.contactId);
+            return <button className="daily-extra-row" key={item.id} onClick={() => onEdit({kind: "interaction", record: item})}>
+              {contact ? <Avatar name={contact.name} mediaId={contact.avatar} /> : <Compass size={20} />}
+              <span><strong>{contact?.name || "Saved conversation"}</strong><small>{item.type} · {date(item.occurredAt)}</small></span><ArrowRight size={16} />
+            </button>;
+          })}
+          {!p.interactions.some((item) => item.type !== "Note" && Date.parse(item.occurredAt) <= Date.now()) && <p className="muted">Your saved conversations will appear here.</p>}
+        </article>
+        <article className="daily-extra-panel daily-network-snapshot">
+          <div className="section-heading"><h2>Your network</h2><Link className="text-link" to="/network">Explore <ArrowUpRight size={16} /></Link></div>
+          <div className="daily-network-circle"><strong>{p.contacts.length}</strong><span>people</span></div>
+          <p>{p.organizations.length} companies saved in this workspace.</p>
+          <Link className="text-link" to="/analytics">See relationship insights <ArrowUpRight size={16} /></Link>
+        </article>
+      </section>
       {suggestions}
       <section className="daily-wrap" aria-labelledby="daily-wrap-title">
         <div className="daily-wrap-intro">

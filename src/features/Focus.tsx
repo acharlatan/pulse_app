@@ -70,6 +70,19 @@ export function Focus() {
           step; there is no automatic prioritization.
         </p>
       </div>
+      {p.workspace === "demo" && p.focusItems.length === 0 && (p.contacts.some((item) => item.id === "contact-0") || p.tasks.some((item) => item.id === "task-0") || p.opportunities.length > 0) && (
+        <aside className="surface demo-focus-examples">
+          <div><strong>See My Focus in action</strong><p>Try a few fictional priorities from this demo workspace. You can change or remove them anytime.</p></div>
+          <button className="button primary" onClick={() => void p.run(() => p.db.transaction("rw", p.db.tables, async () => {
+            const contact = p.contacts.find((item) => item.id === "contact-0");
+            const task = p.tasks.find((item) => item.id === "task-0");
+            const opportunity = p.opportunities[0];
+            if (contact) await setFocus(p.db, "contact", contact.id, "today", day);
+            if (task) await setFocus(p.db, "task", task.id, "pin");
+            if (opportunity) await setFocus(p.db, "opportunity", opportunity.id, "pin");
+          }), "Demo priorities added")}>Add example priorities</button>
+        </aside>
+      )}
       <details className="surface focus-picker">
         <summary>Add a priority</summary>
         <div className="form-grid">

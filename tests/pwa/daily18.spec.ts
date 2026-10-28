@@ -21,7 +21,7 @@ test("Daily Pulse choices and completion remain available offline", async ({
   await context.setOffline(true);
   await page.reload();
   await page
-    .getByRole("heading", { name: "A day with direction.", exact: true })
+    .getByRole("heading", { name: "Today.", exact: true })
     .waitFor();
   const target = page
       .locator(".daily-suggestion")
