@@ -36,7 +36,14 @@ const nav = [
   { to: "/activity", label: "Activity", short: "Activity", icon: Activity },
 ];
 export function Shell({ children }: { children: ReactNode }) {
-  const { intelligence, workspace, settings, contacts, tasks } = usePulse();
+  const {
+    intelligence,
+    workspace,
+    settings,
+    contacts,
+    tasks,
+    switchWorkspace,
+  } = usePulse();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [add, setAdd] = useState(false);
   const [more, setMore] = useState(false);
@@ -241,6 +248,30 @@ export function Shell({ children }: { children: ReactNode }) {
             PULSE.
           </Link>
           <div className="topbar-actions">
+            <details className="workspace-switcher">
+              <summary
+                aria-label={`Workspace: ${workspace === "demo" ? "Demo" : "Personal"}. Switch workspace`}
+              >
+                <span aria-hidden="true">
+                  {workspace === "demo" ? "Demo" : "Personal"}
+                </span>
+                <ChevronDown size={15} />
+              </summary>
+              <div className="workspace-switcher-menu">
+                <strong>Switch workspace</strong>
+                <p>Demo and Personal have separate records on this device.</p>
+                <button
+                  type="button"
+                  className="button secondary"
+                  onClick={() =>
+                    switchWorkspace(workspace === "demo" ? "personal" : "demo")
+                  }
+                >
+                  Open {workspace === "demo" ? "Personal" : "Demo"}
+                </button>
+                <small>Switching does not delete either workspace.</small>
+              </div>
+            </details>
             <span className="local-indicator">
               <i />
               {workspace === "demo" ? "Demo workspace" : "Saved on this device"}

@@ -94,7 +94,13 @@ export function WorkspaceProvider({
   children: ReactNode;
 }) {
   const db = database(workspace);
-  useEffect(() => () => { clearGoogleSession(); clearGoogleImport(); }, [workspace]);
+  useEffect(
+    () => () => {
+      clearGoogleSession();
+      clearGoogleImport();
+    },
+    [workspace],
+  );
   const data = useWorkspaceData(db);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
@@ -309,7 +315,10 @@ export function WorkspaceProvider({
         db,
         workspace,
         switchWorkspace: (next) => {
-          if (confirmLeave()) onSwitch(next);
+          if (confirmLeave()) {
+            window.location.hash = "#/";
+            onSwitch(next);
+          }
         },
         notify: setToast,
         run,
