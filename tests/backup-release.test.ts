@@ -24,6 +24,7 @@ it.each([1, 2])(
       const migrated = await exportBackup(db);
       expect(migrated.settings[0].onboarding).toEqual({
         hidden: false,
+        intention: "",
         exportInitiatedAt: null,
       });
       expect(migrated.settings[0].ai.enabled).toBe(false);

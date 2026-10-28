@@ -299,6 +299,9 @@ export const settingsSchema = z.object({
   onboarding: z
     .object({
       hidden: z.boolean().default(false),
+      intention: z
+        .enum(["", "clients", "partnerships", "opportunities"])
+        .default(""),
       exportInitiatedAt: z.string().datetime().nullable().default(null),
     })
     .prefault({}),
@@ -376,7 +379,7 @@ export const defaults: Settings = {
   gamification: true,
   progress: progressPreferencesSchema.parse({}),
   ai: aiPreferencesSchema.parse({}),
-  onboarding: { hidden: false, exportInitiatedAt: null },
+  onboarding: { hidden: false, intention: "", exportInitiatedAt: null },
   identity: {
     workspaceName: "My workspace",
     avatarMediaId: "",

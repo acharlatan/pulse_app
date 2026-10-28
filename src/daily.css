@@ -616,3 +616,45 @@
   margin: 20px 0 28px;
   gap: 20px;
 }
+.first-week-guide {
+  margin: 24px 0;
+  padding: 24px;
+  background: var(--primary-soft);
+  border-left: 4px solid var(--primary);
+  border-radius: 4px 14px 14px 4px;
+}
+.first-week-guide h3 {
+  font-size: 24px;
+  margin: 8px 0;
+}
+.first-week-guide p {
+  line-height: 1.65;
+}
+.first-week-guide .field {
+  max-width: 420px;
+  margin: 20px 0;
+}
+.first-week-guide ol {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 22px;
+}
+.first-week-guide li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+}
+.first-week-guide li span {
+  color: var(--primary);
+  font-weight: 800;
+}
+.first-week-next {
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.first-week-intention {
+  color: var(--muted);
+}
