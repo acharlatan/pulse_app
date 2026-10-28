@@ -62,7 +62,7 @@ export function Home() {
             Today<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            A clear plan for the people and work that matter.
+            {p.settings.name ? `Hello, ${p.settings.name}. ` : ""}Your space to make meaningful connections and move things forward.
           </p>
         </div>
         <div className="editorial-create">
