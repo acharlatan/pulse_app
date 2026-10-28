@@ -580,3 +580,39 @@
   align-items: center;
   min-height: 44px;
 }
+.daily-plan {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.daily-orientation {
+  order: 1;
+}
+.daily-suggestions {
+  order: 2;
+}
+.daily-workspace {
+  order: 3;
+}
+.daily-wrap {
+  order: 4;
+}
+.home-focused .daily-workspace {
+  order: 2;
+}
+.home-focused .daily-suggestions {
+  order: 3;
+}
+.home-compact .daily-orientation {
+  padding: 24px;
+}
+.home-compact .daily-suggestions {
+  margin: 24px 0;
+}
+.home-compact .daily-suggestion {
+  padding: 18px;
+}
+.home-compact .daily-workspace {
+  margin: 20px 0 28px;
+  gap: 20px;
+}

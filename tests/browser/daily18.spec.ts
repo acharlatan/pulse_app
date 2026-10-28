@@ -243,3 +243,37 @@ test("long saved follow-up context wraps on narrow screens", async ({
     ).toBe(true);
   }
 });
+
+test("Home honors Focus visibility and layout without deleting chosen priorities", async ({
+  page,
+}) => {
+  await start(page);
+  const target = page.locator(".daily-suggestion").first(),
+    title = await target.locator("h3").innerText();
+  await target
+    .getByRole("button", { name: "Choose today", exact: true })
+    .click();
+  await page.goto("/#/customize");
+  await page.getByLabel("Home layout", { exact: true }).selectOption("focused");
+  await page.getByRole("status").filter({ hasText: "Layout saved" }).waitFor();
+  await page.getByLabel("Show My Focus on Home", { exact: true }).uncheck();
+  await page
+    .getByRole("status")
+    .filter({ hasText: "Preference saved" })
+    .waitFor();
+  await page.goto("/#/");
+  await expect(page.locator(".daily-chosen-list")).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Your schedule", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".home-focused")).toHaveCount(1);
+  const work = await page.locator(".daily-workspace").boundingBox(),
+    suggestions = await page.locator(".daily-suggestions").boundingBox();
+  expect(work!.y).toBeLessThan(suggestions!.y);
+  await page.reload();
+  await expect(page.locator(".daily-chosen-list")).toHaveCount(0);
+  await page.goto("/#/focus");
+  await expect(
+    page.locator(".focus-row").filter({ hasText: title }),
+  ).toHaveCount(1);
+});
