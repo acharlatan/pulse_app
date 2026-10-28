@@ -229,7 +229,7 @@ test("long saved follow-up context wraps on narrow screens", async ({
     .slice(0, 290);
   await d.getByLabel("Follow-up title").fill(title);
   await d
-    .getByLabel("Details", { exact: true })
+    .getByRole("textbox", { name: "Details", exact: true })
     .fill("longunbrokencontext".repeat(70));
   await d.getByRole("button", { name: "Save follow-up", exact: true }).click();
   await expect(d).not.toBeVisible();
@@ -254,9 +254,19 @@ test("Home honors Focus visibility and layout without deleting chosen priorities
     .getByRole("button", { name: "Choose today", exact: true })
     .click();
   await page.goto("/#/customize");
-  await page.getByLabel("Home layout", { exact: true }).selectOption("focused");
+  await page
+    .getByRole("combobox", { name: "Home layout", exact: true })
+    .selectOption("focused");
   await page.getByRole("status").filter({ hasText: "Layout saved" }).waitFor();
-  await page.getByLabel("Show My Focus on Home", { exact: true }).uncheck();
+  await expect(
+    page.getByRole("combobox", { name: "Home layout", exact: true }),
+  ).toHaveValue("focused");
+  await page
+    .getByRole("checkbox", { name: "Show My Focus on Home", exact: true })
+    .click();
+  await expect(
+    page.getByRole("checkbox", { name: "Show My Focus on Home", exact: true }),
+  ).not.toBeChecked();
   await page
     .getByRole("status")
     .filter({ hasText: "Preference saved" })
@@ -271,6 +281,10 @@ test("Home honors Focus visibility and layout without deleting chosen priorities
     suggestions = await page.locator(".daily-suggestions").boundingBox();
   expect(work!.y).toBeLessThan(suggestions!.y);
   await page.reload();
+  await page.getByRole("heading", { name: "Today.", exact: true }).waitFor();
+  await expect(
+    page.getByRole("heading", { name: "Your schedule", exact: true }),
+  ).toBeVisible();
   await expect(page.locator(".daily-chosen-list")).toHaveCount(0);
   await page.goto("/#/focus");
   await expect(
