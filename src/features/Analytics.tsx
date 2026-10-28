@@ -85,6 +85,14 @@ export function Analytics() {
     }
   }, [p, transitions, filter, section]);
   const report = result.data;
+  const weekly = useMemo(
+    () =>
+      calculateAnalytics(
+        { ...p, transitions, relationships: p.intelligence.relationships },
+        { ...filters, preset: "7", interactionType: "" },
+      ),
+    [p, transitions, filter, section],
+  );
   const person = (id: string | null) => p.contacts.find((c) => c.id === id);
   function exportCsv() {
     if (!report) return;
@@ -400,6 +408,52 @@ export function Analytics() {
                   setFiltersOpen(true);
                 }}
               />
+              <section
+                className="weekly-review"
+                aria-labelledby="weekly-review-title"
+              >
+                <div>
+                  <p className="eyebrow">A WEEK IN PERSPECTIVE</p>
+                  <h2 id="weekly-review-title">
+                    See what moved. Decide what matters.
+                  </h2>
+                  <p>
+                    Last seven days in your workspace timezone. Current overdue
+                    work is shown separately.
+                  </p>
+                </div>
+                <div className="weekly-review-facts">
+                  <div>
+                    <strong>{weekly.interactions.length}</strong>
+                    <span>recorded conversations</span>
+                  </div>
+                  <div>
+                    <strong>{weekly.completed.length}</strong>
+                    <span>completed follow-ups</span>
+                  </div>
+                  <div>
+                    <strong>{weekly.overdue.length}</strong>
+                    <span>overdue now</span>
+                  </div>
+                </div>
+                <div className="weekly-review-actions">
+                  <button
+                    className="button secondary"
+                    onClick={() => {
+                      setFilter({ ...filter, preset: "7" });
+                      setSection("Relationships");
+                    }}
+                  >
+                    Explore this week’s conversations
+                  </button>
+                  <Link className="button ghost" to="/review">
+                    Review priorities
+                  </Link>
+                  <Link className="button ghost" to="/focus">
+                    Plan your focus
+                  </Link>
+                </div>
+              </section>
               <section className="analytics-period-pulse">
                 <div className="section-heading">
                   <div>

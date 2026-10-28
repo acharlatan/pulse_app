@@ -1,0 +1,172 @@
+/* Final product, stage one: a stronger shared frame and a readable weekly perspective. */
+.weekly-review {
+  margin: 32px 0;
+  padding: clamp(24px, 3vw, 40px);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--primary);
+  background: var(--surface);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 24px;
+}
+.weekly-review h2 {
+  font-size: clamp(24px, 2.6vw, 36px);
+  letter-spacing: -0.8px;
+  line-height: 1.15;
+  margin: 12px 0;
+}
+.weekly-review p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.weekly-review-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: center;
+}
+.weekly-review-facts > div {
+  border-left: 1px solid var(--border);
+  padding-left: 16px;
+  display: grid;
+  gap: 8px;
+}
+.weekly-review-facts strong {
+  color: var(--primary);
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1;
+}
+.weekly-review-facts span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.weekly-review-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.network-masthead {
+  border-bottom-width: 3px;
+}
+.network-page .profile-card {
+  border-top: 3px solid var(--primary);
+}
+.editorial-profile .profile-header {
+  border-bottom: 3px solid var(--primary);
+}
+.editorial-profile .profile-section-nav {
+  border-block: 1px solid var(--border);
+}
+.sidebar .nav-item[aria-current="page"] {
+  box-shadow: inset 3px 0 var(--primary);
+}
+@media (max-width: 767px) {
+  .weekly-review {
+    grid-template-columns: 1fr;
+  }
+  .weekly-review-actions {
+    grid-column: auto;
+  }
+  .weekly-review-facts > div {
+    padding-left: 10px;
+  }
+}
+.network-orientation {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 24px;
+  padding: clamp(24px, 3vw, 40px);
+  margin: 0 0 28px;
+  color: var(--studio-on-ink);
+  background: var(--studio-ink);
+  border-radius: 16px;
+}
+.network-orientation .eyebrow {
+  color: var(--studio-ink-muted);
+}
+.network-orientation h2,
+.profile-perspective h2 {
+  font-size: clamp(24px, 2.6vw, 36px);
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+  margin: 10px 0;
+}
+.network-orientation p:not(.eyebrow) {
+  max-width: 560px;
+  color: var(--studio-ink-muted);
+  line-height: 1.65;
+}
+.network-orientation-facts,
+.profile-perspective-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  align-items: center;
+}
+.network-orientation-facts > div,
+.profile-perspective-facts > div {
+  display: grid;
+  gap: 7px;
+  border-left: 1px solid currentColor;
+  padding-left: 14px;
+  min-width: 0;
+}
+.network-orientation-facts strong,
+.profile-perspective-facts strong {
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1;
+}
+.network-orientation-facts span,
+.profile-perspective-facts span {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.network-orientation-links {
+  grid-column: 1/-1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+.network-orientation-links a {
+  color: var(--studio-on-ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-weight: 700;
+  font-size: 13px;
+}
+.profile-perspective {
+  margin: 24px 0;
+  padding: clamp(24px, 3vw, 36px);
+  background: var(--primary-soft);
+  border-left: 4px solid var(--primary);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+}
+.profile-perspective p:not(.eyebrow),
+.profile-perspective-facts span {
+  color: var(--muted);
+  line-height: 1.6;
+}
+.profile-perspective-facts strong {
+  color: var(--primary);
+}
+.profile-perspective-note {
+  grid-column: 1/-1;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+@media (max-width: 767px) {
+  .network-orientation,
+  .profile-perspective {
+    grid-template-columns: 1fr;
+  }
+  .network-orientation-links,
+  .profile-perspective-note {
+    grid-column: auto;
+  }
+}

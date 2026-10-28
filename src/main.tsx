@@ -9,6 +9,7 @@ import "./editorial.css";
 import "./workspaces.css";
 import "./insights.css";
 import "./daily.css";
+import "./final-product.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

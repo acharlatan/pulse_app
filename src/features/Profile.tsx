@@ -287,6 +287,47 @@ export function Profile({ company = false }: { company?: boolean }) {
           </details>
         </div>
       </section>
+      <section
+        className="profile-perspective"
+        aria-label="Relationship perspective"
+      >
+        <div>
+          <p className="eyebrow">THE STORY SO FAR</p>
+          <h2>Context for the next move.</h2>
+          <p>
+            Saved activity and commitments for this{" "}
+            {company ? "company" : "person"}.
+          </p>
+        </div>
+        <div className="profile-perspective-facts">
+          <div>
+            <strong>
+              {
+                interactions.filter(
+                  (i) =>
+                    i.type !== "Note" && Date.parse(i.occurredAt) <= Date.now(),
+                ).length
+              }
+            </strong>
+            <span>recorded conversations</span>
+          </div>
+          <div>
+            <strong>{tasks.filter((t) => !t.completedAt).length}</strong>
+            <span>open follow-ups</span>
+          </div>
+          <div>
+            <strong>
+              {opportunities.filter((o) => o.status === "open").length}
+            </strong>
+            <span>open opportunities</span>
+          </div>
+        </div>
+        <p className="profile-perspective-note">
+          {next
+            ? `Next follow-up: ${next.title} · ${date(next.dueAt)}`
+            : "No open follow-up is scheduled."}
+        </p>
+      </section>
       <div className="profile-quick-links">
         <FocusButton
           type={company ? "organization" : "contact"}
