@@ -44,7 +44,11 @@ import {
   taskState,
 } from "../services/recommendations";
 export function Profile({ company = false }: { company?: boolean }) {
-  const returnPath = useLocation().state?.networkReturn;
+  const location = useLocation();
+  const returnPath = location.state?.networkReturn;
+  const reviewReturn = location.state?.reviewReturn;
+  const canReturnReview =
+    typeof reviewReturn === "string" && /^\/review(?:\?|$)/.test(reviewReturn);
   const { id } = useParams();
   const p = usePulse();
   const navigate = useNavigate();
@@ -80,7 +84,9 @@ export function Profile({ company = false }: { company?: boolean }) {
   );
   const last = company
     ? interactions
-        .filter((i) => i.type !== "Note")
+        .filter(
+          (i) => i.type !== "Note" && Date.parse(i.occurredAt) <= Date.now(),
+        )
         .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))[0]?.occurredAt
     : contact
       ? lastInteraction(contact.id, p.interactions)
@@ -92,15 +98,17 @@ export function Profile({ company = false }: { company?: boolean }) {
     <div className="page profile-page editorial-profile">
       <Link
         to={
-          typeof returnPath === "string" &&
-          /^\/network(?:\?|$)/.test(returnPath)
-            ? returnPath
-            : "/network"
+          canReturnReview
+            ? reviewReturn
+            : typeof returnPath === "string" &&
+                /^\/network(?:\?|$)/.test(returnPath)
+              ? returnPath
+              : "/network"
         }
         className="text-link back-link"
       >
         <ArrowLeft size={16} />
-        Back to your network
+        {canReturnReview ? "Back to review" : "Back to your network"}
       </Link>
       <section
         className={`surface profile-header ${record.coverMediaId ? "has-cover" : "without-cover"}`}
@@ -288,7 +296,7 @@ export function Profile({ company = false }: { company?: boolean }) {
         </div>
       </section>
       <section
-        className="profile-perspective"
+        className="profile-perspective connected-profile-perspective"
         aria-label="Relationship perspective"
       >
         <div>
@@ -322,13 +330,8 @@ export function Profile({ company = false }: { company?: boolean }) {
             <span>open opportunities</span>
           </div>
         </div>
-        <p className="profile-perspective-note">
-          {next
-            ? `Next follow-up: ${next.title} · ${date(next.dueAt)}`
-            : "No open follow-up is scheduled."}
-        </p>
       </section>
-      <div className="profile-quick-links">
+      <div className="profile-quick-links connected-profile-tools">
         <FocusButton
           type={company ? "organization" : "contact"}
           id={record.id}
@@ -337,13 +340,23 @@ export function Profile({ company = false }: { company?: boolean }) {
           className="button ghost"
           aria-label="View relationship analytics"
           to={`/analytics?${company ? "company" : "person"}=${encodeURIComponent(record.id)}`}
+          state={{
+            profileReturn: `/network/${company ? "companies" : "people"}/${encodeURIComponent(record.id)}`,
+            networkReturn: returnPath,
+            reviewReturn: canReturnReview ? reviewReturn : undefined,
+          }}
         >
           Analytics
         </Link>
         <Link
           className="button ghost"
           aria-label="View in Relationship Orbit"
-          to={`/orbit?${company ? "company" : "person"}=${record.id}`}
+          to={`/orbit?${company ? "company" : "person"}=${encodeURIComponent(record.id)}`}
+          state={{
+            profileReturn: `/network/${company ? "companies" : "people"}/${encodeURIComponent(record.id)}`,
+            networkReturn: returnPath,
+            reviewReturn: canReturnReview ? reviewReturn : undefined,
+          }}
         >
           Orbit
         </Link>

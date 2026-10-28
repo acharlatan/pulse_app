@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty, useFormat } from "../components/ui";
 import { deriveOrbit, type OrbitNode } from "../services/orbit";
@@ -11,6 +11,18 @@ import {
 import { FocusButton } from "../components/focus";
 import { OrbitGuide } from "./OrbitGuide";
 export function Orbit() {
+  const navigationState = useLocation().state as {
+    profileReturn?: unknown;
+    networkReturn?: unknown;
+    reviewReturn?: unknown;
+  } | null;
+  const profileReturn =
+    typeof navigationState?.profileReturn === "string" &&
+    /^\/network\/(people|companies)\/[^/?#]+$/.test(
+      navigationState.profileReturn,
+    )
+      ? navigationState.profileReturn
+      : null;
   const p = usePulse(),
     [params, setParams] = useSearchParams(),
     [search, setSearch] = useState(""),
@@ -102,6 +114,18 @@ export function Orbit() {
   }
   return (
     <div className="page orbit-page">
+      {profileReturn && (
+        <Link
+          className="text-link connected-return"
+          to={profileReturn}
+          state={{
+            networkReturn: navigationState?.networkReturn,
+            reviewReturn: navigationState?.reviewReturn,
+          }}
+        >
+          ← Return to profile
+        </Link>
+      )}
       <div className="page-heading editorial-masthead insight-masthead">
         <div>
           <p className="eyebrow">YOUR CONNECTIONS, IN CONTEXT</p>
@@ -187,7 +211,7 @@ export function Orbit() {
           <button
             className="button ghost"
             onClick={() => {
-              setParams({});
+              setParams({}, { state: navigationState });
               setSelected("");
             }}
           >
@@ -232,7 +256,7 @@ export function Orbit() {
                   setSearch("");
                   setType("");
                   setPriority("");
-                  setParams({});
+                  setParams({}, { state: navigationState });
                 }}
               >
                 Reset view
@@ -274,7 +298,7 @@ export function Orbit() {
               selected={selected}
               onSelect={select}
               onCompany={(id) => {
-                setParams({ company: id });
+                setParams({ company: id }, { state: navigationState });
                 setSearch("");
                 setType("");
                 setPriority("");
@@ -495,7 +519,10 @@ export function Orbit() {
                   <button
                     className="button ghost"
                     onClick={() => {
-                      setParams({ person: person.id });
+                      setParams(
+                        { person: person.id },
+                        { state: navigationState },
+                      );
                       setSelected("");
                     }}
                   >
@@ -529,7 +556,10 @@ export function Orbit() {
                   <button
                     className="button ghost"
                     onClick={() => {
-                      setParams({ company: company.id });
+                      setParams(
+                        { company: company.id },
+                        { state: navigationState },
+                      );
                       setSelected("");
                     }}
                   >

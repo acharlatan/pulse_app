@@ -1,0 +1,211 @@
+/* Relationship-first release: one shared visual frame, with each workspace retaining its purpose. */
+.connected-shell .sidebar {
+  border-right: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+}
+.connected-shell .wordmark {
+  letter-spacing: -0.045em;
+}
+.connected-shell .workspace-label {
+  border: 1px solid color-mix(in srgb, var(--primary) 27%, transparent);
+}
+.connected-shell .nav-item {
+  border-radius: 10px;
+  min-height: 44px;
+}
+.connected-shell .nav-item.active {
+  box-shadow: inset 3px 0 var(--primary);
+  font-weight: 750;
+}
+.connected-shell .topbar {
+  border-bottom: 1px solid var(--editorial-rule);
+}
+.network-page .network-orientation {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.network-page .network-orientation::after {
+  content: "";
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  right: -45px;
+  top: -80px;
+  opacity: 0.16;
+  z-index: -1;
+  box-shadow:
+    0 0 0 28px color-mix(in srgb, currentColor 14%, transparent),
+    0 0 0 60px color-mix(in srgb, currentColor 8%, transparent);
+  pointer-events: none;
+}
+.network-page .directory-toolbar {
+  padding: 16px;
+  border: 1px solid var(--editorial-rule);
+  background: var(--surface);
+  border-radius: 14px;
+}
+.network-page .directory-list .network-person {
+  border-bottom: 1px solid var(--editorial-rule);
+}
+.network-page .network-context {
+  border-top: 4px solid var(--primary);
+}
+.network-page .network-context .context-identity h2 {
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+.editorial-profile .profile-header {
+  border-radius: 18px;
+  overflow: hidden;
+}
+.editorial-profile .connected-profile-perspective {
+  border-radius: 4px 16px 16px 4px;
+}
+.editorial-profile .connected-profile-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.editorial-profile .profile-commitment {
+  border-radius: 14px;
+}
+.editorial-profile .profile-section-nav {
+  scroll-margin-top: 85px;
+}
+@media (max-width: 767px) {
+  .network-page .directory-toolbar {
+    padding: 12px;
+  }
+  .network-page .network-orientation::after {
+    width: 130px;
+    height: 130px;
+  }
+}
+.connected-return {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+/* A relationship directory reads as a collection of individual stories. */
+.network-page .directory-list {
+  gap: 10px;
+}
+.network-page .directory-list .network-person {
+  border: 1px solid var(--editorial-rule);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.network-page .directory-list .profile-card {
+  padding: 22px 74px 22px 20px;
+}
+.network-page .directory-list .context-selected {
+  border: 1px solid var(--primary);
+  background: var(--primary-soft);
+}
+.network-page .directory-list .profile-card-top .avatar {
+  border-radius: 16px;
+}
+.network-page .network-row-label {
+  font-weight: 750;
+}
+.network-page .network-context {
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+}
+.editorial-profile .profile-header {
+  background: var(--surface);
+  border: 1px solid var(--editorial-rule);
+  padding: clamp(20px, 3vw, 36px);
+}
+.editorial-profile .profile-header.without-cover .profile-identity {
+  padding-top: 0;
+}
+.editorial-profile .profile-header-content {
+  padding-bottom: 0;
+}
+.editorial-profile .profile-header.has-cover .profile-cover {
+  margin: -1px -1px 0;
+}
+.editorial-profile .profile-section-nav {
+  gap: 8px;
+  padding: 10px 0;
+}
+.editorial-profile .profile-section-nav button {
+  border-radius: 8px;
+  min-height: 44px;
+}
+.editorial-profile .profile-columns > aside > .surface {
+  border-radius: 12px;
+  border: 1px solid var(--editorial-rule);
+  background: var(--surface);
+}
+@media (max-width: 767px) {
+  .network-page .directory-list .profile-card {
+    padding: 18px 64px 18px 16px;
+  }
+  .editorial-profile .profile-header {
+    padding: 20px;
+  }
+}
+/* Compact context lets relationship records, rather than another hero, lead the screen. */
+.network-page .network-orientation {
+  padding: 20px 24px;
+  gap: 12px 24px;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--editorial-rule);
+  border-left: 4px solid var(--primary);
+}
+.network-page .network-orientation::after {
+  display: none;
+}
+.network-page .network-orientation .eyebrow {
+  color: var(--muted);
+}
+.network-page .network-orientation h2 {
+  font-size: clamp(21px, 2vw, 27px);
+  margin: 7px 0;
+}
+.network-page .network-orientation p:not(.eyebrow) {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+}
+.network-page .network-orientation-links a {
+  color: var(--primary);
+}
+.network-page .network-orientation-facts strong {
+  color: var(--primary);
+  font-size: 30px;
+}
+.editorial-profile .connected-profile-perspective {
+  padding: 18px 24px;
+  gap: 16px;
+  margin: 16px 0;
+}
+.editorial-profile .connected-profile-perspective h2 {
+  font-size: 23px;
+  margin: 6px 0;
+}
+.editorial-profile .connected-profile-perspective p:not(.eyebrow) {
+  margin: 0;
+  font-size: 13px;
+}
+.editorial-profile .profile-perspective-facts strong {
+  font-size: 30px;
+}
+@media (max-width: 767px) {
+  .network-page .network-orientation {
+    padding: 18px;
+  }
+  .editorial-profile .connected-profile-perspective {
+    padding: 18px;
+  }
+}

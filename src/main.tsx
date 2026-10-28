@@ -10,6 +10,7 @@ import "./workspaces.css";
 import "./insights.css";
 import "./daily.css";
 import "./final-product.css";
+import "./connected-product.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

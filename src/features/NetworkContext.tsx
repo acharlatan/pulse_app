@@ -9,9 +9,11 @@ import { restrictionReasons, taskState } from "../services/recommendations";
 export function NetworkContext({
   contact: c,
   onEdit,
+  networkReturn,
 }: {
   contact: Contact;
   onEdit: (e: Editor) => void;
+  networkReturn: string;
 }) {
   const p = usePulse(),
     { date, money } = useFormat();
@@ -43,7 +45,7 @@ export function NetworkContext({
       <div className="context-identity">
         <Avatar name={c.name} mediaId={c.avatar} size="xl" />
         <h2>{c.name}</h2>
-        <Link to={`/network/people/${c.id}`}>
+        <Link to={`/network/people/${c.id}`} state={{ networkReturn }}>
           Open full profile <ArrowUpRight size={15} />
         </Link>
       </div>
@@ -124,7 +126,7 @@ export function NetworkContext({
             </button>
           ))}
           {deals.length > 2 && (
-            <Link to={`/network/people/${c.id}`}>
+            <Link to={`/network/people/${c.id}`} state={{ networkReturn }}>
               View all {deals.length} opportunities
             </Link>
           )}

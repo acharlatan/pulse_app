@@ -83,7 +83,7 @@ export function Shell({ children }: { children: ReactNode }) {
     : 0;
   const count = overdueCount + upcomingCount + reconnectionCount;
   return (
-    <div className="app-shell">
+    <div className="app-shell connected-shell">
       <a
         className="skip-link"
         href="#main"
