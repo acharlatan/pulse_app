@@ -1,0 +1,83 @@
+/* Shared colorful, calm surfaces across PULSE. */
+:root { --pulse-card-lilac:#f1dcfb; --pulse-card-pink:#fbddea; --pulse-card-blue:#d9f1f5; --pulse-card-lime:#e4f59b; --pulse-card-ink:#272138; }
+:root[data-theme="dark"] { --pulse-card-lilac:#3d3455; --pulse-card-pink:#4c3449; --pulse-card-blue:#29444d; --pulse-card-lime:#394927; --pulse-card-ink:#fbf8ff; }
+.navigation-toggle { flex-shrink:0; }
+@media (min-width:768px) {
+  .navigation-closed .sidebar { display:none; }
+  .navigation-closed .workspace-main { margin-left:0; width:100%; }
+  .navigation-open .sidebar { display:flex; }
+}
+@media (max-width:767px) { .navigation-toggle { display:none; } }
+.daily-extra-grid { order:4; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+.daily-extra-panel { min-width:0; border:1px solid var(--border); background:var(--surface); padding:22px; border-radius:24px; }
+.daily-extra-panel .section-heading { align-items:center; gap:10px; }
+.daily-extra-panel h2 { font-size:20px; margin:0; }
+.daily-extra-panel .text-link { font-size:13px; }
+.daily-extra-panel > p { line-height:1.55; }
+.daily-extra-row { width:100%; min-width:0; display:flex; gap:12px; align-items:center; text-align:left; padding:13px 0; color:var(--text); background:transparent; border-bottom:1px solid var(--border); }
+.daily-extra-row > svg:first-child { color:var(--primary); flex-shrink:0; }
+.daily-extra-row > span:not(.avatar) { display:grid; flex:1; min-width:0; gap:3px; }
+.daily-extra-row strong, .daily-extra-row small { overflow-wrap:anywhere; }
+.daily-extra-row small { color:var(--muted); font-size:12px; }
+.daily-network-snapshot { background:var(--pulse-card-blue); color:var(--pulse-card-ink); }
+.daily-network-circle { margin:18px auto 12px; width:118px; height:118px; display:grid; align-content:center; justify-items:center; border-radius:50%; background:var(--surface); border:8px solid var(--primary); box-shadow:0 0 0 9px color-mix(in srgb, var(--primary) 18%, transparent); }
+.daily-network-circle strong { font-size:28px; line-height:1; color:var(--text); }
+.daily-network-circle span { color:var(--muted); font-size:13px; }
+.daily-network-snapshot > p { text-align:center; }
+.daily-wrap { order:5; }
+.daily-inspector .priority-person .avatar.large { width:72px; height:72px; font-size:23px; }
+.demo-focus-examples { display:flex; gap:20px; align-items:center; justify-content:space-between; margin:18px 0; padding:22px; background:var(--pulse-card-lilac); color:var(--pulse-card-ink); border:0; }
+.demo-focus-examples p { margin:5px 0 0; }
+.focus-page .focus-day-brief { background:var(--pulse-card-lilac); color:var(--pulse-card-ink); border:0; border-radius:24px; }
+.focus-page .focus-collection, .focus-page .focus-picker, .review-page .review-card, .analytics-page .surface, .automations-page .surface { border-radius:22px; }
+.network-page .network-masthead, .pipeline-page .work-masthead, .activity-page .work-masthead, .analytics-page .insight-masthead, .review-page .insight-masthead, .focus-page .insight-masthead, .automations-page .insight-masthead { border-bottom:0; }
+:root[data-theme="dark"] .daily-home { --daily-lilac:#3d3455; --daily-lime:#394927; --daily-pink:#4c3449; --daily-blue:#29444d; --daily-color-ink:#fbf8ff; --daily-color-muted:#f0eaf3; }
+:root[data-theme="dark"] .daily-inspector .button.ghost, :root[data-theme="dark"] .daily-suggestion .button.ghost { color:#f5efff; }
+@media (max-width:1050px) { .daily-extra-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:767px) { .daily-extra-grid { grid-template-columns:minmax(0,1fr); } .demo-focus-examples { align-items:flex-start; flex-direction:column; } }
+.topbar-brand { display:inline-flex; gap:8px; align-items:center; color:var(--text); font-weight:850; letter-spacing:.08em; white-space:nowrap; }
+.topbar-brand svg, .topbar-brand span { color:var(--primary); }
+.navigation-open .topbar-brand { display:none; }
+@media (max-width:767px) { .topbar-brand { display:none; } }
+.network-page .network-orientation { border:0; border-radius:24px; background:var(--pulse-card-lilac); color:var(--pulse-card-ink); }
+.network-page .network-orientation h2, .network-page .network-orientation p, .network-page .network-orientation .eyebrow, .network-page .network-orientation-facts strong, .network-page .network-orientation-facts span { color:var(--pulse-card-ink); }
+.network-page .network-orientation-links a { color:var(--pulse-card-ink); }
+.activity-page .agenda-day-stamp, .pipeline-page .pipeline-overview { border-radius:24px; }
+.review-page .review-card:nth-child(3n+1) .review-evidence { background:var(--pulse-card-lilac); color:var(--pulse-card-ink); border-radius:16px; padding:15px; }
+.review-page .review-card:nth-child(3n+2) .review-evidence { background:var(--pulse-card-blue); color:var(--pulse-card-ink); border-radius:16px; padding:15px; }
+.review-page .review-card:nth-child(3n) .review-evidence { background:var(--pulse-card-pink); color:var(--pulse-card-ink); border-radius:16px; padding:15px; }
+.review-page .review-evidence .eyebrow, .review-page .review-evidence p { color:var(--pulse-card-ink); }
+@media (min-width:1100px) {
+  .daily-plan { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(0,1fr); gap:18px; align-items:start; }
+  .daily-orientation, .daily-workspace, .home-focused .daily-workspace, .home-compact .daily-workspace { display:contents; }
+  .daily-intent { display:none; }
+  .daily-status-strip { grid-column:2; grid-row:1; }
+  .daily-inspector, .home-focused .daily-inspector { grid-column:1; grid-row:1 / 3; align-self:stretch; }
+  .daily-chosen, .home-focused .daily-chosen { grid-column:2; grid-row:2; align-self:stretch; }
+  .daily-extra-grid { grid-column:1 / -1; grid-row:3; }
+  .daily-suggestions, .home-focused .daily-suggestions, .home-compact .daily-suggestions { grid-column:1 / -1; grid-row:4; }
+  .daily-wrap { grid-column:1 / -1; grid-row:5; }
+  .home-focused .daily-chosen { grid-column:1; }
+  .home-focused .daily-inspector { grid-column:2; }
+  .home-focused .daily-status-strip { grid-column:1; }
+}
+@media (max-width:767px) {
+  .daily-workspace, .home-focused .daily-workspace, .home-compact .daily-workspace { order:1; }
+  .daily-orientation { order:2; }
+  .daily-extra-grid { order:3; }
+  .daily-suggestions, .home-focused .daily-suggestions, .home-compact .daily-suggestions { order:4; }
+}
+.pipeline-page .pipeline-value-strip { border:0; border-radius:24px; background:var(--pulse-card-lilac); color:var(--pulse-card-ink); padding:24px; }
+.pipeline-page .pipeline-value-strip .eyebrow, .pipeline-page .pipeline-value-strip strong, .pipeline-page .pipeline-value-strip span, .pipeline-page .pipeline-value-strip small { color:var(--pulse-card-ink); }
+.activity-page .activity-ledger { gap:10px; }
+.activity-page .activity-ledger button { border:0; border-radius:18px; background:var(--pulse-card-blue); color:var(--pulse-card-ink); }
+.activity-page .activity-ledger button:nth-child(2) { background:var(--pulse-card-pink); }
+.activity-page .activity-ledger button:nth-child(3) { background:var(--pulse-card-lime); }
+.activity-page .activity-ledger button strong { color:var(--pulse-card-ink); }
+.analytics-page .weekly-review, .analytics-page .coverage-panel, .analytics-page .value-perspective, .analytics-page .analytics-brief, .orbit-page .orbit-map-panel, .orbit-page .orbit-filters { border-radius:22px; }
+.network-page .directory-list .network-person, .network-page .network-context { border-radius:20px; }
+.editorial-profile .profile-header, .editorial-profile .profile-columns > aside > .surface { border-radius:22px; }
+.pipeline-page .pipeline-value-strip summary { color:var(--pulse-card-ink); }
+@media (min-width:768px) { .navigation-closed .topbar { justify-content:flex-start; gap:16px; } .navigation-closed .breadcrumb { margin-right:auto; } }
+@media (min-width:1100px) { .daily-inspector .priority-person .avatar.large { width:88px; height:88px; } }
+@media (min-width:768px) and (max-width:1050px) { .navigation-closed .breadcrumb { display:none; } .navigation-closed .topbar-actions { margin-left:auto; } }

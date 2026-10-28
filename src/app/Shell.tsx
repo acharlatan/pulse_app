@@ -11,6 +11,7 @@ import {
   Home,
   HeartPulse,
   LayoutGrid,
+  PanelLeft,
   Plus,
   Search,
   Settings,
@@ -49,6 +50,7 @@ export function Shell({ children }: { children: ReactNode }) {
   const [more, setMore] = useState(false);
   const [alerts, setAlerts] = useState(false);
   const [search, setSearch] = useState(false);
+  const [navigationOpen, setNavigationOpen] = useState(false);
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
       if (
@@ -90,7 +92,7 @@ export function Shell({ children }: { children: ReactNode }) {
     : 0;
   const count = overdueCount + upcomingCount + reconnectionCount;
   return (
-    <div className="app-shell connected-shell">
+    <div className={`app-shell connected-shell ${navigationOpen ? "navigation-open" : "navigation-closed"}`}>
       <a
         className="skip-link"
         href="#main"
@@ -101,7 +103,7 @@ export function Shell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <aside className="sidebar" aria-label="Workspace navigation">
+      <aside id="workspace-navigation" className="sidebar" aria-label="Workspace navigation">
         <Link to="/" className="wordmark">
           <span className="brand-mark">
             <AudioLines size={25} />
@@ -216,6 +218,8 @@ export function Shell({ children }: { children: ReactNode }) {
       </aside>
       <div className="workspace-main">
         <header className="topbar">
+          <button type="button" className="icon-button navigation-toggle" aria-label={navigationOpen ? "Hide navigation" : "Show navigation"} aria-expanded={navigationOpen} aria-controls="workspace-navigation" onClick={() => setNavigationOpen(!navigationOpen)}><PanelLeft size={20} /></button>
+          <Link to="/" className="topbar-brand"><AudioLines size={22} /> PULSE<span>.</span></Link>
           <div className="breadcrumb">
             <span>Workspace</span>
             <span>/</span>

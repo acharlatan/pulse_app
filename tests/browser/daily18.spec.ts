@@ -277,7 +277,7 @@ test("Home honors Focus visibility and layout without deleting chosen priorities
     page.getByRole("heading", { name: "Your schedule", exact: true }),
   ).toBeVisible();
   await expect(page.locator(".home-focused")).toHaveCount(1);
-  const work = await page.locator(".daily-workspace").boundingBox(),
+  const work = await page.locator(".daily-chosen").boundingBox(),
     suggestions = await page.locator(".daily-suggestions").boundingBox();
   expect(work!.y).toBeLessThan(suggestions!.y);
   await page.reload();

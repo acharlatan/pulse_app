@@ -4,6 +4,9 @@ import { confirmDialogClose } from "../app/update-safety";
 import { X, ArrowUpRight, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
+import demoPortraits from "../demo-portraits.webp";
+const demoNames = ["Olivia Chen", "Marcus Johnson", "Sofia Rivera", "James Park", "Amara Okafor", "Ethan Brooks", "Isabella Rossi", "Noah Williams", "Mia Patel", "Lucas Reed", "Chloe Bennett", "Daniel Kim", "Zoe Mitchell", "Leo Santos", "Ava Thompson", "Elijah Wright"];
+const portraitSlots = [0, 10, 3, 8, 5, 9, 6, 15, 7, 11, 1, 14, 2, 12, 4, 13];
 export function Avatar({
   name,
   size = "",
@@ -15,14 +18,19 @@ export function Avatar({
   company?: boolean;
   mediaId?: string;
 }) {
+  const p = usePulse();
   const colors = ["lavender", "peach", "sage", "blue", "pink"];
   const n = [...name].reduce((v, c) => v + c.charCodeAt(0), 0);
+  const demoIndex = demoNames.indexOf(name);
+  const matching = p.contacts.filter((contact) => contact.name === name);
+  const demoPortrait = !company && !mediaId && p.workspace === "demo" && demoIndex >= 0 && matching.length === 1 && matching[0].id === `contact-${demoIndex}` ? portraitSlots[demoIndex] : -1;
   return (
     <span
       aria-hidden="true"
       className={`avatar ${size} ${company ? "company" : ""} ${colors[n % colors.length]}`}
+      style={demoPortrait >= 0 ? { backgroundImage: `url(${demoPortraits})`, backgroundSize: "400% 400%", backgroundPosition: `${(demoPortrait % 4) * 100 / 3}% ${Math.floor(demoPortrait / 4) * 100 / 3}%` } : undefined}
     >
-      {mediaId?.startsWith("media-") ? (
+      {demoPortrait >= 0 ? null : mediaId?.startsWith("media-") ? (
         <LocalMedia
           id={mediaId}
           fallback={name

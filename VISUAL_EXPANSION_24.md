@@ -1,0 +1,3 @@
+# Visual expansion 24
+
+Daily Pulse now has a compact desktop composition, upcoming follow-ups, recent saved conversations, and a network count. Desktop navigation starts hidden and can be reopened from the top bar; mobile navigation remains available. A local fictional portrait sheet appears only for matching original demo contacts without custom media. It is presentation-only and does not modify personal records or backups. In the Demo workspace, an explicit My Focus action adds example priorities to an empty list without resetting any data. Theme-aware color surfaces extend into other workspaces.
