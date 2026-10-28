@@ -5,10 +5,10 @@ test("demo acceptance journey persists CRM records and appearance", async ({
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await expect(
-    page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ }),
+    page.getByRole("heading", { name: /^Today\./ }),
   ).toBeVisible();
   await page
-    .getByRole("link", { name: "Explore your network", exact: true })
+    .getByRole("link", { name: "Open network", exact: true })
     .click();
   await page.getByRole("button", { name: "Add person", exact: true }).click();
   await page
@@ -39,7 +39,7 @@ test("demo acceptance journey persists CRM records and appearance", async ({
     .getByRole("button", { name: "Save follow-up", exact: true })
     .click();
   await expect(
-    page.getByText("Prepare the proposal", { exact: true }),
+    page.locator("#next-steps").getByText("Prepare the proposal", { exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "Edit profile", exact: true }).click();
   await page.locator('select[name="stage"]').selectOption("Proposal");

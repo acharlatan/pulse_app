@@ -6,7 +6,7 @@ test("search opens globally, navigates records and opens existing editors", asyn
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await expect(
-    page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ }),
+    page.getByRole("heading", { name: /^Today\./ }),
   ).toBeVisible();
   await page.keyboard.press("Control+k");
   const dialog = page.getByRole("dialog", { name: "Search PULSE" });
@@ -47,7 +47,7 @@ test("Home task completion persists through the shared activity flow", async ({
   ).toHaveCount(0);
   await page.reload();
   await expect(
-    page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ }),
+    page.getByRole("heading", { name: /^Today\./ }),
   ).toBeVisible();
   await expect(
     page.locator(".daily-task").filter({ hasText: title }),

@@ -38,7 +38,11 @@ import {
 } from "../components/relationship";
 import { EditorModal, type Editor } from "../components/forms";
 import { deleteContact, deleteOrganization } from "../data/repository";
-import { eligible, lastInteraction } from "../services/recommendations";
+import {
+  eligible,
+  lastInteraction,
+  taskState,
+} from "../services/recommendations";
 export function Profile({ company = false }: { company?: boolean }) {
   const returnPath = useLocation().state?.networkReturn;
   const { id } = useParams();
@@ -81,8 +85,11 @@ export function Profile({ company = false }: { company?: boolean }) {
     : contact
       ? lastInteraction(contact.id, p.interactions)
       : undefined;
+  const next = tasks
+    .filter((t) => !t.completedAt)
+    .sort((a, b) => a.dueAt.localeCompare(b.dueAt))[0];
   return (
-    <div className="page profile-page">
+    <div className="page profile-page editorial-profile">
       <Link
         to={
           typeof returnPath === "string" &&
@@ -95,7 +102,9 @@ export function Profile({ company = false }: { company?: boolean }) {
         <ArrowLeft size={16} />
         Back to your network
       </Link>
-      <section className="surface profile-header">
+      <section
+        className={`surface profile-header ${record.coverMediaId ? "has-cover" : "without-cover"}`}
+      >
         <div className="profile-cover">
           {record.coverMediaId ? (
             <LocalMedia
@@ -285,15 +294,17 @@ export function Profile({ company = false }: { company?: boolean }) {
         />
         <Link
           className="button ghost"
+          aria-label="View relationship analytics"
           to={`/analytics?${company ? "company" : "person"}=${encodeURIComponent(record.id)}`}
         >
-          View relationship analytics
+          Analytics
         </Link>
         <Link
           className="button ghost"
+          aria-label="View in Relationship Orbit"
           to={`/orbit?${company ? "company" : "person"}=${record.id}`}
         >
-          View in Relationship Orbit
+          Orbit
         </Link>
       </div>
 
@@ -328,30 +339,147 @@ export function Profile({ company = false }: { company?: boolean }) {
           </button>
         ))}
       </nav>
-      <div className="relationship-snapshot">
+      <section
+        className="profile-commitment"
+        aria-label="Next relationship commitment"
+      >
         <div>
-          <strong>{tasks.filter((t) => !t.completedAt).length}</strong>
-          <span>Open next steps</span>
+          <p className="eyebrow">
+            {next ? "THE NEXT CHAPTER" : "LAST CONVERSATION"}
+          </p>
+          <h2>
+            {next
+              ? next.title
+              : last
+                ? date(last)
+                : "Your story starts with a conversation."}
+          </h2>
+          <p className="muted">
+            {next
+              ? `${taskState(next, p.settings.timezone)} · Due ${date(next.dueAt)}`
+              : "Conversations and notes remain in the relationship story below."}
+          </p>
         </div>
-        <div>
-          <strong>
-            {opportunities.filter((o) => o.status === "open").length}
-          </strong>
-          <span>Open opportunities</span>
-        </div>
-        <div>
-          <strong>
-            {last
-              ? Math.max(
-                  0,
-                  Math.floor((Date.now() - Date.parse(last)) / 86400000),
-                )
-              : "—"}
-          </strong>
-          <span>Days since conversation</span>
-        </div>
-      </div>
+        <button
+          className="button secondary"
+          onClick={() =>
+            setEditor(
+              next
+                ? { kind: "task", record: next }
+                : {
+                    kind: "interaction",
+                    contact: company ? undefined : contact,
+                    organizationId: company ? id : undefined,
+                  },
+            )
+          }
+        >
+          {next ? "Review commitment" : "Start the story"}
+          <ArrowUpRight size={16} />
+        </button>
+      </section>
       <div className="profile-columns">
+        <div className="profile-story">
+          {company && (
+            <section className="surface" id="people">
+              <SectionHeading
+                title="The people behind the company"
+                action={
+                  <button
+                    className="button ghost"
+                    onClick={() =>
+                      setEditor({ kind: "contact", organizationId: id })
+                    }
+                  >
+                    <Plus size={16} />
+                    Add person
+                  </button>
+                }
+              />
+              {p.contacts
+                .filter((c) => c.organizationId === id)
+                .map((c) => (
+                  <Link
+                    className="representative-row"
+                    key={c.id}
+                    to={`/network/people/${c.id}`}
+                  >
+                    <Avatar mediaId={c.avatar} name={c.name} />
+                    <div>
+                      <strong>{c.name}</strong>
+                      <span>
+                        {c.role} · {c.priority}
+                      </span>
+                      <small>
+                        {lastInteraction(c.id, p.interactions)
+                          ? `Last conversation ${date(lastInteraction(c.id, p.interactions)!)}`
+                          : "No conversations logged"}
+                      </small>
+                    </div>
+                    <Badge tone="purple">{c.stage}</Badge>
+                    <ArrowUpRight size={17} />
+                  </Link>
+                ))}
+              {!p.contacts.some((c) => c.organizationId === id) && (
+                <p className="muted">
+                  Add your first representative to bring this company to life.
+                </p>
+              )}
+            </section>
+          )}
+          <section className="surface" id="story">
+            <SectionHeading
+              title="Relationship story"
+              eyebrow="CONVERSATIONS & NOTES"
+              action={
+                <button
+                  className="button ghost"
+                  onClick={() =>
+                    setEditor({
+                      kind: "interaction",
+                      contact: company ? undefined : contact,
+                      organizationId: company ? id : undefined,
+                    })
+                  }
+                >
+                  <Plus size={16} /> Add
+                </button>
+              }
+            />
+            <RelationshipTimeline
+              interactions={interactions}
+              onEdit={setEditor}
+            />
+          </section>
+          <section className="surface" id="next-steps">
+            <SectionHeading
+              title="Next steps"
+              action={
+                <button
+                  className="button ghost"
+                  onClick={() =>
+                    setEditor({
+                      kind: "task",
+                      contact: company ? undefined : contact,
+                      organizationId: company ? id : undefined,
+                    })
+                  }
+                >
+                  <Plus size={16} />
+                  Plan
+                </button>
+              }
+            />
+            {tasks.map((t) => (
+              <TaskRow key={t.id} task={t} onEdit={setEditor} />
+            ))}
+            {!tasks.length && (
+              <p className="muted">
+                A thoughtful follow-up is a great place to start.
+              </p>
+            )}
+          </section>
+        </div>
         <aside>
           <CustomFields
             type={company ? "organization" : "contact"}
@@ -399,9 +527,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                 <div className="detail-block">
                   <span>Next follow-up</span>
                   <strong>
-                    {tasks.find((t) => !t.completedAt)
-                      ? date(tasks.find((t) => !t.completedAt)!.dueAt)
-                      : "Room for a next step"}
+                    {next ? date(next!.dueAt) : "Room for a next step"}
                   </strong>
                 </div>
                 {contact?.emails.map((email) => (
@@ -505,107 +631,6 @@ export function Profile({ company = false }: { company?: boolean }) {
             )}
           </section>
         </aside>
-        <div className="profile-story">
-          {company && (
-            <section className="surface" id="people">
-              <SectionHeading
-                title="The people behind the company"
-                action={
-                  <button
-                    className="button ghost"
-                    onClick={() =>
-                      setEditor({ kind: "contact", organizationId: id })
-                    }
-                  >
-                    <Plus size={16} />
-                    Add person
-                  </button>
-                }
-              />
-              {p.contacts
-                .filter((c) => c.organizationId === id)
-                .map((c) => (
-                  <Link
-                    className="representative-row"
-                    key={c.id}
-                    to={`/network/people/${c.id}`}
-                  >
-                    <Avatar mediaId={c.avatar} name={c.name} />
-                    <div>
-                      <strong>{c.name}</strong>
-                      <span>
-                        {c.role} · {c.priority}
-                      </span>
-                      <small>
-                        {lastInteraction(c.id, p.interactions)
-                          ? `Last conversation ${date(lastInteraction(c.id, p.interactions)!)}`
-                          : "No conversations logged"}
-                      </small>
-                    </div>
-                    <Badge tone="purple">{c.stage}</Badge>
-                    <ArrowUpRight size={17} />
-                  </Link>
-                ))}
-              {!p.contacts.some((c) => c.organizationId === id) && (
-                <p className="muted">
-                  Add your first representative to bring this company to life.
-                </p>
-              )}
-            </section>
-          )}
-          <section className="surface" id="story">
-            <SectionHeading
-              title="Relationship story"
-              eyebrow="CONVERSATIONS & NOTES"
-              action={
-                <button
-                  className="button ghost"
-                  onClick={() =>
-                    setEditor({
-                      kind: "interaction",
-                      contact: company ? undefined : contact,
-                      organizationId: company ? id : undefined,
-                    })
-                  }
-                >
-                  <Plus size={16} /> Add
-                </button>
-              }
-            />
-            <RelationshipTimeline
-              interactions={interactions}
-              onEdit={setEditor}
-            />
-          </section>
-          <section className="surface" id="next-steps">
-            <SectionHeading
-              title="Next steps"
-              action={
-                <button
-                  className="button ghost"
-                  onClick={() =>
-                    setEditor({
-                      kind: "task",
-                      contact: company ? undefined : contact,
-                      organizationId: company ? id : undefined,
-                    })
-                  }
-                >
-                  <Plus size={16} />
-                  Plan
-                </button>
-              }
-            />
-            {tasks.map((t) => (
-              <TaskRow key={t.id} task={t} onEdit={setEditor} />
-            ))}
-            {!tasks.length && (
-              <p className="muted">
-                A thoughtful follow-up is a great place to start.
-              </p>
-            )}
-          </section>
-        </div>
       </div>
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />

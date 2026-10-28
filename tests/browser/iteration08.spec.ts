@@ -5,7 +5,7 @@ async function demo(page: import("@playwright/test").Page) {
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await expect(
-    page.getByRole("heading", { name: /^Good (morning|afternoon|evening)/ }),
+    page.getByRole("heading", { name: /^Today\./ }),
   ).toBeVisible();
 }
 test("custom pipeline, stable rename, custom company field, segmentation and focus persist", async ({
@@ -146,6 +146,7 @@ test("company segment and selected-only bulk tag", async ({ page }) => {
     page.getByRole("heading", { name: "6 matching companies" }),
   ).toBeVisible();
   await page.goto("/#/network");
+  await page.getByText("Directory tools", {exact:true}).click();
   await page.getByRole("button", { name: "Bulk add tag" }).click();
   await d.getByLabel("Tag", { exact: true }).fill("Priority review");
   await d.getByRole("checkbox", { name: "Amara Okafor", exact: true }).check();
