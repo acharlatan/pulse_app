@@ -273,122 +273,51 @@ export function Focus() {
                             f.entityType,
                             f.recordId,
                             f.today === day ? "removeToday" : "today",
-                      …6734 tokens truncated…((c) => c.organizationId === n.recordId)
-                        .length
-                    }{" "}
-                    people ·{" "}
-                    {
-                      p.opportunities.filter(
-                        (o) => o.organizationId === n.recordId,
-                      ).length
-                    }{" "}
-                    opportunities
-                  </span>
-                  <span className="orbit-explore-link">
-                    Explore connections <ArrowRight size={17} />
-                  </span>
-                </button>
-              ))}
-          </div>
-          {!graph.nodes.some((n) => n.kind === "company") && (
-            <p>
-              No companies in this view. Use List to explore people and
-              independent opportunities.
-            </p>
-          )}
-        </>
-      ) : (
-        <>
-          <header className="orbit-guide-intro">
-            <p className="eyebrow">SAVED ASSOCIATIONS, MADE READABLE</p>
-            <h2>
-              {search
-                ? "Find the record. See its context."
-                : "One starting point. Clear connections."}
-            </h2>
-            <p>
-              People belong to a saved company; opportunities have saved company
-              and representative links. These do not imply that people know one
-              another.
-            </p>
-          </header>
-          <div className="orbit-guide-groups">
-            {(
-              [
-                ["company", "Companies", Building2],
-                ["person", "People", Users],
-                ["opportunity", "Opportunities", BriefcaseBusiness],
-              ] as const
-            ).map(([kind, label, Icon]) => (
-              <section key={kind}>
-                <h3>
-                  <Icon size={18} />
-                  {label}
-                  <span>
-                    {graph.nodes.filter((n) => n.kind === kind).length}
-                  </span>
-                </h3>
-                {graph.nodes
-                  .filter((n) => n.kind === kind)
-                  .map((n) => (
-                    <button
-                      className={`orbit-guide-record ${selected === n.id ? "selected" : ""}`}
-                      key={n.id}
-                      aria-pressed={selected === n.id}
-                      onClick={() => onSelect(n)}
-                    >
-                      <Avatar
-                        name={n.label}
-                        mediaId={n.mediaId}
-                        company={kind === "company"}
-                      />
-                      <span>
-                        <strong>{n.label}</strong>
-                        <small>
-                          {kind === "person"
-                            ? "Saved person"
-                            : kind === "company"
-                              ? "Saved company"
-                              : "Saved opportunity"}
-                        </small>
-                      </span>
-                      <ArrowRight size={16} />
-                    </button>
-                  ))}
-                {!graph.nodes.some((n) => n.kind === kind) && (
-                  <p className="muted">
-                    No matching {label.toLowerCase()} in this view.
-                  </p>
-                )}
-              </section>
+                            day,
+                          ),
+                        "Focus updated",
+                      )
+                    }
+                  >
+                    {f.today === day ? "Remove from today" : "Choose today"}
+                  </button>
+                  <button
+                    className="button ghost"
+                    onClick={() =>
+                      void p.run(
+                        () => setFocus(p.db, f.entityType, f.recordId, "unpin"),
+                        "Unpinned",
+                      )
+                    }
+                  >
+                    Unpin
+                  </button>
+                  {f.entityType === "task" &&
+                    !p.tasks.find((t) => t.id === f.recordId)?.completedAt && (
+                      <button
+                        className="button primary"
+                        onClick={() =>
+                          void p.run(
+                            () => completeTask(p.db, f.recordId),
+                            "Follow-up completed",
+                          )
+                        }
+                      >
+                        Complete task
+                      </button>
+                    )}
+                </div>
+              </article>
             ))}
-          </div>
-        </>
+          </section>
+        );
+      })}
+      {editor && (
+        <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}
-      <details className="orbit-reading-key">
-        <summary>What do these connections mean?</summary>
-        <dl>
-          <div>
-            <dt>Works at</dt>
-            <dd>A person’s currently saved company.</dd>
-          </div>
-          <div>
-            <dt>Company opportunity</dt>
-            <dd>The company explicitly selected on an opportunity.</dd>
-          </div>
-          <div>
-            <dt>Opportunity representative</dt>
-            <dd>
-              A person explicitly linked to an opportunity. Their current
-              employer may have changed.
-            </dd>
-          </div>
-        </dl>
-        <p>
-          Orbit is a view of your records. It does not discover external
-          relationships or infer personal connections.
-        </p>
-      </details>
+      {p.settings.focus.progress && p.settings.gamification && (
+        <ProgressSummary />
+      )}
     </div>
   );
 }
