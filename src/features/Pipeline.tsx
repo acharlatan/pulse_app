@@ -1,17 +1,19 @@
-import { BrandArt } from "../components/BrandArt";
+import { ArrowRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
-import { Badge, Empty } from "../components/ui";
-import { OpportunityCard } from "../components/relationship";
+import { Badge, Empty, useFormat } from "../components/ui";
+import { PipelineOpportunity } from "./PipelineOpportunity";
 import { EditorModal, type Editor } from "../components/forms";
 import { moveOpportunity } from "../data/repository";
 export function Pipeline() {
+  const { money } = useFormat();
   const p = usePulse(),
     [editor, setEditor] = useState<Editor | null>(null),
     [filter, setFilter] = useState("All"),
     [selectedId, setSelectedId] = useState(""),
-    [limit, setLimit] = useState(30);
+    [limit, setLimit] = useState(30),
+    [showEmpty, setShowEmpty] = useState(false);
   const selected =
     p.pipelines.find(
       (x) => x.id === (selectedId || p.settings.focus.lastPipelineId),
@@ -20,7 +22,11 @@ export function Pipeline() {
     p.pipelines[0];
   const rows = p.opportunities.filter((o) => o.pipelineId === selected?.id),
     stages = p.pipelineStages.filter((s) => s.pipelineId === selected?.id);
-  const active = stages.filter((s) => filter === "All" || s.id === filter);
+  const active = stages.filter((s) =>
+    filter === "All"
+      ? showEmpty || rows.some((o) => o.stageId === s.id)
+      : s.id === filter,
+  );
   const totals = new Map<string, number>();
   for (const o of rows)
     if (o.value !== null) {
@@ -29,33 +35,27 @@ export function Pipeline() {
     }
   return (
     <div className="page pipeline-page">
-      <div className="page-heading studio-heading">
-        <BrandArt motif="steps" />
+      <header className="page-heading editorial-masthead work-masthead">
         <div>
-          <p className="eyebrow">POSSIBILITY, WITH DIRECTION</p>
+          <p className="eyebrow">FROM POSSIBILITY TO PARTNERSHIP</p>
           <h1>
-            Room to grow<span className="accent">.</span>
+            Pipeline<span className="accent">.</span>
           </h1>
-          <p className="subtitle">Every opportunity has a next chapter.</p>
+          <p className="editorial-deck">
+            See what’s moving. Make the next move count.
+          </p>
         </div>
         <button
           className="button primary"
-          disabled={selected?.archived}
+          disabled={!selected || selected.archived}
           onClick={() =>
             setEditor({ kind: "opportunity", pipelineId: selected?.id })
           }
         >
+          <Plus size={18} />
           New opportunity
         </button>
-      </div>
-      <div className="review-toolbar">
-        <Link className="button secondary" to="/customize">
-          Manage Pipelines
-        </Link>
-        <Link className="button ghost" to="/focus">
-          My Focus
-        </Link>
-      </div>
+      </header>
       <div className="directory-toolbar">
         <label className="field">
           <span>Pipeline</span>
@@ -83,7 +83,21 @@ export function Pipeline() {
             ))}
           </select>
         </label>
-        <Badge tone="purple">{rows.length} opportunities</Badge>
+        <div className="pipeline-toolbar-links">
+          <button
+            className="button ghost"
+            aria-pressed={showEmpty}
+            onClick={() => setShowEmpty(!showEmpty)}
+          >
+            Empty stages
+          </button>
+          <Link className="button ghost" to="/customize">
+            Manage Pipelines
+          </Link>
+          <Link className="button ghost" to="/focus">
+            My Focus <ArrowRight size={16} />
+          </Link>
+        </div>
         <label className="field">
           <span>View stage</span>
           <select
@@ -103,17 +117,55 @@ export function Pipeline() {
         </label>
       </div>
       <section
-        className="pipeline-totals"
-        aria-label="Pipeline totals by currency"
+        className="pipeline-value-strip"
+        aria-label="Pipeline value overview"
       >
-        {[...totals].map(([key, value]) => (
-          <Badge key={key}>
-            {key} ·{" "}
-            {value.toLocaleString(p.settings.locale, {
-              maximumFractionDigits: 2,
-            })}
-          </Badge>
-        ))}
+        <div className="pipeline-open-label">
+          <span className="eyebrow">IN PLAY</span>
+          <strong>
+            {rows
+              .filter((o) => o.status === "open")
+              .length.toString()
+              .padStart(2, "0")}
+          </strong>
+          <span>open opportunities</span>
+        </div>
+        <div className="pipeline-money">
+          <p className="eyebrow">OPEN VALUE · BY CURRENCY</p>
+          <div>
+            {[...totals]
+              .filter(([key]) => key.startsWith("open ·"))
+              .map(([key, value]) => (
+                <strong key={key}>
+                  {money(value, key.split(" · ")[1])}
+                  <small>{key.split(" · ")[1]}</small>
+                </strong>
+              ))}
+            {!rows.some((o) => o.status === "open" && o.value !== null) && (
+              <strong className="pipeline-no-value">
+                No open value recorded
+              </strong>
+            )}
+          </div>
+          <span>
+            {rows.filter((o) => o.status === "open" && o.value === null).length}{" "}
+            open without a value · Saved values, not a forecast
+          </span>
+        </div>
+        <details
+          className="pipeline-totals"
+          aria-label="Pipeline totals by currency"
+        >
+          <summary>Outcomes by currency</summary>
+          <div>
+            {[...totals].map(([key, value]) => (
+              <Badge key={key}>
+                {key} · {money(value, key.split(" · ")[1])}
+              </Badge>
+            ))}
+            {!totals.size && <p>No valued opportunities yet.</p>}
+          </div>
+        </details>
       </section>
       <h2 className="pipeline-section-title">
         {selected?.name || "Your pipeline"}
@@ -130,6 +182,14 @@ export function Pipeline() {
           >
             <span>{stage.name}</span>
             <strong>{rows.filter((o) => o.stageId === stage.id).length}</strong>
+            <span className="stage-volume-track" aria-hidden="true">
+              <i
+                style={{
+                  width: `${rows.length ? (rows.filter((o) => o.stageId === stage.id).length / rows.length) * 100 : 0}%`,
+                  background: stage.color,
+                }}
+              />
+            </span>
           </button>
         ))}
       </nav>
@@ -145,15 +205,40 @@ export function Pipeline() {
             <section
               className="pipeline-column"
               key={stage.id}
+              data-empty={!deals.length}
               style={{ borderTop: `3px solid ${stage.color}` }}
             >
               <div className="pipeline-title">
-                <span>{stage.name}</span>
+                <div>
+                  <span className="stage-sequence">
+                    {(stages.indexOf(stage) + 1).toString().padStart(2, "0")} /{" "}
+                    {stage.category}
+                  </span>
+                  <h3>{stage.name}</h3>
+                </div>
                 <Badge>{deals.length}</Badge>
+              </div>
+              <div className="stage-value-label">
+                {[
+                  ...new Set(
+                    deals
+                      .filter((o) => o.value !== null)
+                      .map((o) => o.currency),
+                  ),
+                ].map((currency) => (
+                  <span key={currency}>
+                    {money(
+                      deals
+                        .filter((o) => o.currency === currency)
+                        .reduce((sum, o) => sum + (o.value || 0), 0),
+                      currency,
+                    )}
+                  </span>
+                ))}
               </div>
               {deals.slice(0, limit).map((o) => (
                 <div key={o.id} className="pipeline-deal">
-                  <OpportunityCard opportunity={o} onEdit={setEditor} />
+                  <PipelineOpportunity opportunity={o} onEdit={setEditor} />
                   <label className="field">
                     <span>Move to stage / reopen</span>
                     <select
@@ -183,7 +268,13 @@ export function Pipeline() {
                 </button>
               )}
               {!deals.length && (
-                <p className="muted">Room for the next opportunity.</p>
+                <div className="stage-empty">
+                  <span aria-hidden="true">↗</span>
+                  <p>Room for your next move.</p>
+                  <small>
+                    Move an opportunity here using its stage control.
+                  </small>
+                </div>
               )}
             </section>
           );

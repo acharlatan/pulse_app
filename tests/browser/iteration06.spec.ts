@@ -146,7 +146,7 @@ test("missing lazy chunk has a bounded manual recovery and preserves saved recor
     .getByRole("button", { name: "Reload current version", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Room to grow.", exact: true }),
+    page.getByRole("heading", { name: "Pipeline.", exact: true }),
   ).toBeVisible();
   expect(reloads).toBe(1);
   await page.goto("/#/network");
