@@ -6,6 +6,8 @@ import {
   Check,
   CheckCheck,
   Compass,
+  CalendarDays,
+  ListChecks,
   Target,
 } from "lucide-react";
 import { usePulse } from "../app/context";
@@ -207,7 +209,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
             <div className="section-heading">
               <div>
                 <p className="eyebrow">CHOSEN BY YOU</p>
-                <h2>Your Today list</h2>
+                  <h2>Your priorities</h2>
               </div>
               <Link className="text-link" to="/focus">
                 My Focus <ArrowUpRight size={16} />
@@ -340,7 +342,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
         <div className="priority-kicker">
           <span className="pulse-tick" aria-hidden="true" />
           <p className="eyebrow">
-            {selection ? "IN YOUR HANDS" : "START HERE"}
+            {selection ? "YOUR SELECTED PRIORITY" : "A PLACE TO BEGIN"}
           </p>
           {task && (
             <Badge
@@ -525,26 +527,29 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
           <div>
             <p className="eyebrow">LESS SCATTER. MORE INTENTION.</p>
             <h2>A day with direction.</h2>
-            <p>Review what matters. Choose your focus. Make one useful move.</p>
+            <p>Small steps make room for meaningful progress.</p>
           </div>
         </div>
         <div className="daily-status-strip">
           <div>
+            <Target size={19} aria-hidden="true" />
             <strong>{plan.remaining.length}</strong>
             <span>chosen & open</span>
           </div>
           <div>
+            <ListChecks size={19} aria-hidden="true" />
             <strong>{plan.attention.length}</strong>
             <span>follow-ups to review</span>
           </div>
           <div>
+            <CalendarDays size={19} aria-hidden="true" />
             <strong>{plan.later.length}</strong>
             <span>scheduled for later</span>
           </div>
         </div>
       </section>
-      {p.settings.focus.homeLayout === "focused" ? workspace : suggestions}
-      {p.settings.focus.homeLayout === "focused" ? suggestions : workspace}
+      {workspace}
+      {suggestions}
       <section className="daily-wrap" aria-labelledby="daily-wrap-title">
         <div className="daily-wrap-intro">
           <CheckCheck size={28} />
