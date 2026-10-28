@@ -153,3 +153,59 @@
     padding: 20px;
   }
 }
+/* Compact context lets relationship records, rather than another hero, lead the screen. */
+.network-page .network-orientation {
+  padding: 20px 24px;
+  gap: 12px 24px;
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--editorial-rule);
+  border-left: 4px solid var(--primary);
+}
+.network-page .network-orientation::after {
+  display: none;
+}
+.network-page .network-orientation .eyebrow {
+  color: var(--muted);
+}
+.network-page .network-orientation h2 {
+  font-size: clamp(21px, 2vw, 27px);
+  margin: 7px 0;
+}
+.network-page .network-orientation p:not(.eyebrow) {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+}
+.network-page .network-orientation-links a {
+  color: var(--primary);
+}
+.network-page .network-orientation-facts strong {
+  color: var(--primary);
+  font-size: 30px;
+}
+.editorial-profile .connected-profile-perspective {
+  padding: 18px 24px;
+  gap: 16px;
+  margin: 16px 0;
+}
+.editorial-profile .connected-profile-perspective h2 {
+  font-size: 23px;
+  margin: 6px 0;
+}
+.editorial-profile .connected-profile-perspective p:not(.eyebrow) {
+  margin: 0;
+  font-size: 13px;
+}
+.editorial-profile .profile-perspective-facts strong {
+  font-size: 30px;
+}
+@media (max-width: 767px) {
+  .network-page .network-orientation {
+    padding: 18px;
+  }
+  .editorial-profile .connected-profile-perspective {
+    padding: 18px;
+  }
+}

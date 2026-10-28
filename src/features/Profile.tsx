@@ -330,11 +330,6 @@ export function Profile({ company = false }: { company?: boolean }) {
             <span>open opportunities</span>
           </div>
         </div>
-        <p className="profile-perspective-note">
-          {next
-            ? `Next follow-up: ${next.title} · ${date(next.dueAt)}`
-            : "No open follow-up is scheduled."}
-        </p>
       </section>
       <div className="profile-quick-links connected-profile-tools">
         <FocusButton
