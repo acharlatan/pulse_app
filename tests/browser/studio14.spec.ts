@@ -82,6 +82,9 @@ test("branded welcome and an empty personal workspace remain usable", async ({
   ).toBeVisible();
   await page.getByRole("button", { name: /Create My Workspace/ }).click();
   await expect(page.locator("main h1")).toBeVisible();
-  await expect(page.locator(".home-empty")).toBeVisible();
+  await expect(page.locator(".daily-first-use")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Add someone", exact: true }),
+  ).toBeVisible();
   await expect(page.locator(".pulse-overview")).toHaveCount(0);
 });

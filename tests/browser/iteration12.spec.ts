@@ -5,9 +5,7 @@ test("search opens globally, navigates records and opens existing editors", asyn
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
-  await expect(
-    page.getByRole("heading", { name: /^Today\./ }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Today\./ })).toBeVisible();
   await page.keyboard.press("Control+k");
   const dialog = page.getByRole("dialog", { name: "Search PULSE" });
   const search = dialog.getByRole("combobox", {
@@ -39,18 +37,23 @@ test("Home task completion persists through the shared activity flow", async ({
 }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
-  const task = page.locator(".daily-task").first();
-  const title = await task.locator(".home-task-title").innerText();
-  await task.getByRole("button", { name: `Complete ${title}` }).click();
+  await page.getByRole("heading", { name: "Today.", exact: true }).waitFor();
+  const task = page.locator(".daily-inspector");
+  const title = await task.locator("h2").innerText();
+  await task
+    .getByRole("button", { name: "Mark complete", exact: true })
+    .click();
   await expect(
-    page.locator(".daily-task").filter({ hasText: title }),
+    task.getByRole("button", { name: "Completed", exact: true }),
+  ).toBeDisabled();
+  await expect(task.locator("h2")).toHaveText(title);
+  await expect(
+    page.locator(".daily-suggestion").filter({ hasText: title }),
   ).toHaveCount(0);
   await page.reload();
+  await expect(page.getByRole("heading", { name: /^Today\./ })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: /^Today\./ }),
-  ).toBeVisible();
-  await expect(
-    page.locator(".daily-task").filter({ hasText: title }),
+    page.locator(".daily-suggestion").filter({ hasText: title }),
   ).toHaveCount(0);
   await page.goto("/#/activity");
   await page
