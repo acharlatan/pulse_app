@@ -40,7 +40,7 @@ const labels: Record<(typeof filterFields)[number], string> = {
   opportunityStatus: "Opportunity status",
   opportunityStage: "Opportunity stage",
 };
-export function SmartLists() {
+export function SmartLists({ embedded = false }: { embedded?: boolean }) {
   const p = usePulse(),
     [selected, setSelected] = useState("all"),
     [editing, setEditing] = useState<SmartList | null>(null),
@@ -54,13 +54,11 @@ export function SmartLists() {
     ? p.organizations.filter((o) => companyMatch(o, list as SmartList))
     : p.contacts.filter((c) => matcher(c, list));
   return (
-    <div className="page">
+    <div className={embedded ? "smart-lists-embedded" : "page"}>
       <div className="page-heading">
         <div>
           <p className="eyebrow">A NETWORK THAT MAKES SENSE</p>
-          <h1>
-            Your Smart Lists<span className="accent">.</span>
-          </h1>
+          {embedded ? <h2>Your Smart Lists<span className="accent">.</span></h2> : <h1>Your Smart Lists<span className="accent">.</span></h1>}
           <p className="subtitle">
             Saved conditions, live relationships. Your lists update as your
             records change.

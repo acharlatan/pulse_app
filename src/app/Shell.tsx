@@ -1,28 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { NavLink, Link, useLocation } from "react-router-dom";
-import {
-  Activity,
-  ArrowUpRight,
-  AudioLines,
-  Bell,
-  Building2,
-  ChevronDown,
-  CircleHelp,
-  Home,
-  HeartPulse,
-  LayoutGrid,
-  PanelLeft,
-  Plus,
-  Search,
-  Settings,
-  Users,
-  Workflow,
-  Orbit,
-  ChartNoAxesCombined,
-  Target,
-  ListFilter,
-  X,
-} from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Activity, ArrowUpRight, AudioLines, Bell, Building2, ChevronDown, Home, Plus, Search, Users, Workflow, ChartNoAxesCombined } from "lucide-react";
 import { OfflineStatus } from "../components/OfflineStatus";
 import { usePulse } from "./context";
 import { Avatar, Modal } from "../components/ui";
@@ -30,28 +8,26 @@ import { EditorModal, type Editor } from "../components/forms";
 import { useEffect, useRef } from "react";
 import { overdue } from "../services/recommendations";
 import { CommandPalette } from "../components/CommandPalette";
-const nav = [
-  { to: "/", label: "Daily Pulse", short: "Home", icon: Home },
-  { to: "/network", label: "My network", short: "Network", icon: Users },
-  { to: "/pipeline", label: "Pipeline", short: "Pipeline", icon: Workflow },
-  { to: "/activity", label: "Activity", short: "Activity", icon: Activity },
-];
-const mobileNav = [{ ...nav[0], short: "Today" }, { ...nav[1], short: "People" }, { ...nav[2], short: "Work" }, { to: "/analytics", label: "Analytics", short: "Insights", icon: ChartNoAxesCombined }];
+const mainAreas = [
+  { to: "/", label: "Today", icon: Home },
+  { to: "/network", label: "People", icon: Users },
+  { to: "/pipeline", label: "Work", icon: Workflow },
+  { to: "/analytics", label: "Insights", icon: ChartNoAxesCombined },
+] as const;
 export function Shell({ children }: { children: ReactNode }) {
   const {
     intelligence,
     workspace,
     settings,
-    contacts,
     tasks,
     switchWorkspace,
   } = usePulse();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [add, setAdd] = useState(false);
-  const [more, setMore] = useState(false);
   const [alerts, setAlerts] = useState(false);
   const [search, setSearch] = useState(false);
-  const [navigationOpen, setNavigationOpen] = useState(false);
+  const [profileMenu, setProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
       if (
@@ -68,15 +44,20 @@ export function Shell({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("keydown", shortcut);
   }, []);
 
+  useEffect(() => {
+    if (!profileMenu) return;
+    const closeOutside = (event: PointerEvent) => { if (!profileMenuRef.current?.contains(event.target as Node)) setProfileMenu(false); };
+    const escape = (event: KeyboardEvent) => { if (event.key === "Escape") setProfileMenu(false); };
+    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("keydown", escape);
+    return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", escape); };
+  }, [profileMenu]);
   const location = useLocation();
   const path = location.pathname;
-  const area = path === "/" || path === "/focus" ? "Today" : ["/network", "/review", "/lists", "/orbit"].some((prefix) => path.startsWith(prefix)) ? "People" : ["/pipeline", "/activity"].some((prefix) => path.startsWith(prefix)) ? "Work" : path.startsWith("/analytics") ? "Insights" : "Tools";
+  const area = path === "/" || path === "/focus" ? "Today" : ["/network", "/review", "/lists", "/orbit"].some((prefix) => path.startsWith(prefix)) ? "People" : ["/pipeline", "/activity", "/automations"].some((prefix) => path.startsWith(prefix)) ? "Work" : path.startsWith("/analytics") ? "Insights" : "";
   const areaLinks: Record<string, [string, string][]> = {
-    Today: [["/", "Daily Pulse"], ["/focus", "My Focus"]],
-    People: [["/network", "Directory"], ["/review", "Relationship Review"], ["/lists", "Smart Lists"], ["/orbit", "Orbit"]],
-    Work: [["/pipeline", "Pipeline"], ["/activity", "Follow-ups & activity"]],
-    Insights: [["/analytics", "Analytics"], ["/review", "Relationship Review"]],
-    Tools: [["/settings", "Settings"], ["/automations", "Automations"], ["/import", "Import"], ["/customize", "Personalize"], ["/help", "Help"]],
+    People: [["/network", "Directory"], ["/orbit", "Orbit"], ["/review", "Needs attention"]],
+    Work: [["/pipeline", "Pipeline"], ["/activity", "Follow-ups & activity"], ["/automations", "Automations"]],
   };
   const firstRoute = useRef(true);
   useEffect(() => {
@@ -102,9 +83,7 @@ export function Shell({ children }: { children: ReactNode }) {
     : 0;
   const count = overdueCount + upcomingCount + reconnectionCount;
   return (
-    <div
-      className={`app-shell connected-shell ${navigationOpen ? "navigation-open" : "navigation-closed"}`}
-    >
+    <div className="app-shell connected-shell unified-shell">
       <a
         className="skip-link"
         href="#main"
@@ -115,176 +94,19 @@ export function Shell({ children }: { children: ReactNode }) {
       >
         Skip to content
       </a>
-      <aside
-        id="workspace-navigation"
-        className="sidebar"
-        aria-label="Workspace navigation"
-      >
-        <Link to="/" className="wordmark">
-          <span className="brand-mark">
-            <AudioLines size={25} />
-          </span>
-          PULSE<span className="brand-dot">.</span>
-        </Link>
-        <div className="workspace-label">
-          <span className="workspace-icon">
-            <LayoutGrid size={17} />
-          </span>
-          <div>
-            <strong>
-              {workspace === "demo"
-                ? "The demo studio"
-                : settings.identity.workspaceName || "My workspace"}
-            </strong>
-            <small>
-              {workspace === "demo"
-                ? "A little room to explore"
-                : "Private · on this device"}
-            </small>
-          </div>
-        </div>
-        <button className="sidebar-search" onClick={() => setSearch(true)}>
-          <Search size={18} />
-          <span>Search</span>
-          <kbd>⌘ / Ctrl K</kbd>
-        </button>
-        <p className="nav-label">WORKSPACE</p>
-        <nav aria-label="Main navigation">
-          {nav.map(({ to, label, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === "/"}
-              className={({ isActive }) =>
-                "nav-item " + (isActive ? "active" : "")
-              }
-            >
-              <Icon size={20} />
-              {label}
-              {to === "/network" && (
-                <span className="nav-count">{contacts.length}</span>
-              )}
-            </NavLink>
-          ))}
-          <NavLink
-            className={({ isActive }) =>
-              "nav-item " + (isActive ? "active" : "")
-            }
-            to="/review"
-          >
-            <HeartPulse size={20} />
-            Relationship Review
-          </NavLink>
-        </nav>
-        <nav aria-label="Discover">
-          <p className="nav-label">DISCOVER</p>
-          {[
-            ["/analytics", "Analytics"],
-            ["/automations", "Automations"],
-            ["/focus", "My Focus"],
-            ["/orbit", "Relationship Orbit"],
-            ["/lists", "Smart Lists"],
-          ].map(([to, label]) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                "nav-item " + (isActive ? "active" : "")
-              }
-            >
-              {(() => {
-                const Icon = {
-                  "/analytics": ChartNoAxesCombined,
-                  "/automations": Workflow,
-                  "/focus": Target,
-                  "/orbit": Orbit,
-                  "/lists": ListFilter,
-                }[to];
-                return Icon ? <Icon size={19} /> : null;
-              })()}
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-        <div className="sidebar-bottom">
-          <NavLink
-            to="/settings"
-            className={({ isActive }) =>
-              "nav-item " + (isActive ? "active" : "")
-            }
-          >
-            <Settings size={20} />
-            Settings
-          </NavLink>
-          <Link className="nav-item" to="/help">
-            <CircleHelp size={20} />A little guidance
-          </Link>
-          <Link to="/settings" className="user-card">
-            <Avatar
-              workspaceIdentity
-              mediaId={settings.identity.avatarMediaId}
-              name={settings.name || "My workspace"}
-            />
-            <div>
-              <strong>{settings.name || "Your workspace"}</strong>
-              <small>Your personal space</small>
-            </div>
-            <ChevronDown size={16} />
-          </Link>
-        </div>
-      </aside>
       <div className="workspace-main">
         <header className="topbar">
-          <button
-            type="button"
-            className="icon-button navigation-toggle"
-            aria-label={navigationOpen ? "Hide navigation" : "Show navigation"}
-            aria-expanded={navigationOpen}
-            aria-controls="workspace-navigation"
-            onClick={() => setNavigationOpen(!navigationOpen)}
-          >
-            <PanelLeft size={20} />
-          </button>
-          <Link to="/" className="topbar-brand">
-            <AudioLines size={22} /> PULSE<span>.</span>
-          </Link>
-          <div className="breadcrumb">
-            <span>Workspace</span>
-            <span>/</span>
-            <strong>
-              {location.pathname.startsWith("/network")
-                ? "My network"
-                : location.pathname === "/pipeline"
-                  ? "Pipeline"
-                  : location.pathname === "/activity"
-                    ? "Activity"
-                    : location.pathname === "/settings"
-                      ? "Settings"
-                      : location.pathname === "/assistant"
-                        ? "PULSE Intelligence"
-                        : {
-                            "/analytics": "Analytics",
-                            "/automations": "Automations",
-                            "/orbit": "Relationship Orbit",
-                            "/focus": "My Focus",
-                            "/customize": "Personalize PULSE",
-                            "/review": "Relationship Review",
-                            "/lists": "Smart Lists",
-                            "/import": "Import contacts",
-                            "/help": "Help & getting started",
-                          }[location.pathname] || "Daily Pulse"}
-            </strong>
-          </div>
-          <Link to="/" className="mobile-brand">
-            <AudioLines size={21} />
-            PULSE.
-          </Link>
+          <Link to="/" className="unified-brand"><AudioLines size={23} /> PULSE<span>.</span></Link>
+          <nav className="unified-main-nav" aria-label="Main areas">
+            {mainAreas.map(({ to, label }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}>{label}</Link>)}
+          </nav>
           <div className="topbar-actions">
             <details className="workspace-switcher">
               <summary
+                data-workspace={workspace}
                 aria-label={`Workspace: ${workspace === "demo" ? "Demo" : "Personal"}. Switch workspace`}
               >
-                <span aria-hidden="true">
+                <span className="workspace-switcher-text" aria-hidden="true">
                   {workspace === "demo" ? "Demo" : "Personal"}
                 </span>
                 <ChevronDown size={15} />
@@ -325,23 +147,22 @@ export function Shell({ children }: { children: ReactNode }) {
               <Bell size={19} />
               {count > 0 && <i />}
             </button>
-            <Link to="/settings" aria-label="Open settings">
-              <Avatar
-                workspaceIdentity
-                mediaId={settings.identity.avatarMediaId}
-                name={settings.name || "You"}
-                size="small"
-              />
-            </Link>
+            <div className="unified-profile-menu" ref={profileMenuRef}>
+              <button type="button" className="unified-profile-trigger" aria-label="Open workspace menu" aria-expanded={profileMenu} onClick={() => setProfileMenu(!profileMenu)}><Avatar workspaceIdentity mediaId={settings.identity.avatarMediaId} name={settings.name || "You"} size="small" /></button>
+              {profileMenu && <div className="unified-profile-dropdown">
+                <strong>{settings.name || "Your workspace"}</strong><small>{workspace === "demo" ? "Demo workspace" : "Saved on this device"}</small>
+                <Link to="/settings" onClick={() => setProfileMenu(false)}>Settings & backups</Link>
+                <Link to="/customize" onClick={() => setProfileMenu(false)}>Personalize PULSE</Link>
+                <Link to="/import" onClick={() => setProfileMenu(false)}>Import contacts</Link>
+                <Link to="/assistant" onClick={() => setProfileMenu(false)}>PULSE Intelligence</Link>
+                <Link to="/help" onClick={() => setProfileMenu(false)}>Help & getting started</Link>
+              </div>}
+            </div>
           </div>
         </header>
-        <nav className="pulse-primary-nav" aria-label="Main areas">
-          {([["Today", "/"], ["People", "/network"], ["Work", "/pipeline"], ["Insights", "/analytics"], ["Tools", "/settings"]] as const).map(([label, to]) => <Link key={label} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}>{label}</Link>)}
-        </nav>
-        <nav className="pulse-area-nav" aria-label={`${area} sections`}>
-          <span>{area}</span>
-          {areaLinks[area].map(([to, label]) => <NavLink key={to} to={to} end={to === "/"}>{label}</NavLink>)}
-        </nav>
+        {areaLinks[area] && <nav className="unified-section-nav" aria-label={`${area} views`}>
+          <div>{areaLinks[area].map(([to, label]) => <Link key={to} to={to} className={path === to || (to === "/network" && (path.startsWith("/network/") || path === "/lists")) ? "active" : ""} aria-current={path === to ? "page" : undefined}>{label}</Link>)}</div>
+        </nav>}
         <OfflineStatus />
         <main id="main" tabIndex={-1}>
           {children}
@@ -354,45 +175,9 @@ export function Shell({ children }: { children: ReactNode }) {
           <span>Made for meaningful connections.</span>
         </footer>
       </div>
-      <nav className="bottom-nav" aria-label="Mobile navigation">
-        {mobileNav.map(({ to, short, icon: Icon }) => (
-          <NavLink key={to} to={to} end={to === "/"}>
-            <Icon size={21} />
-            <span>{short}</span>
-          </NavLink>
-        ))}
-        <button
-          aria-label="More destinations"
-          aria-expanded={more}
-          onClick={() => setMore(true)}
-        >
-          <LayoutGrid size={21} />
-          <span>More</span>
-        </button>
+      <nav className="bottom-nav unified-bottom-nav" aria-label="Mobile navigation">
+        {mainAreas.map(({ to, label, icon: Icon }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}><Icon size={21} /><span>{label}</span></Link>)}
       </nav>
-      {more && (
-        <Modal title="Explore your workspace" onClose={() => setMore(false)}>
-          <nav className="explore-menu" aria-label="More destinations">
-            {[
-              ["/analytics", "Analytics"],
-              ["/automations", "Automations"],
-              ["/focus", "My Focus"],
-              ["/orbit", "Relationship Orbit"],
-              ["/review", "Relationship Review"],
-              ["/lists", "Smart Lists"],
-              ["/assistant", "PULSE Intelligence"],
-              ["/customize", "Customize"],
-              ["/settings", "Settings"],
-              ["/help", "Help"],
-            ].map(([to, label]) => (
-              <Link key={to} to={to} onClick={() => setMore(false)}>
-                {label}
-                <ArrowUpRight size={18} />
-              </Link>
-            ))}
-          </nav>
-        </Modal>
-      )}
       <button
         className="floating-add"
         aria-label="Create a new record"

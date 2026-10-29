@@ -1,6 +1,12 @@
 # PULSE
 
-**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small businesses. Release candidate 1.2.0-rc.1 (iteration 09); stable release gates remain open.
+**Every relationship has a story.** A local-first, mobile-first B2B CRM for independent professionals and small businesses. Release candidate 1.5.0-rc.1; stable release gates remain open.
+
+## Workspace navigation
+
+PULSE uses four main areas: Today, People, Work, and Insights. Today brings Daily Pulse and My Focus together; People contains the directory, Orbit, and relationship review, with saved-list management in the directory; Work contains the pipeline, follow-ups, activity, and automations. Settings, backups, imports, personalization, help, and the optional assistant are in the workspace menu. Existing route URLs remain valid.
+
+Orbit offers an interactive 3D view and a 2D map, plus the record list. Nodes and lines represent saved records and associations only. Visual depth does not measure closeness. Reduced motion, a non-WebGL fallback, keyboard controls, and the record list remain available. Home's 3D sculpture is decorative.
 
 ## Run
 
@@ -32,7 +38,7 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 - Centralized, explainable relationship health and reviews; saved snoozes/dismissals; opportunity risk flags; authoritative restriction and permission checks.
 - Dynamic built-in and saved ALL/ANY Smart Lists; Network applies the same saved definitions.
 - CSV preview, editable mapping, row validation, deterministic duplicate comparisons, selected-field merges, company matching, atomic import and accurate result/history reports. No consent or availability is imported.
-- Version-five JSON backups with optimized local images, metadata and a validated replacement preview; versions one through four remain supported.
+- Version-six JSON backups with optimized local images, metadata and a validated replacement preview; versions one through five remain supported.
 - Light/dark/device themes; motion preference; local name, locale/timezone and rhythm settings; category-specific in-app alerts.
 - JSON backups with runtime validation and atomic restore; contact CSV export; separate demo reset/personal deletion; workspace switching.
 - Complete opportunity creation, editing, deletion and stage/outcome transitions; company and representative associations, values, expected close and user-entered probabilities.
@@ -42,7 +48,7 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 
 ## Storage and privacy
 
-Dexie schema version 5 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
+Dexie schema version 6 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
 
 No mandatory account, analytics, external fonts or external avatars. Records remain local unless you export them, open a reviewed external communication handoff, or explicitly approve selected context for optional Gemini processing. AI is off by default and production generation remains unconfigured. Provider keys are never entered in the frontend. IndexedDB is **not application-level encryption**; browser-profile access permits data access. Browser clearing/eviction and device loss can erase data. Back up important records. Workspace data is scoped to an origin: preview, GitHub Pages and hosted deployments do not share records. Export/import to move between them. Databases are not yet namespaced for multiple PULSE deployments on the same origin.
 
@@ -58,7 +64,7 @@ Deleting a company **detaches and preserves** its people, conversations, tasks, 
 
 ## Limits and next work
 
-No synchronization, hosted CRM accounts or team permissions. Google OAuth integrations remain planned/disconnected. Optional protected AI and manual communication/calendar handoffs are described below. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Advanced directory pagination and broader external integrations are deferred. Relationship stories render 20 entries at a time. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
+No synchronization, hosted CRM accounts or team permissions. Google Contacts and Calendar require a configured OAuth client and explicit user authorization; production configuration may be unavailable. Optional protected AI and manual communication/calendar handoffs are described below. No background notification delivery. The app must be open/active for in-app reminder evaluation (every minute or data update). Advanced directory pagination and broader external integrations are deferred. Relationship stories render 20 entries at a time. See `DEVELOPMENT_ROADMAP.md`, `PRODUCT_BLUEPRINT.md`, `DESIGN_SYSTEM.md` and `QA_REPORT.md`.
 
 ## License
 
@@ -76,7 +82,7 @@ For a preinstalled test browser, set `PULSE_CHROMIUM_PATH` when running `npm run
 
 ## Relationship intelligence and data import
 
-Open **Relationship Review** from Home, Network, or the desktop navigation. Reviews are rules based, with no AI inference. Health uses actual logged conversation dates or explicitly sourced imported last-contact dates. Notes and creation/import times never count as conversations. Unknown history stays unknown. Thresholds, inclusion preferences, default snooze and Home limits live in Settings → Relationship rhythm → Relationship intelligence settings. Snooze defers one evidence-specific recommendation; dismiss hides unchanged evidence; neither completes tasks nor changes communication eligibility.
+Open **Relationship Review** from Home or the People workspace’s Needs attention view. Reviews are rules based, with no AI inference. Health uses actual logged conversation dates or explicitly sourced imported last-contact dates. Notes and creation/import times never count as conversations. Unknown history stays unknown. Thresholds, inclusion preferences, default snooze and Home limits live in Settings → Relationship rhythm → Relationship intelligence settings. Snooze defers one evidence-specific recommendation; dismiss hides unchanged evidence; neither completes tasks nor changes communication eligibility.
 
 Smart Lists save filter definitions, not copied people. ALL/ANY conditions combine stage, category, priority, effective availability, company, tags, known days since contact, health, follow-up state, and opportunity state. Unknown history never satisfies a days-since comparison. A deleted-company criterion matches no contacts. Company Smart Lists are available in iteration 08.
 
@@ -166,7 +172,7 @@ Database/JSON backup **v4** adds pipelines, stages, definitions, typed values an
 
 PULSE 1.2.0-rc.1 adds an editorial Home led by commitments, Cards/Compact directory views, redesigned profile identity headers, a desktop Discover group and mobile More destinations. Person portraits, company logos/covers and workspace photo/name are stored locally, cropped and compressed in the browser; four accent presets support both themes. Use **Photo & cover** / **Logo & cover** beside profile editing, or Settings → Appearance → Workspace photo.
 
-Relationship Orbit maps actual company memberships and opportunity associations, with search, filters, person/company scopes, selection details and record navigation. Desktop Map starts fitted and bounded to 24 records; mobile starts in List (60 records), with an optional 18-record map. Search or focus a record to explore larger networks. No interpersonal relationships are inferred.
+Relationship Orbit maps actual company memberships and opportunity associations, with search, filters, person/company scopes, selection details and record navigation. The map is bounded to 24 records on desktop and 18 on mobile; the accompanying list supports up to 60 records. Search or focus a record to explore larger networks. No interpersonal relationships are inferred.
 
 DB/backup **v5** adds a media Blob store and additive identity/cover fields. Restore accepts v1–v5. Inputs: JPEG/PNG/WebP ≤8 MB/24 MP; optimized portraits/logos 320×320, covers 1280×480, ≤512 KB each. Local media is capped at 128 images/12 MB; backups use bounded base64 JSON (32 MB intake). No image hosting, cloud sync or AI media transfer. See EXPERIENCE_09.md, RELEASE_1_2.md and QA_REPORT.md for architecture and verified limits. After upgrading, use a v5-compatible forward fix rather than older database clients.
 

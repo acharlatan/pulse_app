@@ -32,6 +32,7 @@ test("the living constellation keeps people and Orbit useful across themes and s
   await page.getByLabel("Search network").fill("Olivia");
   await expect(page.locator("#directory-results")).toContainText("Olivia");
   await page.goto("/#/orbit");
+  await page.getByRole("button", { name: "2D map" }).click();
   await expect(page.locator(".constellation-scene-orbit")).toBeVisible();
   await page.locator(".orbit-node.person").first().click();
   await expect(page.getByRole("complementary", { name: "Selected relationship" })).toBeVisible();

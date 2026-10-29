@@ -11,6 +11,7 @@ import {
 import { FocusButton } from "../components/focus";
 import { OrbitGuide } from "./OrbitGuide";
 import { ConstellationScene } from "../components/ConstellationScene";
+import { OrbitWorld } from "../components/OrbitWorld";
 export function Orbit() {
   const navigationState = useLocation().state as {
     profileReturn?: unknown;
@@ -30,6 +31,10 @@ export function Orbit() {
     [type, setType] = useState(""),
     [priority, setPriority] = useState(""),
     [view, setView] = useState("list"),
+    [mapMode, setMapMode] = useState<"3d" | "2d">("3d"),
+    [webglAvailable, setWebglAvailable] = useState(true),
+    [turn, setTurn] = useState(0),
+    [resetScene, setResetScene] = useState(0),
     [selected, setSelected] = useState(""),
     [zoom, setZoom] = useState(1),
     [pan, setPan] = useState({ x: 0, y: 0 }),
@@ -116,7 +121,7 @@ export function Orbit() {
     const observer = new ResizeObserver(() => {
       if ((viewport.current?.clientWidth || 0) <= 600) {
         // Start close enough to read on a phone; Fit network remains available.
-        setZoom(0.7);
+        setZoom(0.9);
         setPan({ x: 0, y: 0 });
       } else fit();
     });
@@ -229,6 +234,7 @@ export function Orbit() {
         <section className="orbit-map-panel">
           <div className="orbit-toolbar">
             <div className="orbit-stage-title"><span className="orbit-stage-icon" aria-hidden="true">✳</span><div><strong>Your constellation</strong><small>{graph.nodes.length} of {graph.total} matching records · select a connection</small></div></div>
+            <div className="orbit-mode-tabs" aria-label="Map style"><button aria-pressed={mapMode === "3d"} disabled={!webglAvailable} onClick={() => setMapMode("3d")}>3D Orbit</button><button aria-pressed={mapMode === "2d"} onClick={() => setMapMode("2d")}>2D map</button></div>
             <div className="form-actions">
               {
                 <>
@@ -247,7 +253,7 @@ export function Orbit() {
                   >
                     +
                   </button>
-                  <button className="button ghost" onClick={fit}>
+                  <button className="button ghost" onClick={() => { fit(); setResetScene((value) => value + 1); }}>
                     Fit network
                   </button>
                 </>
@@ -256,6 +262,7 @@ export function Orbit() {
                 className="button ghost"
                 onClick={() => {
                   fit();
+                  setResetScene((value) => value + 1);
                   setSelected("");
                   setSearch("");
                   setType("");
@@ -281,6 +288,7 @@ export function Orbit() {
               )}
             </div>
           </div>
+          {!webglAvailable && <p className="orbit-render-notice">3D is unavailable on this device. The 2D map and full list remain available.</p>}
           {graph.limited && (
             <p className="orbit-limit">
               Showing the first {graph.nodes.length} records. Search or open a
@@ -319,8 +327,8 @@ export function Orbit() {
                 onPointerUp={() => (drag.current = null)}
                 onPointerCancel={() => (drag.current = null)}
               >
-                <div className="orbit-dimensional-background"><ConstellationScene variant="orbit" /></div>
-                <div
+                <div className="orbit-dimensional-background">{mapMode === "2d" && <ConstellationScene variant="orbit" />}</div>
+                {mapMode === "3d" ? <OrbitWorld nodes={graph.nodes} edges={graph.edges} selected={selected} zoom={zoom} pan={pan} turn={turn} reset={resetScene} onSelect={select} onUnavailable={() => { setWebglAvailable(false); setMapMode("2d"); }} /> : <div
                   className="orbit-canvas"
                   style={{
                     transform: `translate(${pan.x}px,${pan.y}px) scale(${zoom})`,
@@ -375,10 +383,11 @@ export function Orbit() {
                       <small>{n.kind}</small>
                     </button>
                   ))}
-                </div>
+                </div>}
               </div>
               <div className="orbit-pan">
-                <span>Drag to explore · Pan map</span>
+                <span>{mapMode === "3d" ? "Drag to rotate · Select an orb" : "Drag to explore · Pan map"}</span>
+                {mapMode === "3d" && <><button className="icon-button" aria-label="Rotate orbit left" onClick={() => setTurn((value) => value - 1)}>↶</button><button className="icon-button" aria-label="Rotate orbit right" onClick={() => setTurn((value) => value + 1)}>↷</button></>}
                 {[
                   ["←", -80, 0],
                   ["↑", 0, -80],
@@ -509,8 +518,7 @@ export function Orbit() {
             <span>◇ Opportunity</span>
             <p>
               Lines: works at · opportunity representative · company
-              opportunity. Shared employment does not imply that people know one
-              another.
+              opportunity. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.
             </p>
           </div>
         </section>

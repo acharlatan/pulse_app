@@ -1,0 +1,9 @@
+# PULSE unified workspace
+
+This update removes the desktop sidebar and duplicate global navigation, leaving Today, People, Work and Insights as four primary destinations. Profile-menu links expose settings, backups, import, personalization, help and the optional assistant; the demo/personal switch stays accessible. Today includes the existing My Focus experience, and People exposes saved Smart List management within the directory. People’s Orbit and review, and Work’s pipeline, follow-ups/activity and automations, remain individually addressable workspace views. Existing paths remain valid.
+
+Orbit adds a bounded Three.js rendering of the actual derived saved nodes and edges. Dragging or the rotate controls changes the perspective; clicking a sphere or label opens the same record detail used by the list and 2D map. The 2D map and searchable list remain available; visual depth is an arbitrary layout and never indicates relationship strength. A WebGL failure switches to the 2D map. Reduced-motion mode renders a still scene while preserving explicit interaction. The home sculpture can also be dragged or rotated with buttons. Rendering pauses when offscreen or the tab is hidden.
+
+The existing visual language is extended across working areas and a collapsible demo quick-start is provided. No data schema, backup format, permission rules, automation guarantees, paid services or provider configuration changed. Existing local-first privacy and backup limitations continue to apply.
+
+Validation includes typecheck, lint, 199 unit tests, clean production and subpath builds, responsive Chromium and axe checks in both themes at widths from 320 to 1440, real 3D interaction and WebGL fallback checks, and offline/update regression checks. Automated checks do not substitute for physical-device or native screen-reader testing.

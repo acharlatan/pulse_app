@@ -8,8 +8,9 @@ import { GettingStarted } from "../components/GettingStarted";
 import { ProgressSummary } from "../components/progress";
 import { EditorModal, type Editor } from "../components/forms";
 import { DailyPlan } from "./DailyPlan";
+import { Focus } from "./Focus";
 import { ConstellationScene } from "../components/ConstellationScene";
-export function Home() {
+export function Home({ focus = false }: { focus?: boolean }) {
   const p = usePulse(),
     { date } = useFormat(),
     navigate = useNavigate();
@@ -45,10 +46,13 @@ export function Home() {
     p.organizations.length ||
     p.opportunities.length ||
     p.tasks.length;
+  const todayTabs = <nav className="today-view-tabs" aria-label="Today views"><Link to="/" aria-current={!focus ? "page" : undefined} className={!focus ? "active" : ""}>Daily Pulse</Link><Link to="/focus" aria-current={focus ? "page" : undefined} className={focus ? "active" : ""}>My Focus</Link></nav>;
+  if (focus) return <div className="page home-page editorial-home daily-home today-focus-page">{todayTabs}<Focus embedded /></div>;
   return (
     <div
       className={`page home-page editorial-home daily-home home-${p.settings.focus.homeLayout}`}
     >
+      {todayTabs}
       <header className="editorial-masthead">
         <div>
           <p className="eyebrow">
@@ -91,7 +95,7 @@ export function Home() {
           <div className="opening-actions"><Link className="pulse-opening-link" to="/network">Explore your network <ArrowUpRight size={17} /></Link><Link className="opening-orbit-link" to="/orbit">Enter Orbit ↗</Link></div>
           {p.contacts.length > 0 && <div className="opening-people"><div className="opening-avatar-stack">{p.contacts.slice(0, 5).map((person) => <Avatar key={person.id} name={person.name} mediaId={person.avatar} />)}</div><span><strong>{p.contacts.length} {p.contacts.length === 1 ? "person" : "people"}</strong> in your world</span></div>}
         </div>
-        <div className="opening-art" aria-hidden="true"><div className="opening-art-fallback" /><ConstellationScene variant="home" /><span className="opening-art-caption">A WORLD OF CONNECTIONS <b>✳</b></span></div>
+        <div className="opening-art"><div className="opening-art-fallback" aria-hidden="true" /><ConstellationScene variant="home" /><span className="opening-art-caption" aria-hidden="true">A WORLD OF CONNECTIONS <b>✳</b></span></div>
       </section>
 
       {p.workspace === "personal" &&
@@ -122,6 +126,7 @@ export function Home() {
           ) : null;
         })()}
       <GettingStarted />
+      {p.workspace === "demo" && <details className="demo-quickstart"><summary>New to PULSE? Take a quick tour</summary><div className="demo-quickstart-content"><p>Try these steps with fictional records. Your demo edits stay in this browser and are separate from your personal workspace.</p><div><button className="button secondary" onClick={() => setEditor({ kind: "contact" })}>1 · Add a person</button><Link className="button secondary" to="/network">2 · Open a profile & log a conversation</Link><button className="button secondary" onClick={() => setEditor({ kind: "task" })}>3 · Plan a follow-up</button></div></div></details>}
       {active ? (
         <>
           <DailyPlan onEdit={setEditor} />
