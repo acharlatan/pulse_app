@@ -20,3 +20,13 @@
   .daily-home .daily-suggestions { order: 3; }
   .daily-home .daily-extra-grid { order: 4; }
 }
+.interaction-followup-choice { display: flex; align-items: flex-start; gap: 12px; padding: 15px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-secondary); cursor: pointer; }
+.interaction-followup-choice input { margin-top: 3px; flex: 0 0 auto; }
+.interaction-followup-choice span { display: grid; gap: 4px; }
+.interaction-followup-choice small { color: var(--muted); line-height: 1.45; }
+.continuation-notice { padding: 14px 16px; border-radius: 14px; background: var(--surface-secondary); color: var(--text); line-height: 1.5; }
+.brief-start { display: flex; align-items: flex-start; gap: 18px; padding: 18px 20px; margin: 18px 0; border: 1px solid var(--border); border-radius: 18px; background: var(--surface-secondary); }
+.brief-start > span { flex: 0 0 auto; padding: 6px 9px; border-radius: 8px; background: var(--surface); color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+.brief-start strong { font-size: 18px; }
+.brief-start p { margin: 5px 0 0; color: var(--muted); line-height: 1.45; }
+@media (max-width: 600px) { .brief-start { flex-direction: column; gap: 10px; padding: 16px; } }

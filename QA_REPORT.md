@@ -1,3 +1,7 @@
+# Relationship Workspace verification
+
+30 October 2026: typecheck, lint, and 208 automated tests passed. A managed Chrome preview verified the company overview, the optional interaction-to-follow-up flow and the Insights briefing using fictional demo records. Home, company profile and Insights were checked for horizontal document overflow and axe WCAG 2 A/AA violations at 320, 375, 390, 430, 768, 1024, 1280 and 1440 CSS pixels; none were reported in those checks. These checks do not establish full accessibility compliance. Physical devices, screen readers, installed-PWA behavior and hardware WebGL remain unverified for this release.
+
 # Iteration 01 verification
 
 Date: 25 October 2026. This report distinguishes executed checks from supplied tests and planned verification.

@@ -32,21 +32,55 @@ vi.mock("../src/app/context", () => ({
       },
     },
     organizations: [],
+    contacts: [],
+    opportunities: [],
+    tasks: [],
     settings: { followUpDays: 7, timeoutDays: 30 },
     run,
   }),
 }));
 const saveContact = vi.fn(async () => {});
+const addInteraction = vi.fn(async () => {});
 vi.mock("../src/data/repository", () => ({
   saveContact: (...args: unknown[]) => saveContact(...args),
   saveOrganization: vi.fn(),
-  addInteraction: vi.fn(),
+  addInteraction: (...args: unknown[]) => addInteraction(...args),
   saveTask: vi.fn(),
 }));
 Object.defineProperty(HTMLDialogElement.prototype, "showModal", {
   value: function (this: HTMLDialogElement) {
     this.setAttribute("open", "");
   },
+});
+
+it("saves the interaction before opening an optional follow-up and keeps it saved if cancelled", async () => {
+  const { cleanup } = await import("@testing-library/react");
+  cleanup();
+  addInteraction.mockClear();
+  const close = vi.fn();
+  render(<EditorModal editor={{ kind: "interaction" }} onClose={close} />);
+  fireEvent.change(await screen.findByLabelText("What would you like to remember?"), { target: { value: "Discussed the next step" } });
+  fireEvent.click(screen.getByRole("checkbox", { name: /Plan a follow-up after saving/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Save interaction" }));
+  expect(await screen.findByText(/Interaction saved\. You can plan a separate follow-up/)).toBeInTheDocument();
+  expect(addInteraction).toHaveBeenCalledOnce();
+  expect(close).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
+  expect(close).toHaveBeenCalledOnce();
+});
+
+it("does not start the follow-up if the interaction could not be saved", async () => {
+  const { cleanup } = await import("@testing-library/react");
+  cleanup();
+  addInteraction.mockRejectedValueOnce(new Error("Could not save interaction"));
+  const close = vi.fn();
+  render(<EditorModal editor={{ kind: "interaction" }} onClose={close} />);
+  fireEvent.change(await screen.findByLabelText("What would you like to remember?"), { target: { value: "Discussed the next step" } });
+  fireEvent.click(screen.getByRole("checkbox", { name: /Plan a follow-up after saving/ }));
+  fireEvent.click(screen.getByRole("button", { name: "Save interaction" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Could not save interaction");
+  expect(screen.queryByText(/Interaction saved\. You can plan/)).not.toBeInTheDocument();
+  expect(close).not.toHaveBeenCalled();
 });
 Object.defineProperty(HTMLDialogElement.prototype, "close", { value: vi.fn() });
 describe("accessible profile editing", () => {
