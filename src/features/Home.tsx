@@ -8,7 +8,7 @@ import { GettingStarted } from "../components/GettingStarted";
 import { ProgressSummary } from "../components/progress";
 import { EditorModal, type Editor } from "../components/forms";
 import { DailyPlan } from "./DailyPlan";
-import { PulseAtmosphere } from "../components/PulseAtmosphere";
+import { ConstellationScene } from "../components/ConstellationScene";
 export function Home() {
   const p = usePulse(),
     { date } = useFormat(),
@@ -84,8 +84,14 @@ export function Home() {
       </header>
 
       <section className="pulse-opening" aria-label="Your relationship workspace">
-        <div className="pulse-opening-copy"><span className="pulse-opening-label">YOUR SPACE · YOUR PACE</span><h2>Good things grow<br />through connection<span>.</span></h2><p>Keep the people and possibilities that matter within reach.</p><Link className="pulse-opening-link" to="/network">Explore your network <ArrowUpRight size={17} /></Link></div>
-        <PulseAtmosphere />
+        <div className="pulse-opening-copy">
+          <span className="pulse-opening-label"><span className="opening-spark">✳</span> YOUR SPACE · YOUR PACE</span>
+          <h2>Good things grow<br />through <em>connection</em><span>.</span></h2>
+          <p>Keep the people and possibilities that matter within reach.</p>
+          <div className="opening-actions"><Link className="pulse-opening-link" to="/network">Explore your network <ArrowUpRight size={17} /></Link><Link className="opening-orbit-link" to="/orbit">Enter Orbit ↗</Link></div>
+          {p.contacts.length > 0 && <div className="opening-people"><div className="opening-avatar-stack">{p.contacts.slice(0, 5).map((person) => <Avatar key={person.id} name={person.name} mediaId={person.avatar} />)}</div><span><strong>{p.contacts.length} {p.contacts.length === 1 ? "person" : "people"}</strong> in your world</span></div>}
+        </div>
+        <div className="opening-art" aria-hidden="true"><div className="opening-art-fallback" /><ConstellationScene variant="home" /><span className="opening-art-caption">A WORLD OF CONNECTIONS <b>✳</b></span></div>
       </section>
 
       {p.workspace === "personal" &&

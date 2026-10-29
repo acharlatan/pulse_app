@@ -367,7 +367,7 @@ export function Shell({ children }: { children: ReactNode }) {
           onClick={() => setMore(true)}
         >
           <LayoutGrid size={21} />
-          <span>Tools</span>
+          <span>More</span>
         </button>
       </nav>
       {more && (
