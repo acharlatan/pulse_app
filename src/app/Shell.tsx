@@ -325,6 +325,13 @@ export function Shell({ children }: { children: ReactNode }) {
             </Link>
           </div>
         </header>
+        <nav className="pulse-primary-nav" aria-label="Main areas">
+          <NavLink end to="/">Today</NavLink>
+          <NavLink to="/network">People</NavLink>
+          <NavLink to="/pipeline">Work</NavLink>
+          <NavLink to="/analytics">Insights</NavLink>
+          <NavLink to="/settings">Tools</NavLink>
+        </nav>
         <OfflineStatus />
         <main id="main" tabIndex={-1}>
           {children}
