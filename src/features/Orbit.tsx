@@ -10,7 +10,7 @@ import {
 } from "../services/recommendations";
 import { FocusButton } from "../components/focus";
 import { OrbitGuide } from "./OrbitGuide";
-import { PulseAtmosphere } from "../components/PulseAtmosphere";
+import { ConstellationScene } from "../components/ConstellationScene";
 export function Orbit() {
   const navigationState = useLocation().state as {
     profileReturn?: unknown;
@@ -113,7 +113,13 @@ export function Orbit() {
   }
   useEffect(() => {
     if (!viewport.current) return;
-    const observer = new ResizeObserver(() => fit());
+    const observer = new ResizeObserver(() => {
+      if ((viewport.current?.clientWidth || 0) <= 600) {
+        // Start close enough to read on a phone; Fit network remains available.
+        setZoom(0.7);
+        setPan({ x: 0, y: 0 });
+      } else fit();
+    });
     observer.observe(viewport.current);
     return () => observer.disconnect();
   }, [graph.nodes.length]);
@@ -222,9 +228,7 @@ export function Orbit() {
       >
         <section className="orbit-map-panel">
           <div className="orbit-toolbar">
-            <strong>
-              {graph.nodes.length} of {graph.total} matching records
-            </strong>
+            <div className="orbit-stage-title"><span className="orbit-stage-icon" aria-hidden="true">✳</span><div><strong>Your constellation</strong><small>{graph.nodes.length} of {graph.total} matching records · select a connection</small></div></div>
             <div className="form-actions">
               {
                 <>
@@ -315,7 +319,7 @@ export function Orbit() {
                 onPointerUp={() => (drag.current = null)}
                 onPointerCancel={() => (drag.current = null)}
               >
-                <div className="orbit-dimensional-background"><PulseAtmosphere /></div>
+                <div className="orbit-dimensional-background"><ConstellationScene variant="orbit" /></div>
                 <div
                   className="orbit-canvas"
                   style={{
@@ -374,7 +378,7 @@ export function Orbit() {
                 </div>
               </div>
               <div className="orbit-pan">
-                <span>Pan map</span>
+                <span>Drag to explore · Pan map</span>
                 {[
                   ["←", -80, 0],
                   ["↑", 0, -80],

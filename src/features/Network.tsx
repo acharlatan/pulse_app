@@ -47,7 +47,7 @@ export function Network() {
   const [stage, setStage] = useState(params.get("stage") || "");
   const [sort, setSort] = useState(params.get("sort") || "name");
   const [filters, setFilters] = useState(false);
-  const [display, setDisplay] = useState("list");
+  const [display, setDisplay] = useState("cards");
   const [editor, setEditor] = useState<Editor | null>(null);
   useEffect(() => {
     const next = new URLSearchParams();
@@ -116,6 +116,14 @@ export function Network() {
         ? b.updatedAt.localeCompare(a.updatedAt)
         : a.name.localeCompare(b.name),
     );
+  const recentPeople = Array.from(new Set(p.interactions
+    .filter((interaction) => interaction.contactId && interaction.type !== "Note" && Date.parse(interaction.occurredAt) <= Date.now())
+    .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
+    .map((interaction) => interaction.contactId)))
+    .map((id) => contacts.find((contact) => contact.id === id))
+    .filter((contact): contact is (typeof contacts)[number] => !!contact)
+    .slice(0, 4);
+  const openFollowups = p.tasks.filter((task) => !task.completedAt).length;
   return (
     <div className="page network-page">
       <header className="page-heading editorial-masthead network-masthead">
@@ -128,15 +136,18 @@ export function Network() {
             People you know. The details that move things forward.
           </p>
         </div>
-        <button
-          className="button primary"
-          onClick={() =>
-            setEditor({ kind: tab === "people" ? "contact" : "company" })
-          }
-        >
-          <Plus size={18} />
-          Add {tab === "people" ? "person" : "company"}
-        </button>
+        <div className="network-hero-art">
+          <div className="network-hero-orbit" aria-hidden="true"><span>✳</span></div>
+          <div className="network-hero-faces" aria-hidden="true">
+            {contacts.slice(0, 5).map((contact) => <Avatar key={contact.id} name={contact.name} mediaId={contact.avatar} size="large" />)}
+          </div>
+          <button
+            className="button primary"
+            onClick={() => setEditor({ kind: tab === "people" ? "contact" : "company" })}
+          >
+            <Plus size={18} /> Add {tab === "people" ? "person" : "company"}
+          </button>
+        </div>
       </header>
       <section className="network-orientation" aria-label="Network overview">
         <div>
@@ -181,6 +192,17 @@ export function Network() {
           </Link>
         </div>
       </section>
+      {recentPeople.length > 0 && (
+        <section className="network-recent" aria-labelledby="network-recent-title">
+          <div className="network-recent-heading"><div><p className="eyebrow">A LITTLE CLOSER</p><h2 id="network-recent-title">Recently connected<span>.</span></h2><p>People from your latest logged conversations.</p></div><span className="network-recent-count">{openFollowups} open {openFollowups === 1 ? "follow-up" : "follow-ups"}</span></div>
+          <div className="network-recent-people">{recentPeople.map((contact) => {
+            const organization = organizations.find((org) => org.id === contact.organizationId);
+            return <Link className="network-recent-person" key={contact.id} to={`/network/people/${contact.id}`} state={{ networkReturn: "/network" + (params.size ? "?" + params.toString() : "") }}>
+              <Avatar name={contact.name} mediaId={contact.avatar} size="large" /><span><strong>{contact.name}</strong><small>{contact.role || "Connection"}{organization ? ` · ${organization.name}` : ""}</small></span><ArrowUpRight size={18} />
+            </Link>;
+          })}</div>
+        </section>
+      )}
       <div className="directory-toolbar">
         <div
           className="tabs"
@@ -282,6 +304,10 @@ export function Network() {
             ))}
           </div>
         )}
+        <div className="tabs directory-display" aria-label="Directory presentation">
+          <button aria-pressed={display === "cards"} onClick={() => setDisplay("cards")}>Cards</button>
+          <button aria-pressed={display === "list"} onClick={() => setDisplay("list")}>Compact list</button>
+        </div>
         <details className="network-tools">
           <summary>Directory tools</summary>
           <div className="network-tools-content">
@@ -313,23 +339,7 @@ export function Network() {
               type={tab === "people" ? "contact" : "organization"}
               records={tab === "people" ? people : companies}
             />
-            <div
-              className="tabs directory-display"
-              aria-label="Directory presentation"
-            >
-              <button
-                aria-pressed={display === "list"}
-                onClick={() => setDisplay("list")}
-              >
-                Compact list
-              </button>
-              <button
-                aria-pressed={display === "cards"}
-                onClick={() => setDisplay("cards")}
-              >
-                Cards
-              </button>
-            </div>
+
             <Link className="button ghost" to="/orbit">
               Relationship Orbit
             </Link>
