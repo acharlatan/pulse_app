@@ -127,7 +127,7 @@ test("real waiting SW update warns about unfinished work and does not reload ano
     .click();
   await expect(
     page.getByRole("textbox", { name: "Your preferred name", exact: true }),
-  ).toHaveValue("Alex");
+  ).toHaveValue("Michelle");
   await expect(
     second.getByRole("textbox", { name: "Your preferred name", exact: true }),
   ).toHaveValue("Unfinished second-tab name");
