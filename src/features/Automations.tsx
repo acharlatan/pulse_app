@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { ArrowRight, Workflow, CalendarClock, Users, Bell } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -22,6 +23,7 @@ const triggers: Record<AutomationRule["trigger"], string> = {
   inactive: "Person reaches an inactivity threshold",
 };
 export function Automations() {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     rules = useLiveQuery(() => p.db.automationRules.toArray(), [p.db]) || [],
     history =
@@ -116,24 +118,20 @@ export function Automations() {
     <div className="page automations-page">
       <div className="page-heading editorial-masthead insight-masthead">
         <div>
-          <p className="eyebrow">LESS ADMIN, MORE TIME FOR PEOPLE</p>
+          <p className="eyebrow">{__pulseText("LESS ADMIN, MORE TIME FOR PEOPLE")}</p>
           <h1>
-            Automations<span className="accent">.</span>
+            {__pulseText("Automations")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            Choose a trigger and a safe local action. You stay in control.
-          </p>
+            {__pulseText("Choose a trigger and a safe local action. You stay in control.")}</p>
         </div>
         <Link className="button secondary" to="/analytics">
-          Open Analytics
-        </Link>
+          {__pulseText("Open Analytics")}</Link>
       </div>
       <section className="surface">
-        <h2>Start with a template</h2>
+        <h2>{__pulseText("Start with a template")}</h2>
         <p className="muted">
-          Templates open as disabled drafts. Review and enable each rule
-          yourself.
-        </p>
+          {__pulseText("Templates open as disabled drafts. Review and enable each rule yourself.")}</p>
         <div className="automation-templates">
           {(["stage", "closing", "inactive", "overdue"] as const).map((k) => (
             <button
@@ -158,26 +156,21 @@ export function Automations() {
               <ArrowRight className="template-arrow" size={20} />
               <span className="template-action">
                 {k === "stage" || k === "closing"
-                  ? "Create a local follow-up"
-                  : "Record a local reminder"}
+                  ? __pulseText("Create a local follow-up")
+                  : __pulseText("Record a local reminder")}
               </span>
-              <small>Configure a disabled draft →</small>
+              <small>{__pulseText("Configure a disabled draft →")}</small>
             </button>
           ))}
         </div>
       </section>
       <p className="automation-local-note">
-        Local checks while PULSE is open. Nothing is sent automatically;
-        templates are saved disabled.
-      </p>
+        {__pulseText("Local checks while PULSE is open. Nothing is sent automatically; templates are saved disabled.")}</p>
       <details className="automation-operation">
-        <summary>Execution & safety</summary>
-        <h2>Runs when PULSE is open</h2>
+        <summary>{__pulseText("Execution & safety")}</summary>
+        <h2>{__pulseText("Runs when PULSE is open")}</h2>
         <p>
-          Local checks run on opening, when you return to the app, and
-          periodically while it is active. Closed-app delivery is not
-          guaranteed. No rule sends messages or changes permissions.
-        </p>
+          {__pulseText("Local checks run on opening, when you return to the app, and periodically while it is active. Closed-app delivery is not guaranteed. No rule sends messages or changes permissions.")}</p>
         <div className="form-actions">
           <button
             className="button secondary"
@@ -190,7 +183,7 @@ export function Automations() {
               )
             }
           >
-            {state?.paused ? "Resume all automations" : "Pause all automations"}
+            {state?.paused ? __pulseText("Resume all automations") : __pulseText("Pause all automations")}
           </button>
           <button
             className="button ghost"
@@ -201,51 +194,49 @@ export function Automations() {
               )
             }
           >
-            Check eligible conditions now
-          </button>
+            {__pulseText("Check eligible conditions now")}</button>
         </div>
         <p className="muted">
-          Up to 30 rules; checks are bounded to keep your workspace responsive.
-        </p>
+          {__pulseText("Up to 30 rules; checks are bounded to keep your workspace responsive.")}</p>
         <p className="muted">
           {state?.paused
-            ? "All rules are paused."
-            : "Rules run only after you enable them. The latest 30 days of eligible missed checks may be considered; conditions before enabling, resuming or restoring never replay."}
+            ? __pulseText("All rules are paused.")
+            : __pulseText("Rules run only after you enable them. The latest 30 days of eligible missed checks may be considered; conditions before enabling, resuming or restoring never replay.")}
         </p>
       </details>
       <section className="surface">
-        <h2>Your rules</h2>
+        <h2>{__pulseText("Your rules")}</h2>
         {!visible.length && (
-          <p>No rules yet. Choose a template to make your first draft.</p>
+          <p>{__pulseText("No rules yet. Choose a template to make your first draft.")}</p>
         )}
         {visible.map((r) => (
           <article className="automation-rule" key={r.id}>
             <div>
               <h3>{r.name}</h3>
               <span className="rule-state">
-                {r.enabled ? "Enabled" : "Disabled draft"}
+                {r.enabled ? __pulseText("Enabled") : __pulseText("Disabled draft")}
               </span>
               <div className="rule-sequence">
                 <span>
-                  <small>WHEN</small>
+                  <small>{__pulseText("WHEN")}</small>
                   {triggers[r.trigger]}
                   <br />
                   {r.trigger === "stage"
                     ? `${p.pipelines.find((x) => x.id === r.pipelineId)?.name || "Pipeline"} / ${p.pipelineStages.find((x) => x.id === r.stageId)?.name || "Stage"}`
                     : r.trigger === "overdue"
-                      ? "Saved due time has passed"
+                      ? __pulseText("Saved due time has passed")
                       : `${r.days} elapsed days`}
                 </span>
                 <ArrowRight size={17} />
                 <span>
-                  <small>IF</small>
+                  <small>{__pulseText("IF")}</small>
                   {[r.priority, r.category].filter(Boolean).join(" · ") ||
-                    "Any matching record"}
+                    __pulseText("Any matching record")}
                 </span>
                 <ArrowRight size={17} />
                 <span>
-                  <small>THEN</small>
-                  {r.action === "task" ? "Create follow-up" : "Record reminder"}
+                  <small>{__pulseText("THEN")}</small>
+                  {r.action === "task" ? __pulseText("Create follow-up") : __pulseText("Record reminder")}
                 </span>
               </div>
               <small>{r.description}</small>
@@ -258,8 +249,7 @@ export function Automations() {
                   setEdit({ ...r });
                 }}
               >
-                Edit
-              </button>
+                {__pulseText("Edit")}</button>
               <button
                 className="button secondary"
                 onClick={() =>
@@ -271,7 +261,7 @@ export function Automations() {
                   )
                 }
               >
-                {r.enabled ? "Disable" : "Enable"}
+                {r.enabled ? __pulseText("Disable") : __pulseText("Enable")}
               </button>
               <button
                 className="button ghost"
@@ -286,30 +276,25 @@ export function Automations() {
                   });
                 }}
               >
-                Duplicate
-              </button>
+                {__pulseText("Duplicate")}</button>
               <button
                 className="button ghost destructive"
                 onClick={() => setDeleting(r)}
               >
-                Delete
-              </button>
+                {__pulseText("Delete")}</button>
             </div>
           </article>
         ))}
       </section>
       <section className="surface">
-        <h2>Automation history</h2>
+        <h2>{__pulseText("Automation history")}</h2>
         <p className="muted">
-          Latest 80 checks; duplicate-prevention records remain stored even when
-          older items are not shown. Reminders are visible here while the app is
-          open.
-        </p>
-        {!history.length && <p>No checks recorded yet.</p>}
+          {__pulseText("Latest 80 checks; duplicate-prevention records remain stored even when older items are not shown. Reminders are visible here while the app is open.")}</p>
+        {!history.length && <p>{__pulseText("No checks recorded yet.")}</p>}
         {history.map((h) => (
           <article key={h.id} className="automation-history">
             <strong>
-              {rules.find((r) => r.id === h.ruleId)?.name || "Deleted rule"} ·{" "}
+              {rules.find((r) => r.id === h.ruleId)?.name || __pulseText("Deleted rule")} ·{" "}
               {h.status}
             </strong>
             <p>{h.explanation}</p>
@@ -328,12 +313,11 @@ export function Automations() {
                   })
                 }
               >
-                Open created follow-up
-              </button>
+                {__pulseText("Open created follow-up")}</button>
             )}
-            {h.resultId && h.resultDeleted && <span>Follow-up removed</span>}{" "}
+            {h.resultId && h.resultDeleted && <span>{__pulseText("Follow-up removed")}</span>}{" "}
             {h.sourceType === "contact" && (
-              <Link to={`/network/people/${h.sourceId}`}>Open person</Link>
+              <Link to={`/network/people/${h.sourceId}`}>{__pulseText("Open person")}</Link>
             )}
             {h.sourceType === "opportunity" &&
               p.opportunities.some((o) => o.id === h.sourceId) && (
@@ -346,8 +330,7 @@ export function Automations() {
                     })
                   }
                 >
-                  Open opportunity
-                </button>
+                  {__pulseText("Open opportunity")}</button>
               )}
             {h.sourceType === "task" &&
               p.tasks.some((t) => t.id === h.sourceId) && (
@@ -360,8 +343,7 @@ export function Automations() {
                     })
                   }
                 >
-                  Open source follow-up
-                </button>
+                  {__pulseText("Open source follow-up")}</button>
               )}
           </article>
         ))}
@@ -370,19 +352,17 @@ export function Automations() {
         <Modal
           title={
             rules.some((r) => r.id === edit.id)
-              ? "Edit automation draft"
-              : "Create automation draft"
+              ? __pulseText("Edit automation draft")
+              : __pulseText("Create automation draft")
           }
           onClose={() => setEdit(null)}
         >
           <form onSubmit={(e) => void save(e)}>
             <p>
-              Rules are saved disabled. Editing an enabled rule disables it
-              until you review and enable it again.
-            </p>
+              {__pulseText("Rules are saved disabled. Editing an enabled rule disables it until you review and enable it again.")}</p>
             <div className="form-grid">
               <label className="field wide">
-                <span>Rule name</span>
+                <span>{__pulseText("Rule name")}</span>
                 <input
                   required
                   maxLength={100}
@@ -391,7 +371,7 @@ export function Automations() {
                 />
               </label>
               <label className="field wide">
-                <span>Description (optional)</span>
+                <span>{__pulseText("Description (optional)")}</span>
                 <input
                   maxLength={500}
                   value={edit.description}
@@ -399,7 +379,7 @@ export function Automations() {
                 />
               </label>
               <label className="field">
-                <span>When</span>
+                <span>{__pulseText("When")}</span>
                 <select
                   value={edit.trigger}
                   onChange={(e) =>
@@ -410,14 +390,14 @@ export function Automations() {
                 >
                   {Object.entries(triggers).map(([value, label]) => (
                     <option key={value} value={value}>
-                      {label}
+                      {__pulseText(label)}
                     </option>
                   ))}
                 </select>
               </label>
               {(edit.trigger === "stage" || edit.trigger === "closing") && (
                 <label className="field">
-                  <span>Pipeline</span>
+                  <span>{__pulseText("Pipeline")}</span>
                   <select
                     value={edit.pipelineId}
                     onChange={(e) => {
@@ -432,8 +412,8 @@ export function Automations() {
                   >
                     <option value="">
                       {edit.trigger === "stage"
-                        ? "Choose pipeline"
-                        : "Any pipeline"}
+                        ? __pulseText("Choose pipeline")
+                        : __pulseText("Any pipeline")}
                     </option>
                     {pipelines.map((x) => (
                       <option key={x.id} value={x.id}>
@@ -445,12 +425,12 @@ export function Automations() {
               )}
               {edit.trigger === "stage" && (
                 <label className="field">
-                  <span>Stage</span>
+                  <span>{__pulseText("Stage")}</span>
                   <select
                     value={edit.stageId}
                     onChange={(e) => update({ stageId: e.target.value })}
                   >
-                    <option value="">Choose stage</option>
+                    <option value="">{__pulseText("Choose stage")}</option>
                     {p.pipelineStages
                       .filter((x) => x.pipelineId === edit.pipelineId)
                       .map((x) => (
@@ -463,7 +443,7 @@ export function Automations() {
               )}
               {!["stage", "overdue"].includes(edit.trigger) && (
                 <label className="field">
-                  <span>Threshold in elapsed days</span>
+                  <span>{__pulseText("Threshold in elapsed days")}</span>
                   <input
                     type="number"
                     min={1}
@@ -474,7 +454,7 @@ export function Automations() {
                 </label>
               )}
               <label className="field">
-                <span>If person priority</span>
+                <span>{__pulseText("If person priority")}</span>
                 <select
                   value={edit.priority}
                   onChange={(e) =>
@@ -483,26 +463,26 @@ export function Automations() {
                     })
                   }
                 >
-                  <option value="">Any priority</option>
+                  <option value="">{__pulseText("Any priority")}</option>
                   {priorities.map((x) => (
-                    <option key={x}>{x}</option>
+                    <option key={x} value={x}>{__pulseText(x)}</option>
                   ))}
                 </select>
               </label>
               <label className="field">
-                <span>If person category</span>
+                <span>{__pulseText("If person category")}</span>
                 <select
                   value={edit.category}
                   onChange={(e) => update({ category: e.target.value })}
                 >
-                  <option value="">Any category</option>
+                  <option value="">{__pulseText("Any category")}</option>
                   {categories.map((x) => (
-                    <option key={x}>{x}</option>
+                    <option key={x} value={x}>{__pulseText(x)}</option>
                   ))}
                 </select>
               </label>
               <label className="field">
-                <span>Then</span>
+                <span>{__pulseText("Then")}</span>
                 <select
                   value={edit.action}
                   onChange={(e) =>
@@ -512,14 +492,13 @@ export function Automations() {
                   }
                 >
                   <option value="task">
-                    Create an administrative follow-up
-                  </option>
-                  <option value="reminder">Record an in-app reminder</option>
+                    {__pulseText("Create an administrative follow-up")}</option>
+                  <option value="reminder">{__pulseText("Record an in-app reminder")}</option>
                 </select>
               </label>
               {edit.action === "task" && (
                 <label className="field">
-                  <span>Follow-up title</span>
+                  <span>{__pulseText("Follow-up title")}</span>
                   <input
                     required
                     maxLength={200}
@@ -530,7 +509,7 @@ export function Automations() {
               )}
               {edit.action === "task" && (
                 <label className="field">
-                  <span>Due after elapsed days</span>
+                  <span>{__pulseText("Due after elapsed days")}</span>
                   <input
                     type="number"
                     min={0}
@@ -544,7 +523,7 @@ export function Automations() {
               )}
             </div>
             <section className="automation-preview">
-              <h3>Review before saving</h3>
+              <h3>{__pulseText("Review before saving")}</h3>
               <p>
                 {edit.trigger === "stage"
                   ? `${p.opportunities.filter((o) => o.pipelineId === edit.pipelineId && o.stageId === edit.stageId).length} currently in this stage; the rule acts only on future entries.`
@@ -555,36 +534,27 @@ export function Automations() {
                       : `${p.tasks.filter((t) => !t.completedAt).length} open follow-ups could be considered before date and safety checks.`}
               </p>
               <p>
-                When person conditions are selected, all linked people must
-                match. Restrictions are checked independently.
-              </p>
+                {__pulseText("When person conditions are selected, all linked people must match. Restrictions are checked independently.")}</p>
               <p>
-                When {triggers[edit.trigger].toLowerCase()}
+                {__pulseText("When") + " "}{triggers[edit.trigger].toLowerCase()}
                 {edit.trigger === "stage"
                   ? ` in ${pipelines.find((x) => x.id === edit.pipelineId)?.name || "a selected pipeline"} / ${p.pipelineStages.find((x) => x.id === edit.stageId)?.name || "a selected stage"}`
                   : ` (${edit.days} elapsed days where applicable)`}
                 ,{" "}
                 {edit.action === "task"
                   ? `create “${edit.taskTitle}” due ${edit.delayDays} days later`
-                  : "record a reminder in Automation history"}
-                . Restrictions and withdrawn permissions are always checked
-                before any action.
-              </p>
+                  : __pulseText("record a reminder in Automation history")}
+                {__pulseText(". Restrictions and withdrawn permissions are always checked before any action.")}</p>
               <p>
-                Scheduled checks run only while PULSE is open. Rules start
-                disabled; older events are not replayed. No email or message is
-                sent.
-              </p>
+                {__pulseText("Scheduled checks run only while PULSE is open. Rules start disabled; older events are not replayed. No email or message is sent.")}</p>
               {duplicate && (
                 <p role="status">
-                  A similar enabled rule already exists. Enabling both may
-                  create overlapping reminders or checks.
-                </p>
+                  {__pulseText("A similar enabled rule already exists. Enabling both may create overlapping reminders or checks.")}</p>
               )}
             </section>
             {error && (
               <p className="form-error" role="alert">
-                {error}
+                {__pulseText(error)}
               </p>
             )}
             <div className="form-actions">
@@ -593,10 +563,9 @@ export function Automations() {
                 className="button secondary"
                 onClick={() => setEdit(null)}
               >
-                Cancel
-              </button>
+                {__pulseText("Cancel")}</button>
               <button className="button primary" disabled={busy}>
-                {busy ? "Saving…" : "Save disabled draft"}
+                {busy ? __pulseText("Saving…") : __pulseText("Save disabled draft")}
               </button>
             </div>
           </form>
@@ -609,17 +578,15 @@ export function Automations() {
         />
       )}
       {deleting && (
-        <Modal title="Delete automation?" onClose={() => setDeleting(null)}>
+        <Modal title={__pulseText("Delete automation?")} onClose={() => setDeleting(null)}>
           <p>
-            Delete {deleting.name}? Past checks and created follow-ups remain.
-          </p>
+            {__pulseText("Delete") + " "}{deleting.name}{__pulseText("? Past checks and created follow-ups remain.")}</p>
           <div className="form-actions">
             <button
               className="button secondary"
               onClick={() => setDeleting(null)}
             >
-              Cancel
-            </button>
+              {__pulseText("Cancel")}</button>
             <button
               className="button destructive"
               onClick={() =>
@@ -638,8 +605,7 @@ export function Automations() {
                   })
               }
             >
-              Delete rule
-            </button>
+              {__pulseText("Delete rule")}</button>
           </div>
         </Modal>
       )}

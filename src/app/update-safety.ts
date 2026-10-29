@@ -1,3 +1,5 @@
+import { translateInterface } from "../i18n/useInterfaceText";
+
 // Ephemeral edit markers only: never persist field contents or silently save a draft.
 const dirty = new Set<Element>();
 let editVersion = 0;
@@ -71,7 +73,7 @@ export function confirmRefresh() {
   return (
     !hasUnsavedWork() ||
     window.confirm(
-      "You have unfinished edits. Updating will discard them. Cancel to save your work first, or OK to discard and reload.",
+      translateInterface(document.documentElement.lang, "You have unfinished edits. Updating will discard them. Cancel to save your work first, or OK to discard and reload."),
     )
   );
 }
@@ -97,7 +99,7 @@ export function confirmLeave() {
   if (!hasUnsavedWork()) return true;
   if (
     !window.confirm(
-      "You have unfinished edits. Leave and discard them? Cancel to keep editing.",
+      translateInterface(document.documentElement.lang, "You have unfinished edits. Leave and discard them? Cancel to keep editing."),
     )
   )
     return false;
@@ -113,7 +115,7 @@ export function confirmDialogClose(root: Element | null) {
   if (!edits.length) return true;
   if (
     !window.confirm(
-      "Discard unfinished edits in this dialog? Cancel to keep editing.",
+      translateInterface(document.documentElement.lang, "Discard unfinished edits in this dialog? Cancel to keep editing."),
     )
   )
     return false;

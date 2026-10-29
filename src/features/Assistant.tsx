@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { ActionProposals } from "./ai/ActionProposals";
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -19,6 +20,7 @@ import { Badge, Modal } from "../components/ui";
 import { emailLink, whatsappLink } from "../services/handoffs";
 import { saveAINote } from "../data/ai-repository";
 export function Assistant() {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     [params] = useSearchParams(),
     initial = params.get("scope");
@@ -264,27 +266,25 @@ export function Assistant() {
     <div className="page assistant-page">
       <div className="page-heading">
         <div>
-          <p className="eyebrow">OPTIONAL · SELECTED CONTEXT ONLY</p>
+          <p className="eyebrow">{__pulseText("OPTIONAL · SELECTED CONTEXT ONLY")}</p>
           <h1>
-            PULSE Intelligence<span className="accent">.</span>
+            {__pulseText("PULSE Intelligence")}<span className="accent">.</span>
           </h1>
           <p className="subtitle">
-            Understand the relationship. Find the next step.
-          </p>
+            {__pulseText("Understand the relationship. Find the next step.")}</p>
         </div>
         <Link className="button secondary" to="/settings?section=integrations">
-          AI & integration preferences
-        </Link>
+          {__pulseText("AI & integration preferences")}</Link>
       </div>
       <div className="inline-notice" role="status">
         {!online
-          ? "Offline: AI requires internet. Your local CRM still works."
+          ? __pulseText("Offline: AI requires internet. Your local CRM still works.")
           : status.message}{" "}
-        {!p.settings.ai.enabled && " AI is disabled in this workspace."}
+        {!p.settings.ai.enabled && __pulseText(" AI is disabled in this workspace.")}
       </div>
       <section className="surface ai-controls">
         <label className="field">
-          <span>Context scope</span>
+          <span>{__pulseText("Context scope")}</span>
           <select
             value={scope}
             onChange={(e) => {
@@ -293,13 +293,13 @@ export function Assistant() {
               setId("");
             }}
           >
-            <option value="contact">Contact</option>
-            <option value="organization">Company</option>
-            <option value="opportunity">Opportunity</option>
+            <option value="contact">{__pulseText("Contact")}</option>
+            <option value="organization">{__pulseText("Company")}</option>
+            <option value="opportunity">{__pulseText("Opportunity")}</option>
           </select>
         </label>
         <label className="field">
-          <span>Selected relationship</span>
+          <span>{__pulseText("Selected relationship")}</span>
           <select
             value={id}
             onChange={(e) => {
@@ -307,7 +307,7 @@ export function Assistant() {
               setId(e.target.value);
             }}
           >
-            <option value="">Choose a record</option>
+            <option value="">{__pulseText("Choose a record")}</option>
             {choices.map((r) => (
               <option key={r.id} value={r.id}>
                 {"name" in r ? r.name : r.title}
@@ -316,7 +316,7 @@ export function Assistant() {
           </select>
         </label>
         <label className="field">
-          <span>AI operation</span>
+          <span>{__pulseText("AI operation")}</span>
           <select
             value={operation}
             onChange={(e) => {
@@ -324,26 +324,26 @@ export function Assistant() {
               setOperation(e.target.value as AIRequest["operation"]);
             }}
           >
-            <option value="catch-up">Catch Me Up</option>
-            <option value="ask">Ask PULSE</option>
-            <option value="draft">Draft a message</option>
-            <option value="extract-actions">Notes to Actions</option>
+            <option value="catch-up">{__pulseText("Catch Me Up")}</option>
+            <option value="ask">{__pulseText("Ask PULSE")}</option>
+            <option value="draft">{__pulseText("Draft a message")}</option>
+            <option value="extract-actions">{__pulseText("Notes to Actions")}</option>
           </select>
         </label>
         {operation === "ask" && (
           <label className="field">
-            <span>Your question</span>
+            <span>{__pulseText("Your question")}</span>
             <textarea
               maxLength={1000}
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              placeholder="What commitments are recorded?"
+              placeholder={__pulseText("What commitments are recorded?")}
             />
           </label>
         )}
         {operation === "extract-actions" && (
           <label className="field">
-            <span>Optional note to extract (also sent if approved)</span>
+            <span>{__pulseText("Optional note to extract (also sent if approved)")}</span>
             <textarea
               maxLength={4000}
               value={text}
@@ -354,17 +354,17 @@ export function Assistant() {
         {operation === "draft" && (
           <>
             <label className="field">
-              <span>Message goal</span>
+              <span>{__pulseText("Message goal")}</span>
               <input
                 maxLength={1000}
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Meeting request, proposal update or relationship check-in"
+                placeholder={__pulseText("Meeting request, proposal update or relationship check-in")}
               />
             </label>
             <div className="ai-form-grid">
               <label className="field">
-                <span>Tone</span>
+                <span>{__pulseText("Tone")}</span>
                 <select
                   value={tone}
                   onChange={(e) => setTone(e.target.value as AIRequest["tone"])}
@@ -376,12 +376,12 @@ export function Assistant() {
                     "Concise",
                     "Direct",
                   ].map((t) => (
-                    <option key={t}>{t}</option>
+                    <option key={t} value={t}>{__pulseText(t)}</option>
                   ))}
                 </select>
               </label>
               <label className="field">
-                <span>Length</span>
+                <span>{__pulseText("Length")}</span>
                 <select
                   value={length}
                   onChange={(e) =>
@@ -389,12 +389,12 @@ export function Assistant() {
                   }
                 >
                   {["Short", "Standard", "Detailed"].map((t) => (
-                    <option key={t}>{t}</option>
+                    <option key={t} value={t}>{__pulseText(t)}</option>
                   ))}
                 </select>
               </label>
               <label className="field">
-                <span>Channel</span>
+                <span>{__pulseText("Channel")}</span>
                 <select
                   value={options.channel}
                   onChange={(e) => {
@@ -406,12 +406,12 @@ export function Assistant() {
                   }}
                 >
                   {["Email", "WhatsApp", "General"].map((t) => (
-                    <option key={t}>{t}</option>
+                    <option key={t} value={t}>{__pulseText(t)}</option>
                   ))}
                 </select>
               </label>
               <label className="field">
-                <span>Communication purpose</span>
+                <span>{__pulseText("Communication purpose")}</span>
                 <select
                   value={options.purpose}
                   onChange={(e) => {
@@ -422,8 +422,8 @@ export function Assistant() {
                     });
                   }}
                 >
-                  <option>Relationship</option>
-                  <option>Marketing</option>
+                  <option value="Relationship">{__pulseText("Relationship")}</option>
+                  <option value="Marketing">{__pulseText("Marketing")}</option>
                 </select>
               </label>
             </div>
@@ -433,7 +433,7 @@ export function Assistant() {
           </>
         )}
         <details>
-          <summary>Choose included information</summary>
+          <summary>{__pulseText("Choose included information")}</summary>
           <div className="ai-form-grid">
             {(
               [
@@ -471,7 +471,7 @@ export function Assistant() {
             ))}
           </div>
           <label className="field">
-            <span>Interaction date from (UTC date)</span>
+            <span>{__pulseText("Interaction date from (UTC date)")}</span>
             <input
               type="date"
               value={options.from}
@@ -479,7 +479,7 @@ export function Assistant() {
             />
           </label>
           <label className="field">
-            <span>Interaction keyword filter</span>
+            <span>{__pulseText("Interaction keyword filter")}</span>
             <input
               value={options.keyword}
               onChange={(e) =>
@@ -489,11 +489,7 @@ export function Assistant() {
           </label>
         </details>
         <p className="muted">
-          Up to 15 records (first 3 representatives, 5 open tasks and 3 deals),
-          1,500 characters per record; full payload preview before every
-          request. Notes, contact channels and deal values are excluded by
-          default. AI can be wrong; verify its cited records.
-        </p>
+          {__pulseText("Up to 15 records (first 3 representatives, 5 open tasks and 3 deals), 1,500 characters per record; full payload preview before every request. Notes, contact channels and deal values are excluded by default. AI can be wrong; verify its cited records.")}</p>
         <div className="record-actions">
           <button
             className="button primary"
@@ -502,33 +498,28 @@ export function Assistant() {
             }
             onClick={prepare}
           >
-            Review context
-          </button>
+            {__pulseText("Review context")}</button>
           <button className="button ghost" onClick={clear}>
-            Clear temporary conversation
-          </button>
+            {__pulseText("Clear temporary conversation")}</button>
           {busy && (
             <button className="button secondary" onClick={clear}>
-              Cancel generation
-            </button>
+              {__pulseText("Cancel generation")}</button>
           )}
         </div>
-        {busy && <p role="status">Preparing a grounded response…</p>}
+        {busy && <p role="status">{__pulseText("Preparing a grounded response…")}</p>}
         {error && (
           <p role="alert" className="form-error">
-            {error}
+            {__pulseText(error)}
           </p>
         )}
       </section>
       {answer && (
         <section className="surface ai-answer">
-          <Badge tone="purple">AI-generated · verify before acting</Badge>
+          <Badge tone="purple">{__pulseText("AI-generated · verify before acting")}</Badge>
           <p className="muted">
-            Your request: {answer.request.question || answer.request.operation}{" "}
-            · {answer.request.context.label}. This answer used only the approved
-            context snapshot.
-          </p>
-          <h2>Summary with cited records</h2>
+            {__pulseText("Your request:") + " "}{answer.request.question || answer.request.operation}{" "}
+            · {answer.request.context.label}{__pulseText(". This answer used only the approved context snapshot.")}</p>
+          <h2>{__pulseText("Summary with cited records")}</h2>
           {answer.result.facts.map((f, i) => (
             <div className="ai-fact" key={i}>
               <p>{f.text}</p>
@@ -538,7 +529,7 @@ export function Assistant() {
                 );
                 return source ? (
                   <details key={ref}>
-                    <summary>Source · {source.kind}</summary>
+                    <summary>{__pulseText("Source ·") + " "}{source.kind}</summary>
                     <p>{source.text}</p>
                     <small>{source.at}</small>
                     {(() => {
@@ -555,8 +546,7 @@ export function Assistant() {
                             setSourceEditor({ kind: "interaction", record: i })
                           }
                         >
-                          Open saved interaction
-                        </button>
+                          {__pulseText("Open saved interaction")}</button>
                       ) : t ? (
                         <button
                           className="button ghost"
@@ -564,8 +554,7 @@ export function Assistant() {
                             setSourceEditor({ kind: "task", record: t })
                           }
                         >
-                          Open saved task
-                        </button>
+                          {__pulseText("Open saved task")}</button>
                       ) : d ? (
                         <button
                           className="button ghost"
@@ -573,41 +562,36 @@ export function Assistant() {
                             setSourceEditor({ kind: "opportunity", record: d })
                           }
                         >
-                          Open saved opportunity
-                        </button>
+                          {__pulseText("Open saved opportunity")}</button>
                       ) : source.kind === "contact" &&
                         p.contacts.some((c) => c.id === recordId) ? (
                         <Link
                           className="button ghost"
                           to={`/network/people/${encodeURIComponent(recordId)}`}
                         >
-                          Open profile
-                        </Link>
+                          {__pulseText("Open profile")}</Link>
                       ) : source.kind === "organization" &&
                         p.organizations.some((o) => o.id === recordId) ? (
                         <Link
                           className="button ghost"
                           to={`/network/companies/${encodeURIComponent(recordId)}`}
                         >
-                          Open company
-                        </Link>
+                          {__pulseText("Open company")}</Link>
                       ) : (
                         <p>
-                          Source may have been removed. The snapshot above was
-                          used.
-                        </p>
+                          {__pulseText("Source may have been removed. The snapshot above was used.")}</p>
                       );
                     })()}
                   </details>
                 ) : (
-                  <p key={ref}>Source: your approved input note</p>
+                  <p key={ref}>{__pulseText("Source: your approved input note")}</p>
                 );
               })}
             </div>
           ))}
           {answer.result.suggestions.length > 0 && (
             <>
-              <h3>Suggestions, not saved instructions</h3>
+              <h3>{__pulseText("Suggestions, not saved instructions")}</h3>
               <ul>
                 {answer.result.suggestions.map((v, i) => (
                   <li key={i}>{v}</li>
@@ -617,7 +601,7 @@ export function Assistant() {
           )}
           {answer.result.missing.length > 0 && (
             <>
-              <h3>Missing or uncertain</h3>
+              <h3>{__pulseText("Missing or uncertain")}</h3>
               <ul>
                 {answer.result.missing.map((v, i) => (
                   <li key={i}>{v}</li>
@@ -627,11 +611,9 @@ export function Assistant() {
           )}
           <div className="record-actions">
             <button className="button secondary" onClick={() => copy(summary)}>
-              Copy summary
-            </button>
+              {__pulseText("Copy summary")}</button>
             <button className="button ghost" onClick={prepare}>
-              Adjust context / regenerate
-            </button>
+              {__pulseText("Adjust context / regenerate")}</button>
             {summary && scope !== "opportunity" && (
               <button
                 className="button secondary"
@@ -641,15 +623,14 @@ export function Assistant() {
                   setSavingNote(true);
                 }}
               >
-                Review saving as note
-              </button>
+                {__pulseText("Review saving as note")}</button>
             )}
           </div>
           {answer.result.draft && (
             <>
-              <h3>Editable draft · nothing sent</h3>
+              <h3>{__pulseText("Editable draft · nothing sent")}</h3>
               <label className="field">
-                <span>Draft subject</span>
+                <span>{__pulseText("Draft subject")}</span>
                 <input
                   value={draft.subject}
                   onChange={(e) =>
@@ -658,7 +639,7 @@ export function Assistant() {
                 />
               </label>
               <label className="field">
-                <span>Draft message</span>
+                <span>{__pulseText("Draft message")}</span>
                 <textarea
                   value={draft.body}
                   onChange={(e) => setDraft({ ...draft, body: e.target.value })}
@@ -669,22 +650,19 @@ export function Assistant() {
                   className="button secondary"
                   onClick={() => copy(draft.body)}
                 >
-                  Copy draft
-                </button>
+                  {__pulseText("Copy draft")}</button>
                 <button
                   className="button secondary"
                   disabled={reasons.length > 0}
                   onClick={() => handoff("Email")}
                 >
-                  Open email composer
-                </button>
+                  {__pulseText("Open email composer")}</button>
                 <button
                   className="button secondary"
                   disabled={reasons.length > 0}
                   onClick={() => handoff("WhatsApp")}
                 >
-                  Open WhatsApp draft
-                </button>
+                  {__pulseText("Open WhatsApp draft")}</button>
               </div>
             </>
           )}
@@ -699,31 +677,23 @@ export function Assistant() {
         </section>
       )}
       {preview && (
-        <Modal title="Approve context sharing" onClose={() => setPreview(null)}>
+        <Modal title={__pulseText("Approve context sharing")} onClose={() => setPreview(null)}>
           <p>
-            Send only this request to Google Gemini through PULSE's protected
-            Worker. External provider terms and data handling apply; free-tier
-            data may be used to improve provider products. Nothing is sent until
-            you confirm.
+            {__pulseText("Send only this request to Google Gemini through PULSE's protected Worker. External provider terms and data handling apply; free-tier data may be used to improve provider products. Nothing is sent until you confirm.")}</p>
+          <p>
+            {preview.context.records.length} {" " + __pulseText("selected records ·")}{" "}
+            {preview.context.omitted} {" " + __pulseText("additional records omitted. Each record may be clipped at 1,500 characters. Date from:")}{" "}
+            {preview.context.dateFrom || __pulseText("all dates within scope")}.
           </p>
           <p>
-            {preview.context.records.length} selected records ·{" "}
-            {preview.context.omitted} additional records omitted. Each record
-            may be clipped at 1,500 characters. Date from:{" "}
-            {preview.context.dateFrom || "all dates within scope"}.
-          </p>
-          <p>
-            Permission evidence, entire workspace and unselected fields are
-            excluded. Review the exact payload:
-          </p>
+            {__pulseText("Permission evidence, entire workspace and unselected fields are excluded. Review the exact payload:")}</p>
           <pre className="ai-preview">{JSON.stringify(preview, null, 2)}</pre>
           <div className="record-actions">
             <button
               className="button secondary"
               onClick={() => setPreview(null)}
             >
-              Cancel
-            </button>
+              {__pulseText("Cancel")}</button>
             <button
               className="button primary"
               disabled={
@@ -731,23 +701,20 @@ export function Assistant() {
               }
               onClick={send}
             >
-              Send approved context to Gemini
-            </button>
+              {__pulseText("Send approved context to Gemini")}</button>
           </div>
           {!status.available && <p>{status.message}</p>}
         </Modal>
       )}
       {savingNote && (
         <Modal
-          title="Save reviewed AI note?"
+          title={__pulseText("Save reviewed AI note?")}
           onClose={() => setSavingNote(false)}
         >
           <p>
-            This creates a labeled local note. Existing notes remain unchanged
-            and no XP is awarded.
-          </p>
+            {__pulseText("This creates a labeled local note. Existing notes remain unchanged and no XP is awarded.")}</p>
           <label className="field">
-            <span>Reviewed note content</span>
+            <span>{__pulseText("Reviewed note content")}</span>
             <textarea
               maxLength={10000}
               value={noteText}
@@ -759,8 +726,7 @@ export function Assistant() {
               className="button secondary"
               onClick={() => setSavingNote(false)}
             >
-              Cancel
-            </button>
+              {__pulseText("Cancel")}</button>
             <button
               className="button primary"
               disabled={saving || !noteText.trim()}
@@ -784,8 +750,7 @@ export function Assistant() {
                 setSaving(false);
               }}
             >
-              Save this note
-            </button>
+              {__pulseText("Save this note")}</button>
           </div>
         </Modal>
       )}

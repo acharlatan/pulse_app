@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { useState, type ReactNode, type FormEvent } from "react";
 import { usePulse } from "../app/context";
@@ -64,6 +65,7 @@ export function RecordForm({
   onDelete?: () => Promise<unknown>;
   deleteLabel?: string;
 }) {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -101,15 +103,13 @@ export function RecordForm({
       >
         {confirm ? (
           <p className="confirm-copy">
-            Confirm this operation? Related people and companies are preserved.
-            Deleted records cannot be recovered without a backup.
-          </p>
+            {__pulseText("Confirm this operation? Related people and companies are preserved. Deleted records cannot be recovered without a backup.")}</p>
         ) : (
           <div className="form-grid">{children}</div>
         )}
         {error && (
           <p id="record-error" role="alert" className="form-error">
-            {error}
+            {__pulseText(error)}
           </p>
         )}
         <div className="form-actions">
@@ -119,7 +119,7 @@ export function RecordForm({
             disabled={busy}
             onClick={() => (confirm ? setConfirm(false) : onClose())}
           >
-            {confirm ? "Go back" : t("cancel")}
+            {confirm ? __pulseText("Go back") : t("cancel")}
           </button>
           {confirm ? (
             <button
@@ -128,8 +128,7 @@ export function RecordForm({
               disabled={busy}
               onClick={() => void act(onDelete!)}
             >
-              Confirm
-            </button>
+              {__pulseText("Confirm")}</button>
           ) : (
             <>
               <button className="button primary" disabled={busy}>
@@ -159,6 +158,7 @@ export function RecordEditorModal({
   editor: RecordEditor;
   onClose: () => void;
 }) {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const p = usePulse();
   const [organizationId, setOrganizationId] = useState(
@@ -194,7 +194,7 @@ export function RecordEditorModal({
     const o = editor.record;
     return (
       <RecordForm
-        title={o ? "Opportunity details" : "New opportunity"}
+        title={o ? __pulseText("Opportunity details") : __pulseText("New opportunity")}
         onClose={onClose}
         onDelete={o ? () => deleteOpportunity(p.db, o.id) : undefined}
         onSave={async (d) =>
@@ -226,7 +226,7 @@ export function RecordEditorModal({
         p.intelligence.opportunities.find((i) => i.opportunityId === o.id)
           ?.flags.length ? (
           <p className="field-help wide">
-            Review:{" "}
+            {__pulseText("Review:")}{" "}
             {
               p.intelligence.opportunities.find((i) => i.opportunityId === o.id)
                 ?.reason
@@ -247,7 +247,7 @@ export function RecordEditorModal({
             value={organizationId}
             onChange={(e) => setOrganizationId(e.target.value)}
           >
-            <option value="">Independent opportunity</option>
+            <option value="">{__pulseText("Independent opportunity")}</option>
             {p.organizations.map((v) => (
               <option key={v.id} value={v.id}>
                 {v.name}
@@ -256,7 +256,7 @@ export function RecordEditorModal({
           </select>
         </Field>
         <fieldset className="wide people-picker" key={organizationId}>
-          <legend>Associated people</legend>
+          <legend>{__pulseText("Associated people")}</legend>
           {p.contacts
             .filter(
               (c) =>
@@ -278,16 +278,15 @@ export function RecordEditorModal({
                 <span>
                   {c.name}
                   {c.organizationId !== organizationId && organizationId
-                    ? " · previous representative"
+                    ? __pulseText(" · previous representative")
                     : ""}
                 </span>
               </label>
             ))}
           <small>
-            Select the representatives involved in this opportunity.
-          </small>
+            {__pulseText("Select the representatives involved in this opportunity.")}</small>
         </fieldset>
-        <Field label="Pipeline">
+        <Field label={__pulseText("Pipeline")}>
           <select
             value={pipelineId}
             onChange={(e) => setPipelineId(e.target.value)}
@@ -297,12 +296,12 @@ export function RecordEditorModal({
               .map((x) => (
                 <option key={x.id} value={x.id}>
                   {x.name}
-                  {x.archived ? " (archived)" : ""}
+                  {x.archived ? __pulseText(" (archived)") : ""}
                 </option>
               ))}
           </select>
         </Field>
-        <Field label="Stage / outcome">
+        <Field label={__pulseText("Stage / outcome")}>
           <select
             key={pipelineId}
             name="stageId"
@@ -319,8 +318,7 @@ export function RecordEditorModal({
             }
           >
             <option value="" disabled>
-              Choose a destination stage
-            </option>
+              {__pulseText("Choose a destination stage")}</option>
             {p.pipelineStages
               .filter((s) => s.pipelineId === pipelineId)
               .map((s) => (
@@ -330,10 +328,9 @@ export function RecordEditorModal({
               ))}
           </select>
           <small>
-            Won and Lost close the deal. Select an active stage to reopen it.
-          </small>
+            {__pulseText("Won and Lost close the deal. Select an active stage to reopen it.")}</small>
         </Field>
-        <Field label="Value (optional)">
+        <Field label={__pulseText("Value (optional)")}>
           <input
             name="value"
             type="number"
@@ -342,7 +339,7 @@ export function RecordEditorModal({
             defaultValue={o?.value ?? ""}
           />
         </Field>
-        <Field label="Currency">
+        <Field label={__pulseText("Currency")}>
           <input
             name="currency"
             required
@@ -351,7 +348,7 @@ export function RecordEditorModal({
             defaultValue={o?.currency || p.settings.pipeline.currency}
           />
         </Field>
-        <Field label="Expected close (device time)">
+        <Field label={__pulseText("Expected close (device time)")}>
           <input
             type="datetime-local"
             name="expectedCloseAt"
@@ -360,7 +357,7 @@ export function RecordEditorModal({
             }
           />
         </Field>
-        <Field label="Probability · user entered (%)">
+        <Field label={__pulseText("Probability · user entered (%)")}>
           <input
             name="probability"
             type="number"
@@ -369,7 +366,7 @@ export function RecordEditorModal({
             defaultValue={o?.probability ?? ""}
           />
         </Field>
-        <Field label="Notes" wide>
+        <Field label={__pulseText("Notes")} wide>
           <textarea
             name="notes"
             rows={4}
@@ -384,7 +381,7 @@ export function RecordEditorModal({
     const v = editor.record;
     return (
       <RecordForm
-        title="Availability & timeout"
+        title={__pulseText("Availability & timeout")}
         onClose={onClose}
         onDelete={v ? () => endRestriction(p.db, v.id) : undefined}
         deleteLabel="End restriction"
@@ -406,10 +403,8 @@ export function RecordEditorModal({
         }
       >
         <p className="field-help wide">
-          Temporary pauses expire for review. On hold and Do not contact remain
-          indefinite until explicitly ended. No messages are sent.
-        </p>
-        <Field label="Availability" wide>
+          {__pulseText("Temporary pauses expire for review. On hold and Do not contact remain indefinite until explicitly ended. No messages are sent.")}</p>
+        <Field label={__pulseText("Availability")} wide>
           <select
             value={restrictionType}
             onChange={(e) =>
@@ -417,11 +412,11 @@ export function RecordEditorModal({
             }
           >
             {availabilities.map((s) => (
-              <option key={s}>{s}</option>
+              <option key={s} value={s}>{__pulseText(s)}</option>
             ))}
           </select>
         </Field>
-        <Field label="Starts (device time)">
+        <Field label={__pulseText("Starts (device time)")}>
           <input
             name="startAt"
             type="datetime-local"
@@ -431,7 +426,7 @@ export function RecordEditorModal({
           />
         </Field>
         {restrictionType === "Temporarily unavailable" && (
-          <Field label="Until (optional, device time)">
+          <Field label={__pulseText("Until (optional, device time)")}>
             <input
               name="endAt"
               type="datetime-local"
@@ -445,21 +440,21 @@ export function RecordEditorModal({
             />
           </Field>
         )}
-        <Field label="Reason" wide>
+        <Field label={__pulseText("Reason")} wide>
           <input
             name="reason"
             maxLength={1000}
             defaultValue={v?.reason}
-            placeholder="e.g. Budget review period"
+            placeholder={__pulseText("e.g. Budget review period")}
           />
         </Field>
-        <Field label="Source / explanation" wide>
+        <Field label={__pulseText("Source / explanation")} wide>
           <textarea
             name="source"
             maxLength={5000}
             rows={3}
             defaultValue={v?.source}
-            placeholder="Client request during a call"
+            placeholder={__pulseText("Client request during a call")}
           />
         </Field>
       </RecordForm>
@@ -468,7 +463,7 @@ export function RecordEditorModal({
   const v = editor.record;
   return (
     <RecordForm
-      title="Communication permission"
+      title={__pulseText("Communication permission")}
       onClose={onClose}
       onSave={(d) =>
         savePermission(p.db, {
@@ -484,38 +479,36 @@ export function RecordEditorModal({
       }
     >
       <p className="field-help wide">
-        Unknown means no permission recorded. Marketing and relationship
-        communication are distinct. A timeout ending never grants consent.
-      </p>
-      <Field label="Channel">
+        {__pulseText("Unknown means no permission recorded. Marketing and relationship communication are distinct. A timeout ending never grants consent.")}</p>
+      <Field label={__pulseText("Channel")}>
         <select name="channel" defaultValue={v?.channel || "Email"}>
           {["Email", "Phone", "Message", "All"].map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{__pulseText(s)}</option>
           ))}
         </select>
       </Field>
-      <Field label="Purpose">
+      <Field label={__pulseText("Purpose")}>
         <select name="purpose" defaultValue={v?.purpose || "Relationship"}>
           {["Relationship", "Marketing"].map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{__pulseText(s)}</option>
           ))}
         </select>
       </Field>
-      <Field label="Permission status">
+      <Field label={__pulseText("Permission status")}>
         <select name="status" defaultValue={v?.status || "Unknown"}>
           {["Unknown", "Granted", "Denied", "Withdrawn"].map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{__pulseText(s)}</option>
           ))}
         </select>
       </Field>
-      <Field label="Withdrawal date (if withdrawn)">
+      <Field label={__pulseText("Withdrawal date (if withdrawn)")}>
         <input
           name="withdrawnAt"
           type="datetime-local"
           defaultValue={v?.withdrawnAt ? localDate(v.withdrawnAt) : ""}
         />
       </Field>
-      <Field label="Evidence / source" wide>
+      <Field label={__pulseText("Evidence / source")} wide>
         <textarea
           name="evidence"
           rows={4}

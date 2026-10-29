@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { useState } from "react";
 import { ProgressDetails } from "../components/progress";
@@ -10,6 +11,7 @@ import { TaskRow } from "../components/relationship";
 import { priorities } from "../data/models";
 import { taskState } from "../services/recommendations";
 export function Activity() {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const p = usePulse();
   const { date } = useFormat();
@@ -66,8 +68,7 @@ export function Activity() {
               month: "long",
               day: "numeric",
             })}{" "}
-            · YOUR WORKING DAY
-          </p>
+            {__pulseText("· YOUR WORKING DAY")}</p>
           <h1>
             {t("activityTitle")}<span className="accent">.</span>
           </h1>
@@ -83,7 +84,7 @@ export function Activity() {
           {t("planFollowup")}
         </button>
       </header>
-      <nav className="activity-ledger" aria-label="Follow-up overview">
+      <nav className="activity-ledger" aria-label={__pulseText("Follow-up overview")}>
         {[
           ["overdue", "Overdue"],
           ["today", "Due today"],
@@ -104,7 +105,7 @@ export function Activity() {
                 ).length
               }
             </strong>
-            {label}
+            {__pulseText(label)}
           </button>
         ))}
       </nav>
@@ -115,7 +116,7 @@ export function Activity() {
             className={tab === "tasks" ? "selected" : ""}
             onClick={() => setTab("tasks")}
           >
-            Follow-ups{" "}
+            {__pulseText("Follow-ups")}{" "}
             <span>{p.tasks.filter((t) => !t.completedAt).length}</span>
           </button>
           <button
@@ -123,38 +124,36 @@ export function Activity() {
             className={tab === "timeline" ? "selected" : ""}
             onClick={() => setTab("timeline")}
           >
-            Activity timeline
-          </button>
+            {__pulseText("Activity timeline")}</button>
           <button
             aria-pressed={tab === "progress"}
             className={tab === "progress" ? "selected" : ""}
             onClick={() => setTab("progress")}
           >
-            Your progress
-          </button>
+            {__pulseText("Your progress")}</button>
         </div>
         {tab === "tasks" && (
           <div className="agenda-controls">
             <label className="field">
-              <span>Show</span>
+              <span>{__pulseText("Show")}</span>
               <select
-                aria-label="Filter tasks"
+                aria-label={__pulseText("Filter tasks")}
                 value={filter}
                 onChange={(e) => {
                   setFilter(e.target.value);
                   setLimit(40);
                 }}
               >
-                <option value="open">Open tasks</option>
-                <option value="today">Today</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="overdue">Overdue</option>
-                <option value="complete">Completed</option>
-                <option value="all">All tasks</option>
+                <option value="open">{__pulseText("Open tasks")}</option>
+                <option value="today">{__pulseText("Today")}</option>
+                <option value="upcoming">{__pulseText("Upcoming")}</option>
+                <option value="overdue">{__pulseText("Overdue")}</option>
+                <option value="complete">{__pulseText("Completed")}</option>
+                <option value="all">{__pulseText("All tasks")}</option>
               </select>
             </label>
             <label className="field">
-              <span>Sort tasks</span>
+              <span>{__pulseText("Sort tasks")}</span>
               <select
                 value={sort}
                 onChange={(e) => {
@@ -162,9 +161,9 @@ export function Activity() {
                   setLimit(40);
                 }}
               >
-                <option value="due">Due date</option>
-                <option value="priority">Priority</option>
-                <option value="updated">Recently updated</option>
+                <option value="due">{__pulseText("Due date")}</option>
+                <option value="priority">{__pulseText("Priority")}</option>
+                <option value="updated">{__pulseText("Recently updated")}</option>
               </select>
             </label>
           </div>
@@ -176,7 +175,7 @@ export function Activity() {
         <div className="agenda-workspace">
           <section
             className="activity-surface agenda-groups"
-            aria-label="Follow-up agenda"
+            aria-label={__pulseText("Follow-up agenda")}
           >
             {(sort === "due"
               ? ["Overdue", "Due today", "Upcoming", "Completed"]
@@ -201,20 +200,20 @@ export function Activity() {
                 >
                   <header className="agenda-group-heading">
                     <span className="agenda-group-marker" aria-hidden="true" />
-                    <h2>{group === "Due today" ? "Today" : group}</h2>
+                    <h2>{group === "Due today" ? __pulseText("Today") : group}</h2>
                     <span>{matching.length}</span>
                     <small>
                       {group === "Overdue"
-                        ? "A little attention goes a long way"
+                        ? __pulseText("A little attention goes a long way")
                         : group === "Due today"
-                          ? "Room for today’s commitments"
+                          ? __pulseText("Room for today’s commitments")
                           : group === "Upcoming"
-                            ? "A look at what’s ahead"
+                            ? __pulseText("A look at what’s ahead")
                             : group === "Completed"
-                              ? "Promises you’ve kept"
+                              ? __pulseText("Promises you’ve kept")
                               : sort === "priority"
-                                ? "Highest priority first"
-                                : "Most recently updated first"}
+                                ? __pulseText("Highest priority first")
+                                : __pulseText("Most recently updated first")}
                     </small>
                   </header>
                   {visible.map((t) => (
@@ -225,31 +224,29 @@ export function Activity() {
             })}
             {!tasks.length && (
               <Empty
-                title="A little breathing room"
-                body="No tasks in this view. Plan a follow-up when you are ready."
+                title={__pulseText("A little breathing room")}
+                body={__pulseText("No tasks in this view. Plan a follow-up when you are ready.")}
                 action={
                   <button
                     className="button secondary"
                     onClick={() => setEditor({ kind: "task" })}
                   >
-                    Plan a next step
-                  </button>
+                    {__pulseText("Plan a next step")}</button>
                 }
               />
             )}
           </section>
           <aside className="agenda-side">
             <div className="agenda-day-stamp">
-              <span className="eyebrow">KEEP THE THREAD</span>
+              <span className="eyebrow">{__pulseText("KEEP THE THREAD")}</span>
               <h2>
-                Conversations
-                <br />
-                become next steps<span className="accent">.</span>
+                {__pulseText("Conversations")}<br />
+                {__pulseText("become next steps")}<span className="accent">.</span>
               </h2>
-              <p>Remember the conversation behind the commitment.</p>
+              <p>{__pulseText("Remember the conversation behind the commitment.")}</p>
             </div>
             <details className="agenda-conversations" open>
-              <summary>Recent conversations</summary>
+              <summary>{__pulseText("Recent conversations")}</summary>
               {p.interactions
                 .filter(
                   (i) =>
@@ -272,7 +269,7 @@ export function Activity() {
                           />
                         )}
                         <span>
-                          {c?.name || org?.name || "Saved conversation"}
+                          {c?.name || org?.name || __pulseText("Saved conversation")}
                           <small>
                             {i.type} · {date(i.occurredAt)}
                           </small>
@@ -287,7 +284,7 @@ export function Activity() {
                           className="text-link"
                           to={`/network/${c ? "people" : "companies"}/${(c || org)!.id}`}
                         >
-                          Continue the story <ArrowUpRight size={15} />
+                          {__pulseText("Continue the story") + " "}<ArrowUpRight size={15} />
                         </Link>
                       )}
                     </article>
@@ -298,18 +295,17 @@ export function Activity() {
                   i.type !== "Note" && Date.parse(i.occurredAt) <= Date.now(),
               ) && (
                 <p className="muted">
-                  Your next logged conversation will appear here.
-                </p>
+                  {__pulseText("Your next logged conversation will appear here.")}</p>
               )}
             </details>
             <Link className="agenda-focus-link" to="/focus">
-              Your chosen priorities <ArrowRight size={17} />
+              {__pulseText("Your chosen priorities") + " "}<ArrowRight size={17} />
             </Link>
           </aside>
         </div>
       ) : (
         <section className="surface activity-surface work-event-stream">
-          <h2>The story so far</h2>
+          <h2>{__pulseText("The story so far")}</h2>
           {p.events.slice(0, limit).map((e) => (
             <div className="timeline-row" key={e.id}>
               <span className="timeline-dot">
@@ -339,8 +335,8 @@ export function Activity() {
           ))}
           {!p.events.length && (
             <Empty
-              title="Your story starts here"
-              body="Add a person or log a conversation to start your timeline."
+              title={__pulseText("Your story starts here")}
+              body={__pulseText("Add a person or log a conversation to start your timeline.")}
             />
           )}
         </section>
@@ -351,8 +347,7 @@ export function Activity() {
             className="button secondary"
             onClick={() => setLimit(limit + 40)}
           >
-            Show more activity
-          </button>
+            {__pulseText("Show more activity")}</button>
         )}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />

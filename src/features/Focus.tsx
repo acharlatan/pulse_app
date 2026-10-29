@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -11,6 +12,7 @@ import { taskState } from "../services/recommendations";
 import { ProgressSummary } from "../components/progress";
 import type { FocusItem } from "../data/expansion-models";
 export function Focus({ embedded = false }: { embedded?: boolean }) {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const p = usePulse(),
     day = calendarDay(Date.now(), p.settings.timezone);
@@ -44,20 +46,19 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
     <div className={embedded ? "focus-page focus-embedded" : "page focus-page"}>
       <div className="page-heading editorial-masthead insight-masthead">
         <div>
-          <p className="eyebrow">CHOSEN BY YOU</p>
+          <p className="eyebrow">{__pulseText("CHOSEN BY YOU")}</p>
           <h1>
             {t("focus")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            Keep relationships close. Choose what to move forward today.
-          </p>
+            {__pulseText("Keep relationships close. Choose what to move forward today.")}</p>
         </div>
       </div>
       <div className="focus-day-brief">
-        <span className="eyebrow">TODAY · CHOSEN BY YOU</span>
+        <span className="eyebrow">{__pulseText("TODAY · CHOSEN BY YOU")}</span>
         <strong>
           {p.focusItems.filter((f) => f.today === day).length}
-          <small>selected</small>
+          <small>{__pulseText("selected")}</small>
         </strong>
         <p>
           {
@@ -68,9 +69,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                 p.tasks.some((t) => t.id === f.recordId && t.completedAt),
             ).length
           }{" "}
-          completed follow-ups in today’s selections. Choose a manageable next
-          step; there is no automatic prioritization.
-        </p>
+          {__pulseText("completed follow-ups in today’s selections. Choose a manageable next step; there is no automatic prioritization.")}</p>
       </div>
       {p.workspace === "demo" &&
         p.focusItems.length === 0 &&
@@ -79,11 +78,9 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
           p.opportunities.length > 0) && (
           <aside className="surface demo-focus-examples">
             <div>
-              <strong>Example priorities</strong>
+              <strong>{__pulseText("Example priorities")}</strong>
               <p>
-                Preview how your focus can look. These fictional examples are
-                not yet pinned.
-              </p>
+                {__pulseText("Preview how your focus can look. These fictional examples are not yet pinned.")}</p>
               <div className="demo-focus-preview">
                 {p.contacts.find((item) => item.id === "contact-0") && (
                   <div>
@@ -103,7 +100,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                             .name
                         }
                       </strong>
-                      <small>Example relationship</small>
+                      <small>{__pulseText("Example relationship")}</small>
                     </span>
                   </div>
                 )}
@@ -114,7 +111,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                       <strong>
                         {p.tasks.find((item) => item.id === "task-0")!.title}
                       </strong>
-                      <small>Example follow-up</small>
+                      <small>{__pulseText("Example follow-up")}</small>
                     </span>
                   </div>
                 )}
@@ -123,7 +120,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                     <span className="demo-focus-symbol">↗</span>
                     <span>
                       <strong>{p.opportunities[0].title}</strong>
-                      <small>Example opportunity</small>
+                      <small>{__pulseText("Example opportunity")}</small>
                     </span>
                   </div>
                 )}
@@ -161,15 +158,14 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                 )
               }
             >
-              Add example priorities
-            </button>
+              {__pulseText("Add example priorities")}</button>
           </aside>
         )}
       <details className="surface focus-picker">
-        <summary>Add a priority</summary>
+        <summary>{__pulseText("Add a priority")}</summary>
         <div className="form-grid">
           <label className="field">
-            <span>Record type</span>
+            <span>{__pulseText("Record type")}</span>
             <select
               value={type}
               onChange={(e) => {
@@ -177,24 +173,24 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                 setId("");
               }}
             >
-              <option value="contact">Person</option>
-              <option value="organization">Company</option>
-              <option value="opportunity">Opportunity</option>
-              <option value="task">Follow-up</option>
+              <option value="contact">{__pulseText("Person")}</option>
+              <option value="organization">{__pulseText("Company")}</option>
+              <option value="opportunity">{__pulseText("Opportunity")}</option>
+              <option value="task">{__pulseText("Follow-up")}</option>
             </select>
           </label>
           <label className="field">
-            <span>Search records</span>
+            <span>{__pulseText("Search records")}</span>
             <input value={search} onChange={(e) => setSearch(e.target.value)} />
           </label>
           <label className="field">
-            <span>Record</span>
+            <span>{__pulseText("Record")}</span>
             <select
-              aria-label="Focus record"
+              aria-label={__pulseText("Focus record")}
               value={id}
               onChange={(e) => setId(e.target.value)}
             >
-              <option value="">Choose a record</option>
+              <option value="">{__pulseText("Choose a record")}</option>
               {records
                 .filter((r) =>
                   name(r).toLowerCase().includes(search.toLowerCase()),
@@ -206,7 +202,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                   </option>
                 ))}
             </select>
-            <small>Search to narrow the first 100 matches.</small>
+            <small>{__pulseText("Search to narrow the first 100 matches.")}</small>
           </label>
         </div>
         <div className="form-actions">
@@ -217,8 +213,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
               void p.run(() => setFocus(p.db, type, id, "pin"), "Pinned")
             }
           >
-            Pin record
-          </button>
+            {__pulseText("Pin record")}</button>
           <button
             className="button primary"
             disabled={!id}
@@ -229,14 +224,10 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
               )
             }
           >
-            Add to today
-          </button>
+            {__pulseText("Add to today")}</button>
         </div>
         <p className="muted">
-          Up to 100 pins and 20 daily priorities. Pins stay until removed; daily
-          selections remain on their chosen date. Removing a priority does not
-          reschedule its task.
-        </p>
+          {__pulseText("Up to 100 pins and 20 daily priorities. Pins stay until removed; daily selections remain on their chosen date. Removing a priority does not reschedule its task.")}</p>
       </details>
       {(
         [
@@ -274,8 +265,8 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
             <h2>{section}</h2>
             {!items.length && (
               <Empty
-                title="Give today a little direction."
-                body="Open Add a priority to choose a person, company, opportunity or follow-up. Your other pins stay below until you select them for today."
+                title={__pulseText("Give today a little direction.")}
+                body={__pulseText("Open Add a priority to choose a person, company, opportunity or follow-up. Your other pins stay below until you select them for today.")}
               />
             )}
             {items.slice(0, 100).map((f) => (
@@ -302,12 +293,12 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                         <p className="focus-deal-context">
                           <strong>
                             {o.value === null
-                              ? "Value not set"
+                              ? __pulseText("Value not set")
                               : money(o.value, o.currency)}
                           </strong>
                           <Badge tone="purple">
                             {p.pipelineStages.find((s) => s.id === o.stageId)
-                              ?.name || "Stage"}{" "}
+                              ?.name || __pulseText("Stage")}{" "}
                             · {o.status}
                           </Badge>
                         </p>
@@ -325,15 +316,14 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                               setEditor({ kind: "task", record: t })
                             }
                           >
-                            Edit task
-                          </button>
+                            {__pulseText("Edit task")}</button>
                         </p>
                       );
                     })()}
                   <p className="muted">
-                    {f.entityType} · Personally pinned{" "}
+                    {f.entityType} {" " + __pulseText("· Personally pinned")}{" "}
                     {f.today === day
-                      ? "· Selected today"
+                      ? __pulseText("· Selected today")
                       : f.today
                         ? `· Selected ${f.today}`
                         : ""}
@@ -343,8 +333,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                     <Link
                       to={`/network/${f.entityType === "contact" ? "people" : "companies"}/${f.recordId}`}
                     >
-                      Open relationship
-                    </Link>
+                      {__pulseText("Open relationship")}</Link>
                   ) : (
                     <Link
                       to={
@@ -353,7 +342,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                           : "/pipeline"
                       }
                     >
-                      Open {f.entityType}
+                      {__pulseText("Open") + " "}{f.entityType}
                     </Link>
                   )}
                 </div>
@@ -374,7 +363,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                       )
                     }
                   >
-                    {f.today === day ? "Remove from today" : "Choose today"}
+                    {f.today === day ? __pulseText("Remove from today") : __pulseText("Choose today")}
                   </button>
                   <button
                     className="button ghost"
@@ -385,8 +374,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                       )
                     }
                   >
-                    Unpin
-                  </button>
+                    {__pulseText("Unpin")}</button>
                   {f.entityType === "task" &&
                     !p.tasks.find((t) => t.id === f.recordId)?.completedAt && (
                       <button
@@ -398,8 +386,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                           )
                         }
                       >
-                        Complete task
-                      </button>
+                        {__pulseText("Complete task")}</button>
                     )}
                 </div>
               </article>

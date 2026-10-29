@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -29,6 +30,7 @@ export function CommandPalette({
   onClose: () => void;
   onEdit: (editor: Editor) => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -180,7 +182,7 @@ export function CommandPalette({
     else if (item.editor) onEdit(item.editor);
   }
   return (
-    <Modal title="Search PULSE" onClose={onClose}>
+    <Modal title={__pulseText("Search PULSE")} onClose={onClose}>
       <div
         className="command-palette"
         onKeyDown={(e) => {
@@ -201,7 +203,7 @@ export function CommandPalette({
         <label className="command-input">
           <Search size={20} />
           <input
-            aria-label="Search records and actions"
+            aria-label={__pulseText("Search records and actions")}
             data-non-editing
             ref={inputRef}
             value={query}
@@ -209,7 +211,7 @@ export function CommandPalette({
               setQuery(e.target.value);
               setSelected(0);
             }}
-            placeholder="Search people, companies, tasks…"
+            placeholder={__pulseText("Search people, companies, tasks…")}
             aria-controls="command-results"
             aria-activedescendant={
               results[active] ? `command-${active}` : undefined
@@ -220,12 +222,12 @@ export function CommandPalette({
           />
         </label>
         <p className="command-label">
-          {query.trim() ? "Search results" : "Suggested actions"}
+          {query.trim() ? __pulseText("Search results") : __pulseText("Suggested actions")}
         </p>
         <div
           id="command-results"
           role="listbox"
-          aria-label="Search results"
+          aria-label={__pulseText("Search results")}
           className="command-results"
         >
           {results.map((item, index) => {
@@ -258,21 +260,19 @@ export function CommandPalette({
                   </span>
                 )}
                 <span>
-                  <strong>{item.title}</strong>
-                  <small>{item.context}</small>
+                  <strong>{item.icon === "command" ? __pulseText(item.title) : item.title}</strong>
+                  <small>{item.icon === "command" ? __pulseText(item.context) : item.context}</small>
                 </span>
               </button>
             );
           })}
           {!results.length && (
             <p className="command-empty">
-              No results found. Try another name or action.
-            </p>
+              {__pulseText("No results found. Try another name or action.")}</p>
           )}
         </div>
         <p className="command-hint">
-          Use ↑ ↓ to select · Enter to open · Esc to close
-        </p>
+          {__pulseText("Use ↑ ↓ to select · Enter to open · Esc to close")}</p>
       </div>
     </Modal>
   );

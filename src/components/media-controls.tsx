@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { lazy, Suspense, useState } from "react";
 import type { MediaOwner } from "../data/media-repository";
 const Editor = lazy(() =>
@@ -10,6 +11,7 @@ export function MediaControls({
   owner: MediaOwner;
   id: string;
 }) {
+  const __pulseText = useInterfaceText();
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -19,13 +21,13 @@ export function MediaControls({
         onClick={() => setOpen(true)}
       >
         {owner === "workspace"
-          ? "Workspace photo"
+          ? __pulseText("Workspace photo")
           : owner === "organization"
-            ? "Logo & cover"
-            : "Photo & cover"}
+            ? __pulseText("Logo & cover")
+            : __pulseText("Photo & cover")}
       </button>
       {open && (
-        <Suspense fallback={<p role="status">Opening image editor…</p>}>
+        <Suspense fallback={<p role="status">{__pulseText("Opening image editor…")}</p>}>
           <Editor owner={owner} recordId={id} onClose={() => setOpen(false)} />
         </Suspense>
       )}

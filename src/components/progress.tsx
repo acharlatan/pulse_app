@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -6,52 +7,44 @@ import type { Editor } from "./forms";
 import { TaskRow } from "./relationship";
 import { eligible } from "../services/recommendations";
 export function ProgressSummary() {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     v = p.progress;
   if (!p.settings.gamification) return null;
   return (
-    <section className="surface momentum-summary" aria-label="Your progress">
-      <SectionHeading title="Your momentum" />
+    <section className="surface momentum-summary" aria-label={__pulseText("Your progress")}>
+      <SectionHeading title={__pulseText("Your momentum")} />
       {p.rewards.filter((r) => r.day === v.day).length >= 10 && (
         <p className="inline-notice">
-          Today’s reward limit is reached. Your CRM work remains available; new
-          grants resume on the next progress day.
-        </p>
+          {__pulseText("Today’s reward limit is reached. Your CRM work remains available; new grants resume on the next progress day.")}</p>
       )}
       {!p.settings.progress.enabled ? (
         <>
           <p>
-            Optional encouragement for meaningful work. Turn on tracking to
-            start earning XP; existing records are never backfilled.
-          </p>
+            {__pulseText("Optional encouragement for meaningful work. Turn on tracking to start earning XP; existing records are never backfilled.")}</p>
           <Link className="button secondary" to="/settings?section=progress">
-            Configure progress in Settings
-          </Link>
+            {__pulseText("Configure progress in Settings")}</Link>
         </>
       ) : (
         <>
           <div className="momentum-numbers">
-            <strong>Level {v.level}</strong>
+            <strong>{__pulseText("Level") + " "}{v.level}</strong>
             <Badge tone="purple">{v.xp} XP</Badge>
           </div>
           <progress
-            aria-label="Current level progress"
+            aria-label={__pulseText("Current level progress")}
             value={v.levelXP}
             max={100}
           />
           <p className="muted">
-            {v.levelXP} / 100 XP toward level {v.level + 1}. Every 100 XP adds
-            one level.
-          </p>
+            {v.levelXP} {" " + __pulseText("/ 100 XP toward level") + " "}{v.level + 1}{__pulseText(". Every 100 XP adds one level.")}</p>
           {p.settings.progress.weeklyGoal > 0 && (
             <p>
-              {v.weekly} / {p.settings.progress.weeklyGoal} qualifying
-              follow-ups this week
-            </p>
+              {v.weekly} / {p.settings.progress.weeklyGoal} {" " + __pulseText("qualifying follow-ups this week")}</p>
           )}
           {p.settings.progress.streak && (
             <p>
-              {v.streak} day{v.streak === 1 ? "" : "s"} of momentum · longest{" "}
+              {v.streak} {" " + __pulseText("day")}{v.streak === 1 ? "" : "s"} {" " + __pulseText("of momentum · longest")}{" "}
               {v.longest}
             </p>
           )}
@@ -59,19 +52,17 @@ export function ProgressSummary() {
             v.streak > 0 &&
             !p.rewards.some((r) => r.active && r.day === v.day) && (
               <p className="inline-notice">
-                A small intention for today: review your planned commitments
-                when you have time. No background reminder is sent.
-              </p>
+                {__pulseText("A small intention for today: review your planned commitments when you have time. No background reminder is sent.")}</p>
             )}
           <Link className="button ghost" to="/activity?view=progress">
-            See progress & criteria
-          </Link>
+            {__pulseText("See progress & criteria")}</Link>
         </>
       )}
     </section>
   );
 }
 export function ProgressDetails({ onEdit }: { onEdit: (e: Editor) => void }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     v = p.progress,
     { date } = useFormat(),
@@ -81,64 +72,36 @@ export function ProgressDetails({ onEdit }: { onEdit: (e: Editor) => void }) {
     <div className="progress-workspace">
       <ProgressSummary />
       <section className="surface">
-        <SectionHeading title="A clear starting point" />
+        <SectionHeading title={__pulseText("A clear starting point")} />
         <p>
-          Progress tracking is {prefs.enabled ? "on" : "off"}. Turning it off
-          pauses new earning and quests, while keeping history and applying
-          source corrections.
-        </p>
+          {__pulseText("Progress tracking is") + " "}{prefs.enabled ? __pulseText("on") : __pulseText("off")}{__pulseText(". Turning it off pauses new earning and quests, while keeping history and applying source corrections.")}</p>
         {p.progressState && (
           <p>
-            Tracking started {date(p.progressState.startedAt)}. Progress
-            calendar: <strong>{p.progressState.timezone}</strong>. This calendar
-            stays fixed after tracking starts, even if you change display
-            timezone. Weeks begin Monday.
-          </p>
+            {__pulseText("Tracking started") + " "}{date(p.progressState.startedAt)}{__pulseText(". Progress calendar:") + " "}<strong>{p.progressState.timezone}</strong>{__pulseText(". This calendar stays fixed after tracking starts, even if you change display timezone. Weeks begin Monday.")}</p>
         )}
         <details>
-          <summary>What counts, and why</summary>
+          <summary>{__pulseText("What counts, and why")}</summary>
           <ul className="reward-rules">
             <li>
-              5 XP: complete a previously saved follow-up linked to an eligible
-              contact, with a title of at least 12 characters or a description
-              of at least 20.
-            </li>
+              {__pulseText("5 XP: complete a previously saved follow-up linked to an eligible contact, with a title of at least 12 characters or a description of at least 20.")}</li>
             <li>
-              10 XP: save a call or meeting with an eligible contact, at least
-              40 characters of summary, occurring within the preceding 24 hours.
-              These checks reject empty entries; they cannot judge quality or
-              prove an outreach outcome.
-            </li>
+              {__pulseText("10 XP: save a call or meeting with an eligible contact, at least 40 characters of summary, occurring within the preceding 24 hours. These checks reject empty entries; they cannot judge quality or prove an outreach outcome.")}</li>
             <li>
-              5 XP: move an existing open opportunity to Won or Lost, with at
-              least 20 characters of outcome notes and eligible associated
-              contacts.
-            </li>
+              {__pulseText("5 XP: move an existing open opportunity to Won or Lost, with at least 20 characters of outcome notes and eligible associated contacts.")}</li>
             <li>
-              At most 10 original entitlements per calendar day. Equivalent
-              same-day records do not earn again. Reopening reverses XP;
-              recompleting restores the same entitlement and original day.
-              Deleted sources retain a non-earning tombstone.
-            </li>
+              {__pulseText("At most 10 original entitlements per calendar day. Equivalent same-day records do not earn again. Reopening reverses XP; recompleting restores the same entitlement and original day. Deleted sources retain a non-earning tombstone.")}</li>
             <li>
-              Imports, restores, notes, profile creation and ordinary edits earn
-              nothing. Quests and achievements add no bonus XP. Past-day records
-              do not manufacture streaks. Legitimate CRM work remains available
-              regardless of reward eligibility.
-            </li>
+              {__pulseText("Imports, restores, notes, profile creation and ordinary edits earn nothing. Quests and achievements add no bonus XP. Past-day records do not manufacture streaks. Legitimate CRM work remains available regardless of reward eligibility.")}</li>
           </ul>
         </details>
         <Link className="button ghost" to="/settings?section=progress">
-          Manage progress preferences
-        </Link>
+          {__pulseText("Manage progress preferences")}</Link>
       </section>
       {prefs.enabled && prefs.quests && (
         <section className="surface">
-          <SectionHeading title="Today's small intentions" />
+          <SectionHeading title={__pulseText("Today's small intentions")} />
           <p className="muted">
-            Up to three saved commitments. Complete the specific qualifying task
-            today. No extra XP for a quest.
-          </p>
+            {__pulseText("Up to three saved commitments. Complete the specific qualifying task today. No extra XP for a quest.")}</p>
           {quests.map((q) => {
             const t = p.tasks.find((t) => t.id === q.taskId),
               c = p.contacts.find((c) => c.id === t?.contactId),
@@ -146,24 +109,20 @@ export function ProgressDetails({ onEdit }: { onEdit: (e: Editor) => void }) {
             return (
               <div className="quest-row" key={q.id}>
                 <Badge tone={q.complete ? "green" : "purple"}>
-                  {q.complete ? "Completed" : "Planned"}
+                  {q.complete ? __pulseText("Completed") : __pulseText("Planned")}
                 </Badge>
                 <h3>{q.title}</h3>
                 {!t ? (
                   <p>
-                    Task removed. This saved intention is no longer available.
-                  </p>
+                    {__pulseText("Task removed. This saved intention is no longer available.")}</p>
                 ) : !available ? (
                   <p>
-                    Outreach is restricted. Review the profile; this intention
-                    does not override restrictions.
-                    {c && (
+                    {__pulseText("Outreach is restricted. Review the profile; this intention does not override restrictions.")}{c && (
                       <Link
                         className="button ghost"
                         to={`/network/people/${c.id}`}
                       >
-                        Open profile
-                      </Link>
+                        {__pulseText("Open profile")}</Link>
                     )}
                   </p>
                 ) : (
@@ -174,24 +133,22 @@ export function ProgressDetails({ onEdit }: { onEdit: (e: Editor) => void }) {
           })}
           {!quests.length && (
             <Empty
-              title="Room to breathe"
-              body="No eligible follow-ups are due. Your existing work can guide tomorrow's intentions."
+              title={__pulseText("Room to breathe")}
+              body={__pulseText("No eligible follow-ups are due. Your existing work can guide tomorrow's intentions.")}
             />
           )}
         </section>
       )}
       {prefs.achievements && prefs.enabled && (
         <section className="surface">
-          <SectionHeading title="Meaningful milestones" />
+          <SectionHeading title={__pulseText("Meaningful milestones")} />
           <p className="muted">
-            Criteria are recalculated from active entitlements. Corrections can
-            relock a milestone. No bonus XP.
-          </p>
+            {__pulseText("Criteria are recalculated from active entitlements. Corrections can relock a milestone. No bonus XP.")}</p>
           <div className="milestone-grid">
             {v.achievements.map((a) => (
               <article className="milestone" key={a.id}>
                 <Badge tone={a.unlocked ? "green" : ""}>
-                  {a.unlocked ? "Unlocked" : "In progress"}
+                  {a.unlocked ? __pulseText("Unlocked") : __pulseText("In progress")}
                 </Badge>
                 <h3>{a.title}</h3>
                 <p>{a.criteria}</p>
@@ -201,18 +158,16 @@ export function ProgressDetails({ onEdit }: { onEdit: (e: Editor) => void }) {
         </section>
       )}
       <section className="surface">
-        <SectionHeading title="Reward & correction history" />
+        <SectionHeading title={__pulseText("Reward & correction history")} />
         <p className="muted">
-          Original earning dates stay fixed. CRM activity remains in the
-          Activity timeline.
-        </p>
+          {__pulseText("Original earning dates stay fixed. CRM activity remains in the Activity timeline.")}</p>
         {p.rewardChanges.slice(0, 40).map((change) => {
           const reward = p.rewards.find((r) => r.id === change.rewardId);
           return (
             <div className="reward-history" key={change.id}>
               <Badge>{change.action}</Badge>
               <div>
-                <strong>{reward?.rule || "Recorded progress"}</strong>
+                <strong>{reward?.rule || __pulseText("Recorded progress")}</strong>
                 <p>{change.reason}</p>
                 <small>
                   {date(change.at, {
@@ -227,13 +182,11 @@ export function ProgressDetails({ onEdit }: { onEdit: (e: Editor) => void }) {
           );
         })}
         {!p.rewardChanges.length && (
-          <p>No rewards recorded yet. Your CRM is ready whenever you are.</p>
+          <p>{__pulseText("No rewards recorded yet. Your CRM is ready whenever you are.")}</p>
         )}
         {p.rewardChanges.length > 40 && (
           <p>
-            Showing the latest 40 corrections. Export a full backup to retain
-            all history.
-          </p>
+            {__pulseText("Showing the latest 40 corrections. Export a full backup to retain all history.")}</p>
         )}
       </section>
     </div>
@@ -241,6 +194,7 @@ export function ProgressDetails({ onEdit }: { onEdit: (e: Editor) => void }) {
 }
 
 export function ProgressSettings() {
+  const __pulseText = useInterfaceText();
   const p = usePulse();
   const [busy, setBusy] = useState(false);
   return (
@@ -301,7 +255,7 @@ export function ProgressSettings() {
         </label>
       ))}
       <label className="field">
-        <span>Weekly follow-up goal (0 disables)</span>
+        <span>{__pulseText("Weekly follow-up goal (0 disables)")}</span>
         <input
           name="weeklyGoal"
           type="number"
@@ -312,23 +266,15 @@ export function ProgressSettings() {
         />
       </label>
       <p className="inline-notice">
-        Tracking starts when enabled. Turning XP off preserves history and
-        corrections but pauses new earning. Hiding widgets does not pause
-        earning. Quests and achievements add no bonus XP. Reminders are visible
-        only while PULSE is open; no background notifications.
-      </p>
+        {__pulseText("Tracking starts when enabled. Turning XP off preserves history and corrections but pauses new earning. Hiding widgets does not pause earning. Quests and achievements add no bonus XP. Reminders are visible only while PULSE is open; no background notifications.")}</p>
       {p.progressState && (
         <p className="muted">
-          Fixed progress calendar: {p.progressState.timezone}. Changing display
-          timezone does not move past days or create awards.
-        </p>
+          {__pulseText("Fixed progress calendar:") + " "}{p.progressState.timezone}{__pulseText(". Changing display timezone does not move past days or create awards.")}</p>
       )}
       <button className="button primary" type="submit" disabled={busy}>
-        Save progress preferences
-      </button>
+        {__pulseText("Save progress preferences")}</button>
       <Link className="button ghost" to="/activity?view=progress">
-        View progress and reward rules
-      </Link>
+        {__pulseText("View progress and reward rules")}</Link>
     </form>
   );
 }

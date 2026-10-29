@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { ArrowRight, Plus } from "lucide-react";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import { PipelineOpportunity } from "./PipelineOpportunity";
 import { EditorModal, type Editor } from "../components/forms";
 import { moveOpportunity } from "../data/repository";
 export function Pipeline() {
+  const __pulseText = useInterfaceText();
   const { money } = useFormat();
   const t = useTranslation();
   const p = usePulse(),
@@ -39,7 +41,7 @@ export function Pipeline() {
     <div className="page pipeline-page">
       <header className="page-heading editorial-masthead work-masthead">
         <div>
-          <p className="eyebrow">FROM POSSIBILITY TO PARTNERSHIP</p>
+          <p className="eyebrow">{__pulseText("FROM POSSIBILITY TO PARTNERSHIP")}</p>
           <h1>
             {t("pipeline")}<span className="accent">.</span>
           </h1>
@@ -60,7 +62,7 @@ export function Pipeline() {
       </header>
       <div className="directory-toolbar">
         <label className="field">
-          <span>Pipeline</span>
+          <span>{__pulseText("Pipeline")}</span>
           <select
             value={selected?.id || ""}
             onChange={(e) => {
@@ -80,7 +82,7 @@ export function Pipeline() {
             {p.pipelines.map((x) => (
               <option key={x.id} value={x.id}>
                 {x.name}
-                {x.archived ? " (archived)" : ""}
+                {x.archived ? __pulseText(" (archived)") : ""}
               </option>
             ))}
           </select>
@@ -91,17 +93,15 @@ export function Pipeline() {
             aria-pressed={showEmpty}
             onClick={() => setShowEmpty(!showEmpty)}
           >
-            Empty stages
-          </button>
+            {__pulseText("Empty stages")}</button>
           <Link className="button ghost" to="/customize">
-            Manage Pipelines
-          </Link>
+            {__pulseText("Manage Pipelines")}</Link>
           <Link className="button ghost" to="/focus">
-            My Focus <ArrowRight size={16} />
+            {__pulseText("My Focus") + " "}<ArrowRight size={16} />
           </Link>
         </div>
         <label className="field">
-          <span>View stage</span>
+          <span>{__pulseText("View stage")}</span>
           <select
             value={filter}
             onChange={(e) => {
@@ -109,7 +109,7 @@ export function Pipeline() {
               setLimit(30);
             }}
           >
-            <option value="All">All</option>
+            <option value="All">{__pulseText("All")}</option>
             {stages.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
@@ -120,20 +120,20 @@ export function Pipeline() {
       </div>
       <section
         className="pipeline-value-strip"
-        aria-label="Pipeline value overview"
+        aria-label={__pulseText("Pipeline value overview")}
       >
         <div className="pipeline-open-label">
-          <span className="eyebrow">IN PLAY</span>
+          <span className="eyebrow">{__pulseText("IN PLAY")}</span>
           <strong>
             {rows
               .filter((o) => o.status === "open")
               .length.toString()
               .padStart(2, "0")}
           </strong>
-          <span>open opportunities</span>
+          <span>{__pulseText("open opportunities")}</span>
         </div>
         <div className="pipeline-money">
-          <p className="eyebrow">OPEN VALUE · BY CURRENCY</p>
+          <p className="eyebrow">{__pulseText("OPEN VALUE · BY CURRENCY")}</p>
           <div>
             {[...totals]
               .filter(([key]) => key.startsWith("open ·"))
@@ -145,34 +145,32 @@ export function Pipeline() {
               ))}
             {!rows.some((o) => o.status === "open" && o.value !== null) && (
               <strong className="pipeline-no-value">
-                No open value recorded
-              </strong>
+                {__pulseText("No open value recorded")}</strong>
             )}
           </div>
           <span>
             {rows.filter((o) => o.status === "open" && o.value === null).length}{" "}
-            open without a value · Saved values, not a forecast
-          </span>
+            {__pulseText("open without a value · Saved values, not a forecast")}</span>
         </div>
         <details
           className="pipeline-totals"
-          aria-label="Pipeline totals by currency"
+          aria-label={__pulseText("Pipeline totals by currency")}
         >
-          <summary>Outcomes by currency</summary>
+          <summary>{__pulseText("Outcomes by currency")}</summary>
           <div>
             {[...totals].map(([key, value]) => (
               <Badge key={key}>
                 {key} · {money(value, key.split(" · ")[1])}
               </Badge>
             ))}
-            {!totals.size && <p>No valued opportunities yet.</p>}
+            {!totals.size && <p>{__pulseText("No valued opportunities yet.")}</p>}
           </div>
         </details>
       </section>
       <h2 className="pipeline-section-title">
-        {selected?.name || "Your pipeline"}
+        {selected?.name || __pulseText("Your pipeline")}
       </h2>
-      <nav className="pipeline-stage-map" aria-label="Pipeline stage overview">
+      <nav className="pipeline-stage-map" aria-label={__pulseText("Pipeline stage overview")}>
         {stages.map((stage) => (
           <button
             key={stage.id}
@@ -198,7 +196,7 @@ export function Pipeline() {
       <div
         className="pipeline-grid"
         role="region"
-        aria-label="Opportunity board"
+        aria-label={__pulseText("Opportunity board")}
         tabIndex={0}
       >
         {active.map((stage) => {
@@ -242,7 +240,7 @@ export function Pipeline() {
                 <div key={o.id} className="pipeline-deal">
                   <PipelineOpportunity opportunity={o} onEdit={setEditor} />
                   <label className="field">
-                    <span>Move to stage / reopen</span>
+                    <span>{__pulseText("Move to stage / reopen")}</span>
                     <select
                       value={o.stageId}
                       onChange={(e) =>
@@ -266,16 +264,14 @@ export function Pipeline() {
                   className="button secondary"
                   onClick={() => setLimit(limit + 30)}
                 >
-                  Show more opportunities
-                </button>
+                  {__pulseText("Show more opportunities")}</button>
               )}
               {!deals.length && (
                 <div className="stage-empty">
                   <span aria-hidden="true">↗</span>
-                  <p>Room for your next move.</p>
+                  <p>{__pulseText("Room for your next move.")}</p>
                   <small>
-                    Move an opportunity here using its stage control.
-                  </small>
+                    {__pulseText("Move an opportunity here using its stage control.")}</small>
                 </div>
               )}
             </section>
@@ -284,8 +280,8 @@ export function Pipeline() {
       </div>
       {!rows.length && (
         <Empty
-          title="Make room for possibility"
-          body="No opportunities in this pipeline. Create one to get started."
+          title={__pulseText("Make room for possibility")}
+          body={__pulseText("No opportunities in this pipeline. Create one to get started.")}
         />
       )}
       {editor && (

@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useEffect, useRef, useState } from "react";
 import { usePulse } from "../app/context";
 import { Modal } from "./ui";
@@ -14,6 +15,7 @@ export function MediaEditor({
   recordId: string;
   onClose: () => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     canvas = useRef<HTMLCanvasElement>(null),
     [slot, setSlot] = useState<"avatar" | "cover">("avatar"),
@@ -110,7 +112,7 @@ export function MediaEditor({
   }
   return (
     <Modal
-      title="Profile media"
+      title={__pulseText("Profile media")}
       onClose={() => {
         if (!busy) onClose();
       }}
@@ -122,12 +124,10 @@ export function MediaEditor({
         }}
       >
         <p className="muted">
-          Private, on this device. Images are optimized locally and included in
-          backups.
-        </p>
+          {__pulseText("Private, on this device. Images are optimized locally and included in backups.")}</p>
         {owner !== "workspace" && (
           <label className="field">
-            <span>Image kind</span>
+            <span>{__pulseText("Image kind")}</span>
             <select
               value={slot}
               onChange={(e) => {
@@ -142,9 +142,9 @@ export function MediaEditor({
               }}
             >
               <option value="avatar">
-                {owner === "organization" ? "Company logo" : "Portrait"}
+                {owner === "organization" ? __pulseText("Company logo") : __pulseText("Portrait")}
               </option>
-              <option value="cover">Cover image</option>
+              <option value="cover">{__pulseText("Cover image")}</option>
             </select>
           </label>
         )}
@@ -152,18 +152,16 @@ export function MediaEditor({
           <div className={`media-current ${slot}`}>
             <LocalMedia
               id={ref}
-              alt="Current saved image"
+              alt={__pulseText("Current saved image")}
               fallback={
                 <p>
-                  No image yet. Your initials and ambient cover remain
-                  available.
-                </p>
+                  {__pulseText("No image yet. Your initials and ambient cover remain available.")}</p>
               }
             />
           </div>
         )}
         <label className="field">
-          <span>Choose image</span>
+          <span>{__pulseText("Choose image")}</span>
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp"
@@ -191,7 +189,7 @@ export function MediaEditor({
               }
             }}
           />
-          <small>JPEG, PNG or WebP · up to 8 MB / 24 megapixels.</small>
+          <small>{__pulseText("JPEG, PNG or WebP · up to 8 MB / 24 megapixels.")}</small>
         </label>
         {image && (
           <>
@@ -199,12 +197,11 @@ export function MediaEditor({
               ref={canvas}
               className={`crop-preview ${slot}`}
               role="img"
-              aria-label="Image crop preview"
+              aria-label={__pulseText("Image crop preview")}
             />
             <p className="muted">
-              {info}. Saved as an optimized{" "}
-              {slot === "cover" ? "1280 × 480" : "320 × 320"} image.
-            </p>
+              {info}{__pulseText(". Saved as an optimized")}{" "}
+              {slot === "cover" ? "1280 × 480" : "320 × 320"} {" " + __pulseText("image.")}</p>
             {slot === "avatar" && owner === "organization" && (
               <label className="check-option">
                 <input
@@ -212,13 +209,12 @@ export function MediaEditor({
                   checked={contain}
                   onChange={(e) => setContain(e.target.checked)}
                 />
-                Fit the complete logo on white
-              </label>
+                {__pulseText("Fit the complete logo on white")}</label>
             )}
             {!(contain && slot === "avatar") && (
               <div className="form-grid">
                 <label className="field">
-                  <span>Zoom</span>
+                  <span>{__pulseText("Zoom")}</span>
                   <input
                     type="range"
                     min="1"
@@ -229,7 +225,7 @@ export function MediaEditor({
                   />
                 </label>
                 <label className="field">
-                  <span>Horizontal position</span>
+                  <span>{__pulseText("Horizontal position")}</span>
                   <input
                     type="range"
                     min="0"
@@ -239,7 +235,7 @@ export function MediaEditor({
                   />
                 </label>
                 <label className="field">
-                  <span>Vertical position</span>
+                  <span>{__pulseText("Vertical position")}</span>
                   <input
                     type="range"
                     min="0"
@@ -254,7 +250,7 @@ export function MediaEditor({
         )}
         {error && (
           <p role="alert" className="form-error">
-            {error}
+            {__pulseText(error)}
           </p>
         )}
         <div className="form-actions">
@@ -264,10 +260,9 @@ export function MediaEditor({
             disabled={busy}
             onClick={onClose}
           >
-            Cancel
-          </button>
+            {__pulseText("Cancel")}</button>
           <button className="button primary" disabled={busy || !image}>
-            {busy ? "Processing…" : "Save image"}
+            {busy ? __pulseText("Processing…") : __pulseText("Save image")}
           </button>
           {ref && (
             <button
@@ -276,8 +271,7 @@ export function MediaEditor({
               disabled={busy}
               onClick={() => void commit(true)}
             >
-              Remove saved image
-            </button>
+              {__pulseText("Remove saved image")}</button>
           )}
         </div>
       </form>

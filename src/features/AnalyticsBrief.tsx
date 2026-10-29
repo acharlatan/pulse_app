@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowUpRight, Check, Target } from "lucide-react";
@@ -23,6 +24,7 @@ export function AnalyticsBrief({
     s: "Relationships" | "Opportunities" | "Productivity" | "Data quality",
   ) => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     { money } = useFormat();
   const g = analyticsGuidance(
@@ -73,25 +75,21 @@ export function AnalyticsBrief({
   }
   return (
     <>
-      <section className="analytics-brief" aria-label="Focus briefing">
+      <section className="analytics-brief" aria-label={__pulseText("Focus briefing")}>
         <header>
           <div>
-            <p className="eyebrow">TURN INFORMATION INTO INTENTION</p>
-            <h2>Where should your focus go?</h2>
+            <p className="eyebrow">{__pulseText("TURN INFORMATION INTO INTENTION")}</p>
+            <h2>{__pulseText("Where should your focus go?")}</h2>
             <p>
-              Choose a lane. Inspect the evidence. Keep the next step
-              deliberate.
-            </p>
+              {__pulseText("Choose a lane. Inspect the evidence. Keep the next step deliberate.")}</p>
             <small className="brief-scope-note">
-              Current priorities · activity dates apply to the period reports
-              below.
-            </small>
+              {__pulseText("Current priorities · activity dates apply to the period reports below.")}</small>
           </div>
           <span className="brief-symbol" aria-hidden="true">
             <Target size={36} />
           </span>
         </header>
-        <div className="focus-lanes" aria-label="Focus lanes">
+        <div className="focus-lanes" aria-label={__pulseText("Focus lanes")}>
           {lanes.map((l, i) => (
             <button
               key={l.id}
@@ -100,8 +98,8 @@ export function AnalyticsBrief({
             >
               <span className="lane-number">0{i + 1}</span>
               <strong>{l.rows.length}</strong>
-              <h3>{l.name}</h3>
-              <span>{l.description}</span>
+              <h3>{__pulseText(l.name)}</h3>
+              <span>{__pulseText(l.description)}</span>
               <ArrowRight size={18} />
             </button>
           ))}
@@ -109,11 +107,11 @@ export function AnalyticsBrief({
         <div className="focus-desk">
           <div className="section-heading">
             <div>
-              <p className="eyebrow">CURRENT SAVED EVIDENCE</p>
-              <h3>{active.name}</h3>
+              <p className="eyebrow">{__pulseText("CURRENT SAVED EVIDENCE")}</p>
+              <h3>{__pulseText(active.name)}</h3>
             </div>
             <Link className="text-link" to="/focus">
-              Open My Focus <ArrowUpRight size={16} />
+              {__pulseText("Open My Focus") + " "}<ArrowUpRight size={16} />
             </Link>
           </div>
           {active.rows.length ? (
@@ -129,7 +127,7 @@ export function AnalyticsBrief({
                       className="button secondary"
                       to={`/network/people/${t.id}`}
                     >
-                      {t.label}
+                      {__pulseText(t.label)}
                       <ArrowUpRight size={15} />
                     </Link>
                   ) : (
@@ -137,7 +135,7 @@ export function AnalyticsBrief({
                       className="button secondary"
                       onClick={() => open(t)}
                     >
-                      {t.label}
+                      {__pulseText(t.label)}
                       <ArrowUpRight size={15} />
                     </button>
                   )}
@@ -148,12 +146,12 @@ export function AnalyticsBrief({
           ) : (
             <div className="brief-clear">
               <Check size={22} />
-              <p>{active.empty}</p>
+              <p>{__pulseText(active.empty)}</p>
             </div>
           )}
           {active.rows.length > 3 && (
             <p className="muted">
-              Showing 3 of {active.rows.length}.{" "}
+              {__pulseText("Showing 3 of") + " "}{active.rows.length}.{" "}
               <Link
                 to={
                   active.id === "commitments"
@@ -161,62 +159,50 @@ export function AnalyticsBrief({
                     : "/review"
                 }
               >
-                Open the full work queue
-              </Link>
+                {__pulseText("Open the full work queue")}</Link>
               .
             </p>
           )}
           <details className="insight-explainer">
-            <summary>Why these focus lanes?</summary>
+            <summary>{__pulseText("Why these focus lanes?")}</summary>
             <p>
-              Commitments use saved overdue dates. Opportunity flags and
-              relationship reviews use the same rules as Review; there is no
-              hidden score or prediction. These are current snapshots in your
-              selected record scope, independent of the report’s activity dates.
-              Tasks may be reviewed administratively even when outreach is
-              restricted. Pinning is your choice; nothing is sent or completed
-              here.
-            </p>
+              {__pulseText("Commitments use saved overdue dates. Opportunity flags and relationship reviews use the same rules as Review; there is no hidden score or prediction. These are current snapshots in your selected record scope, independent of the report’s activity dates. Tasks may be reviewed administratively even when outreach is restricted. Pinning is your choice; nothing is sent or completed here.")}</p>
           </details>
         </div>
       </section>
       <section className="analytics-perspectives">
         <article className="coverage-panel">
-          <p className="eyebrow">RELATIONSHIP COVERAGE · SELECTED PERIOD</p>
-          <h2>Who is part of the conversation?</h2>
+          <p className="eyebrow">{__pulseText("RELATIONSHIP COVERAGE · SELECTED PERIOD")}</p>
+          <h2>{__pulseText("Who is part of the conversation?")}</h2>
           <div className="coverage-fraction">
             <strong>{g.coverage.reached}</strong>
             <span>
-              of {g.coverage.total}
+              {__pulseText("of") + " "}{g.coverage.total}
               <br />
-              current people
-            </span>
+              {__pulseText("current people")}</span>
           </div>
           <progress
-            aria-label="People with a recorded conversation in the period"
+            aria-label={__pulseText("People with a recorded conversation in the period")}
             max={Math.max(1, g.coverage.total)}
             value={g.coverage.reached}
           />
           <p>
             {g.coverage.total
               ? `${g.coverage.total - g.coverage.reached} have no logged conversation in this period.`
-              : "Add people to build a useful view of your relationships."}
+              : __pulseText("Add people to build a useful view of your relationships.")}
           </p>
           <p className="muted">
-            Coverage describes recorded activity, not relationship quality. It
-            includes paused and restricted people; a missing conversation is not
-            permission to contact them.
-          </p>
+            {__pulseText("Coverage describes recorded activity, not relationship quality. It includes paused and restricted people; a missing conversation is not permission to contact them.")}</p>
           <button
             className="text-link"
             onClick={() => onSection("Relationships")}
           >
-            Explore relationship evidence <ArrowRight size={16} />
+            {__pulseText("Explore relationship evidence") + " "}<ArrowRight size={16} />
           </button>
         </article>
         <article className="value-perspective">
-          <p className="eyebrow">OPEN OPPORTUNITIES · CURRENT SNAPSHOT</p>
-          <h2>What is still in play?</h2>
+          <p className="eyebrow">{__pulseText("OPEN OPPORTUNITIES · CURRENT SNAPSHOT")}</p>
+          <h2>{__pulseText("What is still in play?")}</h2>
           {report.currency.length ? (
             report.currency.map(([c, value]) => (
               <p className="perspective-value" key={c}>
@@ -225,41 +211,35 @@ export function AnalyticsBrief({
               </p>
             ))
           ) : (
-            <p>No open values recorded in this scope.</p>
+            <p>{__pulseText("No open values recorded in this scope.")}</p>
           )}
           <p>
-            {report.active.length} open opportunities ·{" "}
-            {report.active.filter((o) => o.value === null).length} without a
-            value.
-          </p>
+            {report.active.length} {" " + __pulseText("open opportunities ·")}{" "}
+            {report.active.filter((o) => o.value === null).length} {" " + __pulseText("without a value.")}</p>
           <p className="muted">
-            Saved values stay separate by currency. This is neither a revenue
-            forecast nor a measure of how much an action will earn.
-          </p>
+            {__pulseText("Saved values stay separate by currency. This is neither a revenue forecast nor a measure of how much an action will earn.")}</p>
           <button
             className="text-link"
             onClick={() => onSection("Opportunities")}
           >
-            Inspect the pipeline <ArrowRight size={16} />
+            {__pulseText("Inspect the pipeline") + " "}<ArrowRight size={16} />
           </button>
         </article>
       </section>
       <section className="analytics-company-lens">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">EFFORT & OPEN WORK</p>
-            <h2>Look at the company behind the numbers.</h2>
+            <p className="eyebrow">{__pulseText("EFFORT & OPEN WORK")}</p>
+            <h2>{__pulseText("Look at the company behind the numbers.")}</h2>
           </div>
         </div>
         <p className="muted">
-          Compare recorded conversations with current open work, then inspect a
-          company’s records.
-        </p>
+          {__pulseText("Compare recorded conversations with current open work, then inspect a company’s records.")}</p>
         <div className="company-lens-head" aria-hidden="true">
-          <span>Company</span>
-          <span>Conversations in period</span>
-          <span>Open opportunities now</span>
-          <span>Overdue now</span>
+          <span>{__pulseText("Company")}</span>
+          <span>{__pulseText("Conversations in period")}</span>
+          <span>{__pulseText("Open opportunities now")}</span>
+          <span>{__pulseText("Overdue now")}</span>
         </div>
         {g.companyActivity.slice(0, companyLimit).map((row) => {
           const org = p.organizations.find((o) => o.id === row.organizationId);
@@ -273,7 +253,7 @@ export function AnalyticsBrief({
                   <>
                     <Avatar name={org.name} mediaId={org.avatar} company />
                     <button
-                      aria-label={`Scope report to ${org.name}`}
+                      aria-label={__pulseText("Scope report to {0}", org.name)}
                       onClick={() => onCompany(org.id)}
                     >
                       <strong>{org.name}</strong>
@@ -281,11 +261,11 @@ export function AnalyticsBrief({
                     </button>
                   </>
                 ) : (
-                  <strong>No company recorded</strong>
+                  <strong>{__pulseText("No company recorded")}</strong>
                 )}
               </div>
               <span>
-                <small>Conversations</small>
+                <small>{__pulseText("Conversations")}</small>
                 <strong>{row.conversations}</strong>
                 <i
                   aria-hidden="true"
@@ -295,11 +275,11 @@ export function AnalyticsBrief({
                 />
               </span>
               <span>
-                <small>Open opportunities</small>
+                <small>{__pulseText("Open opportunities")}</small>
                 <strong>{row.open}</strong>
               </span>
               <span>
-                <small>Overdue</small>
+                <small>{__pulseText("Overdue")}</small>
                 <strong className={row.overdue ? "is-overdue" : ""}>
                   {row.overdue}
                 </strong>
@@ -312,32 +292,22 @@ export function AnalyticsBrief({
             className="button secondary"
             onClick={() => setCompanyLimit(companyLimit + 8)}
           >
-            Show more companies ({g.companyActivity.length - companyLimit}{" "}
-            remaining)
-          </button>
+            {__pulseText("Show more companies (")}{g.companyActivity.length - companyLimit}{" "}
+            {__pulseText("remaining)")}</button>
         )}
         {!g.companyActivity.length && (
-          <p>No matching conversation or open-work records yet.</p>
+          <p>{__pulseText("No matching conversation or open-work records yet.")}</p>
         )}
         <details className="insight-explainer">
           <summary>
-            How can I use this without chasing the busiest company?
-          </summary>
+            {__pulseText("How can I use this without chasing the busiest company?")}</summary>
           <p>
-            Companies are sorted by overdue work, then open opportunities and
-            conversations. Conversation activity uses each record’s historical
-            company; open-work columns use saved current associations. These are
-            different cohorts. Start with an actual overdue commitment. Then
-            inspect an open opportunity or relationship review to decide whether
-            it deserves a next step. Conversation volume alone does not measure
-            interest, value or satisfaction. Missing dates and links reduce what
-            the report can explain.
-          </p>
+            {__pulseText("Companies are sorted by overdue work, then open opportunities and conversations. Conversation activity uses each record’s historical company; open-work columns use saved current associations. These are different cohorts. Start with an actual overdue commitment. Then inspect an open opportunity or relationship review to decide whether it deserves a next step. Conversation volume alone does not measure interest, value or satisfaction. Missing dates and links reduce what the report can explain.")}</p>
           <button
             className="text-link"
             onClick={() => onSection("Data quality")}
           >
-            Review missing context <ArrowRight size={16} />
+            {__pulseText("Review missing context") + " "}<ArrowRight size={16} />
           </button>
         </details>
       </section>

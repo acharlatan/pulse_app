@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -41,6 +42,7 @@ const labels: Record<(typeof filterFields)[number], string> = {
   opportunityStage: "Opportunity stage",
 };
 export function SmartLists({ embedded = false }: { embedded?: boolean }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     [selected, setSelected] = useState("all"),
     [editing, setEditing] = useState<SmartList | null>(null),
@@ -57,12 +59,10 @@ export function SmartLists({ embedded = false }: { embedded?: boolean }) {
     <div className={embedded ? "smart-lists-embedded" : "page"}>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">A NETWORK THAT MAKES SENSE</p>
-          {embedded ? <h2>Your Smart Lists<span className="accent">.</span></h2> : <h1>Your Smart Lists<span className="accent">.</span></h1>}
+          <p className="eyebrow">{__pulseText("A NETWORK THAT MAKES SENSE")}</p>
+          {embedded ? <h2>{__pulseText("Your Smart Lists")}<span className="accent">.</span></h2> : <h1>{__pulseText("Your Smart Lists")}<span className="accent">.</span></h1>}
           <p className="subtitle">
-            Saved conditions, live relationships. Your lists update as your
-            records change.
-          </p>
+            {__pulseText("Saved conditions, live relationships. Your lists update as your records change.")}</p>
         </div>
         <button
           className="button primary"
@@ -78,13 +78,12 @@ export function SmartLists({ embedded = false }: { embedded?: boolean }) {
             })
           }
         >
-          Create Smart List
-        </button>
+          {__pulseText("Create Smart List")}</button>
       </div>
       <div className="smart-layout">
         <section>
           <label className="field">
-            <span>Choose a Smart List</span>
+            <span>{__pulseText("Choose a Smart List")}</span>
             <select
               value={selected}
               onChange={(e) => {
@@ -103,7 +102,7 @@ export function SmartLists({ embedded = false }: { embedded?: boolean }) {
                   {l.entityType === "organization"
                     ? p.organizations.filter((o) => companyMatch(o, l)).length
                     : p.contacts.filter((c) => matcher(c, l)).length}
-                  {l.entityType === "organization" ? " · companies" : ""}
+                  {l.entityType === "organization" ? __pulseText(" · companies") : ""}
                 </option>
               ))}
             </select>
@@ -119,30 +118,26 @@ export function SmartLists({ embedded = false }: { embedded?: boolean }) {
                   ),
               ) && (
                 <p role="status">
-                  Invalid condition: a custom field was archived or deleted.
-                  Edit this list to repair it.
-                </p>
+                  {__pulseText("Invalid condition: a custom field was archived or deleted. Edit this list to repair it.")}</p>
               )}
               <p>
                 {smartListSchema.safeParse(list).success
                   ? `${list.mode.toUpperCase()} conditions: ${list.conditions.map((r) => `${labels[r.field]} ${r.operator} ${r.value || "no company"}`).join(" · ")}`
-                  : "Unsupported saved definition. Edit this list to repair it."}
+                  : __pulseText("Unsupported saved definition. Edit this list to repair it.")}
               </p>
               <button
                 className="button secondary"
                 onClick={() => setEditing(list)}
               >
-                Edit / rename list
-              </button>
+                {__pulseText("Edit / rename list")}</button>
             </div>
           )}
           <Link className="button ghost" to="/review">
-            Relationship Review
-          </Link>
+            {__pulseText("Relationship Review")}</Link>
         </section>
         <section className="surface">
           <h2>
-            {matches.length} matching {isCompany ? "companies" : "people"}
+            {matches.length} {" " + __pulseText("matching") + " "}{isCompany ? __pulseText("companies") : __pulseText("people")}
           </h2>
           {matches.slice(0, limit).map((c) => (
             <Link
@@ -159,16 +154,16 @@ export function SmartLists({ embedded = false }: { embedded?: boolean }) {
                     (o) =>
                       o.id ===
                       ("organizationId" in c ? c.organizationId : c.id),
-                  )?.name || "Independent"}
+                  )?.name || __pulseText("Independent")}
                 </span>
               </div>
-              <Badge>{"stage" in c ? c.stage : "Company"}</Badge>
+              <Badge>{"stage" in c ? c.stage : __pulseText("Company")}</Badge>
             </Link>
           ))}
           {!matches.length && (
             <Empty
-              title="No matches right now"
-              body="This list will update when records meet its conditions."
+              title={__pulseText("No matches right now")}
+              body={__pulseText("This list will update when records meet its conditions.")}
             />
           )}
           {matches.length > limit && (
@@ -176,8 +171,7 @@ export function SmartLists({ embedded = false }: { embedded?: boolean }) {
               className="button secondary"
               onClick={() => setLimit(limit + 30)}
             >
-              Show more people
-            </button>
+              {__pulseText("Show more people")}</button>
           )}
         </section>
       </div>
@@ -200,6 +194,7 @@ function SmartListEditor({
   onClose: () => void;
   onSaved: (id: string) => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     [rules, setRules] = useState<SmartList["conditions"]>(
       smartListSchema.safeParse(record).success
@@ -226,7 +221,7 @@ function SmartListEditor({
   };
   return (
     <RecordForm
-      title="Smart List conditions"
+      title={__pulseText("Smart List conditions")}
       onClose={onClose}
       deleteLabel="Delete Smart List"
       onDelete={
@@ -248,16 +243,16 @@ function SmartListEditor({
         onSaved(record.id);
       }}
     >
-      <Field label="List contains" wide>
+      <Field label={__pulseText("List contains")} wide>
         <select
           value={entityType}
           onChange={(e) => setEntityType(e.target.value as typeof entityType)}
         >
-          <option value="contact">People</option>
-          <option value="organization">Companies</option>
+          <option value="contact">{__pulseText("People")}</option>
+          <option value="organization">{__pulseText("Companies")}</option>
         </select>
       </Field>
-      <Field label="List name" wide>
+      <Field label={__pulseText("List name")} wide>
         <input
           name="name"
           required
@@ -265,16 +260,16 @@ function SmartListEditor({
           defaultValue={record.name}
         />
       </Field>
-      <Field label="Match" wide>
+      <Field label={__pulseText("Match")} wide>
         <select name="mode" defaultValue={record.mode}>
-          <option value="all">ALL conditions</option>
-          <option value="any">ANY condition</option>
+          <option value="all">{__pulseText("ALL conditions")}</option>
+          <option value="any">{__pulseText("ANY condition")}</option>
         </select>
       </Field>
       {rules.map((r, i) => (
         <fieldset className="condition-row wide" key={i}>
-          <legend>Condition {i + 1}</legend>
-          <Field label={`Field ${i + 1}`}>
+          <legend>{__pulseText("Condition") + " "}{i + 1}</legend>
+          <Field label={__pulseText("Field {0}", i + 1)}>
             <select
               value={r.field}
               onChange={(e) => {
@@ -330,7 +325,7 @@ function SmartListEditor({
                 ))}
             </select>
           </Field>
-          <Field label={`Comparison ${i + 1}`}>
+          <Field label={__pulseText("Comparison {0}", i + 1)}>
             <select
               value={r.operator}
               onChange={(e) =>
@@ -361,12 +356,12 @@ function SmartListEditor({
                       ? ["contains", "is"]
                       : ["is"]
               ).map((o) => (
-                <option key={o}>{o}</option>
+                <option key={o} value={o}>{__pulseText(o)}</option>
               ))}
             </select>
           </Field>
           {r.field === "customField" && (
-            <Field label={`Custom field ${i + 1}`}>
+            <Field label={__pulseText("Custom field {0}", i + 1)}>
               <select
                 required
                 value={r.fieldId || ""}
@@ -378,7 +373,7 @@ function SmartListEditor({
                   )
                 }
               >
-                <option value="">Choose field</option>
+                <option value="">{__pulseText("Choose field")}</option>
                 {p.fieldDefinitions
                   .filter((f) => f.entityType === entityType && !f.archived)
                   .map((f) => (
@@ -389,7 +384,7 @@ function SmartListEditor({
               </select>
             </Field>
           )}
-          <Field label={`Value ${i + 1}`}>
+          <Field label={__pulseText("Value {0}", i + 1)}>
             {r.field === "organizationId" ? (
               <select
                 value={r.value}
@@ -401,7 +396,7 @@ function SmartListEditor({
                   )
                 }
               >
-                <option value="">No company</option>
+                <option value="">{__pulseText("No company")}</option>
                 {p.organizations.map((o) => (
                   <option key={o.id} value={o.id}>
                     {o.name}
@@ -452,7 +447,7 @@ function SmartListEditor({
               className="button ghost destructive"
               onClick={() => setRules(rules.filter((_, index) => index !== i))}
             >
-              Remove condition {i + 1}
+              {__pulseText("Remove condition") + " "}{i + 1}
             </button>
           )}
         </fieldset>
@@ -468,14 +463,10 @@ function SmartListEditor({
             ])
           }
         >
-          Add condition
-        </button>
+          {__pulseText("Add condition")}</button>
       )}
       <p className="wide field-help">
-        Days-since conditions exclude unknown history. Paused and restricted
-        classifications are calculated from active instructions and permissions.
-        Lists never grant outreach permission.
-      </p>
+        {__pulseText("Days-since conditions exclude unknown history. Paused and restricted classifications are calculated from active instructions and permissions. Lists never grant outreach permission.")}</p>
     </RecordForm>
   );
 }

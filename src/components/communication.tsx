@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { usePulse } from "../app/context";
 import { Modal } from "./ui";
@@ -5,6 +6,7 @@ import { outreachReasons } from "../ai/context";
 import { emailLink, whatsappLink } from "../services/handoffs";
 import type { Contact } from "../data/models";
 export function CommunicationHandoff({ contact }: { contact: Contact }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     [open, setOpen] = useState(false),
     [subject, setSubject] = useState(""),
@@ -45,35 +47,29 @@ export function CommunicationHandoff({ contact }: { contact: Contact }) {
         disabled={reasons.length > 0}
         onClick={() => setOpen(true)}
       >
-        Message handoff
-      </button>
+        {__pulseText("Message handoff")}</button>
       {open && (
         <Modal
-          title="Review a relationship message"
+          title={__pulseText("Review a relationship message")}
           onClose={() => setOpen(false)}
         >
           <p>
-            Local composer handoff only. No AI, account connection or automatic
-            sending. Promotional communication requires separate marketing
-            permission and is not supported by this composer.
-          </p>
+            {__pulseText("Local composer handoff only. No AI, account connection or automatic sending. Promotional communication requires separate marketing permission and is not supported by this composer.")}</p>
           <label className="field">
-            <span>Message subject</span>
+            <span>{__pulseText("Message subject")}</span>
             <input
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
             />
           </label>
           <label className="field">
-            <span>Message body</span>
+            <span>{__pulseText("Message body")}</span>
             <textarea value={body} onChange={(e) => setBody(e.target.value)} />
           </label>
           <p className="muted">
-            Email: {contact.emails[0] || "not recorded"} · WhatsApp:{" "}
-            {contact.phones[0] || "not recorded"}. A valid international number
-            does not prove a WhatsApp account exists.
-          </p>
-          {error && <p role="alert">{error}</p>}
+            {__pulseText("Email:") + " "}{contact.emails[0] || __pulseText("not recorded")} {" " + __pulseText("· WhatsApp:")}{" "}
+            {contact.phones[0] || __pulseText("not recorded")}{__pulseText(". A valid international number does not prove a WhatsApp account exists.")}</p>
+          {error && <p role="alert">{__pulseText(error)}</p>}
           <div className="record-actions">
             <button
               className="button secondary"
@@ -86,21 +82,17 @@ export function CommunicationHandoff({ contact }: { contact: Contact }) {
                 }
               }}
             >
-              Copy message
-            </button>
+              {__pulseText("Copy message")}</button>
             <button className="button primary" onClick={() => handoff("Email")}>
-              Open email composer
-            </button>
+              {__pulseText("Open email composer")}</button>
             <button
               className="button secondary"
               onClick={() => handoff("WhatsApp")}
             >
-              Open WhatsApp draft
-            </button>
+              {__pulseText("Open WhatsApp draft")}</button>
           </div>
           <button className="button ghost" onClick={() => setOpen(false)}>
-            Close
-          </button>
+            {__pulseText("Close")}</button>
         </Modal>
       )}
     </>

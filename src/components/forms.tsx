@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState, useEffect, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "../i18n/useTranslation";
 import { usePulse } from "../app/context";
@@ -58,6 +59,7 @@ export function EditorModal({
   editor: Editor;
   onClose: () => void;
 }) {
+  const __pulseText = useInterfaceText();
   const { db } = usePulse();
   const [snapshot, setSnapshot] = useState<Editor | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -100,14 +102,14 @@ export function EditorModal({
   }, [db, editor]);
   if (loadError)
     return (
-      <Modal title="Record unavailable" onClose={onClose}>
-        <p role="alert">{loadError}</p>
+      <Modal title={__pulseText("Record unavailable")} onClose={onClose}>
+        <p role="alert">{__pulseText(loadError)}</p>
       </Modal>
     );
   if (!snapshot)
     return (
-      <Modal title="Opening record" onClose={onClose}>
-        <p role="status">Reading the latest saved record…</p>
+      <Modal title={__pulseText("Opening record")} onClose={onClose}>
+        <p role="status">{__pulseText("Reading the latest saved record…")}</p>
       </Modal>
     );
   if (
@@ -126,6 +128,7 @@ function BasicEditorModal({
   editor: BasicEditor;
   onClose: () => void;
 }) {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const { db, organizations, contacts, opportunities, tasks, settings, run } =
     usePulse();
@@ -300,9 +303,7 @@ function BasicEditorModal({
       {deleting ? (
         <>
           <p>
-            Delete this record? Related tasks, people and companies are
-            preserved.
-          </p>
+            {__pulseText("Delete this record? Related tasks, people and companies are preserved.")}</p>
           <div className="form-actions">
             <button
               className="button secondary"
@@ -328,8 +329,7 @@ function BasicEditorModal({
                 setBusy(false);
               }}
             >
-              Confirm delete
-            </button>
+              {__pulseText("Confirm delete")}</button>
           </div>
         </>
       ) : (
@@ -347,24 +347,24 @@ function BasicEditorModal({
                     maxLength={200}
                     autoFocus
                     defaultValue={rec?.name}
-                    placeholder="e.g. Forma Studio"
+                    placeholder={__pulseText("e.g. Forma Studio")}
                   />
                 </Field>
-                <Field label="Industry">
+                <Field label={__pulseText("Industry")}>
                   <input
                     name="industry"
                     defaultValue={editor.record?.industry}
-                    placeholder="Design & creative"
+                    placeholder={__pulseText("Design & creative")}
                   />
                 </Field>
-                <Field label="Location">
+                <Field label={__pulseText("Location")}>
                   <input
                     name="location"
                     defaultValue={editor.record?.location}
-                    placeholder="City, country"
+                    placeholder={__pulseText("City, country")}
                   />
                 </Field>
-                <Field label="Website" wide>
+                <Field label={__pulseText("Website")} wide>
                   <input
                     name="website"
                     type="url"
@@ -372,7 +372,7 @@ function BasicEditorModal({
                     placeholder="https://example.com"
                   />
                 </Field>
-                <Field label="About the company" wide>
+                <Field label={__pulseText("About the company")} wide>
                   <textarea
                     name="description"
                     rows={4}
@@ -391,7 +391,7 @@ function BasicEditorModal({
                     maxLength={200}
                     autoFocus
                     defaultValue={editor.record?.name}
-                    placeholder="A new connection"
+                    placeholder={__pulseText("A new connection")}
                   />
                 </Field>
                 <Field label={t("preferredName")}>
@@ -412,7 +412,7 @@ function BasicEditorModal({
                       ""
                     }
                   >
-                    <option value="">Independent / no company</option>
+                    <option value="">{__pulseText("Independent / no company")}</option>
                     {organizations.map((o) => (
                       <option key={o.id} value={o.id}>
                         {o.name}
@@ -440,7 +440,7 @@ function BasicEditorModal({
                     defaultValue={editor.record?.category || "Prospect"}
                   >
                     {categories.map((s) => (
-                      <option key={s}>{s}</option>
+                      <option key={s} value={s}>{__pulseText(s)}</option>
                     ))}
                   </select>
                 </Field>
@@ -450,7 +450,7 @@ function BasicEditorModal({
                     defaultValue={editor.record?.stage || "New"}
                   >
                     {stages.map((s) => (
-                      <option key={s}>{s}</option>
+                      <option key={s} value={s}>{__pulseText(s)}</option>
                     ))}
                   </select>
                 </Field>
@@ -460,7 +460,7 @@ function BasicEditorModal({
                     defaultValue={editor.record?.priority || "Normal"}
                   >
                     {priorities.map((s) => (
-                      <option key={s}>{s}</option>
+                      <option key={s} value={s}>{__pulseText(s)}</option>
                     ))}
                   </select>
                 </Field>
@@ -473,12 +473,12 @@ function BasicEditorModal({
                     }
                   >
                     {availabilities.map((s) => (
-                      <option key={s}>{s}</option>
+                      <option key={s} value={s}>{__pulseText(s)}</option>
                     ))}
                   </select>
                 </Field>
                 {availability === "Temporarily unavailable" && (
-                  <Field label="Pause until (optional)" wide>
+                  <Field label={__pulseText("Pause until (optional)")} wide>
                     <input
                       name="timeout"
                       type="date"
@@ -490,31 +490,30 @@ function BasicEditorModal({
                       }
                     />
                     <small>
-                      Without a date, outreach stays paused until you change it.
-                    </small>
+                      {__pulseText("Without a date, outreach stays paused until you change it.")}</small>
                   </Field>
                 )}
               </>
             )}
             {(editor.kind === "contact" || editor.kind === "company") && (
-              <Field label="Tags · separated by commas" wide>
+              <Field label={__pulseText("Tags · separated by commas")} wide>
                 <input
                   name="tags"
                   defaultValue={rec?.tags.join(", ")}
-                  placeholder="Partnership, Creative"
+                  placeholder={__pulseText("Partnership, Creative")}
                 />
               </Field>
             )}
             {(editor.kind === "interaction" || editor.kind === "task") && (
               <>
-                <Field label="Related person" wide>
+                <Field label={__pulseText("Related person")} wide>
                   <select
                     name="contactId"
                     defaultValue={
                       editor.record?.contactId || editor.contact?.id || ""
                     }
                   >
-                    <option value="">No person / company only</option>
+                    <option value="">{__pulseText("No person / company only")}</option>
                     {contacts.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}
@@ -526,8 +525,8 @@ function BasicEditorModal({
                   <Field
                     label={
                       editor.kind === "interaction" && editor.record
-                        ? "Historical company"
-                        : "Related company (used when no person)"
+                        ? __pulseText("Historical company")
+                        : __pulseText("Related company (used when no person)")
                     }
                   >
                     <select
@@ -539,7 +538,7 @@ function BasicEditorModal({
                         ""
                       }
                     >
-                      <option value="">No company</option>
+                      <option value="">{__pulseText("No company")}</option>
                       {organizations.map((o) => (
                         <option key={o.id} value={o.id}>
                           {o.name}
@@ -550,12 +549,12 @@ function BasicEditorModal({
                 }
                 {editor.kind === "interaction" && (
                   <>
-                    <Field label="Related opportunity">
+                    <Field label={__pulseText("Related opportunity")}>
                       <select
                         name="opportunityId"
                         defaultValue={editor.record?.opportunityId || ""}
                       >
-                        <option value="">None</option>
+                        <option value="">{__pulseText("None")}</option>
                         {opportunities.map((o) => (
                           <option key={o.id} value={o.id}>
                             {o.title}
@@ -563,12 +562,12 @@ function BasicEditorModal({
                         ))}
                       </select>
                     </Field>
-                    <Field label="Linked follow-up">
+                    <Field label={__pulseText("Linked follow-up")}>
                       <select
                         name="followUpId"
                         defaultValue={editor.record?.followUpId || ""}
                       >
-                        <option value="">None</option>
+                        <option value="">{__pulseText("None")}</option>
                         {tasks.map((t) => (
                           <option key={t.id} value={t.id}>
                             {t.title}
@@ -582,7 +581,7 @@ function BasicEditorModal({
             )}
             {editor.kind === "interaction" && (
               <>
-                <Field label="Interaction type">
+                <Field label={__pulseText("Interaction type")}>
                   <select
                     name="type"
                     defaultValue={
@@ -591,12 +590,12 @@ function BasicEditorModal({
                   >
                     {["Call", "Email", "Meeting", "Message", "Note"].map(
                       (s) => (
-                        <option key={s}>{s}</option>
+                        <option key={s} value={s}>{__pulseText(s)}</option>
                       ),
                     )}
                   </select>
                 </Field>
-                <Field label="When">
+                <Field label={__pulseText("When")}>
                   <input
                     name="occurredAt"
                     type="datetime-local"
@@ -606,7 +605,7 @@ function BasicEditorModal({
                     )}
                   />
                 </Field>
-                <Field label="What would you like to remember?" wide>
+                <Field label={__pulseText("What would you like to remember?")} wide>
                   <textarea
                     autoFocus
                     name="summary"
@@ -614,14 +613,14 @@ function BasicEditorModal({
                     maxLength={20000}
                     rows={5}
                     defaultValue={editor.record?.summary}
-                    placeholder="The details that make this relationship personal…"
+                    placeholder={__pulseText("The details that make this relationship personal…")}
                   />
                 </Field>
-                <Field label="Outcome / next step" wide>
+                <Field label={__pulseText("Outcome / next step")} wide>
                   <input
                     name="outcome"
                     defaultValue={editor.record?.outcome}
-                    placeholder="e.g. Share a proposal next week"
+                    placeholder={__pulseText("e.g. Share a proposal next week")}
                   />
                 </Field>
               </>
@@ -638,7 +637,7 @@ function BasicEditorModal({
                     placeholder={
                       editor.contact
                         ? `Check in with ${editor.contact.preferredName || editor.contact.name}`
-                        : "Your next meaningful action"
+                        : __pulseText("Your next meaningful action")
                     }
                   />
                 </Field>
@@ -661,7 +660,7 @@ function BasicEditorModal({
                     defaultValue={editor.record?.priority || "Normal"}
                   >
                     {priorities.map((s) => (
-                      <option key={s}>{s}</option>
+                      <option key={s} value={s}>{__pulseText(s)}</option>
                     ))}
                   </select>
                 </Field>
@@ -674,15 +673,13 @@ function BasicEditorModal({
                   />
                 </Field>
                 <p className="field-help wide">
-                  This reminder appears in PULSE while the app is open. Nothing
-                  is sent automatically.
-                </p>
+                  {__pulseText("This reminder appears in PULSE while the app is open. Nothing is sent automatically.")}</p>
               </>
             )}
           </div>
           {error && (
             <p id="form-error" className="form-error" role="alert">
-              {error}
+              {__pulseText(error)}
             </p>
           )}
           <div className="form-actions">
@@ -700,8 +697,7 @@ function BasicEditorModal({
                   className="button ghost destructive"
                   onClick={() => setDeleting(true)}
                 >
-                  Delete record
-                </button>
+                  {__pulseText("Delete record")}</button>
               )}
             <button className="button primary" disabled={busy}>
               {busy ? t("saving") : editor.kind === "company" ? t("saveCompany") : editor.kind === "contact" ? t("savePerson") : editor.kind === "task" ? t("saveFollowup") : t("saveInteraction")}

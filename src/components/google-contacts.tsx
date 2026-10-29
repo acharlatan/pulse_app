@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -15,6 +16,7 @@ import {
   type GooglePerson,
 } from "../services/google-api";
 export function GoogleContacts() {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     navigate = useNavigate();
   const [people, setPeople] = useState<GooglePerson[]>([]),
@@ -60,15 +62,11 @@ export function GoogleContacts() {
   }
   return (
     <section className="surface">
-      <h2>Google Contacts</h2>
+      <h2>{__pulseText("Google Contacts")}</h2>
       <p>
-        Read-only, selected import. Review matches and fields before anything is
-        saved. Contacts and consent are never changed on Google.
-      </p>
+        {__pulseText("Read-only, selected import. Review matches and fields before anything is saved. Contacts and consent are never changed on Google.")}</p>
       <p>
-        Status: {googleSessionStatus("contacts", p.workspace)}. Access lasts
-        only for this session; switching workspaces clears it.
-      </p>
+        {__pulseText("Status:") + " "}{googleSessionStatus("contacts", p.workspace)}{__pulseText(". Access lasts only for this session; switching workspaces clears it.")}</p>
       <button
         className="button secondary"
         disabled={
@@ -76,13 +74,13 @@ export function GoogleContacts() {
         }
         onClick={() => void preview()}
       >
-        {busy ? "Loading…" : "Connect and preview contacts"}
+        {busy ? __pulseText("Loading…") : __pulseText("Connect and preview contacts")}
       </button>
       {p.workspace !== "personal" && (
-        <p>Open your personal workspace to connect Google.</p>
+        <p>{__pulseText("Open your personal workspace to connect Google.")}</p>
       )}
       {!configuredGoogleClient() && (
-        <p>Google Cloud OAuth configuration is needed before connecting.</p>
+        <p>{__pulseText("Google Cloud OAuth configuration is needed before connecting.")}</p>
       )}
       <button
         className="button ghost"
@@ -93,15 +91,12 @@ export function GoogleContacts() {
           setLoaded(false);
         }}
       >
-        Disconnect
-      </button>
-      {error && <p role="alert">{error}</p>}
+        {__pulseText("Disconnect")}</button>
+      {error && <p role="alert">{__pulseText(error)}</p>}
       {loaded && (
         <>
           <p>
-            {people.length} retrieved · {selected.size} selected. Nothing is
-            saved yet.
-          </p>
+            {people.length} {" " + __pulseText("retrieved ·") + " "}{selected.size} {" " + __pulseText("selected. Nothing is saved yet.")}</p>
           {people.map((person) => (
             <label className="bulk-option" key={person.resourceName}>
               <input
@@ -117,9 +112,9 @@ export function GoogleContacts() {
                 }
               />
               <span>
-                {person.names?.[0]?.displayName || "Name missing"} ·{" "}
-                {person.emailAddresses?.[0]?.value || "No email"} ·{" "}
-                {person.organizations?.[0]?.name || "No company"}
+                {person.names?.[0]?.displayName || __pulseText("Name missing")} ·{" "}
+                {person.emailAddresses?.[0]?.value || __pulseText("No email")} ·{" "}
+                {person.organizations?.[0]?.name || __pulseText("No company")}
               </span>
             </label>
           ))}
@@ -136,8 +131,7 @@ export function GoogleContacts() {
               navigate("/import");
             }}
           >
-            Review selected contacts
-          </button>
+            {__pulseText("Review selected contacts")}</button>
         </>
       )}
     </section>

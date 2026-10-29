@@ -1,8 +1,10 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useEffect, useRef, useState } from "react";
 import { usePulse } from "../app/context";
 
 /** A decorative, local-only scene. Saved relationships remain in the semantic map above it. */
 export function ConstellationScene({ variant }: { variant: "home" | "orbit" }) {
+  const __pulseText = useInterfaceText();
   const host = useRef<HTMLDivElement>(null);
   const steer = useRef<(direction: number) => void>(() => {});
   const [ready, setReady] = useState(false);
@@ -166,5 +168,5 @@ export function ConstellationScene({ variant }: { variant: "home" | "orbit" }) {
     }).catch(() => { /* CSS artwork remains when WebGL cannot initialize. */ });
     return () => { destroyed = true; dispose(); };
   }, [settings.reducedMotion, variant]);
-  return <><div className={`constellation-scene constellation-scene-${variant}`} ref={host} aria-hidden="true" />{variant === "home" && ready && <div className="home-scene-controls" aria-label="Rotate the 3D artwork"><span>DRAG TO EXPLORE</span><button aria-label="Rotate artwork left" onClick={() => steer.current(-1)}>↶</button><button aria-label="Rotate artwork right" onClick={() => steer.current(1)}>↷</button></div>}</>;
+  return <><div className={`constellation-scene constellation-scene-${variant}`} ref={host} aria-hidden="true" />{variant === "home" && ready && <div className="home-scene-controls" aria-label={__pulseText("Rotate the 3D artwork")}><span>{__pulseText("DRAG TO EXPLORE")}</span><button aria-label={__pulseText("Rotate artwork left")} onClick={() => steer.current(-1)}>↶</button><button aria-label={__pulseText("Rotate artwork right")} onClick={() => steer.current(1)}>↷</button></div>}</>;
 }

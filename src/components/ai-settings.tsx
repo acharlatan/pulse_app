@@ -1,7 +1,9 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
 export function AISettings() {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     [status, setStatus] = useState("AI availability has not been checked."),
     [busy, setBusy] = useState(false);
@@ -21,7 +23,7 @@ export function AISettings() {
   }, []);
   return (
     <div className="surface ai-settings">
-      <h3>Optional PULSE Intelligence</h3>
+      <h3>{__pulseText("Optional PULSE Intelligence")}</h3>
       <p role="status">{status}</p>
       <form
         onSubmit={async (e) => {
@@ -64,23 +66,14 @@ export function AISettings() {
           </label>
         ))}
         <p className="inline-notice">
-          Every request still requires exact context review and approval. Only
-          selected information is sent to Google Gemini. Provider terms apply;
-          free-tier content may be used to improve its products. Responses
-          remain temporary unless explicitly saved. Permission evidence is never
-          included. No background transmission or automatic actions.
-        </p>
+          {__pulseText("Every request still requires exact context review and approval. Only selected information is sent to Google Gemini. Provider terms apply; free-tier content may be used to improve its products. Responses remain temporary unless explicitly saved. Permission evidence is never included. No background transmission or automatic actions.")}</p>
         <button className="button primary" disabled={busy}>
-          Save AI preferences
-        </button>
+          {__pulseText("Save AI preferences")}</button>
       </form>
       <Link className="button ghost" to="/assistant">
-        Open PULSE Intelligence
-      </Link>
+        {__pulseText("Open PULSE Intelligence")}</Link>
       <p className="muted">
-        Calendar files, email composers and WhatsApp links are local handoffs,
-        not synchronized account connections.
-      </p>
+        {__pulseText("Calendar files, email composers and WhatsApp links are local handoffs, not synchronized account connections.")}</p>
     </div>
   );
 }

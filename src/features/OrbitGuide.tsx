@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { ArrowRight, Building2, Users, BriefcaseBusiness } from "lucide-react";
 import { usePulse } from "../app/context";
 import { Avatar } from "../components/ui";
@@ -17,18 +18,17 @@ export function OrbitGuide({
   onSelect: (n: OrbitNode) => void;
   selected: string;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse();
   return (
     <div className="orbit-guide">
       {!scoped && !search && graph.nodes.some((n) => n.kind === "company") ? (
         <>
           <header className="orbit-guide-intro">
-            <span className="eyebrow">START WITH SOMETHING FAMILIAR</span>
-            <h2>Choose a company. Follow the thread.</h2>
+            <span className="eyebrow">{__pulseText("START WITH SOMETHING FAMILIAR")}</span>
+            <h2>{__pulseText("Choose a company. Follow the thread.")}</h2>
             <p>
-              Explore its saved people and opportunities first. Use Map when you
-              want to see the connections spatially.
-            </p>
+              {__pulseText("Explore its saved people and opportunities first. Use Map when you want to see the connections spatially.")}</p>
           </header>
           <div className="orbit-company-index">
             {graph.nodes
@@ -47,41 +47,35 @@ export function OrbitGuide({
                       p.contacts.filter((c) => c.organizationId === n.recordId)
                         .length
                     }{" "}
-                    people ·{" "}
+                    {__pulseText("people ·")}{" "}
                     {
                       p.opportunities.filter(
                         (o) => o.organizationId === n.recordId,
                       ).length
                     }{" "}
-                    opportunities
-                  </span>
+                    {__pulseText("opportunities")}</span>
                   <span className="orbit-explore-link">
-                    Explore connections <ArrowRight size={17} />
+                    {__pulseText("Explore connections") + " "}<ArrowRight size={17} />
                   </span>
                 </button>
               ))}
           </div>
           {!graph.nodes.some((n) => n.kind === "company") && (
             <p>
-              No companies in this view. Use List to explore people and
-              independent opportunities.
-            </p>
+              {__pulseText("No companies in this view. Use List to explore people and independent opportunities.")}</p>
           )}
         </>
       ) : (
         <>
           <header className="orbit-guide-intro">
-            <p className="eyebrow">SAVED ASSOCIATIONS, MADE READABLE</p>
+            <p className="eyebrow">{__pulseText("SAVED ASSOCIATIONS, MADE READABLE")}</p>
             <h2>
               {search
-                ? "Find the record. See its context."
-                : "One starting point. Clear connections."}
+                ? __pulseText("Find the record. See its context.")
+                : __pulseText("One starting point. Clear connections.")}
             </h2>
             <p>
-              People belong to a saved company; opportunities have saved company
-              and representative links. These do not imply that people know one
-              another.
-            </p>
+              {__pulseText("People belong to a saved company; opportunities have saved company and representative links. These do not imply that people know one another.")}</p>
           </header>
           <div className="orbit-guide-groups">
             {(
@@ -94,7 +88,7 @@ export function OrbitGuide({
               <section key={kind}>
                 <h3>
                   <Icon size={18} />
-                  {label}
+                  {__pulseText(label)}
                   <span>
                     {graph.nodes.filter((n) => n.kind === kind).length}
                   </span>
@@ -117,10 +111,10 @@ export function OrbitGuide({
                         <strong>{n.label}</strong>
                         <small>
                           {kind === "person"
-                            ? "Saved person"
+                            ? __pulseText("Saved person")
                             : kind === "company"
-                              ? "Saved company"
-                              : "Saved opportunity"}
+                              ? __pulseText("Saved company")
+                              : __pulseText("Saved opportunity")}
                         </small>
                       </span>
                       <ArrowRight size={16} />
@@ -128,8 +122,7 @@ export function OrbitGuide({
                   ))}
                 {!graph.nodes.some((n) => n.kind === kind) && (
                   <p className="muted">
-                    No matching {label.toLowerCase()} in this view.
-                  </p>
+                    {__pulseText("No matching") + " "}{label.toLowerCase()} {" " + __pulseText("in this view.")}</p>
                 )}
               </section>
             ))}
@@ -137,28 +130,24 @@ export function OrbitGuide({
         </>
       )}
       <details className="orbit-reading-key">
-        <summary>What do these connections mean?</summary>
+        <summary>{__pulseText("What do these connections mean?")}</summary>
         <dl>
           <div>
-            <dt>Works at</dt>
-            <dd>A person’s currently saved company.</dd>
+            <dt>{__pulseText("Works at")}</dt>
+            <dd>{__pulseText("A person’s currently saved company.")}</dd>
           </div>
           <div>
-            <dt>Company opportunity</dt>
-            <dd>The company explicitly selected on an opportunity.</dd>
+            <dt>{__pulseText("Company opportunity")}</dt>
+            <dd>{__pulseText("The company explicitly selected on an opportunity.")}</dd>
           </div>
           <div>
-            <dt>Opportunity representative</dt>
+            <dt>{__pulseText("Opportunity representative")}</dt>
             <dd>
-              A person explicitly linked to an opportunity. Their current
-              employer may have changed.
-            </dd>
+              {__pulseText("A person explicitly linked to an opportunity. Their current employer may have changed.")}</dd>
           </div>
         </dl>
         <p>
-          Orbit is a view of your records. It does not discover external
-          relationships or infer personal connections.
-        </p>
+          {__pulseText("Orbit is a view of your records. It does not discover external relationships or infer personal connections.")}</p>
       </details>
     </div>
   );

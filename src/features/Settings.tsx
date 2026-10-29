@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { BrandArt } from "../components/BrandArt";
 import { useTranslation } from "../i18n/useTranslation";
 import { LanguageSelector } from "../components/LanguageSelector";
@@ -45,6 +46,7 @@ function download(content: string, name: string, type = "application/json") {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export function Settings() {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const p = usePulse();
   const { date } = useFormat();
@@ -115,39 +117,34 @@ export function Settings() {
       <div className="page-heading studio-heading">
         <BrandArt motif="orbit" />
         <div>
-          <p className="eyebrow">MAKE YOURSELF AT HOME</p>
+          <p className="eyebrow">{__pulseText("MAKE YOURSELF AT HOME")}</p>
           <h1>
             {t("settingsTitle")}<span className="accent">.</span>
           </h1>
           <p className="subtitle">
-            Small preferences that make PULSE feel more like you.
-          </p>
+            {__pulseText("Small preferences that make PULSE feel more like you.")}</p>
         </div>
         <Badge tone="green">
           <ShieldCheck size={14} />
-          Local-first, always
-        </Badge>
+          {__pulseText("Local-first, always")}</Badge>
       </div>
-      <nav className="settings-shortcuts" aria-label="Workspace tools">
+      <nav className="settings-shortcuts" aria-label={__pulseText("Workspace tools")}>
         <Link className="button secondary" to="/customize">
-          Personalize PULSE · Pipelines & custom fields
-        </Link>
+          {__pulseText("Personalize PULSE · Pipelines & custom fields")}</Link>
         <Link className="button ghost" to="/focus">
-          My Focus
-        </Link>
+          {__pulseText("My Focus")}</Link>
         <Link className="button secondary" to="/help">
-          Help & getting started
-        </Link>
+          {__pulseText("Help & getting started")}</Link>
       </nav>
       <div className="settings-layout">
-        <nav className="settings-tabs" aria-label="Settings categories">
+        <nav className="settings-tabs" aria-label={__pulseText("Settings categories")}>
           {tabs.map(([key, label]) => (
             <button
               key={key}
               className={section === key ? "active" : ""}
               onClick={() => setSection(key)}
             >
-              {label}
+              {__pulseText(label)}
               <ChevronRight size={15} />
             </button>
           ))}
@@ -156,11 +153,10 @@ export function Settings() {
           {section === "appearance" && (
             <section className="surface workspace-identity-panel">
               <div>
-                <p className="eyebrow">MY WORKSPACE · LOCAL IDENTITY</p>
-                <h2>Make this space yours.</h2>
+                <p className="eyebrow">{__pulseText("MY WORKSPACE · LOCAL IDENTITY")}</p>
+                <h2>{__pulseText("Make this space yours.")}</h2>
                 <p className="muted">
-                  Your workspace identity stays on this device.
-                </p>
+                  {__pulseText("Your workspace identity stays on this device.")}</p>
               </div>
               <Avatar
                 workspaceIdentity
@@ -182,7 +178,7 @@ export function Settings() {
                 }}
               >
                 <label className="field">
-                  <span>Workspace name</span>
+                  <span>{__pulseText("Workspace name")}</span>
                   <input
                     name="workspaceName"
                     maxLength={80}
@@ -190,11 +186,10 @@ export function Settings() {
                   />
                 </label>
                 <button className="button secondary">
-                  Save workspace name
-                </button>
+                  {__pulseText("Save workspace name")}</button>
               </form>
               <label className="field">
-                <span>Accent preset</span>
+                <span>{__pulseText("Accent preset")}</span>
                 <select
                   value={p.settings.identity.accent}
                   onChange={(e) =>
@@ -206,10 +201,10 @@ export function Settings() {
                     })
                   }
                 >
-                  <option value="periwinkle">Signature Periwinkle</option>
-                  <option value="forest">Forest / Sage</option>
-                  <option value="coral">Soft Coral</option>
-                  <option value="blue">Cool Blue</option>
+                  <option value="periwinkle">{__pulseText("Signature Periwinkle")}</option>
+                  <option value="forest">{__pulseText("Forest / Sage")}</option>
+                  <option value="coral">{__pulseText("Soft Coral")}</option>
+                  <option value="blue">{__pulseText("Cool Blue")}</option>
                 </select>
               </label>
             </section>
@@ -218,13 +213,11 @@ export function Settings() {
             <>
               <LanguageSelector />
               <SectionHeading
-                title="A look that feels like you"
-                eyebrow="APPEARANCE"
+                title={__pulseText("A look that feels like you")}
+                eyebrow={__pulseText("APPEARANCE")}
               />
               <p className="section-description">
-                A softer workspace, from your first coffee to your last
-                follow-up.
-              </p>
+                {__pulseText("A softer workspace, from your first coffee to your last follow-up.")}</p>
               <div className="theme-options">
                 {(
                   [
@@ -252,7 +245,7 @@ export function Settings() {
                     </div>
                     <span>
                       <Icon size={17} />
-                      {label}
+                      {__pulseText(label)}
                       {p.settings.theme === key && <Check size={17} />}
                     </span>
                   </button>
@@ -260,11 +253,9 @@ export function Settings() {
               </div>
               <label className="setting-toggle">
                 <div>
-                  <strong>Reduce motion</strong>
+                  <strong>{__pulseText("Reduce motion")}</strong>
                   <small>
-                    Keep transitions quiet. Device preferences are also
-                    respected.
-                  </small>
+                    {__pulseText("Keep transitions quiet. Device preferences are also respected.")}</small>
                 </div>
                 <input
                   type="checkbox"
@@ -278,16 +269,15 @@ export function Settings() {
           {section === "relationships" && (
             <>
               <SectionHeading
-                title="Every relationship has its own pace"
-                eyebrow="RELATIONSHIP RHYTHM"
+                title={__pulseText("Every relationship has its own pace")}
+                eyebrow={__pulseText("RELATIONSHIP RHYTHM")}
               />
               <p className="section-description">
-                These transparent rules guide your reconnection suggestions.
-              </p>
+                {__pulseText("These transparent rules guide your reconnection suggestions.")}</p>
               <form onSubmit={saveRhythm} key={p.workspace}>
                 <div className="form-grid">
                   <label className="field wide">
-                    <span>Your preferred name</span>
+                    <span>{__pulseText("Your preferred name")}</span>
                     <input
                       name="name"
                       maxLength={80}
@@ -304,7 +294,7 @@ export function Settings() {
                     { key: "timeoutDays", label: "Default pause (days)" },
                   ].map(({ key, label }) => (
                     <label className="field" key={key}>
-                      <span>{label}</span>
+                      <span>{__pulseText(label)}</span>
                       <input
                         type="number"
                         name={key}
@@ -316,11 +306,11 @@ export function Settings() {
                     </label>
                   ))}
                   <label className="field">
-                    <span>Locale</span>
+                    <span>{__pulseText("Locale")}</span>
                     <input name="locale" key={p.settings.locale} required defaultValue={p.settings.locale} placeholder="en-US" />
                   </label>
                   <label className="field">
-                    <span>Display timezone</span>
+                    <span>{__pulseText("Display timezone")}</span>
                     <input
                       name="timezone"
                       required
@@ -330,13 +320,9 @@ export function Settings() {
                   </label>
                 </div>
                 <details className="intelligence-settings">
-                  <summary>Relationship intelligence settings</summary>
+                  <summary>{__pulseText("Relationship intelligence settings")}</summary>
                   <p className="field-help">
-                    Cooling and dormant thresholds are at least your applicable
-                    review threshold. Unknown history is never classified as
-                    cooling or dormant. Stalled opportunities require a real
-                    linked conversation.
-                  </p>
+                    {__pulseText("Cooling and dormant thresholds are at least your applicable review threshold. Unknown history is never classified as cooling or dormant. Stalled opportunities require a real linked conversation.")}</p>
                   <div className="form-grid">
                     {[
                       { key: "coolingDays", label: "Cooling after (days)" },
@@ -353,7 +339,7 @@ export function Settings() {
                       { key: "homeLimit", label: "Maximum Home reviews" },
                     ].map(({ key, label }) => (
                       <label className="field" key={key}>
-                        <span>{label}</span>
+                        <span>{__pulseText(label)}</span>
                         <input
                           type="number"
                           name={key}
@@ -398,17 +384,14 @@ export function Settings() {
                           p.settings.intelligence[key as "enabled"]
                         }
                       />
-                      <span>{label}</span>
+                      <span>{__pulseText(label)}</span>
                     </label>
                   ))}
                 </details>
                 <p className="field-help">
-                  Display dates use your selected timezone. Date and time inputs
-                  use this device's timezone. Paused and restricted people are
-                  excluded from reconnect suggestions.
-                </p>
+                  {__pulseText("Display dates use your selected timezone. Date and time inputs use this device's timezone. Paused and restricted people are excluded from reconnect suggestions.")}</p>
                 <div className="form-actions">
-                  <button className="button primary">Save your rhythm</button>
+                  <button className="button primary">{__pulseText("Save your rhythm")}</button>
                 </div>
               </form>
             </>
@@ -416,13 +399,11 @@ export function Settings() {
           {section === "alerts" && (
             <>
               <SectionHeading
-                title="The right nudge, at the right time"
-                eyebrow="IN-APP NOTIFICATIONS"
+                title={__pulseText("The right nudge, at the right time")}
+                eyebrow={__pulseText("IN-APP NOTIFICATIONS")}
               />
               <p className="section-description">
-                PULSE checks reminders when open or active. Background, email,
-                and mobile push delivery are not available.
-              </p>
+                {__pulseText("PULSE checks reminders when open or active. Background, email, and mobile push delivery are not available.")}</p>
               {(
                 [
                   {
@@ -447,8 +428,8 @@ export function Settings() {
               ).map((v) => (
                 <label className="setting-toggle" key={v.key}>
                   <div>
-                    <strong>{v.label}</strong>
-                    <small>{v.description}</small>
+                    <strong>{__pulseText(v.label)}</strong>
+                    <small>{__pulseText(v.description)}</small>
                   </div>
                   <input
                     type="checkbox"
@@ -466,21 +447,17 @@ export function Settings() {
                 </label>
               ))}
               <div className="inline-notice">
-                Delivery: in-app only. Browser notifications, quiet hours, and
-                scheduled summaries are planned.
-              </div>
+                {__pulseText("Delivery: in-app only. Browser notifications, quiet hours, and scheduled summaries are planned.")}</div>
             </>
           )}
           {section === "progress" && (
             <>
               <SectionHeading
-                title="Progress at your own pace"
-                eyebrow="YOUR MOMENTUM"
+                title={__pulseText("Progress at your own pace")}
+                eyebrow={__pulseText("YOUR MOMENTUM")}
               />
               <p className="section-description">
-                A little encouragement for meaningful work, without the
-                pressure.
-              </p>
+                {__pulseText("A little encouragement for meaningful work, without the pressure.")}</p>
               <ProgressSettings
                 key={
                   JSON.stringify(p.settings.progress) + p.settings.gamification
@@ -491,68 +468,51 @@ export function Settings() {
           {section === "data" && (
             <>
               <SectionHeading
-                title="Your relationships. Your data."
-                eyebrow="PRIVACY & DATA"
+                title={__pulseText("Your relationships. Your data.")}
+                eyebrow={__pulseText("PRIVACY & DATA")}
               />
               <p className="section-description">
-                Your CRM stays in this browser’s IndexedDB. Optional AI sends
-                only the request you explicitly approve to Google Gemini; it
-                does not synchronize your workspace.
-              </p>
+                {__pulseText("Your CRM stays in this browser’s IndexedDB. Optional AI sends only the request you explicitly approve to Google Gemini; it does not synchronize your workspace.")}</p>
               <div className="privacy-note">
                 <LockKeyhole size={22} />
                 <p>
-                  Local storage is not application-level encryption. Anyone with
-                  access to this browser profile may access your records.
-                  Clearing browser data can erase your workspace. Keep regular
-                  backups in a safe place.
-                </p>
+                  {__pulseText("Local storage is not application-level encryption. Anyone with access to this browser profile may access your records. Clearing browser data can erase your workspace. Keep regular backups in a safe place.")}</p>
               </div>
               <div className="data-action">
                 <div>
-                  <strong>Import contacts from CSV</strong>
+                  <strong>{__pulseText("Import contacts from CSV")}</strong>
                   <small>
-                    Add or selectively update contacts after mapping, validation
-                    and duplicate review. This does not replace the workspace.
-                  </small>
+                    {__pulseText("Add or selectively update contacts after mapping, validation and duplicate review. This does not replace the workspace.")}</small>
                 </div>
                 <Link className="button secondary" to="/import">
-                  Import contacts
-                </Link>
+                  {__pulseText("Import contacts")}</Link>
               </div>
               <p className="field-help">
-                Storage belongs to this site origin. To move between GitHub
-                Pages, Cloudflare or another device, export a backup here and
-                restore it there. There is no cloud synchronization or recovery
-                account.
-              </p>
+                {__pulseText("Storage belongs to this site origin. To move between GitHub Pages, Cloudflare or another device, export a backup here and restore it there. There is no cloud synchronization or recovery account.")}</p>
               {p.importBatches.length > 0 && (
                 <details>
-                  <summary>Recent imports</summary>
+                  <summary>{__pulseText("Recent imports")}</summary>
                   {p.importBatches.slice(0, 5).map((b) => (
                     <p key={b.id}>
                       {b.fileName} ·{" "}
                       {new Date(b.createdAt).toLocaleString(p.settings.locale, {
                         timeZone: p.settings.timezone,
                       })}{" "}
-                      · {b.createdContacts} created, {b.updatedContacts}{" "}
-                      updated, {b.skipped} skipped, {b.invalid} rejected
-                    </p>
+                      · {b.createdContacts} {" " + __pulseText("created,") + " "}{b.updatedContacts}{" "}
+                      {__pulseText("updated,") + " "}{b.skipped} {" " + __pulseText("skipped,") + " "}{b.invalid} {" " + __pulseText("rejected")}</p>
                   ))}
                 </details>
               )}
               <div className="data-action">
                 <div>
-                  <strong>Export a workspace backup</strong>
+                  <strong>{__pulseText("Export a workspace backup")}</strong>
                   <small>
-                    JSON · All CRM records and preferences for this workspace.
-                  </small>
+                    {__pulseText("JSON · All CRM records and preferences for this workspace.")}</small>
                   <small>
                     {p.settings.onboarding.exportInitiatedAt
                       ? `Last download requested ${date(p.settings.onboarding.exportInitiatedAt)}.`
-                      : "No backup download requested yet."}{" "}
-                    Check that the downloaded file is retained safely.
-                  </small>
+                      : __pulseText("No backup download requested yet.")}{" "}
+                    {__pulseText("Check that the downloaded file is retained safely.")}</small>
                 </div>
                 <button
                   className="button secondary"
@@ -572,16 +532,13 @@ export function Settings() {
                   }
                 >
                   <Download size={17} />
-                  Export
-                </button>
+                  {__pulseText("Export")}</button>
               </div>
               <div className="data-action">
                 <div>
-                  <strong>Restore a JSON backup</strong>
+                  <strong>{__pulseText("Restore a JSON backup")}</strong>
                   <small>
-                    Replaces this workspace only, after validation and
-                    confirmation.
-                  </small>
+                    {__pulseText("Replaces this workspace only, after validation and confirmation.")}</small>
                 </div>
                 <input
                   ref={input}
@@ -612,20 +569,18 @@ export function Settings() {
                   onClick={() => input.current?.click()}
                 >
                   <Upload size={17} />
-                  Restore
-                </button>
+                  {__pulseText("Restore")}</button>
               </div>
               {fileError && (
                 <p role="alert" className="form-error">
-                  {fileError}
+                  {__pulseText(fileError)}
                 </p>
               )}
               <div className="data-action">
                 <div>
-                  <strong>Download contacts as CSV</strong>
+                  <strong>{__pulseText("Download contacts as CSV")}</strong>
                   <small>
-                    Name, role, company, email, stage, and priority.
-                  </small>
+                    {__pulseText("Name, role, company, email, stage, and priority.")}</small>
                 </div>
                 <button
                   className="button secondary"
@@ -668,7 +623,7 @@ export function Settings() {
               </div>
               <div className="data-action">
                 <div>
-                  <strong>Device storage</strong>
+                  <strong>{__pulseText("Device storage")}</strong>
                   <small>
                     {storage ||
                       `${p.contacts.length} people · ${p.organizations.length} companies · ${p.interactions.length} interactions`}
@@ -686,13 +641,12 @@ export function Settings() {
                   }
                 >
                   <HardDrive size={17} />
-                  Check
-                </button>
+                  {__pulseText("Check")}</button>
               </div>
               <div className="data-action">
                 <div>
-                  <strong>Switch workspace</strong>
-                  <small>Demo and personal records are kept separately.</small>
+                  <strong>{__pulseText("Switch workspace")}</strong>
+                  <small>{__pulseText("Demo and personal records are kept separately.")}</small>
                 </div>
                 <button
                   className="button secondary"
@@ -703,42 +657,37 @@ export function Settings() {
                   }
                 >
                   <ArrowLeftRight size={17} />
-                  Open {p.workspace === "demo" ? "personal" : "demo"}
+                  {__pulseText("Open") + " "}{p.workspace === "demo" ? __pulseText("personal") : __pulseText("demo")}
                 </button>
               </div>
               {p.workspace === "demo" && (
                 <div className="data-action">
                   <div>
-                    <strong>Reset demo data</strong>
+                    <strong>{__pulseText("Reset demo data")}</strong>
                     <small>
-                      Restore fictional examples. Your personal workspace is
-                      untouched.
-                    </small>
+                      {__pulseText("Restore fictional examples. Your personal workspace is untouched.")}</small>
                   </div>
                   <button
                     className="button secondary"
                     onClick={() => setConfirm("reset")}
                   >
                     <RotateCcw size={17} />
-                    Reset demo
-                  </button>
+                    {__pulseText("Reset demo")}</button>
                 </div>
               )}
               {p.workspace === "personal" && (
                 <div className="data-action">
                   <div>
-                    <strong>Delete personal workspace data</strong>
+                    <strong>{__pulseText("Delete personal workspace data")}</strong>
                     <small>
-                      Permanently clear this personal workspace on this device.
-                    </small>
+                      {__pulseText("Permanently clear this personal workspace on this device.")}</small>
                   </div>
                   <button
                     className="button danger"
                     onClick={() => setConfirm("delete")}
                   >
                     <Trash2 size={17} />
-                    Delete data
-                  </button>
+                    {__pulseText("Delete data")}</button>
                 </div>
               )}
             </>
@@ -746,19 +695,14 @@ export function Settings() {
           {section === "integrations" && (
             <>
               <SectionHeading
-                title="Room for your favorite tools"
-                eyebrow="INTEGRATIONS"
+                title={__pulseText("Room for your favorite tools")}
+                eyebrow={__pulseText("INTEGRATIONS")}
               />
               <p className="section-description">
-                Core CRM features work offline without an account. Google
-                connections require explicit authorization.
-              </p>
+                {__pulseText("Core CRM features work offline without an account. Google connections require explicit authorization.")}</p>
               <AISettings key={JSON.stringify(p.settings.ai)} />
               <p className="inline-notice">
-                Available without account connection: task/meeting .ics exports,
-                email composer and WhatsApp draft handoffs. Gemini is available
-                only after provider and protected operator configuration.
-              </p>
+                {__pulseText("Available without account connection: task/meeting .ics exports, email composer and WhatsApp draft handoffs. Gemini is available only after provider and protected operator configuration.")}</p>
               <GoogleContacts />
               {[
                 [
@@ -782,8 +726,8 @@ export function Settings() {
                 <span className="soft-icon">
                   <Download size={18} />
                 </span>
-                <strong>JSON backup & CSV export</strong>
-                <Badge tone="green">Available in Privacy & data</Badge>
+                <strong>{__pulseText("JSON backup & CSV export")}</strong>
+                <Badge tone="green">{__pulseText("Available in Privacy & data")}</Badge>
               </div>
             </>
           )}
@@ -795,8 +739,8 @@ export function Settings() {
             confirm === "restore"
               ? `Replace ${p.workspace} workspace?`
               : confirm === "reset"
-                ? "Reset the demo?"
-                : "Delete your personal data?"
+                ? __pulseText("Reset the demo?")
+                : __pulseText("Delete your personal data?")
           }
           body={
             confirm === "restore"
@@ -805,8 +749,8 @@ export function Settings() {
                   return `Compatible backup v${b.version} · ${b.metadata?.exportedAt || "Date not recorded (legacy backup)"} · ${b.contacts.length} contacts, ${b.organizations.length} companies, ${b.interactions.length} interactions, ${b.tasks.length} tasks, ${b.opportunities.length} opportunities, ${b.smartLists.length} Smart Lists, ${b.rewards.length} reward entitlements and ${b.dailyQuests.length} saved quests. This REPLACES ALL records and preferences in ${p.workspace}. The other workspace is untouched. Export a backup first.`;
                 })()
               : confirm === "reset"
-                ? "Your demo edits will be replaced with fictional sample data. Your personal workspace will not change."
-                : "All personal CRM records on this device will be permanently deleted. Export a backup first if you need a copy. The demo workspace is untouched."
+                ? __pulseText("Your demo edits will be replaced with fictional sample data. Your personal workspace will not change.")
+                : __pulseText("All personal CRM records on this device will be permanently deleted. Export a backup first if you need a copy. The demo workspace is untouched.")
           }
           action={
             confirm === "restore"

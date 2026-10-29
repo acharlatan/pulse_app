@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Activity, ArrowUpRight, AudioLines, Bell, Building2, ChevronDown, Home, Plus, Search, Users, Workflow, ChartNoAxesCombined } from "lucide-react";
@@ -17,6 +18,7 @@ const mainAreas = [
   { to: "/analytics", label: "Insights", icon: ChartNoAxesCombined },
 ] as const;
 export function Shell({ children }: { children: ReactNode }) {
+  const __pulseText = useInterfaceText();
   const {
     intelligence,
     workspace,
@@ -95,12 +97,11 @@ export function Shell({ children }: { children: ReactNode }) {
           document.querySelector<HTMLElement>("main")?.focus();
         }}
       >
-        Skip to content
-      </a>
+        {__pulseText("Skip to content")}</a>
       <div className="workspace-main">
         <header className="topbar">
           <Link to="/" className="unified-brand"><AudioLines size={23} /> PULSE<span>.</span></Link>
-          <nav className="unified-main-nav" aria-label="Main areas">
+          <nav className="unified-main-nav" aria-label={__pulseText("Main areas")}>
             {mainAreas.map(({ to, label }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}>{t(label.toLowerCase() as "today" | "people" | "work" | "insights")}</Link>)}
           </nav>
           <div className="topbar-actions">
@@ -116,7 +117,7 @@ export function Shell({ children }: { children: ReactNode }) {
               </summary>
               <div className="workspace-switcher-menu">
                 <strong>{t("switchWorkspace")}</strong>
-                <p>Demo and Personal have separate records on this device.</p>
+                <p>{__pulseText("Demo and Personal have separate records on this device.")}</p>
                 <button
                   type="button"
                   className="button secondary"
@@ -126,12 +127,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 >
                   {workspace === "demo" ? t("openPersonal") : t("openDemo")}
                 </button>
-                <small>Switching does not delete either workspace.</small>
+                <small>{__pulseText("Switching does not delete either workspace.")}</small>
               </div>
             </details>
             <span className="local-indicator">
               <i />
-              {workspace === "demo" ? "Demo workspace" : "Saved on this device"}
+              {workspace === "demo" ? __pulseText("Demo workspace") : __pulseText("Saved on this device")}
             </span>
             <button
               type="button"
@@ -153,7 +154,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <div className="unified-profile-menu" ref={profileMenuRef}>
               <button type="button" className="unified-profile-trigger" aria-label={t("workspaceMenu")} aria-expanded={profileMenu} onClick={() => setProfileMenu(!profileMenu)}><Avatar workspaceIdentity mediaId={settings.identity.avatarMediaId} name={settings.name || "You"} size="small" /></button>
               {profileMenu && <div className="unified-profile-dropdown">
-                <strong>{settings.name || "Your workspace"}</strong><small>{workspace === "demo" ? "Demo workspace" : "Saved on this device"}</small>
+                <strong>{settings.name || __pulseText("Your workspace")}</strong><small>{workspace === "demo" ? __pulseText("Demo workspace") : __pulseText("Saved on this device")}</small>
                 <LanguageSelector compact />
                 <Link to="/settings" onClick={() => setProfileMenu(false)}>{t("settingsBackups")}</Link>
                 <Link to="/customize" onClick={() => setProfileMenu(false)}>{t("personalize")}</Link>
@@ -164,7 +165,7 @@ export function Shell({ children }: { children: ReactNode }) {
             </div>
           </div>
         </header>
-        {areaLinks[area] && <nav className="unified-section-nav" aria-label={`${area} views`}>
+        {areaLinks[area] && <nav className="unified-section-nav" aria-label={__pulseText("{0} views", area === "People" ? t("people") : t("work"))}>
           <div>{areaLinks[area].map(([to, label]) => <Link key={to} to={to} className={path === to || (to === "/network" && (path.startsWith("/network/") || path === "/lists")) ? "active" : ""} aria-current={path === to ? "page" : undefined}>{t(({ "Directory": "directory", "Orbit": "orbit", "Needs attention": "attention", "Pipeline": "pipeline", "Follow-ups & activity": "activity", "Automations": "automations" } as const)[label as "Directory" | "Orbit" | "Needs attention" | "Pipeline" | "Follow-ups & activity" | "Automations"])}</Link>)}</div>
         </nav>}
         <OfflineStatus />
@@ -174,25 +175,24 @@ export function Shell({ children }: { children: ReactNode }) {
         <footer className="app-footer">
           <span>
             <AudioLines size={14} />
-            Every relationship has a story.
-          </span>
-          <span>Made for meaningful connections.</span>
+            {__pulseText("Every relationship has a story.")}</span>
+          <span>{__pulseText("Made for meaningful connections.")}</span>
         </footer>
       </div>
-      <nav className="bottom-nav unified-bottom-nav" aria-label="Mobile navigation">
+      <nav className="bottom-nav unified-bottom-nav" aria-label={__pulseText("Mobile navigation")}>
         {mainAreas.map(({ to, label, icon: Icon }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}><Icon size={21} /><span>{t(label.toLowerCase() as "today" | "people" | "work" | "insights")}</span></Link>)}
       </nav>
       <button
         className="floating-add"
-        aria-label="Create a new record"
+        aria-label={__pulseText("Create a new record")}
         aria-haspopup="dialog"
         onClick={() => setAdd(true)}
       >
         <Plus size={23} />
       </button>
       {add && (
-        <Modal title="Make a new connection" onClose={() => setAdd(false)}>
-          <p className="muted">Every great relationship starts somewhere.</p>
+        <Modal title={__pulseText("Make a new connection")} onClose={() => setAdd(false)}>
+          <p className="muted">{__pulseText("Every great relationship starts somewhere.")}</p>
           <div className="add-options">
             {[
               {
@@ -239,32 +239,27 @@ export function Shell({ children }: { children: ReactNode }) {
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}
       {alerts && (
-        <Modal title="Your in-app alerts" onClose={() => setAlerts(false)}>
+        <Modal title={__pulseText("Your in-app alerts")} onClose={() => setAlerts(false)}>
           <p className="muted">
-            Checked while PULSE is open. Your notification preferences apply
-            here.
-          </p>
+            {__pulseText("Checked while PULSE is open. Your notification preferences apply here.")}</p>
           {count ? (
             <div className="alert-summary">
               <Bell />
-              <h3>A little attention goes a long way</h3>
+              <h3>{__pulseText("A little attention goes a long way")}</h3>
               <p>
-                {overdueCount} overdue tasks · {upcomingCount} follow-ups in the
-                next 24 hours · {reconnectionCount} relationship/deal reviews
-              </p>
+                {overdueCount} {" " + __pulseText("overdue tasks ·") + " "}{upcomingCount} {" " + __pulseText("follow-ups in the next 24 hours ·") + " "}{reconnectionCount} {" " + __pulseText("relationship/deal reviews")}</p>
               <Link
                 className="button primary"
                 to="/activity"
                 onClick={() => setAlerts(false)}
               >
-                Review tasks
-              </Link>
+                {__pulseText("Review tasks")}</Link>
             </div>
           ) : (
             <div className="empty">
               <Bell />
-              <h3>You're all caught up</h3>
-              <p>No overdue task alerts are enabled or due.</p>
+              <h3>{__pulseText("You're all caught up")}</h3>
+              <p>{__pulseText("No overdue task alerts are enabled or due.")}</p>
             </div>
           )}
           <Link
@@ -272,7 +267,7 @@ export function Shell({ children }: { children: ReactNode }) {
             to="/settings"
             onClick={() => setAlerts(false)}
           >
-            Manage alert preferences <ArrowUpRight size={16} />
+            {__pulseText("Manage alert preferences") + " "}<ArrowUpRight size={16} />
           </Link>
         </Modal>
       )}

@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useEffect, useRef } from "react";
 import type { OrbitNode, OrbitEdge } from "../services/orbit";
 import { usePulse } from "../app/context";
@@ -16,6 +17,7 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
   pan: { x: number; y: number }; turn: number; reset: number;
   onSelect: (node: OrbitNode) => void; onUnavailable: () => void;
 }) {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const host = useRef<HTMLDivElement>(null);
   const markerRefs = useRef(new Map<string, HTMLButtonElement>());
@@ -161,7 +163,7 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
   useEffect(() => { if (reset) controls.current?.reset(); }, [reset]);
   return <div className="orbit-world" ref={host}>
     <svg className="orbit-marker-leaders" aria-hidden="true">{nodes.map((node) => <line key={node.id} ref={(element) => { if (element) leaderRefs.current.set(node.id, element); else leaderRefs.current.delete(node.id); }} />)}</svg>
-    <div className="orbit-dom-nodes" role="group" aria-label="3D relationship nodes">
+    <div className="orbit-dom-nodes" role="group" aria-label={__pulseText("3D relationship nodes")}>
       {nodes.map((node) => <button key={node.id} ref={(element) => { if (element) markerRefs.current.set(node.id, element); else markerRefs.current.delete(node.id); }} className={`orbit-3d-node ${node.kind}${node.id === selected ? " selected" : ""}`} aria-pressed={node.id === selected} title={node.label} onClick={() => onSelect(node)}>
         <Avatar name={node.label} mediaId={node.mediaId} company={node.kind === "company"} ariaHidden={false} />{" "}
         <span className="orbit-3d-label">{node.label}</span><span className="sr-only"> {node.kind === "person" ? t("person") : node.kind === "company" ? t("company") : t("opportunity")}</span>

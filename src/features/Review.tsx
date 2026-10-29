@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { FocusButton } from "../components/focus";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -12,6 +13,7 @@ import {
 } from "../data/repository";
 import type { Recommendation } from "../services/recommendations";
 export function Review() {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     { date } = useFormat(),
     [params, setParams] = useSearchParams();
@@ -88,21 +90,18 @@ export function Review() {
     <div className="page review-page">
       <div className="page-heading editorial-masthead insight-masthead">
         <div>
-          <p className="eyebrow">A LITTLE INTENTION, EVERY DAY</p>
+          <p className="eyebrow">{__pulseText("A LITTLE INTENTION, EVERY DAY")}</p>
           <h1>
-            Relationships to review<span className="accent">.</span>
+            {__pulseText("Relationships to review")}<span className="accent">.</span>
           </h1>
           <p className="subtitle">
-            Who needs attention, why, and a thoughtful next step. Based on your
-            saved records.
-          </p>
+            {__pulseText("Who needs attention, why, and a thoughtful next step. Based on your saved records.")}</p>
         </div>
         <Link className="button secondary" to="/lists">
-          Smart Lists
-        </Link>
+          {__pulseText("Smart Lists")}</Link>
       </div>
       <div className="review-toolbar">
-        <div className="review-tabs" aria-label="Review categories">
+        <div className="review-tabs" aria-label={__pulseText("Review categories")}>
           {[
             "For You",
             "Overdue",
@@ -127,23 +126,19 @@ export function Review() {
           ))}
         </div>
         <label className="field">
-          <span>Sort reviews</span>
+          <span>{__pulseText("Sort reviews")}</span>
           <select value={sort} onChange={(e) => setSort(e.target.value)}>
-            <option value="urgency">Highest urgency</option>
-            <option value="priority">Contact priority</option>
-            <option value="oldest">Oldest outstanding action</option>
-            <option value="changed">Recently changed</option>
+            <option value="urgency">{__pulseText("Highest urgency")}</option>
+            <option value="priority">{__pulseText("Contact priority")}</option>
+            <option value="oldest">{__pulseText("Oldest outstanding action")}</option>
+            <option value="changed">{__pulseText("Recently changed")}</option>
           </select>
         </label>
       </div>
       <Link className="button secondary" to="/focus">
-        My Focus
-      </Link>
+        {__pulseText("My Focus")}</Link>
       <p className="review-queue-label">
-        {rows.length} {view.toLowerCase()} reviews · Snooze defers a suggestion.
-        Dismiss hides unchanged evidence. Neither changes a task, availability
-        or permission.
-      </p>
+        {rows.length} {view.toLowerCase()} {" " + __pulseText("reviews · Snooze defers a suggestion. Dismiss hides unchanged evidence. Neither changes a task, availability or permission.")}</p>
       <div className="review-grid">
         {rows.slice(0, limit).map((r) => {
           const c = p.contacts.find((c) => c.id === r.contactId),
@@ -162,7 +157,7 @@ export function Review() {
                   <p className="muted">
                     {org?.name ||
                       (c
-                        ? "Independent"
+                        ? __pulseText("Independent")
                         : p.pipelineStages.find((s) => s.id === o?.stageId)
                             ?.name)}
                     {c ? ` · ${c.stage} · ${c.priority}` : ""}
@@ -175,12 +170,12 @@ export function Review() {
                 {r.category}
               </Badge>
               <div className="review-evidence">
-                <span className="eyebrow">WHY THIS IS HERE</span>
+                <span className="eyebrow">{__pulseText("WHY THIS IS HERE")}</span>
                 <p className="review-reason">{r.reason}</p>
               </div>
               {r.action?.until && (
                 <p className="muted">
-                  Snoozed until{" "}
+                  {__pulseText("Snoozed until")}{" "}
                   {date(r.action.until, {
                     month: "short",
                     day: "numeric",
@@ -200,8 +195,7 @@ export function Review() {
                           (params.size ? "?" + params.toString() : ""),
                       }}
                     >
-                      Open profile
-                    </Link>
+                      {__pulseText("Open profile")}</Link>
                     {!r.blocked && (
                       <>
                         <button
@@ -220,8 +214,8 @@ export function Review() {
                           }
                         >
                           {r.taskId
-                            ? "Reschedule follow-up"
-                            : "Schedule follow-up"}
+                            ? __pulseText("Reschedule follow-up")
+                            : __pulseText("Schedule follow-up")}
                         </button>
                       </>
                     )}
@@ -234,12 +228,11 @@ export function Review() {
                       setEditor({ kind: "opportunity", record: o })
                     }
                   >
-                    Review opportunity
-                  </button>
+                    {__pulseText("Review opportunity")}</button>
                 )}
               </div>
               <details className="review-secondary">
-                <summary>More review actions</summary>
+                <summary>{__pulseText("More review actions")}</summary>
                 <div className="record-actions">
                   {c && <FocusButton type="contact" id={c.id} />}
                   {o && <FocusButton type="opportunity" id={o.id} />}
@@ -250,8 +243,7 @@ export function Review() {
                         setEditor({ kind: "interaction", contact: c })
                       }
                     >
-                      Log interaction
-                    </button>
+                      {__pulseText("Log interaction")}</button>
                   )}
                   {!r.blocked &&
                     (r.action ? (
@@ -264,8 +256,7 @@ export function Review() {
                           )
                         }
                       >
-                        Unsnooze
-                      </button>
+                        {__pulseText("Unsnooze")}</button>
                     ) : (
                       <>
                         <button
@@ -275,14 +266,12 @@ export function Review() {
                             setDays(String(p.settings.intelligence.snoozeDays));
                           }}
                         >
-                          Snooze
-                        </button>
+                          {__pulseText("Snooze")}</button>
                         <button
                           className="button ghost"
                           onClick={() => dismiss(r)}
                         >
-                          Dismiss
-                        </button>
+                          {__pulseText("Dismiss")}</button>
                       </>
                     ))}
                 </div>
@@ -293,8 +282,8 @@ export function Review() {
       </div>
       {!rows.length && (
         <Empty
-          title="Room to breathe"
-          body="No reviews match this view. You may be caught up, have deferred suggestions, or have recommendations disabled in Settings."
+          title={__pulseText("Room to breathe")}
+          body={__pulseText("No reviews match this view. You may be caught up, have deferred suggestions, or have recommendations disabled in Settings.")}
         />
       )}
       {rows.length > limit && (
@@ -302,15 +291,14 @@ export function Review() {
           className="button secondary"
           onClick={() => setLimit(limit + 20)}
         >
-          Show more reviews
-        </button>
+          {__pulseText("Show more reviews")}</button>
       )}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}
       {snooze && (
         <RecordForm
-          title="Snooze recommendation"
+          title={__pulseText("Snooze recommendation")}
           onClose={() => setSnooze(null)}
           onSave={(d) => {
             const until =
@@ -329,24 +317,21 @@ export function Review() {
           }}
         >
           <p className="wide field-help">
-            This defers only this recommendation. The underlying task and
-            communication restrictions remain unchanged. Dates use device time.
-          </p>
-          <Field label="Snooze for" wide>
+            {__pulseText("This defers only this recommendation. The underlying task and communication restrictions remain unchanged. Dates use device time.")}</p>
+          <Field label={__pulseText("Snooze for")} wide>
             <select value={days} onChange={(e) => setDays(e.target.value)}>
-              <option value="1">Tomorrow</option>
-              <option value="3">In 3 days</option>
-              <option value="7">Next week</option>
+              <option value="1">{__pulseText("Tomorrow")}</option>
+              <option value="3">{__pulseText("In 3 days")}</option>
+              <option value="7">{__pulseText("Next week")}</option>
               {![1, 3, 7].includes(p.settings.intelligence.snoozeDays) && (
                 <option value={p.settings.intelligence.snoozeDays}>
-                  Default · {p.settings.intelligence.snoozeDays} days
-                </option>
+                  {__pulseText("Default ·") + " "}{p.settings.intelligence.snoozeDays} {" " + __pulseText("days")}</option>
               )}
-              <option value="custom">Custom date</option>
+              <option value="custom">{__pulseText("Custom date")}</option>
             </select>
           </Field>
           {days === "custom" && (
-            <Field label="Snooze until" wide>
+            <Field label={__pulseText("Snooze until")} wide>
               <input
                 name="until"
                 type="datetime-local"

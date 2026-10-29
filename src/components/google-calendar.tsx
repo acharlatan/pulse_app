@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useEffect, useRef, useState } from "react";
 import { usePulse } from "../app/context";
 import {
@@ -20,6 +21,7 @@ export function GoogleCalendar({
   id: string;
   form: React.RefObject<HTMLFormElement | null>;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse();
   const [description, setDescription] = useState(""),
     [error, setError] = useState(""),
@@ -78,7 +80,7 @@ export function GoogleCalendar({
   return (
     <div>
       <label className="field">
-        <span>Google event description (optional)</span>
+        <span>{__pulseText("Google event description (optional)")}</span>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -86,35 +88,27 @@ export function GoogleCalendar({
         />
       </label>
       <p className="muted">
-        Only the title, time and description above are shared after you choose
-        Add to Google Calendar. Uses your primary calendar; no invitations or
-        synchronization. Dates use device time.
-      </p>
+        {__pulseText("Only the title, time and description above are shared after you choose Add to Google Calendar. Uses your primary calendar; no invitations or synchronization. Dates use device time.")}</p>
       <p className="muted">
-        Google’s permission also allows viewing, editing and deleting events on
-        calendars you own. PULSE uses it only to create the reviewed event and
-        check for an existing event when needed.
-      </p>
+        {__pulseText("Google’s permission also allows viewing, editing and deleting events on calendars you own. PULSE uses it only to create the reviewed event and check for an existing event when needed.")}</p>
       {p.workspace !== "personal" && (
-        <p>Google is available in your personal workspace.</p>
+        <p>{__pulseText("Google is available in your personal workspace.")}</p>
       )}
       {!configuredGoogleClient() && (
-        <p>Google Cloud OAuth setup is required to connect.</p>
+        <p>{__pulseText("Google Cloud OAuth setup is required to connect.")}</p>
       )}
       {error && (
         <p role="alert">
-          {error} If the outcome is uncertain, retrying uses the same event ID.
-        </p>
+          {__pulseText(error)} {" " + __pulseText("If the outcome is uncertain, retrying uses the same event ID.")}</p>
       )}
       {result && (
         <p role="status">
           {result.existing
-            ? "An event for this record already exists."
-            : "Event created."}{" "}
+            ? __pulseText("An event for this record already exists.")
+            : __pulseText("Event created.")}{" "}
           {result.htmlLink && (
             <a href={result.htmlLink} target="_blank" rel="noopener noreferrer">
-              Open in Google Calendar
-            </a>
+              {__pulseText("Open in Google Calendar")}</a>
           )}
         </p>
       )}
@@ -127,8 +121,7 @@ export function GoogleCalendar({
             setResult(null);
           }}
         >
-          Create another event
-        </button>
+          {__pulseText("Create another event")}</button>
       )}
       <button
         type="button"
@@ -141,7 +134,7 @@ export function GoogleCalendar({
         }
         onClick={() => void create()}
       >
-        {busy ? "Working…" : "Add to Google Calendar"}
+        {busy ? __pulseText("Working…") : __pulseText("Add to Google Calendar")}
       </button>
     </div>
   );

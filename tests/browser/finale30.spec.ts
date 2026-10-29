@@ -76,7 +76,7 @@ test("language choices update core labels and persist independently by workspace
   await expect(dialog).toHaveCount(0);
   await page.getByLabel("Buscar en la red").fill("Contacto de prueba");
   await expect(page.locator("#directory-results")).toContainText("Contacto de prueba");
-  await page.getByRole("navigation", { name: "People views" }).getByRole("link", { name: "Órbita", exact: true }).click();
+  await page.locator(".unified-section-nav").getByRole("link", { name: "Órbita", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Órbita de relaciones.", exact: true })).toBeVisible();
   await page.locator(".workspace-switcher summary").click();
   await page.getByRole("button", { name: "Abrir espacio personal" }).click();

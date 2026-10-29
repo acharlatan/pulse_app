@@ -1,8 +1,10 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { EditorModal, type Editor } from "./forms";
 export function GettingStarted({ always = false }: { always?: boolean }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse();
   const [editor, setEditor] = useState<Editor | null>(null);
   if (p.workspace !== "personal" || (!always && p.settings.onboarding.hidden))
@@ -68,28 +70,21 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
   ];
   const next = guidedSteps.find((step) => !step.done);
   return (
-    <section className="surface getting-started" aria-label="Getting started">
-      <p className="eyebrow">YOUR WORKSPACE, YOUR PACE</p>
-      <h2>Your next connection starts here.</h2>
+    <section className="surface getting-started" aria-label={__pulseText("Getting started")}>
+      <p className="eyebrow">{__pulseText("YOUR WORKSPACE, YOUR PACE")}</p>
+      <h2>{__pulseText("Your next connection starts here.")}</h2>
       <p>
-        Keep people, conversations and commitments together. Start anywhere;
-        these steps are optional.
-      </p>
+        {__pulseText("Keep people, conversations and commitments together. Start anywhere; these steps are optional.")}</p>
       <p className="muted">
-        Records stay in this browser. There is no automatic cloud backup or
-        cross-device sync. Export important work and keep the file somewhere you
-        trust.
-      </p>
+        {__pulseText("Records stay in this browser. There is no automatic cloud backup or cross-device sync. Export important work and keep the file somewhere you trust.")}</p>
       {(always || next) && (
         <div className="first-week-guide">
-          <p className="eyebrow">YOUR FIRST WEEK · START SMALL</p>
-          <h3>Make PULSE useful for your work.</h3>
+          <p className="eyebrow">{__pulseText("YOUR FIRST WEEK · START SMALL")}</p>
+          <h3>{__pulseText("Make PULSE useful for your work.")}</h3>
           <p>
-            Choose an intention, bring in a few people, and save one next step.
-            This guide is optional and you can change your intention anytime.
-          </p>
+            {__pulseText("Choose an intention, bring in a few people, and save one next step. This guide is optional and you can change your intention anytime.")}</p>
           <label className="field">
-            <span>What would you like to focus on?</span>
+            <span>{__pulseText("What would you like to focus on?")}</span>
             <select
               value={intention}
               onChange={(e) =>
@@ -105,47 +100,47 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
                 )
               }
             >
-              <option value="">Choose an intention (optional)</option>
-              <option value="clients">Manage clients</option>
-              <option value="partnerships">Build partnerships</option>
-              <option value="opportunities">Move opportunities forward</option>
+              <option value="">{__pulseText("Choose an intention (optional)")}</option>
+              <option value="clients">{__pulseText("Manage clients")}</option>
+              <option value="partnerships">{__pulseText("Build partnerships")}</option>
+              <option value="opportunities">{__pulseText("Move opportunities forward")}</option>
             </select>
           </label>
           {intention && (
             <p className="first-week-intention">
               {intention === "clients"
-                ? "Keep client conversations and commitments together."
+                ? __pulseText("Keep client conversations and commitments together.")
                 : intention === "partnerships"
-                  ? "Make space for thoughtful partnership follow-ups."
-                  : "Keep opportunities and their next steps visible."}
+                  ? __pulseText("Make space for thoughtful partnership follow-ups.")
+                  : __pulseText("Keep opportunities and their next steps visible.")}
             </p>
           )}
           <ol>
             {guidedSteps.map((step) => (
-              <li key={step.label}>
+              <li key={__pulseText(step.label)}>
                 <span
-                  aria-label={step.done ? "Completed" : "Not yet completed"}
+                  aria-label={step.done ? __pulseText("Completed") : __pulseText("Not yet completed")}
                 >
                   {step.done ? "✓" : "○"}
                 </span>
-                <strong>{step.label}</strong>
+                <strong>{__pulseText(step.label)}</strong>
               </li>
             ))}
           </ol>
           {next ? (
             <div className="first-week-next">
-              <strong>Next: {next.label}</strong>
-              <p>{next.description}</p>
+              <strong>{__pulseText("Next:") + " "}{__pulseText(next.label)}</strong>
+              <p>{__pulseText(next.description)}</p>
               {next.kind ? (
                 <button
                   className="button secondary"
                   onClick={() => setEditor({ kind: next.kind })}
                 >
-                  {next.action}
+                  {__pulseText(next.action)}
                 </button>
               ) : (
                 <Link className="button secondary" to={next.to!}>
-                  {next.action}
+                  {__pulseText(next.action)}
                 </Link>
               )}{" "}
               {next.label === "Build your starting network" && (
@@ -153,31 +148,25 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
                   className="button ghost"
                   onClick={() => setEditor({ kind: "contact" })}
                 >
-                  Add one person
-                </button>
+                  {__pulseText("Add one person")}</button>
               )}
             </div>
           ) : (
             <div className="first-week-next">
-              <strong>Your first foundations are in place.</strong>
+              <strong>{__pulseText("Your first foundations are in place.")}</strong>
               <p>
-                Return to Daily Pulse for your next steps, or hide this guide
-                whenever you’re ready.
-              </p>
+                {__pulseText("Return to Daily Pulse for your next steps, or hide this guide whenever you’re ready.")}</p>
               <Link className="button secondary" to="/">
-                Open Daily Pulse
-              </Link>
+                {__pulseText("Open Daily Pulse")}</Link>
             </div>
           )}
         </div>
       )}
       <p className="getting-started-progress">
-        {steps.filter((step) => step.done).length} of {steps.length} foundations
-        in place · optional, at your pace
-      </p>
+        {steps.filter((step) => step.done).length} {" " + __pulseText("of") + " "}{steps.length} {" " + __pulseText("foundations in place · optional, at your pace")}</p>
       {!always && steps.find((step) => !step.done) && (
         <div className="getting-started-next">
-          <span className="eyebrow">YOUR NEXT FOUNDATION</span>
+          <span className="eyebrow">{__pulseText("YOUR NEXT FOUNDATION")}</span>
           {(() => {
             const step = steps.find((step) => !step.done)!;
             return step.kind ? (
@@ -185,11 +174,11 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
                 className="button primary"
                 onClick={() => setEditor({ kind: step.kind })}
               >
-                {step.label}
+                {__pulseText(step.label)}
               </button>
             ) : (
               <Link className="button primary" to={step.to!}>
-                {step.label}
+                {__pulseText(step.label)}
               </Link>
             );
           })()}
@@ -198,8 +187,8 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
       {always ? (
         <ul>
           {steps.map((step) => (
-            <li key={step.label}>
-              <span aria-label={step.done ? "Completed" : "Not yet completed"}>
+            <li key={__pulseText(step.label)}>
+              <span aria-label={step.done ? __pulseText("Completed") : __pulseText("Not yet completed")}>
                 {step.done ? "✓" : "○"}
               </span>{" "}
               {step.kind ? (
@@ -207,11 +196,11 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
                   className="text-link"
                   onClick={() => setEditor({ kind: step.kind })}
                 >
-                  {step.label}
+                  {__pulseText(step.label)}
                 </button>
               ) : (
                 <Link className="text-link" to={step.to!}>
-                  {step.label}
+                  {__pulseText(step.label)}
                 </Link>
               )}
             </li>
@@ -219,12 +208,12 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
         </ul>
       ) : (
         <details className="getting-started-steps">
-          <summary>Explore all setup steps</summary>{" "}
+          <summary>{__pulseText("Explore all setup steps")}</summary>{" "}
           <ul>
             {steps.map((step) => (
-              <li key={step.label}>
+              <li key={__pulseText(step.label)}>
                 <span
-                  aria-label={step.done ? "Completed" : "Not yet completed"}
+                  aria-label={step.done ? __pulseText("Completed") : __pulseText("Not yet completed")}
                 >
                   {step.done ? "✓" : "○"}
                 </span>{" "}
@@ -233,11 +222,11 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
                     className="text-link"
                     onClick={() => setEditor({ kind: step.kind })}
                   >
-                    {step.label}
+                    {__pulseText(step.label)}
                   </button>
                 ) : (
                   <Link className="text-link" to={step.to!}>
-                    {step.label}
+                    {__pulseText(step.label)}
                   </Link>
                 )}
               </li>
@@ -246,16 +235,12 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
         </details>
       )}
       <p className="field-help">
-        Steps reflect current saved records. A requested download does not prove
-        the file was retained. These steps earn no XP.
-      </p>
+        {__pulseText("Steps reflect current saved records. A requested download does not prove the file was retained. These steps earn no XP.")}</p>
       <div className="profile-actions">
         <Link className="button primary" to="/import">
-          Import contacts from CSV
-        </Link>
+          {__pulseText("Import contacts from CSV")}</Link>
         <Link className="button secondary" to="/help">
-          How PULSE works
-        </Link>
+          {__pulseText("How PULSE works")}</Link>
         <button
           className="button ghost"
           onClick={() =>
@@ -272,8 +257,8 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
           }
         >
           {p.settings.onboarding.hidden
-            ? "Show guide on Home"
-            : "Hide guide on Home"}
+            ? __pulseText("Show guide on Home")
+            : __pulseText("Hide guide on Home")}
         </button>
       </div>
       {editor && (

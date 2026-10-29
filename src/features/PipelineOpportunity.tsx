@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, CalendarClock } from "lucide-react";
 import { usePulse } from "../app/context";
@@ -14,6 +15,7 @@ export function PipelineOpportunity({
   opportunity: Opportunity;
   onEdit: (e: Editor) => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     { date, money } = useFormat();
   const org = p.organizations.find((v) => v.id === o.organizationId);
@@ -44,7 +46,7 @@ export function PipelineOpportunity({
                 : "purple"
           }
         >
-          {stage?.name || "Stage"} · {o.status}
+          {stage?.name || __pulseText("Stage")} · {o.status}
         </Badge>
         <ArrowUpRight size={17} aria-hidden="true" />
       </div>
@@ -63,12 +65,12 @@ export function PipelineOpportunity({
         </Link>
       )}
       <strong className="deal-value">
-        {o.value === null ? "Value not set" : money(o.value, o.currency)}
+        {o.value === null ? __pulseText("Value not set") : money(o.value, o.currency)}
       </strong>
       {o.expectedCloseAt && (
         <p className="board-close">
           <CalendarClock size={15} />
-          Expected {date(o.expectedCloseAt)}
+          {__pulseText("Expected") + " "}{date(o.expectedCloseAt)}
         </p>
       )}
       {people.length > 0 && (
@@ -80,13 +82,13 @@ export function PipelineOpportunity({
             </Link>
           ))}
           {people.length > 2 && (
-            <span>+{people.length - 2} more in details</span>
+            <span>+{people.length - 2} {" " + __pulseText("more in details")}</span>
           )}
         </div>
       )}
       {o.status === "open" && (
         <div className="board-next">
-          <p className="eyebrow">RELATED FOLLOW-UP</p>
+          <p className="eyebrow">{__pulseText("RELATED FOLLOW-UP")}</p>
           {next ? (
             <>
               <button onClick={() => onEdit({ kind: "task", record: next })}>
@@ -102,23 +104,21 @@ export function PipelineOpportunity({
                 {taskState(next, p.settings.timezone)} · {date(next.dueAt)}
               </small>
               <small>
-                Via{" "}
+                {__pulseText("Via")}{" "}
                 {next.organizationId === o.organizationId && o.organizationId
-                  ? "company"
-                  : "representative"}{" "}
-                · may support other work
-              </small>
+                  ? __pulseText("company")
+                  : __pulseText("representative")}{" "}
+                {__pulseText("· may support other work")}</small>
             </>
           ) : (
             <p className="muted">
-              No open follow-up for this company or its representatives.
-            </p>
+              {__pulseText("No open follow-up for this company or its representatives.")}</p>
           )}
         </div>
       )}
       <details className="board-card-tools">
         <summary>
-          Details & tools{insight?.flags.length ? " · review needed" : ""}
+          {__pulseText("Details & tools")}{insight?.flags.length ? __pulseText(" · review needed") : ""}
         </summary>
         <div>
           <FocusButton type="opportunity" id={o.id} />
@@ -139,14 +139,12 @@ export function PipelineOpportunity({
             className="button ghost"
             to={`/assistant?scope=opportunity&id=${encodeURIComponent(o.id)}`}
           >
-            Catch Me Up
-          </Link>
+            {__pulseText("Catch Me Up")}</Link>
           <button
             className="button secondary"
             onClick={() => onEdit({ kind: "opportunity", record: o })}
           >
-            View / edit opportunity
-          </button>
+            {__pulseText("View / edit opportunity")}</button>
         </div>
       </details>
     </article>
