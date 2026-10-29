@@ -9,11 +9,8 @@ test("demo portraits, example priorities, navigation and themes", async ({page},
   const avatar = page.locator(".daily-inspector .avatar").first();
   await expect(avatar).toHaveCSS("background-image", /demo-portraits/);
   if (info.project.name === "desktop") {
-    await expect(page.getByRole("button", {name:"Show navigation"})).toBeVisible();
-    await page.getByRole("button", {name:"Show navigation"}).click();
-    await expect(page.getByRole("navigation", {name:"Main navigation"})).toBeVisible();
-    await page.getByRole("button", {name:"Hide navigation"}).click();
-    await expect(page.getByRole("navigation", {name:"Main navigation"})).toBeHidden();
+    await expect(page.getByRole("navigation", {name:"Main areas"}).getByRole("link")).toHaveCount(4);
+    await expect(page.locator(".sidebar")).toHaveCount(0);
   }
   await page.goto("/#/focus");
   await page.getByRole("button", {name:"Add example priorities"}).click();

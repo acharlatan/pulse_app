@@ -236,13 +236,8 @@ test("the experience fits key widths and both themes, with usable media controls
       }
   }
   await page.setViewportSize({ width: 320, height: 800 });
-  await page
-    .getByRole("button", { name: "More destinations", exact: true })
-    .click();
-  await page
-    .getByRole("dialog")
-    .getByRole("link", { name: "Relationship Orbit" })
-    .click();
+  await page.getByRole("navigation", { name: "Mobile navigation" }).getByRole("link", { name: "People" }).click();
+  await page.getByRole("navigation", { name: "People views" }).getByRole("link", { name: "Orbit", exact: true }).click();
   await page.getByRole("heading", { name: "Relationship Orbit." }).waitFor();
   await page.goto("/#/network/people/contact-0");
   await page.getByRole("button", { name: "Photo & cover" }).click();

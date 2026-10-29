@@ -131,6 +131,7 @@ test("Orbit explains company context and keeps map/list/profile journeys working
     .getByRole("link", { name: "View in Relationship Orbit", exact: true })
     .click();
   await page.getByRole("button", { name: "Map", exact: true }).click();
+  await page.getByRole("button", { name: "2D map" }).click();
   await page.locator(".orbit-node.company").filter({hasText: "Forma Studio"}).click();
   await expect(page.locator(".orbit-active-edge")).not.toHaveCount(0);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

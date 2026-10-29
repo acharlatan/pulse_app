@@ -1,4 +1,5 @@
 import { NetworkContext } from "./NetworkContext";
+import { SmartLists } from "./SmartLists";
 import { useFormat } from "../components/ui";
 import { taskState } from "../services/recommendations";
 import { BulkTags } from "../components/bulk-tags";
@@ -47,6 +48,7 @@ export function Network() {
   const [stage, setStage] = useState(params.get("stage") || "");
   const [sort, setSort] = useState(params.get("sort") || "name");
   const [filters, setFilters] = useState(false);
+  const [showLists, setShowLists] = useState(false);
   const [display, setDisplay] = useState("cards");
   const [editor, setEditor] = useState<Editor | null>(null);
   useEffect(() => {
@@ -304,14 +306,7 @@ export function Network() {
             ))}
           </div>
         )}
-        <div className="tabs directory-display" aria-label="Directory presentation">
-          <button aria-pressed={display === "cards"} onClick={() => setDisplay("cards")}>Cards</button>
-          <button aria-pressed={display === "list"} onClick={() => setDisplay("list")}>Compact list</button>
-        </div>
-        <details className="network-tools">
-          <summary>Directory tools</summary>
-          <div className="network-tools-content">
-            <label className="field">
+        <div className="directory-saved-list">            <label className="field">
               <span>Smart List</span>
               <select value={smart} onChange={(e) => setSmart(e.target.value)}>
                 {(tab === "people"
@@ -335,26 +330,26 @@ export function Network() {
                   ))}
               </select>
             </label>
+<button className="button secondary" aria-expanded={showLists} aria-controls="network-saved-lists" onClick={() => setShowLists(!showLists)}>Manage lists</button></div>
+        <div className="tabs directory-display" aria-label="Directory presentation">
+          <button aria-pressed={display === "cards"} onClick={() => setDisplay("cards")}>Cards</button>
+          <button aria-pressed={display === "list"} onClick={() => setDisplay("list")}>Compact list</button>
+        </div>
+        <details className="network-tools">
+          <summary>Directory tools</summary>
+          <div className="network-tools-content">
             <BulkTags
               type={tab === "people" ? "contact" : "organization"}
               records={tab === "people" ? people : companies}
             />
 
-            <Link className="button ghost" to="/orbit">
-              Relationship Orbit
-            </Link>
-            <Link className="button ghost" to="/review">
-              Relationship Review
-            </Link>
-            <Link className="button ghost" to="/lists">
-              Manage Smart Lists
-            </Link>
             <Link className="button ghost" to="/import">
               Import contacts
             </Link>
           </div>
         </details>
       </div>
+      {showLists && <section className="network-lists-panel" id="network-saved-lists" aria-label="Manage saved lists"><SmartLists embedded /></section>}
       {filters && tab === "people" && (
         <div className="filter-panel">
           <label>

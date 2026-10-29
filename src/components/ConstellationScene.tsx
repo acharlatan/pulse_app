@@ -1,9 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePulse } from "../app/context";
 
 /** A decorative, local-only scene. Saved relationships remain in the semantic map above it. */
 export function ConstellationScene({ variant }: { variant: "home" | "orbit" }) {
   const host = useRef<HTMLDivElement>(null);
+  const steer = useRef<(direction: number) => void>(() => {});
+  const [ready, setReady] = useState(false);
   const { settings } = usePulse();
 
   useEffect(() => {
@@ -98,13 +100,32 @@ export function ConstellationScene({ variant }: { variant: "home" | "orbit" }) {
         else { cancelAnimationFrame(frame); frame = 0; }
       });
       intersection.observe(element);
+      let drag: { x: number; y: number } | null = null;
+      const down = (event: PointerEvent) => {
+        if (variant !== "home" || (event.target as Element).closest("button, a")) return;
+        drag = { x: event.clientX, y: event.clientY };
+        pointerHost?.setPointerCapture(event.pointerId);
+      };
+      const up = () => { drag = null; };
       const pointer = (event: PointerEvent) => {
+        if (drag) {
+          sculpture.rotation.y += (event.clientX - drag.x) * 0.012;
+          targetY = Math.max(-0.7, Math.min(0.7, targetY + (event.clientY - drag.y) * 0.008));
+          drag = { x: event.clientX, y: event.clientY };
+          render();
+          return;
+        }
         const bounds = element.getBoundingClientRect();
         targetX = ((event.clientX - bounds.left) / Math.max(bounds.width, 1) - 0.5) * 0.25;
         targetY = ((event.clientY - bounds.top) / Math.max(bounds.height, 1) - 0.5) * 0.18;
       };
       const pointerHost = element.parentElement;
       pointerHost?.addEventListener("pointermove", pointer);
+      pointerHost?.addEventListener("pointerdown", down);
+      pointerHost?.addEventListener("pointerup", up);
+      pointerHost?.addEventListener("pointercancel", up);
+      steer.current = (direction) => { sculpture.rotation.y += direction * 0.5; render(); };
+      setReady(true);
       const tick = () => {
         frame = 0;
         if (destroyed || !visible || document.hidden || reduced()) return;
@@ -130,6 +151,10 @@ export function ConstellationScene({ variant }: { variant: "home" | "orbit" }) {
         media.removeEventListener("change", onVisibility);
         intersection.disconnect(); resizeObserver.disconnect();
         pointerHost?.removeEventListener("pointermove", pointer);
+        pointerHost?.removeEventListener("pointerdown", down);
+        pointerHost?.removeEventListener("pointerup", up);
+        pointerHost?.removeEventListener("pointercancel", up);
+        steer.current = () => {};
         scene.traverse((object) => {
           if (object instanceof T.Mesh || object instanceof T.Points) {
             object.geometry.dispose();
@@ -141,5 +166,5 @@ export function ConstellationScene({ variant }: { variant: "home" | "orbit" }) {
     }).catch(() => { /* CSS artwork remains when WebGL cannot initialize. */ });
     return () => { destroyed = true; dispose(); };
   }, [settings.reducedMotion, variant]);
-  return <div className={`constellation-scene constellation-scene-${variant}`} ref={host} aria-hidden="true" />;
+  return <><div className={`constellation-scene constellation-scene-${variant}`} ref={host} aria-hidden="true" />{variant === "home" && ready && <div className="home-scene-controls" aria-label="Rotate the 3D artwork"><span>DRAG TO EXPLORE</span><button aria-label="Rotate artwork left" onClick={() => steer.current(-1)}>↶</button><button aria-label="Rotate artwork right" onClick={() => steer.current(1)}>↷</button></div>}</>;
 }

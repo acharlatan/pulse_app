@@ -9,7 +9,7 @@ import { EditorModal, type Editor } from "../components/forms";
 import { taskState } from "../services/recommendations";
 import { ProgressSummary } from "../components/progress";
 import type { FocusItem } from "../data/expansion-models";
-export function Focus() {
+export function Focus({ embedded = false }: { embedded?: boolean }) {
   const p = usePulse(),
     day = calendarDay(Date.now(), p.settings.timezone);
   const { date, money } = useFormat();
@@ -39,7 +39,7 @@ export function Focus() {
     return rows.find((r) => r.id === f.recordId);
   };
   return (
-    <div className="page focus-page">
+    <div className={embedded ? "focus-page focus-embedded" : "page focus-page"}>
       <div className="page-heading editorial-masthead insight-masthead">
         <div>
           <p className="eyebrow">CHOSEN BY YOU</p>

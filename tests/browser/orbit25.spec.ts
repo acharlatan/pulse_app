@@ -31,6 +31,7 @@ test("demo Michelle, company marks, focus examples and map-first Orbit", async (
   expect((await page.locator(".orbit-viewport").boundingBox())!.y).toBeLessThan(
     (await page.locator(".orbit-browse").boundingBox())!.y,
   );
+  await page.getByRole("button", { name: "2D map" }).click();
   await expect(page.locator(".orbit-node.company svg").first()).toBeVisible();
   await page.getByRole("button", { name: "Explore", exact: true }).click();
   await expect(page.locator(".orbit-viewport")).toBeVisible();

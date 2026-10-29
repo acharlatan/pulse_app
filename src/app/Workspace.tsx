@@ -13,9 +13,6 @@ const Automations = lazy(() =>
 const Orbit = lazy(() =>
   import("../features/Orbit").then((m) => ({ default: m.Orbit })),
 );
-const Focus = lazy(() =>
-  import("../features/Focus").then((m) => ({ default: m.Focus })),
-);
 const Customize = lazy(() =>
   import("../features/Customize").then((m) => ({ default: m.Customize })),
 );
@@ -83,7 +80,7 @@ export function WorkspaceApp({
                 <Route path="/analytics" element={<Analytics />} />
                 <Route path="/automations" element={<Automations />} />
                 <Route path="/orbit" element={<Orbit />} />
-                <Route path="/focus" element={<Focus />} />
+                <Route path="/focus" element={<Home focus />} />
                 <Route path="/customize" element={<Customize />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/help" element={<Help />} />
