@@ -89,6 +89,13 @@ export function AnalyticsBrief({
             <Target size={36} />
           </span>
         </header>
+        <div className="brief-start" role="status">
+          <span>{__pulseText(active.rows.length ? "YOUR SELECTED FOCUS" : "THIS LANE IS CLEAR")}</span>
+          <div>
+            <strong>{__pulseText(active.rows.length ? active.name : "No current items in this lane")}</strong>
+            <p>{__pulseText(active.rows.length ? active.description : "Choose another lane or explore the reports below.")}</p>
+          </div>
+        </div>
         <div className="focus-lanes" aria-label={__pulseText("Focus lanes")}>
           {lanes.map((l, i) => (
             <button

@@ -41,6 +41,7 @@ import { EditorModal, type Editor } from "../components/forms";
 import { deleteContact, deleteOrganization } from "../data/repository";
 import {
   eligible,
+  effectiveAvailability,
   lastInteraction,
   taskState,
 } from "../services/recommendations";
@@ -287,7 +288,7 @@ export function Profile({ company = false }: { company?: boolean }) {
           </details>
         </div>
       </section>
-      <section
+      {!company && <section
         className="profile-perspective connected-profile-perspective"
         aria-label={__pulseText("Relationship perspective")}
       >
@@ -322,7 +323,23 @@ export function Profile({ company = false }: { company?: boolean }) {
             <span>{__pulseText("open opportunities")}</span>
           </div>
         </div>
-      </section>
+      </section>}
+      {company && org && (
+        <section className="company-command surface" aria-label={__pulseText("Company overview")}>
+          <div className="company-command-heading">
+            <div><p className="eyebrow">{__pulseText("THE STORY SO FAR")}</p><h2>{__pulseText("Context for the next move.")}</h2></div>
+            <button className="button secondary" onClick={() => setEditor({ kind: "interaction", organizationId: org.id })}>{__pulseText("Log interaction")}</button>
+          </div>
+          <div className="company-command-grid">
+            <div><span>{__pulseText("Last conversation")}</span><strong>{last ? date(last) : __pulseText("Not recorded")}</strong></div>
+            <div><span>{__pulseText("Next follow-up")}</span>{next ? <button className="text-link" onClick={() => setEditor({kind:"task",record:next})}>{next.title} · {date(next.dueAt)}</button> : <strong>{__pulseText("No open follow-ups.")}</strong>}</div>
+            <div><span>{__pulseText("Open opportunities")}</span><strong>{opportunities.filter(o => o.status === "open").length}</strong></div>
+          </div>
+          <div className="company-command-people">
+            {p.contacts.filter(c => c.organizationId === org.id).slice(0, 6).map(c => <Link key={c.id} to={`/network/people/${c.id}`}><Avatar name={c.name} mediaId={c.avatar} /><span><strong>{c.name}</strong><small>{effectiveAvailability(c, p.restrictions)}</small></span></Link>)}
+          </div>
+        </section>
+      )}
       <div className="profile-quick-links connected-profile-tools">
         <FocusButton
           type={company ? "organization" : "contact"}

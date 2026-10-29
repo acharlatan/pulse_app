@@ -61,6 +61,8 @@ export function EditorModal({
 }) {
   const __pulseText = useInterfaceText();
   const { db } = usePulse();
+  const [continuation, setContinuation] = useState<BasicEditor | null>(null);
+  const currentEditor = continuation || editor;
   const [snapshot, setSnapshot] = useState<Editor | null>(null);
   const [loadError, setLoadError] = useState("");
   useEffect(() => {
@@ -75,12 +77,12 @@ export function EditorModal({
       restriction: db.restrictions,
       permission: db.permissions,
     };
-    const record = editor.record;
+    const record = currentEditor.record;
     if (!record) {
-      setSnapshot(editor);
+      setSnapshot(currentEditor);
       return;
     }
-    void tables[editor.kind]
+    void tables[currentEditor.kind]
       .get(record.id)
       .then((latest) => {
         if (!active) return;
@@ -88,7 +90,7 @@ export function EditorModal({
           setLoadError(
             "This record no longer exists. Close this editor and review the latest workspace.",
           );
-        else setSnapshot({ ...editor, record: latest } as Editor);
+        else setSnapshot({ ...currentEditor, record: latest } as Editor);
       })
       .catch(() => {
         if (active)
@@ -99,7 +101,7 @@ export function EditorModal({
     return () => {
       active = false;
     };
-  }, [db, editor]);
+  }, [db, currentEditor]);
   if (loadError)
     return (
       <Modal title={__pulseText("Record unavailable")} onClose={onClose}>
@@ -118,15 +120,19 @@ export function EditorModal({
     snapshot.kind === "permission"
   )
     return <RecordEditorModal editor={snapshot} onClose={onClose} />;
-  return <BasicEditorModal editor={snapshot} onClose={onClose} />;
+  return <BasicEditorModal key={continuation ? "follow-up" : "initial"} editor={snapshot} onClose={onClose} onContinue={setContinuation} continued={!!continuation} />;
 }
 
 function BasicEditorModal({
   editor,
   onClose,
+  onContinue,
+  continued,
 }: {
   editor: BasicEditor;
   onClose: () => void;
+  onContinue: (editor: BasicEditor) => void;
+  continued: boolean;
 }) {
   const __pulseText = useInterfaceText();
   const t = useTranslation();
@@ -283,7 +289,10 @@ function BasicEditorModal({
       }
       const result = await action();
       await run(async () => result, "Saved to your workspace");
-      onClose();
+      if (editor.kind === "interaction" && !editor.record && form.get("planFollowUp")) {
+        const contact = contacts.find((c) => c.id === str("contactId"));
+        onContinue({ kind: "task", contact, organizationId: str("organizationId") || undefined });
+      } else onClose();
     } catch (err) {
       setError(
         err instanceof Error
@@ -300,6 +309,7 @@ function BasicEditorModal({
       .slice(0, 16);
   return (
     <Modal title={title} onClose={onClose}>
+      {continued && <p className="continuation-notice" role="status">{__pulseText("Interaction saved. You can plan a separate follow-up below; closing this form keeps the interaction saved.")}</p>}
       {deleting ? (
         <>
           <p>
@@ -623,6 +633,7 @@ function BasicEditorModal({
                     placeholder={__pulseText("e.g. Share a proposal next week")}
                   />
                 </Field>
+                {!editor.record && <label className="interaction-followup-choice wide"><input type="checkbox" name="planFollowUp" /><span><strong>{__pulseText("Plan a follow-up after saving")}</strong><small>{__pulseText("Continue with the same person or company. The follow-up is saved separately.")}</small></span></label>}
               </>
             )}
             {editor.kind === "task" && (

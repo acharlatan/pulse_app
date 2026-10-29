@@ -692,10 +692,10 @@ export function Orbit() {
               ))}
               {!related.length && <p className="muted">{__pulseText("None recorded.")}</p>}
               <h3>{__pulseText("Next actions")}</h3>
-              {tasks.slice(0, 5).map((t) => (
-                <p key={t.id}>
-                  {t.title} · {date(t.dueAt)}
-                </p>
+              {tasks.slice().sort((a,b) => a.dueAt.localeCompare(b.dueAt)).slice(0, 5).map((task) => (
+                <button key={task.id} className="orbit-related" onClick={() => setEditor({kind:"task",record:task})}>
+                  <strong>{task.title}</strong><small>{date(task.dueAt)}</small>
+                </button>
               ))}
               {!tasks.length && <p className="muted">{__pulseText("No open follow-ups.")}</p>}
             </>
