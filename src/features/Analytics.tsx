@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n/useTranslation";
 import { AnalyticsBrief } from "./AnalyticsBrief";
 import {
   analyticsDisplayTrend,
@@ -25,6 +26,7 @@ const sections = [
   "Data quality",
 ] as const;
 export function Analytics() {
+  const t = useTranslation();
   const navigationState = useLocation().state as {
     profileReturn?: unknown;
     networkReturn?: unknown;
@@ -182,10 +184,10 @@ export function Analytics() {
         <div>
           <p className="eyebrow">YOUR WORK, IN CONTEXT</p>
           <h1>
-            Analytics<span className="accent">.</span>
+            {t("analytics")}<span className="accent">.</span>
           </h1>
           <p className="subtitle">
-            Less noise. Clear evidence. A useful next move.
+            {t("analyticsIntro")}
           </p>
         </div>
         <div className="form-actions">
@@ -197,7 +199,7 @@ export function Analytics() {
             disabled={!report}
             onClick={exportCsv}
           >
-            Export this report
+            {t("exportReport")}
           </button>
         </div>
       </div>

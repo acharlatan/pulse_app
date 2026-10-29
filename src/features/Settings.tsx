@@ -1,4 +1,6 @@
 import { BrandArt } from "../components/BrandArt";
+import { useTranslation } from "../i18n/useTranslation";
+import { LanguageSelector } from "../components/LanguageSelector";
 import { clearGoogleSession } from "../services/google-session";
 import { clearGoogleImport } from "../services/google-api";
 import { GoogleContacts } from "../components/google-contacts";
@@ -43,6 +45,7 @@ function download(content: string, name: string, type = "application/json") {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export function Settings() {
+  const t = useTranslation();
   const p = usePulse();
   const { date } = useFormat();
   const [params, setParams] = useSearchParams();
@@ -114,7 +117,7 @@ export function Settings() {
         <div>
           <p className="eyebrow">MAKE YOURSELF AT HOME</p>
           <h1>
-            Your space, your rhythm<span className="accent">.</span>
+            {t("settingsTitle")}<span className="accent">.</span>
           </h1>
           <p className="subtitle">
             Small preferences that make PULSE feel more like you.
@@ -213,6 +216,7 @@ export function Settings() {
           )}
           {section === "appearance" && (
             <>
+              <LanguageSelector />
               <SectionHeading
                 title="A look that feels like you"
                 eyebrow="APPEARANCE"
@@ -313,12 +317,7 @@ export function Settings() {
                   ))}
                   <label className="field">
                     <span>Locale</span>
-                    <input
-                      name="locale"
-                      required
-                      defaultValue={p.settings.locale}
-                      placeholder="en-US"
-                    />
+                    <input name="locale" key={p.settings.locale} required defaultValue={p.settings.locale} placeholder="en-US" />
                   </label>
                   <label className="field">
                     <span>Display timezone</span>

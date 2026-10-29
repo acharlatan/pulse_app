@@ -245,3 +245,16 @@ it("roundtrips valid media and rejects dangling covers before changing any table
   expect(await db.media.count()).toBe(2);
   expect((await db.contacts.get("contact-0"))?.avatar).toBe("media-test");
 });
+
+
+it("balances a bounded map while keeping only saved associations", async () => {
+  const data = { contacts: await db.contacts.toArray(), organizations: await db.organizations.toArray(), opportunities: await db.opportunities.toArray() };
+  const graph = deriveOrbit(data, { limit: 18, balance: true });
+  expect(graph.nodes).toHaveLength(18);
+  expect(graph.nodes.filter((node) => node.kind === "person").length).toBeGreaterThanOrEqual(8);
+  expect(graph.nodes.some((node) => node.kind === "company")).toBe(true);
+  expect(graph.nodes.some((node) => node.kind === "opportunity")).toBe(true);
+  const full = deriveOrbit(data, { limit: 60 });
+  expect(graph.edges.every((edge) => full.edges.some((saved) => saved.id === edge.id))).toBe(true);
+  expect(deriveOrbit(data, { limit: 18, balance: true })).toEqual(graph);
+});

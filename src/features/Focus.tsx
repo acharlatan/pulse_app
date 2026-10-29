@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n/useTranslation";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -10,6 +11,7 @@ import { taskState } from "../services/recommendations";
 import { ProgressSummary } from "../components/progress";
 import type { FocusItem } from "../data/expansion-models";
 export function Focus({ embedded = false }: { embedded?: boolean }) {
+  const t = useTranslation();
   const p = usePulse(),
     day = calendarDay(Date.now(), p.settings.timezone);
   const { date, money } = useFormat();
@@ -44,7 +46,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
         <div>
           <p className="eyebrow">CHOSEN BY YOU</p>
           <h1>
-            My Focus<span className="accent">.</span>
+            {t("focus")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
             Keep relationships close. Choose what to move forward today.

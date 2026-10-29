@@ -2,6 +2,8 @@ import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Activity, ArrowUpRight, AudioLines, Bell, Building2, ChevronDown, Home, Plus, Search, Users, Workflow, ChartNoAxesCombined } from "lucide-react";
 import { OfflineStatus } from "../components/OfflineStatus";
+import { LanguageSelector } from "../components/LanguageSelector";
+import { useTranslation } from "../i18n/useTranslation";
 import { usePulse } from "./context";
 import { Avatar, Modal } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
@@ -22,6 +24,7 @@ export function Shell({ children }: { children: ReactNode }) {
     tasks,
     switchWorkspace,
   } = usePulse();
+  const t = useTranslation();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [add, setAdd] = useState(false);
   const [alerts, setAlerts] = useState(false);
@@ -98,21 +101,21 @@ export function Shell({ children }: { children: ReactNode }) {
         <header className="topbar">
           <Link to="/" className="unified-brand"><AudioLines size={23} /> PULSE<span>.</span></Link>
           <nav className="unified-main-nav" aria-label="Main areas">
-            {mainAreas.map(({ to, label }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}>{label}</Link>)}
+            {mainAreas.map(({ to, label }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}>{t(label.toLowerCase() as "today" | "people" | "work" | "insights")}</Link>)}
           </nav>
           <div className="topbar-actions">
             <details className="workspace-switcher">
               <summary
                 data-workspace={workspace}
-                aria-label={`Workspace: ${workspace === "demo" ? "Demo" : "Personal"}. Switch workspace`}
+                aria-label={`${t("switchWorkspace")}: ${workspace === "demo" ? t("demo") : t("personal")}`}
               >
                 <span className="workspace-switcher-text" aria-hidden="true">
-                  {workspace === "demo" ? "Demo" : "Personal"}
+                  {workspace === "demo" ? t("demo") : t("personal")}
                 </span>
                 <ChevronDown size={15} />
               </summary>
               <div className="workspace-switcher-menu">
-                <strong>Switch workspace</strong>
+                <strong>{t("switchWorkspace")}</strong>
                 <p>Demo and Personal have separate records on this device.</p>
                 <button
                   type="button"
@@ -121,7 +124,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     switchWorkspace(workspace === "demo" ? "personal" : "demo")
                   }
                 >
-                  Open {workspace === "demo" ? "Personal" : "Demo"}
+                  {workspace === "demo" ? t("openPersonal") : t("openDemo")}
                 </button>
                 <small>Switching does not delete either workspace.</small>
               </div>
@@ -133,7 +136,7 @@ export function Shell({ children }: { children: ReactNode }) {
             <button
               type="button"
               className="icon-button"
-              aria-label="Search PULSE"
+              aria-label={t("searchApp")}
               aria-haspopup="dialog"
               onClick={() => setSearch(true)}
             >
@@ -141,27 +144,28 @@ export function Shell({ children }: { children: ReactNode }) {
             </button>
             <button
               className="icon-button notification"
-              aria-label="Open in-app alerts"
+              aria-label={t("alerts")}
               onClick={() => setAlerts(true)}
             >
               <Bell size={19} />
               {count > 0 && <i />}
             </button>
             <div className="unified-profile-menu" ref={profileMenuRef}>
-              <button type="button" className="unified-profile-trigger" aria-label="Open workspace menu" aria-expanded={profileMenu} onClick={() => setProfileMenu(!profileMenu)}><Avatar workspaceIdentity mediaId={settings.identity.avatarMediaId} name={settings.name || "You"} size="small" /></button>
+              <button type="button" className="unified-profile-trigger" aria-label={t("workspaceMenu")} aria-expanded={profileMenu} onClick={() => setProfileMenu(!profileMenu)}><Avatar workspaceIdentity mediaId={settings.identity.avatarMediaId} name={settings.name || "You"} size="small" /></button>
               {profileMenu && <div className="unified-profile-dropdown">
                 <strong>{settings.name || "Your workspace"}</strong><small>{workspace === "demo" ? "Demo workspace" : "Saved on this device"}</small>
-                <Link to="/settings" onClick={() => setProfileMenu(false)}>Settings & backups</Link>
-                <Link to="/customize" onClick={() => setProfileMenu(false)}>Personalize PULSE</Link>
-                <Link to="/import" onClick={() => setProfileMenu(false)}>Import contacts</Link>
-                <Link to="/assistant" onClick={() => setProfileMenu(false)}>PULSE Intelligence</Link>
-                <Link to="/help" onClick={() => setProfileMenu(false)}>Help & getting started</Link>
+                <LanguageSelector compact />
+                <Link to="/settings" onClick={() => setProfileMenu(false)}>{t("settingsBackups")}</Link>
+                <Link to="/customize" onClick={() => setProfileMenu(false)}>{t("personalize")}</Link>
+                <Link to="/import" onClick={() => setProfileMenu(false)}>{t("importContacts")}</Link>
+                <Link to="/assistant" onClick={() => setProfileMenu(false)}>{t("intelligence")}</Link>
+                <Link to="/help" onClick={() => setProfileMenu(false)}>{t("help")}</Link>
               </div>}
             </div>
           </div>
         </header>
         {areaLinks[area] && <nav className="unified-section-nav" aria-label={`${area} views`}>
-          <div>{areaLinks[area].map(([to, label]) => <Link key={to} to={to} className={path === to || (to === "/network" && (path.startsWith("/network/") || path === "/lists")) ? "active" : ""} aria-current={path === to ? "page" : undefined}>{label}</Link>)}</div>
+          <div>{areaLinks[area].map(([to, label]) => <Link key={to} to={to} className={path === to || (to === "/network" && (path.startsWith("/network/") || path === "/lists")) ? "active" : ""} aria-current={path === to ? "page" : undefined}>{t(({ "Directory": "directory", "Orbit": "orbit", "Needs attention": "attention", "Pipeline": "pipeline", "Follow-ups & activity": "activity", "Automations": "automations" } as const)[label as "Directory" | "Orbit" | "Needs attention" | "Pipeline" | "Follow-ups & activity" | "Automations"])}</Link>)}</div>
         </nav>}
         <OfflineStatus />
         <main id="main" tabIndex={-1}>
@@ -176,7 +180,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </footer>
       </div>
       <nav className="bottom-nav unified-bottom-nav" aria-label="Mobile navigation">
-        {mainAreas.map(({ to, label, icon: Icon }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}><Icon size={21} /><span>{label}</span></Link>)}
+        {mainAreas.map(({ to, label, icon: Icon }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}><Icon size={21} /><span>{t(label.toLowerCase() as "today" | "people" | "work" | "insights")}</span></Link>)}
       </nav>
       <button
         className="floating-add"

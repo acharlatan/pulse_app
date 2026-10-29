@@ -69,12 +69,14 @@ export function Avatar({
   company = false,
   mediaId,
   workspaceIdentity = false,
+  ariaHidden = true,
 }: {
   name: string;
   size?: string;
   company?: boolean;
   mediaId?: string;
   workspaceIdentity?: boolean;
+  ariaHidden?: boolean;
 }) {
   const p = usePulse();
   const colors = ["lavender", "peach", "sage", "blue", "pink"];
@@ -107,7 +109,7 @@ export function Avatar({
       : null;
   return (
     <span
-      aria-hidden="true"
+      aria-hidden={ariaHidden}
       className={`avatar ${size} ${company ? "company" : ""} ${colors[n % colors.length]}`}
       style={
         demoProfile

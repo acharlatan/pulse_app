@@ -1,0 +1,92 @@
+/* Clear interface layers in the dimensional map: images and text are real UI, not canvas textures. */
+.orbit-world canvas { position: absolute; inset: 0; z-index: 0; }
+.orbit-dom-nodes { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.orbit-3d-node { position: absolute; top: 0; left: 0; pointer-events: auto; visibility: hidden; display: flex; flex-direction: column; align-items: center; gap: 3px; width: 112px; min-height: 68px; color: #fff; cursor: pointer; padding: 0; background: transparent; border: 0; }
+.orbit-3d-node .avatar { width: 44px; height: 44px; flex-shrink: 0; border: 3px solid #dfcaff; box-shadow: 0 3px 16px #06041c99, 0 0 0 4px #a896eb44; font-size: 15px; }
+.orbit-3d-node.company .avatar { border-color: #8cdeea; box-shadow: 0 3px 16px #06041c99, 0 0 0 4px #8cdeea44; }
+.orbit-3d-node.opportunity .avatar { border-color: #f3abd8; box-shadow: 0 3px 16px #06041c99, 0 0 0 4px #f3abd844; }
+.orbit-3d-label { display: block; max-width: 112px; padding: 4px 8px; border: 1px solid #b9aacf; border-radius: 8px; background: #211c38f5; color: #fff; font-size: 13px; line-height: 1.18; font-weight: 750; overflow: hidden; text-overflow: ellipsis; white-space: normal; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; box-shadow: 0 3px 12px #09051b80; }
+.orbit-3d-node:hover .avatar, .orbit-3d-node.selected .avatar { box-shadow: 0 0 0 5px #ddffa5, 0 6px 22px #000a; }
+.orbit-3d-node:focus-visible { outline: 3px solid #d9ff9b; outline-offset: 3px; border-radius: 12px; z-index: 5000 !important; }
+.orbit-3d-node.selected { z-index: 4000 !important; }
+@media (max-width: 600px) { .orbit-3d-node { width: 96px; min-height: 64px; } .orbit-3d-node .avatar { width: 40px; height: 40px; } .orbit-3d-label { max-width: 106px; font-size: 13px; } }
+/* More space for work: compact mastheads, navigation and controls. */
+.unified-shell .topbar { min-height: 62px; padding-block: 7px; }
+.unified-section-nav { padding-top: 8px; }
+.unified-section-nav > div { padding: 3px; }
+.unified-section-nav a, .today-view-tabs a { min-height: 38px; }
+.home-page, .network-page, .orbit-page, .pipeline-page, .activity-page, .analytics-page { padding-top: 20px; }
+.today-view-tabs { margin-bottom: 12px; }
+.daily-home .editorial-masthead { margin-bottom: 16px; }
+.daily-home .pulse-opening { min-height: 300px; }
+.pulse-opening-copy { padding: clamp(24px,3vw,42px); }
+.daily-home .pulse-opening h2 { font-size: clamp(34px,3.7vw,54px); margin: 12px 0; }
+.opening-art { min-height: 300px; }
+.opening-people { margin-top: 16px; }
+.network-page .network-masthead { min-height: 190px; padding: clamp(22px,3vw,36px); }
+.network-page .network-masthead h1 { font-size: clamp(40px,4.5vw,66px); }
+.network-page .network-orientation { padding: 20px 24px; margin-bottom: 18px; }
+.network-recent { margin: 18px 0; padding: 20px; }
+.network-recent-heading { margin-bottom: 14px; }
+.network-recent-person { padding: 12px; }
+.orbit-page .insight-masthead { padding: 20px 24px; margin-bottom: 14px; align-items: center; }
+.orbit-page .insight-masthead h1 { font-size: clamp(32px,3vw,46px); margin: 6px 0; }
+.orbit-page .insight-masthead .editorial-deck { margin: 0; }
+.orbit-page .orbit-filters { margin: 0; padding: 14px 16px; gap: 12px; }
+.orbit-layout { margin-top: 14px; }
+.orbit-page .orbit-toolbar { padding: 14px 18px; gap: 10px; }
+.orbit-page .orbit-browse { padding: 22px; }
+.pipeline-page .work-masthead, .activity-page .work-masthead, .analytics-page .insight-masthead, .review-page .insight-masthead, .automations-page .insight-masthead, .focus-page .insight-masthead, .settings-page .studio-heading { padding: clamp(22px,2.5vw,34px); }
+.pipeline-page .work-masthead h1, .activity-page .work-masthead h1, .analytics-page .insight-masthead h1, .review-page .insight-masthead h1, .automations-page .insight-masthead h1, .focus-page .insight-masthead h1, .settings-page .studio-heading h1 { font-size: clamp(34px,3.5vw,52px); margin: 8px 0; }
+.language-selector { padding: 16px; margin: 0 0 20px; border-radius: 16px; background: var(--surface-secondary); }
+.language-selector .field { display: grid; gap: 6px; }
+.language-selector select { width: 100%; max-width: 360px; }
+.language-selector small { display: block; margin-top: 7px; color: var(--muted); line-height: 1.4; }
+.language-selector-compact { padding: 10px; margin: 4px 0; }
+.language-selector-compact small { font-size: 12px; }
+.unified-profile-dropdown { max-height: min(75vh, 580px); overflow-y: auto; }
+@media (max-width: 767px) {
+  .unified-shell .topbar { min-height: calc(60px + env(safe-area-inset-top,0px)); }
+  .home-page, .network-page, .orbit-page, .pipeline-page, .activity-page, .analytics-page { padding-top: 16px; }
+  .daily-home .pulse-opening { min-height: 0; }
+  .daily-home .pulse-opening-copy { padding: 23px 22px 4px; }
+  .daily-home .pulse-opening h2 { font-size: clamp(32px,9vw,43px); }
+  .opening-art { min-height: 180px; height: 180px; }
+  .network-page .network-masthead { min-height: 0; padding: 22px; }
+  .network-hero-faces { padding-top: 8px; }
+  .orbit-page .insight-masthead { padding: 18px; }
+  .orbit-page .insight-masthead h1 { font-size: 32px; }
+  .orbit-page .orbit-toolbar { padding: 12px; }
+}
+.orbit-filter-toggle { flex: 0 0 auto; min-height: 44px; }
+.orbit-extra-filters { display: flex; gap: 10px; flex: 1 1 320px; min-width: 0; }
+.orbit-extra-filters .field { flex: 1 1 130px; min-width: 0; }
+.orbit-page .orbit-filters { align-items: end; }
+.orbit-page .orbit-viewport { min-height: 500px; }
+@media (max-width: 767px) {
+  .orbit-page .insight-masthead { padding: 14px 18px; }
+  .orbit-page .insight-masthead h1 { font-size: 27px; }
+  .orbit-page .insight-masthead .editorial-deck { font-size: 14px; line-height: 1.4; }
+  .orbit-page .insight-masthead > .button { display: none; }
+  .orbit-page .orbit-filters { padding: 10px; }
+  .orbit-page .orbit-filters > .search-field { flex: 1 1 130px; }
+  .orbit-page .orbit-toolbar { display: flex; flex-wrap: wrap; align-items: center; }
+  .orbit-page .orbit-stage-title { flex: 1 1 170px; }
+  .orbit-page .orbit-stage-icon { width: 36px; height: 36px; font-size: 20px; }
+  .orbit-page .orbit-stage-title strong { font-size: 15px; }
+  .orbit-page .orbit-mode-tabs { width: auto; flex: 0 1 auto; }
+  .orbit-page .orbit-toolbar .form-actions { flex: 1 1 100%; margin: 0; }
+}
+
+.orbit-mode-tabs button { white-space: nowrap; }
+@media (max-width: 360px) { .workspace-switcher-text::after, .workspace-switcher summary[data-workspace="demo"] .workspace-switcher-text::after { content: "●"; font-size: 12px; } }
+
+.orbit-marker-leaders { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+.orbit-marker-leaders line { stroke: #e7dbff; stroke-width: 1.3; stroke-dasharray: 3 4; opacity: .85; }
+
+.language-selector small { overflow-wrap: anywhere; }
+@media (min-width:768px) and (max-width:1050px) { .unified-shell .topbar { gap: 10px; padding-inline: 16px; } .unified-main-nav a { padding-inline: 8px; font-size: 13px; } }
+
+.workspace-switcher-text { display: inline-block; max-width: 60px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+.today-view-tabs { max-width: 100%; flex-wrap: wrap; border-radius: 18px; }
+.today-view-tabs a { white-space: normal; overflow-wrap: anywhere; }

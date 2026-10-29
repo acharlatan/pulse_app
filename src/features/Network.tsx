@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n/useTranslation";
 import { NetworkContext } from "./NetworkContext";
 import { SmartLists } from "./SmartLists";
 import { useFormat } from "../components/ui";
@@ -24,6 +25,7 @@ import {
 } from "../services/smart-lists";
 import { priorities, stages, availabilities, categories } from "../data/models";
 export function Network() {
+  const t = useTranslation();
   const p = usePulse();
   const { date } = useFormat();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -132,10 +134,10 @@ export function Network() {
         <div>
           <p className="eyebrow">YOUR RELATIONSHIPS, REMEMBERED</p>
           <h1>
-            Network<span className="accent">.</span>
+            {t("network")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            People you know. The details that move things forward.
+            {t("peopleIntro")}
           </p>
         </div>
         <div className="network-hero-art">
@@ -147,7 +149,7 @@ export function Network() {
             className="button primary"
             onClick={() => setEditor({ kind: tab === "people" ? "contact" : "company" })}
           >
-            <Plus size={18} /> Add {tab === "people" ? "person" : "company"}
+            <Plus size={18} /> {tab === "people" ? t("addPerson") : t("addCompany")}
           </button>
         </div>
       </header>
@@ -196,7 +198,7 @@ export function Network() {
       </section>
       {recentPeople.length > 0 && (
         <section className="network-recent" aria-labelledby="network-recent-title">
-          <div className="network-recent-heading"><div><p className="eyebrow">A LITTLE CLOSER</p><h2 id="network-recent-title">Recently connected<span>.</span></h2><p>People from your latest logged conversations.</p></div><span className="network-recent-count">{openFollowups} open {openFollowups === 1 ? "follow-up" : "follow-ups"}</span></div>
+          <div className="network-recent-heading"><div><p className="eyebrow">A LITTLE CLOSER</p><h2 id="network-recent-title">{t("recently")}<span>.</span></h2><p>{t("recentDesc")}</p></div><span className="network-recent-count">{openFollowups} open {openFollowups === 1 ? "follow-up" : "follow-ups"}</span></div>
           <div className="network-recent-people">{recentPeople.map((contact) => {
             const organization = organizations.find((org) => org.id === contact.organizationId);
             return <Link className="network-recent-person" key={contact.id} to={`/network/people/${contact.id}`} state={{ networkReturn: "/network" + (params.size ? "?" + params.toString() : "") }}>
@@ -236,7 +238,7 @@ export function Network() {
             onClick={() => setTab("people")}
           >
             <Users size={17} />
-            People <span>{contacts.length}</span>
+            {t("people")} <span>{contacts.length}</span>
           </button>
           <button
             role="tab"
@@ -248,17 +250,17 @@ export function Network() {
             onClick={() => setTab("companies")}
           >
             <Building2 size={17} />
-            Companies <span>{organizations.length}</span>
+            {t("companies")} <span>{organizations.length}</span>
           </button>
         </div>
         <div className="directory-controls">
           <label className="search-field">
             <Search size={18} />
             <input
-              aria-label="Search network"
+              aria-label={t("searchNetwork")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Find a familiar face…"
+              placeholder={t("searchNetwork")}
             />
           </label>
           {tab === "people" && (
@@ -268,11 +270,11 @@ export function Network() {
               onClick={() => setFilters(!filters)}
             >
               <SlidersHorizontal size={17} />
-              <span>Filters</span>
+              <span>{t("filters")}</span>
             </button>
           )}
           <select
-            aria-label="Sort network"
+            aria-label={t("sortNetwork")}
             className="sort-select"
             value={sort}
             onChange={(e) => setSort(e.target.value)}
@@ -289,9 +291,9 @@ export function Network() {
         {tab === "people" && (
           <div className="network-segments" aria-label="Relationship segments">
             {[
-              ["all", "Everyone"],
-              ["overdue", "Follow-ups overdue"],
-              ["pinned", "Pinned"],
+              ["all", t("everyone")],
+              ["overdue", t("overdue")],
+              ["pinned", t("pinnedShort")],
             ].map(([id, label]) => (
               <button
                 key={id}
@@ -307,7 +309,7 @@ export function Network() {
           </div>
         )}
         <div className="directory-saved-list">            <label className="field">
-              <span>Smart List</span>
+              <span>{t("smartList")}</span>
               <select value={smart} onChange={(e) => setSmart(e.target.value)}>
                 {(tab === "people"
                   ? [...builtInLists, ["pinned", "Pinned relationships"]]
@@ -330,13 +332,13 @@ export function Network() {
                   ))}
               </select>
             </label>
-<button className="button secondary" aria-expanded={showLists} aria-controls="network-saved-lists" onClick={() => setShowLists(!showLists)}>Manage lists</button></div>
+<button className="button secondary" aria-expanded={showLists} aria-controls="network-saved-lists" onClick={() => setShowLists(!showLists)}>{t("manageLists")}</button></div>
         <div className="tabs directory-display" aria-label="Directory presentation">
-          <button aria-pressed={display === "cards"} onClick={() => setDisplay("cards")}>Cards</button>
-          <button aria-pressed={display === "list"} onClick={() => setDisplay("list")}>Compact list</button>
+          <button aria-pressed={display === "cards"} onClick={() => setDisplay("cards")}>{t("cards")}</button>
+          <button aria-pressed={display === "list"} onClick={() => setDisplay("list")}>{t("compact")}</button>
         </div>
         <details className="network-tools">
-          <summary>Directory tools</summary>
+          <summary>{t("directoryTools")}</summary>
           <div className="network-tools-content">
             <BulkTags
               type={tab === "people" ? "contact" : "organization"}

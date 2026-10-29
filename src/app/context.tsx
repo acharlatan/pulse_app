@@ -1,3 +1,4 @@
+import { languageChoice } from "../i18n/catalog";
 import { clearGoogleSession } from "../services/google-session";
 import { clearGoogleImport } from "../services/google-api";
 import { confirmLeave, markSaved } from "./update-safety";
@@ -138,6 +139,7 @@ export function WorkspaceProvider({
     if (!s) return;
     const query = matchMedia("(prefers-color-scheme: dark)");
     const apply = () => {
+      document.documentElement.lang = languageChoice(s.locale);
       document.documentElement.dataset.theme =
         s.theme === "system" ? (query.matches ? "dark" : "light") : s.theme;
       document.documentElement.dataset.accent = s.identity.accent;

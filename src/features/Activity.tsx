@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n/useTranslation";
 import { useState } from "react";
 import { ProgressDetails } from "../components/progress";
 import { Link, useSearchParams } from "react-router-dom";
@@ -9,6 +10,7 @@ import { TaskRow } from "../components/relationship";
 import { priorities } from "../data/models";
 import { taskState } from "../services/recommendations";
 export function Activity() {
+  const t = useTranslation();
   const p = usePulse();
   const { date } = useFormat();
   const [params, setParams] = useSearchParams();
@@ -67,10 +69,10 @@ export function Activity() {
             · YOUR WORKING DAY
           </p>
           <h1>
-            Activity<span className="accent">.</span>
+            {t("activityTitle")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            A little intention. A clear next step.
+            {t("activityIntro")}
           </p>
         </div>
         <button
@@ -78,7 +80,7 @@ export function Activity() {
           onClick={() => setEditor({ kind: "task" })}
         >
           <Plus size={17} />
-          Plan a follow-up
+          {t("planFollowup")}
         </button>
       </header>
       <nav className="activity-ledger" aria-label="Follow-up overview">

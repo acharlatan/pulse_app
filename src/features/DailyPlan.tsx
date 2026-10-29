@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n/useTranslation";
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -20,6 +21,7 @@ import { restrictionReasons, taskState } from "../services/recommendations";
 import { dailyPulse } from "../services/daily-pulse";
 type Selection = { type: FocusItem["entityType"]; id: string };
 export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
+  const t = useTranslation();
   const p = usePulse(),
     { date, money } = useFormat();
   const plan = dailyPulse(
@@ -391,7 +393,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
             <div className="section-heading">
               <div>
                 <p className="eyebrow">CHOSEN BY YOU</p>
-                  <h2>Your priorities</h2>
+                  <h2>{t("yourPriorities")}</h2>
               </div>
               <Link className="text-link" to="/focus">
                 My Focus <ArrowUpRight size={16} />
@@ -551,7 +553,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
       {workspace}
       <section className="daily-extra-grid" aria-label="More from your workspace">
         <article className="daily-extra-panel">
-          <div className="section-heading"><h2>Coming up</h2><Link className="text-link" to="/activity?filter=upcoming">View follow-ups <ArrowUpRight size={16} /></Link></div>
+          <div className="section-heading"><h2>{t("comingUp")}</h2><Link className="text-link" to="/activity?filter=upcoming">View follow-ups <ArrowUpRight size={16} /></Link></div>
           {plan.later.length ? plan.later.slice(0, 3).map((item) => (
             <button className="daily-extra-row" key={item.id} onClick={() => inspect({ type: "task", id: item.id })}>
               <CalendarDays size={20} /><span><strong>{item.title}</strong><small>{date(item.dueAt)}</small></span><ArrowRight size={16} />
@@ -559,7 +561,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
           )) : <p className="muted">No later follow-ups scheduled yet.</p>}
         </article>
         <article className="daily-extra-panel">
-          <div className="section-heading"><h2>Recent conversations</h2><Link className="text-link" to="/activity">View activity <ArrowUpRight size={16} /></Link></div>
+          <div className="section-heading"><h2>{t("recentConversations")}</h2><Link className="text-link" to="/activity">View activity <ArrowUpRight size={16} /></Link></div>
           {p.interactions.filter((item) => item.type !== "Note" && Date.parse(item.occurredAt) <= Date.now()).slice(0, 3).map((item) => {
             const contact = p.contacts.find((person) => person.id === item.contactId);
             return <button className="daily-extra-row" key={item.id} onClick={() => onEdit({kind: "interaction", record: item})}>
@@ -570,7 +572,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
           {!p.interactions.some((item) => item.type !== "Note" && Date.parse(item.occurredAt) <= Date.now()) && <p className="muted">Your saved conversations will appear here.</p>}
         </article>
         <article className="daily-extra-panel daily-network-snapshot">
-          <div className="section-heading"><h2>Your network</h2><Link className="text-link" to="/network">Explore <ArrowUpRight size={16} /></Link></div>
+          <div className="section-heading"><h2>{t("yourNetwork")}</h2><Link className="text-link" to="/network">Explore <ArrowUpRight size={16} /></Link></div>
           <div className="daily-network-circle"><strong>{p.contacts.length}</strong><span>people</span></div>
           <p>{p.organizations.length} companies saved in this workspace.</p>
           <Link className="text-link" to="/analytics">See relationship insights <ArrowUpRight size={16} /></Link>

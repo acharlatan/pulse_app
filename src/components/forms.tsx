@@ -1,4 +1,5 @@
 import { useState, useEffect, type FormEvent, type ReactNode } from "react";
+import { useTranslation } from "../i18n/useTranslation";
 import { usePulse } from "../app/context";
 import { Modal } from "./ui";
 import {
@@ -125,6 +126,7 @@ function BasicEditorModal({
   editor: BasicEditor;
   onClose: () => void;
 }) {
+  const t = useTranslation();
   const { db, organizations, contacts, opportunities, tasks, settings, run } =
     usePulse();
   const [deleting, setDeleting] = useState(false);
@@ -306,7 +308,7 @@ function BasicEditorModal({
               className="button secondary"
               onClick={() => setDeleting(false)}
             >
-              Cancel
+              {t("cancel")}
             </button>
             <button
               className="button danger"
@@ -338,7 +340,7 @@ function BasicEditorModal({
           <div className="form-grid">
             {editor.kind === "company" && (
               <>
-                <Field label="Company name" wide>
+                <Field label={t("companyName")} wide>
                   <input
                     name="name"
                     required
@@ -382,7 +384,7 @@ function BasicEditorModal({
             )}
             {editor.kind === "contact" && (
               <>
-                <Field label="Full name" wide>
+                <Field label={t("fullName")} wide>
                   <input
                     name="name"
                     required
@@ -392,16 +394,16 @@ function BasicEditorModal({
                     placeholder="A new connection"
                   />
                 </Field>
-                <Field label="Preferred name">
+                <Field label={t("preferredName")}>
                   <input
                     name="preferredName"
                     defaultValue={editor.record?.preferredName}
                   />
                 </Field>
-                <Field label="Role or title">
+                <Field label={t("roleTitle")}>
                   <input name="role" defaultValue={editor.record?.role} />
                 </Field>
-                <Field label="Company" wide>
+                <Field label={t("company")} wide>
                   <select
                     name="organizationId"
                     defaultValue={
@@ -418,21 +420,21 @@ function BasicEditorModal({
                     ))}
                   </select>
                 </Field>
-                <Field label="Email">
+                <Field label={t("email")}>
                   <input
                     name="email"
                     type="email"
                     defaultValue={editor.record?.emails[0]}
                   />
                 </Field>
-                <Field label="Phone">
+                <Field label={t("phone")}>
                   <input
                     name="phone"
                     type="tel"
                     defaultValue={editor.record?.phones[0]}
                   />
                 </Field>
-                <Field label="Relationship">
+                <Field label={t("relationship")}>
                   <select
                     name="category"
                     defaultValue={editor.record?.category || "Prospect"}
@@ -442,7 +444,7 @@ function BasicEditorModal({
                     ))}
                   </select>
                 </Field>
-                <Field label="Stage">
+                <Field label={t("stage")}>
                   <select
                     name="stage"
                     defaultValue={editor.record?.stage || "New"}
@@ -452,7 +454,7 @@ function BasicEditorModal({
                     ))}
                   </select>
                 </Field>
-                <Field label="Priority">
+                <Field label={t("priority")}>
                   <select
                     name="priority"
                     defaultValue={editor.record?.priority || "Normal"}
@@ -462,7 +464,7 @@ function BasicEditorModal({
                     ))}
                   </select>
                 </Field>
-                <Field label="Availability">
+                <Field label={t("availability")}>
                   <select
                     name="availability"
                     value={availability}
@@ -626,7 +628,7 @@ function BasicEditorModal({
             )}
             {editor.kind === "task" && (
               <>
-                <Field label="Follow-up title" wide>
+                <Field label={t("followupTitle")} wide>
                   <input
                     name="title"
                     defaultValue={editor.record?.title}
@@ -640,7 +642,7 @@ function BasicEditorModal({
                     }
                   />
                 </Field>
-                <Field label="Due date and time">
+                <Field label={t("dueDate")}>
                   <input
                     name="dueAt"
                     type="datetime-local"
@@ -653,7 +655,7 @@ function BasicEditorModal({
                     )}
                   />
                 </Field>
-                <Field label="Priority">
+                <Field label={t("priority")}>
                   <select
                     name="priority"
                     defaultValue={editor.record?.priority || "Normal"}
@@ -663,7 +665,7 @@ function BasicEditorModal({
                     ))}
                   </select>
                 </Field>
-                <Field label="Details" wide>
+                <Field label={t("details")} wide>
                   <textarea
                     name="description"
                     rows={3}
@@ -689,7 +691,7 @@ function BasicEditorModal({
               className="button secondary"
               onClick={onClose}
             >
-              Cancel
+              {t("cancel")}
             </button>
             {(editor.kind === "interaction" || editor.kind === "task") &&
               editor.record && (
@@ -702,16 +704,7 @@ function BasicEditorModal({
                 </button>
               )}
             <button className="button primary" disabled={busy}>
-              {busy
-                ? "Saving…"
-                : "Save " +
-                  (editor.kind === "company"
-                    ? "company"
-                    : editor.kind === "contact"
-                      ? "person"
-                      : editor.kind === "task"
-                        ? "follow-up"
-                        : "interaction")}
+              {busy ? t("saving") : editor.kind === "company" ? t("saveCompany") : editor.kind === "contact" ? t("savePerson") : editor.kind === "task" ? t("saveFollowup") : t("saveInteraction")}
             </button>
           </div>
         </form>
