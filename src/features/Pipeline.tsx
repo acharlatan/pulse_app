@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n/useTranslation";
 import { ArrowRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -8,6 +9,7 @@ import { EditorModal, type Editor } from "../components/forms";
 import { moveOpportunity } from "../data/repository";
 export function Pipeline() {
   const { money } = useFormat();
+  const t = useTranslation();
   const p = usePulse(),
     [editor, setEditor] = useState<Editor | null>(null),
     [filter, setFilter] = useState("All"),
@@ -39,10 +41,10 @@ export function Pipeline() {
         <div>
           <p className="eyebrow">FROM POSSIBILITY TO PARTNERSHIP</p>
           <h1>
-            Pipeline<span className="accent">.</span>
+            {t("pipeline")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            See what’s moving. Make the next move count.
+            {t("pipelineIntro")}
           </p>
         </div>
         <button
@@ -53,7 +55,7 @@ export function Pipeline() {
           }
         >
           <Plus size={18} />
-          New opportunity
+          {t("newOpportunity")}
         </button>
       </header>
       <div className="directory-toolbar">

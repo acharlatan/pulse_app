@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n/useTranslation";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
@@ -11,6 +12,7 @@ import { DailyPlan } from "./DailyPlan";
 import { Focus } from "./Focus";
 import { ConstellationScene } from "../components/ConstellationScene";
 export function Home({ focus = false }: { focus?: boolean }) {
+  const t = useTranslation();
   const p = usePulse(),
     { date } = useFormat(),
     navigate = useNavigate();
@@ -46,7 +48,7 @@ export function Home({ focus = false }: { focus?: boolean }) {
     p.organizations.length ||
     p.opportunities.length ||
     p.tasks.length;
-  const todayTabs = <nav className="today-view-tabs" aria-label="Today views"><Link to="/" aria-current={!focus ? "page" : undefined} className={!focus ? "active" : ""}>Daily Pulse</Link><Link to="/focus" aria-current={focus ? "page" : undefined} className={focus ? "active" : ""}>My Focus</Link></nav>;
+  const todayTabs = <nav className="today-view-tabs" aria-label="Today views"><Link to="/" aria-current={!focus ? "page" : undefined} className={!focus ? "active" : ""}>{t("dailyPulse")}</Link><Link to="/focus" aria-current={focus ? "page" : undefined} className={focus ? "active" : ""}>{t("focus")}</Link></nav>;
   if (focus) return <div className="page home-page editorial-home daily-home today-focus-page">{todayTabs}<Focus embedded /></div>;
   return (
     <div
@@ -64,10 +66,10 @@ export function Home({ focus = false }: { focus?: boolean }) {
             · DAILY PULSE
           </p>
           <h1>
-            Today<span className="accent">.</span>
+            {t("today")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            {p.settings.name ? `Hello, ${p.settings.name}. ` : ""}Your space to make meaningful connections and move things forward.
+            {p.settings.name ? `${t("hello")}, ${p.settings.name}. ` : ""}{t("homeIntro")}
           </p>
         </div>
         <div className="editorial-create">
@@ -76,13 +78,13 @@ export function Home({ focus = false }: { focus?: boolean }) {
             onClick={() => setEditor({ kind: "contact" })}
           >
             <Plus size={17} />
-            New connection
+            {t("newConnection")}
           </button>
           <button
             className="button ghost"
             onClick={() => setEditor({ kind: "task" })}
           >
-            Plan a follow-up
+            {t("planFollowup")}
           </button>
         </div>
       </header>
@@ -90,9 +92,9 @@ export function Home({ focus = false }: { focus?: boolean }) {
       <section className="pulse-opening" aria-label="Your relationship workspace">
         <div className="pulse-opening-copy">
           <span className="pulse-opening-label"><span className="opening-spark">✳</span> YOUR SPACE · YOUR PACE</span>
-          <h2>Good things grow<br />through <em>connection</em><span>.</span></h2>
-          <p>Keep the people and possibilities that matter within reach.</p>
-          <div className="opening-actions"><Link className="pulse-opening-link" to="/network">Explore your network <ArrowUpRight size={17} /></Link><Link className="opening-orbit-link" to="/orbit">Enter Orbit ↗</Link></div>
+          <h2>{t("hero1")}<br /><em>{t("hero2")}</em><span>.</span></h2>
+          <p>{t("heroCopy")}</p>
+          <div className="opening-actions"><Link className="pulse-opening-link" to="/network">{t("exploreNetwork")} <ArrowUpRight size={17} /></Link><Link className="opening-orbit-link" to="/orbit">{t("enterOrbit")} ↗</Link></div>
           {p.contacts.length > 0 && <div className="opening-people"><div className="opening-avatar-stack">{p.contacts.slice(0, 5).map((person) => <Avatar key={person.id} name={person.name} mediaId={person.avatar} />)}</div><span><strong>{p.contacts.length} {p.contacts.length === 1 ? "person" : "people"}</strong> in your world</span></div>}
         </div>
         <div className="opening-art"><div className="opening-art-fallback" aria-hidden="true" /><ConstellationScene variant="home" /><span className="opening-art-caption" aria-hidden="true">A WORLD OF CONNECTIONS <b>✳</b></span></div>
@@ -135,7 +137,7 @@ export function Home({ focus = false }: { focus?: boolean }) {
               <div>
                 <p className="eyebrow">KEEP CLOSE</p>
                 <h2>
-                  {pins.length ? "Your pinned relationships" : "Your people"}
+                  {pins.length ? t("pinned") : t("yourPeople")}
                 </h2>
               </div>
               <Link className="text-link" to="/network">
@@ -218,7 +220,7 @@ export function Home({ focus = false }: { focus?: boolean }) {
               className="button secondary"
               onClick={() => setEditor({ kind: "task" })}
             >
-              Plan a follow-up
+              {t("planFollowup")}
             </button>
           </div>
           <div className="form-actions">

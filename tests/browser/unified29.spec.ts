@@ -33,12 +33,9 @@ test("unified workspaces, editable lists and interactive 3D preserve the core jo
   const orbitCanvas = page.locator(".orbit-world canvas");
   await expect(orbitCanvas).toBeVisible();
   const before = await orbitCanvas.screenshot({ path: info.outputPath("orbit-canvas.png") });
-  if (info.project.name === "mobile") {
-    const size = await orbitCanvas.boundingBox();
-    await orbitCanvas.click({ position: { x: size!.width * 0.563, y: size!.height * 0.596 } });
-    await expect(page.getByRole("complementary", { name: "Selected relationship" })).toBeVisible();
-    await page.getByRole("button", { name: "Close selection" }).click();
-  }
+  await page.locator(".orbit-3d-node.person").filter({ hasText: "Olivia Chen" }).click();
+  await expect(page.getByRole("complementary", { name: "Selected relationship" })).toContainText("Olivia Chen");
+  await page.getByRole("button", { name: "Close selection" }).click();
   await page.getByRole("button", { name: "Rotate orbit right" }).click();
   const after = await orbitCanvas.screenshot();
   expect(after.equals(before)).toBe(false);

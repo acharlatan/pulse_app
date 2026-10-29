@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n/useTranslation";
 import { useState, type ReactNode, type FormEvent } from "react";
 import { usePulse } from "../app/context";
 import { Modal } from "./ui";
@@ -63,6 +64,7 @@ export function RecordForm({
   onDelete?: () => Promise<unknown>;
   deleteLabel?: string;
 }) {
+  const t = useTranslation();
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [confirm, setConfirm] = useState(false);
@@ -117,7 +119,7 @@ export function RecordForm({
             disabled={busy}
             onClick={() => (confirm ? setConfirm(false) : onClose())}
           >
-            {confirm ? "Go back" : "Cancel"}
+            {confirm ? "Go back" : t("cancel")}
           </button>
           {confirm ? (
             <button
@@ -131,7 +133,7 @@ export function RecordForm({
           ) : (
             <>
               <button className="button primary" disabled={busy}>
-                {busy ? "Saving…" : "Save changes"}
+                {busy ? t("saving") : t("saveChanges")}
               </button>
               {onDelete && (
                 <button
@@ -157,6 +159,7 @@ export function RecordEditorModal({
   editor: RecordEditor;
   onClose: () => void;
 }) {
+  const t = useTranslation();
   const p = usePulse();
   const [organizationId, setOrganizationId] = useState(
     editor.kind === "opportunity"
@@ -230,7 +233,7 @@ export function RecordEditorModal({
             }
           </p>
         ) : null}
-        <Field label="Opportunity title" wide>
+        <Field label={t("opportunityTitle")} wide>
           <input
             name="title"
             required
@@ -239,7 +242,7 @@ export function RecordEditorModal({
             autoFocus
           />
         </Field>
-        <Field label="Company" wide>
+        <Field label={t("company")} wide>
           <select
             value={organizationId}
             onChange={(e) => setOrganizationId(e.target.value)}

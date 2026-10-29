@@ -1,3 +1,4 @@
+import { useTranslation } from "../i18n/useTranslation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -13,6 +14,7 @@ import { OrbitGuide } from "./OrbitGuide";
 import { ConstellationScene } from "../components/ConstellationScene";
 import { OrbitWorld } from "../components/OrbitWorld";
 export function Orbit() {
+  const t = useTranslation();
   const navigationState = useLocation().state as {
     profileReturn?: unknown;
     networkReturn?: unknown;
@@ -29,6 +31,7 @@ export function Orbit() {
     [params, setParams] = useSearchParams(),
     [search, setSearch] = useState(""),
     [type, setType] = useState(""),
+    [filtersOpen, setFiltersOpen] = useState(false),
     [priority, setPriority] = useState(""),
     [view, setView] = useState("list"),
     [mapMode, setMapMode] = useState<"3d" | "2d">("3d"),
@@ -55,9 +58,10 @@ export function Orbit() {
         priority,
         company: params.get("company") || "",
         person: params.get("person") || "",
-        limit: matchMedia("(max-width:600px)").matches ? 18 : 24,
+        limit: matchMedia("(max-width:600px)").matches ? (mapMode === "3d" ? 12 : 18) : 24,
+        balance: true,
       }),
-    [p, search, type, priority, params],
+    [p, search, type, priority, params, mapMode],
   );
   const fullGraph = useMemo(
     () =>
@@ -156,21 +160,21 @@ export function Orbit() {
         <div>
           <p className="eyebrow">YOUR CONNECTIONS, IN CONTEXT</p>
           <h1>
-            Relationship Orbit<span className="accent">.</span>
+            {t("orbitTitle")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            Start with a familiar record. Understand what connects it.
+            {t("orbitIntro")}
           </p>
         </div>
         <Link className="button secondary" to="/network">
-          Back to Network
+          {t("backNetwork")}
         </Link>
       </div>
       <div className="orbit-filters surface">
         <label className="search-field">
           <span className="sr-only">Search Orbit</span>
           <input
-            aria-label="Search Orbit"
+            aria-label={t("searchOrbit")}
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
@@ -179,8 +183,9 @@ export function Orbit() {
             placeholder="Find a person, company or opportunity"
           />
         </label>
-        <label className="field">
-          <span>Show</span>
+        <button className="button secondary orbit-filter-toggle" aria-expanded={filtersOpen} aria-controls="orbit-extra-filters" onClick={() => setFiltersOpen(!filtersOpen)}>{t("filters")}{type || priority ? " •" : ""}</button>
+        {filtersOpen && <div id="orbit-extra-filters" className="orbit-extra-filters"><label className="field">
+          <span>{t("show")}</span>
           <select
             value={type}
             onChange={(e) => {
@@ -188,24 +193,24 @@ export function Orbit() {
               setSelected("");
             }}
           >
-            <option value="">All record types</option>
-            <option value="person">People</option>
-            <option value="company">Companies</option>
-            <option value="opportunity">Opportunities</option>
+            <option value="">{t("allRecords")}</option>
+            <option value="person">{t("people")}</option>
+            <option value="company">{t("companies")}</option>
+            <option value="opportunity">{t("opportunities")}</option>
           </select>
         </label>
         <label className="field">
-          <span>Contact priority</span>
+          <span>{t("contactPriority")}</span>
           <select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
           >
-            <option value="">All priorities</option>
+            <option value="">{t("allPriorities")}</option>
             {["VIP", "High", "Normal", "Low"].map((x) => (
-              <option key={x}>{x}</option>
+              <option key={x} value={x}>{x === "High" ? t("high") : x === "Normal" ? t("normal") : x === "Low" ? t("low") : x}</option>
             ))}
           </select>
-        </label>
+        </label></div>}
       </div>
       {params.size > 0 && (
         <p className="orbit-scope">
@@ -233,8 +238,8 @@ export function Orbit() {
       >
         <section className="orbit-map-panel">
           <div className="orbit-toolbar">
-            <div className="orbit-stage-title"><span className="orbit-stage-icon" aria-hidden="true">✳</span><div><strong>Your constellation</strong><small>{graph.nodes.length} of {graph.total} matching records · select a connection</small></div></div>
-            <div className="orbit-mode-tabs" aria-label="Map style"><button aria-pressed={mapMode === "3d"} disabled={!webglAvailable} onClick={() => setMapMode("3d")}>3D Orbit</button><button aria-pressed={mapMode === "2d"} onClick={() => setMapMode("2d")}>2D map</button></div>
+            <div className="orbit-stage-title"><span className="orbit-stage-icon" aria-hidden="true">✳</span><div><strong>{t("constellation")}</strong><small>{graph.nodes.length} of {graph.total} matching records · select a connection</small></div></div>
+            <div className="orbit-mode-tabs" aria-label="Map style"><button aria-pressed={mapMode === "3d"} disabled={!webglAvailable} onClick={() => setMapMode("3d")}>{t("map3d")}</button><button aria-pressed={mapMode === "2d"} onClick={() => setMapMode("2d")}>{t("map2d")}</button></div>
             <div className="form-actions">
               {
                 <>
@@ -254,47 +259,14 @@ export function Orbit() {
                     +
                   </button>
                   <button className="button ghost" onClick={() => { fit(); setResetScene((value) => value + 1); }}>
-                    Fit network
+                    {t("fit")}
                   </button>
                 </>
               }
-              <button
-                className="button ghost"
-                onClick={() => {
-                  fit();
-                  setResetScene((value) => value + 1);
-                  setSelected("");
-                  setSearch("");
-                  setType("");
-                  setPriority("");
-                  setParams({}, { state: navigationState });
-                }}
-              >
-                Reset view
-              </button>
-              {node && graph.nodes.some((n) => n.id === node.id) && (
-                <button
-                  className="button secondary"
-                  onClick={() => {
-                    setZoom(1);
-                    const mapNode = graph.nodes.find(
-                      (item) => item.id === node.id,
-                    )!;
-                    setPan({ x: 500 - mapNode.x, y: 380 - mapNode.y });
-                  }}
-                >
-                  Center selected
-                </button>
-              )}
             </div>
           </div>
           {!webglAvailable && <p className="orbit-render-notice">3D is unavailable on this device. The 2D map and full list remain available.</p>}
-          {graph.limited && (
-            <p className="orbit-limit">
-              Showing the first {graph.nodes.length} records. Search or open a
-              company/person orbit to explore the rest.
-            </p>
-          )}
+
           {!graph.nodes.length ? (
             <Empty
               title="Your orbit starts with a connection"
@@ -405,6 +377,34 @@ export function Orbit() {
                     {label}
                   </button>
                 ))}
+              <button
+                className="button ghost"
+                onClick={() => {
+                  fit();
+                  setResetScene((value) => value + 1);
+                  setSelected("");
+                  setSearch("");
+                  setType("");
+                  setPriority("");
+                  setParams({}, { state: navigationState });
+                }}
+              >
+                {t("reset")}
+              </button>
+              {node && graph.nodes.some((n) => n.id === node.id) && (
+                <button
+                  className="button secondary"
+                  onClick={() => {
+                    setZoom(1);
+                    const mapNode = graph.nodes.find(
+                      (item) => item.id === node.id,
+                    )!;
+                    setPan({ x: 500 - mapNode.x, y: 380 - mapNode.y });
+                  }}
+                >
+                  Center selected
+                </button>
+              )}
                 <button
                   className="button ghost"
                   onClick={() => {
@@ -414,7 +414,7 @@ export function Orbit() {
                       ?.scrollIntoView({ block: "start", behavior: "instant" });
                   }}
                 >
-                  Browse matching records
+                  {t("browse")}
                 </button>
               </div>
             </>
@@ -437,7 +437,7 @@ export function Orbit() {
                   aria-pressed={view === "guide"}
                   onClick={() => setView("guide")}
                 >
-                  Explore
+                  {t("explore")}
                 </button>
                 <button
                   onClick={() => {
@@ -447,13 +447,13 @@ export function Orbit() {
                     });
                   }}
                 >
-                  Map
+                  {t("map")}
                 </button>
                 <button
                   aria-pressed={view === "list"}
                   onClick={() => setView("list")}
                 >
-                  List
+                  {t("list")}
                 </button>
               </div>{" "}
             </div>
@@ -517,8 +517,8 @@ export function Orbit() {
             <span>▢ Company</span>
             <span>◇ Opportunity</span>
             <p>
-              Lines: works at · opportunity representative · company
-              opportunity. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.
+              Solid lines show works at · opportunity representative · company
+              opportunity. Dotted lines connect portraits to their positions. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.
             </p>
           </div>
         </section>
@@ -545,7 +545,7 @@ export function Orbit() {
                 className="button ghost orbit-close"
                 onClick={() => setSelected("")}
               >
-                Close selection
+                {t("closeSelection")}
               </button>
               <Avatar
                 name={node.label}
@@ -553,7 +553,7 @@ export function Orbit() {
                 size="xl"
                 company={node.kind === "company"}
               />
-              <Badge>{node.kind}</Badge>
+              <Badge>{node.kind === "person" ? t("person") : node.kind === "company" ? t("company") : t("opportunity")}</Badge>
               <h2>{node.label}</h2>
               {person && (
                 <>
@@ -576,7 +576,7 @@ export function Orbit() {
                     className="button primary"
                     to={`/network/people/${person.id}`}
                   >
-                    Open Profile
+                    {t("openProfile")}
                   </Link>
                   <button
                     className="button ghost"

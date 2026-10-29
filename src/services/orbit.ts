@@ -28,6 +28,7 @@ export function deriveOrbit(
     type?: string;
     limit?: number;
     priority?: string;
+    balance?: boolean;
   } = {},
 ) {
   const limit = Math.max(1, Math.min(options.limit || 60, 80)),
@@ -78,7 +79,28 @@ export function deriveOrbit(
         (!options.type || n.kind === options.type),
     )
     .sort((a, b) => a.id.localeCompare(b.id));
-  const shown = candidates.slice(0, limit),
+  // For a bounded map, interleave kinds so people are not hidden behind an
+  // alphabetically earlier block of companies or opportunities. The full list
+  // remains unchanged and edges are still derived only from saved associations.
+  const shown = options.balance && candidates.length > limit ? (() => {
+    const groups = {
+      person: candidates.filter((item) => item.kind === "person"),
+      company: candidates.filter((item) => item.kind === "company"),
+      opportunity: candidates.filter((item) => item.kind === "opportunity"),
+    };
+    const positions = { person: 0, company: 0, opportunity: 0 };
+    const sequence = ["person", "company", "person", "opportunity"] as const;
+    const chosen: typeof candidates = [];
+    while (chosen.length < limit) {
+      let added = false;
+      for (const kind of sequence) {
+        const item = groups[kind][positions[kind]];
+        if (item && chosen.length < limit) { chosen.push(item); positions[kind]++; added = true; }
+      }
+      if (!added) break;
+    }
+    return chosen;
+  })() : candidates.slice(0, limit),
     nodes: OrbitNode[] = shown.map((n) => {
       const group = shown.filter((x) => x.kind === n.kind);
       const position = group.findIndex((x) => x.id === n.id);

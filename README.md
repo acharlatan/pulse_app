@@ -6,7 +6,9 @@
 
 PULSE uses four main areas: Today, People, Work, and Insights. Today brings Daily Pulse and My Focus together; People contains the directory, Orbit, and relationship review, with saved-list management in the directory; Work contains the pipeline, follow-ups, activity, and automations. Settings, backups, imports, personalization, help, and the optional assistant are in the workspace menu. Existing route URLs remain valid.
 
-Orbit offers an interactive 3D view and a 2D map, plus the record list. Nodes and lines represent saved records and associations only. Visual depth does not measure closeness. Reduced motion, a non-WebGL fallback, keyboard controls, and the record list remain available. Home's 3D sculpture is decorative.
+Orbit offers an interactive 3D view with local portraits, company icons, sharp HTML labels and a 2D map plus record list. Solid lines show saved associations; short dotted tethers connect displaced labels to their 3D positions. Depth does not measure closeness. Reduced motion, a non-WebGL fallback, keyboard controls, and the record list remain available. Home's 3D sculpture is decorative.
+
+The workspace menu and Settings → Appearance offer 11 language choices. Navigation, selected page labels and common editor fields are translated; other interface text remains English and the app says so beside the selector. Date and number formatting follows the selected locale. A workspace's locale is stored locally and included in backups. Contact names, notes, saved data and other user content are never translated.
 
 ## Run
 
@@ -172,7 +174,7 @@ Database/JSON backup **v4** adds pipelines, stages, definitions, typed values an
 
 PULSE 1.2.0-rc.1 adds an editorial Home led by commitments, Cards/Compact directory views, redesigned profile identity headers, a desktop Discover group and mobile More destinations. Person portraits, company logos/covers and workspace photo/name are stored locally, cropped and compressed in the browser; four accent presets support both themes. Use **Photo & cover** / **Logo & cover** beside profile editing, or Settings → Appearance → Workspace photo.
 
-Relationship Orbit maps actual company memberships and opportunity associations, with search, filters, person/company scopes, selection details and record navigation. The map is bounded to 24 records on desktop and 18 on mobile; the accompanying list supports up to 60 records. Search or focus a record to explore larger networks. No interpersonal relationships are inferred.
+Relationship Orbit maps actual company memberships and opportunity associations, with search, filters, person/company scopes, selection details and record navigation. The map is bounded to 24 records on desktop; mobile uses up to 12 records in 3D or 18 in 2D. The accompanying list supports up to 60 records. Search or focus a record to explore larger networks. No interpersonal relationships are inferred.
 
 DB/backup **v5** adds a media Blob store and additive identity/cover fields. Restore accepts v1–v5. Inputs: JPEG/PNG/WebP ≤8 MB/24 MP; optimized portraits/logos 320×320, covers 1280×480, ≤512 KB each. Local media is capped at 128 images/12 MB; backups use bounded base64 JSON (32 MB intake). No image hosting, cloud sync or AI media transfer. See EXPERIENCE_09.md, RELEASE_1_2.md and QA_REPORT.md for architecture and verified limits. After upgrading, use a v5-compatible forward fix rather than older database clients.
 
