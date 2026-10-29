@@ -132,70 +132,72 @@ export function Network() {
   const openFollowups = p.tasks.filter((task) => !task.completedAt).length;
   return (
     <div className="page network-page">
-      <header className="page-heading editorial-masthead network-masthead">
-        <div>
-          <p className="eyebrow">{__pulseText("YOUR RELATIONSHIPS, REMEMBERED")}</p>
-          <h1>
-            {t("network")}<span className="accent">.</span>
-          </h1>
-          <p className="editorial-deck">
-            {t("peopleIntro")}
-          </p>
-        </div>
-        <div className="network-hero-art">
-          <div className="network-hero-orbit" aria-hidden="true"><span>✳</span></div>
-          <div className="network-hero-faces" aria-hidden="true">
-            {contacts.slice(0, 5).map((contact) => <Avatar key={contact.id} name={contact.name} mediaId={contact.avatar} size="large" />)}
-          </div>
-          <button
-            className="button primary"
-            onClick={() => setEditor({ kind: tab === "people" ? "contact" : "company" })}
-          >
-            <Plus size={18} /> {tab === "people" ? t("addPerson") : t("addCompany")}
-          </button>
-        </div>
-      </header>
-      <section className="network-orientation" aria-label={__pulseText("Network overview")}>
-        <div>
-          <p className="eyebrow">{__pulseText("YOUR RELATIONSHIP LANDSCAPE")}</p>
-          <h2>{__pulseText("Every connection has a next chapter.")}</h2>
-          <p>
-            {__pulseText("Find a person or company, revisit the context, and choose a thoughtful next step.")}</p>
-        </div>
-        <div className="network-orientation-facts">
+      <div className="network-cover">
+        <header className="page-heading editorial-masthead network-masthead">
           <div>
-            <strong>{contacts.length}</strong>
-            <span>{__pulseText("saved people")}</span>
+            <p className="eyebrow">{__pulseText("YOUR RELATIONSHIPS, REMEMBERED")}</p>
+            <h1>
+              {t("network")}<span className="accent">.</span>
+            </h1>
+            <p className="editorial-deck">
+              {t("peopleIntro")}
+            </p>
           </div>
+          <div className="network-hero-art">
+            <div className="network-hero-orbit" aria-hidden="true"><span>✳</span></div>
+            <div className="network-hero-faces" aria-hidden="true">
+              {contacts.slice(0, 5).map((contact) => <Avatar key={contact.id} name={contact.name} mediaId={contact.avatar} size="large" />)}
+            </div>
+            <button
+              className="button primary"
+              onClick={() => setEditor({ kind: tab === "people" ? "contact" : "company" })}
+            >
+              <Plus size={18} /> {tab === "people" ? t("addPerson") : t("addCompany")}
+            </button>
+          </div>
+        </header>
+        <section className="network-orientation" aria-label={__pulseText("Network overview")}>
           <div>
-            <strong>{organizations.length}</strong>
-            <span>{__pulseText("saved companies")}</span>
+            <p className="eyebrow">{__pulseText("YOUR RELATIONSHIP LANDSCAPE")}</p>
+            <h2>{__pulseText("Every connection has a next chapter.")}</h2>
+            <p>
+              {__pulseText("Find a person or company, revisit the context, and choose a thoughtful next step.")}</p>
           </div>
-          <div>
-            <strong>
-              {
-                p.focusItems.filter(
-                  (f) =>
-                    f.entityType === "contact" ||
-                    f.entityType === "organization",
-                ).length
-              }
-            </strong>
-            <span>{__pulseText("pinned connections")}</span>
+          <div className="network-orientation-facts">
+            <div>
+              <strong>{contacts.length}</strong>
+              <span>{__pulseText("saved people")}</span>
+            </div>
+            <div>
+              <strong>{organizations.length}</strong>
+              <span>{__pulseText("saved companies")}</span>
+            </div>
+            <div>
+              <strong>
+                {
+                  p.focusItems.filter(
+                    (f) =>
+                      f.entityType === "contact" ||
+                      f.entityType === "organization",
+                  ).length
+                }
+              </strong>
+              <span>{__pulseText("pinned connections")}</span>
+            </div>
           </div>
-        </div>
-        <div className="network-orientation-links">
-          <Link to="/review">
-            {__pulseText("Review relationships") + " "}<ArrowUpRight size={16} />
-          </Link>
-          <Link to="/orbit">
-            {__pulseText("Explore Orbit") + " "}<ArrowUpRight size={16} />
-          </Link>
-          <Link to="/analytics">
-            {__pulseText("Understand your network") + " "}<ArrowUpRight size={16} />
-          </Link>
-        </div>
-      </section>
+          <div className="network-orientation-links">
+            <Link to="/review">
+              {__pulseText("Review relationships") + " "}<ArrowUpRight size={16} />
+            </Link>
+            <Link to="/orbit">
+              {__pulseText("Explore Orbit") + " "}<ArrowUpRight size={16} />
+            </Link>
+            <Link to="/analytics">
+              {__pulseText("Understand your network") + " "}<ArrowUpRight size={16} />
+            </Link>
+          </div>
+        </section>
+      </div>
       {recentPeople.length > 0 && (
         <section className="network-recent" aria-labelledby="network-recent-title">
           <div className="network-recent-heading"><div><p className="eyebrow">{__pulseText("A LITTLE CLOSER")}</p><h2 id="network-recent-title">{t("recently")}<span>.</span></h2><p>{t("recentDesc")}</p></div><span className="network-recent-count">{openFollowups} {" " + __pulseText("open") + " "}{openFollowups === 1 ? __pulseText("follow-up") : __pulseText("follow-ups")}</span></div>

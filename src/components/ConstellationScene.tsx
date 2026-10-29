@@ -35,13 +35,18 @@ export function ConstellationScene({ variant }: { variant: "home" | "orbit" }) {
       sculpture.position.x = variant === "home" ? 0 : 1.5;
       sculpture.scale.setScalar(variant === "home" ? 1 : 0.9);
       const body = new T.Mesh(
-        new T.IcosahedronGeometry(1.16, 5),
-        new T.MeshPhysicalMaterial({ color: 0xb29aff, metalness: 0.25, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.16 }),
+        new T.TorusKnotGeometry(0.83, 0.25, 180, 24, 2, 3),
+        new T.MeshPhysicalMaterial({ color: 0xc4a5ff, metalness: 0.5, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.12, iridescence: 0.7 }),
       );
       sculpture.add(body);
+      const core = new T.Mesh(
+        new T.IcosahedronGeometry(0.43, 2),
+        new T.MeshPhysicalMaterial({ color: 0xe7ffb1, metalness: 0.3, roughness: 0.2, clearcoat: 1 }),
+      );
+      sculpture.add(core);
       const shell = new T.Mesh(
-        new T.IcosahedronGeometry(1.29, 3),
-        new T.MeshBasicMaterial({ color: 0xffd3fa, wireframe: true, transparent: true, opacity: 0.16 }),
+        new T.IcosahedronGeometry(1.42, 1),
+        new T.MeshBasicMaterial({ color: 0xffd3fa, wireframe: true, transparent: true, opacity: 0.13 }),
       );
       sculpture.add(shell);
       const rings: import("three").Mesh[] = [];

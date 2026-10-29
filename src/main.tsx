@@ -33,3 +33,4 @@ import "./constellation.css";
 import "./unified-product.css";
 
 import "./finale.css";
+import "./atelier.css";
