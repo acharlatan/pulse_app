@@ -36,6 +36,7 @@ const nav = [
   { to: "/pipeline", label: "Pipeline", short: "Pipeline", icon: Workflow },
   { to: "/activity", label: "Activity", short: "Activity", icon: Activity },
 ];
+const mobileNav = [{ ...nav[0], short: "Today" }, { ...nav[1], short: "People" }, { ...nav[2], short: "Work" }, { to: "/analytics", label: "Analytics", short: "Insights", icon: ChartNoAxesCombined }];
 export function Shell({ children }: { children: ReactNode }) {
   const {
     intelligence,
@@ -68,6 +69,15 @@ export function Shell({ children }: { children: ReactNode }) {
   }, []);
 
   const location = useLocation();
+  const path = location.pathname;
+  const area = path === "/" || path === "/focus" ? "Today" : ["/network", "/review", "/lists", "/orbit"].some((prefix) => path.startsWith(prefix)) ? "People" : ["/pipeline", "/activity"].some((prefix) => path.startsWith(prefix)) ? "Work" : path.startsWith("/analytics") ? "Insights" : "Tools";
+  const areaLinks: Record<string, [string, string][]> = {
+    Today: [["/", "Daily Pulse"], ["/focus", "My Focus"]],
+    People: [["/network", "Directory"], ["/review", "Relationship Review"], ["/lists", "Smart Lists"], ["/orbit", "Orbit"]],
+    Work: [["/pipeline", "Pipeline"], ["/activity", "Follow-ups & activity"]],
+    Insights: [["/analytics", "Analytics"], ["/review", "Relationship Review"]],
+    Tools: [["/settings", "Settings"], ["/automations", "Automations"], ["/import", "Import"], ["/customize", "Personalize"], ["/help", "Help"]],
+  };
   const firstRoute = useRef(true);
   useEffect(() => {
     if (firstRoute.current) {
@@ -326,11 +336,11 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
         </header>
         <nav className="pulse-primary-nav" aria-label="Main areas">
-          <NavLink end to="/">Today</NavLink>
-          <NavLink to="/network">People</NavLink>
-          <NavLink to="/pipeline">Work</NavLink>
-          <NavLink to="/analytics">Insights</NavLink>
-          <NavLink to="/settings">Tools</NavLink>
+          {([["Today", "/"], ["People", "/network"], ["Work", "/pipeline"], ["Insights", "/analytics"], ["Tools", "/settings"]] as const).map(([label, to]) => <Link key={label} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}>{label}</Link>)}
+        </nav>
+        <nav className="pulse-area-nav" aria-label={`${area} sections`}>
+          <span>{area}</span>
+          {areaLinks[area].map(([to, label]) => <NavLink key={to} to={to} end={to === "/"}>{label}</NavLink>)}
         </nav>
         <OfflineStatus />
         <main id="main" tabIndex={-1}>
@@ -345,7 +355,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </footer>
       </div>
       <nav className="bottom-nav" aria-label="Mobile navigation">
-        {nav.map(({ to, short, icon: Icon }) => (
+        {mobileNav.map(({ to, short, icon: Icon }) => (
           <NavLink key={to} to={to} end={to === "/"}>
             <Icon size={21} />
             <span>{short}</span>
@@ -357,7 +367,7 @@ export function Shell({ children }: { children: ReactNode }) {
           onClick={() => setMore(true)}
         >
           <LayoutGrid size={21} />
-          <span>More</span>
+          <span>Tools</span>
         </button>
       </nav>
       {more && (

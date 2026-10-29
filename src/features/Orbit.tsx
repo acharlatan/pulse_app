@@ -10,6 +10,7 @@ import {
 } from "../services/recommendations";
 import { FocusButton } from "../components/focus";
 import { OrbitGuide } from "./OrbitGuide";
+import { PulseAtmosphere } from "../components/PulseAtmosphere";
 export function Orbit() {
   const navigationState = useLocation().state as {
     profileReturn?: unknown;
@@ -314,6 +315,7 @@ export function Orbit() {
                 onPointerUp={() => (drag.current = null)}
                 onPointerCancel={() => (drag.current = null)}
               >
+                <div className="orbit-dimensional-background"><PulseAtmosphere /></div>
                 <div
                   className="orbit-canvas"
                   style={{
