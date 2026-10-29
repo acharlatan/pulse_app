@@ -2,7 +2,7 @@
 
 ## Identity
 
-Airy editorial spacing, warm neutrals, periwinkle emphasis and relationship-centered cards. Code-native orbital artwork expresses people in connection; initials provide private, deterministic avatars with no remote requests. Avoid corporate tables, gradient wallpaper, unnecessary button outlines and fake analytics.
+An editorial workspace pairs warm paper, deep plum navigation, periwinkle and lime accents, and relationship-centered cards. The Daily Pulse opening includes links to saved people beside a decorative three-dimensional sculpture; the People overview combines identity and live counts. Initials provide private, deterministic avatars with no remote requests. Avoid unnecessary decoration, button outlines and fake analytics.
 
 ## Tokens
 
@@ -10,10 +10,10 @@ Current semantic variables in `src/experience.css`, extending `src/styles.css`:
 
 | Token        | Light     | Dark      |
 | ------------ | --------- | --------- |
-| Background   | `#f6f5f2` | `#17181d` |
-| Surface      | `#fffefa` | `#202127` |
-| Text         | `#262739` | `#f1f0eb` |
-| Muted        | `#626373` | `#b7b6c2` |
+| Background   | `#f5f2ed` | `#13111b` |
+| Surface      | `#fffdf9` | `#292536` |
+| Text         | `#211c2d` | `#fdfaff` |
+| Muted        | `#625b6c` | `#e0dbe9` |
 | Primary      | `#6650ce` | `#b3a3ff` |
 | Soft primary | `#efebfb` | `#332b4b` |
 | Success      | `#247965` | `#8dd6ba` |
@@ -29,7 +29,7 @@ Use a 4px base and 8px major rhythm; card padding 20–32px, page gutters 14–4
 
 ## Layout
 
-Desktop: fixed sidebar, centered 1280px maximum content, intentional Home primary/secondary columns. Tablet collapses Home to a main column with supporting panels. Below 768px: bottom navigation, safe-area spacing, top settings/alerts, contextual floating add. Directory goes 3 → 2 → 1 columns. Profiles stack essential details and relationship story. Settings category navigation wraps rather than clips. Dialogs use native `showModal`, internal scrolling and small-screen margins.
+Desktop: four top-level destinations in the top bar, contextual section navigation and centered content. Daily Pulse uses a two-part opening; the People cover combines the masthead and overview. Tablet and mobile stack these compositions. Below 768px: bottom navigation, safe-area spacing, top settings/alerts, contextual floating add. The directory adapts its columns and profiles stack essential details and relationship story. Settings category navigation wraps rather than clips. Dialogs use native `showModal`, internal scrolling and small-screen margins.
 
 ## Components and states
 

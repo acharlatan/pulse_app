@@ -444,3 +444,9 @@ New unit coverage includes prospective stage history, rollback, cross-tab idempo
 ## Iteration 11 release candidate
 
 Google Calendar and Contacts have scoped mock-provider tests and reviewed UI flows. A full 182-test unit run passed. Existing browser regression passed 61/62 under contention, and the remaining desktop Settings reload passed in isolation on the final build. Six mock-provider browser cases passed; root offline/PWA tests passed 12 cases and scoped-subpath checks passed two cases. See RELEASE_1_4.md and the release PR for deployment and actual-provider verification status. No real Google account was connected.
+
+## Atelier visual refresh
+
+TypeScript, lint, 206 unit tests and a clean production build passed. A same-origin browser preview checked Today, People, Orbit, Pipeline and Analytics for horizontal document overflow at 320, 375, 390, 430, 768, 1024, 1280 and 1440 CSS pixels in both themes. Empty Personal was also checked at those widths, and Spanish, German, Filipino and Japanese layouts were checked at five widths. Axe scans of the five screens passed at 390 and 1440 in both themes, and at 390 across all four accent presets in light and dark. These were preview checks, not the repository's compiled Playwright/PWA suite.
+
+Manually checked the desktop and 390px layouts, light and dark surfaces, a keyboard-activated portrait link, a long fictional name and email, directory search, editor opening and workspace switching. The cloud browser could not create a WebGL context, so its CSS fallback was visible; the updated three-dimensional sculpture was not visually tested there. A local Playwright browser download was truncated, so compiled browser/PWA checks, physical devices and screen-reader checks remain unverified. No conformance or field-performance certification is claimed.
