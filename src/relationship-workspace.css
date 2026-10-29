@@ -1,0 +1,22 @@
+/* A factual company overview, using the existing records and editors. */
+.company-command { margin: 16px 0; padding: clamp(20px, 3vw, 32px); border-radius: 24px; background: var(--surface); border: 1px solid var(--border); box-shadow: 0 12px 32px #291b3112; }
+.company-command-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.company-command-heading h2 { margin: 5px 0; letter-spacing: -.035em; }
+.company-command-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+.company-command-grid > div { min-width: 0; display: grid; align-content: start; gap: 7px; padding: 16px; border-radius: 16px; background: var(--surface-secondary); }
+.company-command-grid span, .company-command-people small { color: var(--muted); font-size: 13px; }
+.company-command-grid strong, .company-command-grid button { overflow-wrap: anywhere; text-align: left; }
+.company-command-people { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.company-command-people:empty { display: none; }
+.company-command-people a { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 8px 12px; border: 1px solid var(--border); border-radius: 15px; background: var(--surface); }
+.company-command-people a > span:not(.avatar) { display: grid; min-width: 0; gap: 2px; overflow-wrap: anywhere; }
+@media(max-width: 700px) { .company-command-grid { grid-template-columns: 1fr; } .company-command { padding: 20px; } }
+/* Bring evidence-based suggestions ahead of secondary workspace summaries. */
+@media (min-width: 1100px) {
+  .daily-home .daily-suggestions { grid-row: 3; }
+  .daily-home .daily-extra-grid { grid-row: 4; }
+}
+@media (max-width: 767px) {
+  .daily-home .daily-suggestions { order: 3; }
+  .daily-home .daily-extra-grid { order: 4; }
+}

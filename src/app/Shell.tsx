@@ -213,6 +213,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 icon: Activity,
                 kind: "task" as const,
               },
+              {
+                label: "Log interaction",
+                description: "Remember a conversation",
+                icon: Activity,
+                kind: "interaction" as const,
+              },
             ].map((v) => (
               <button
                 key={v.kind}
@@ -223,8 +229,8 @@ export function Shell({ children }: { children: ReactNode }) {
               >
                 <v.icon size={22} />
                 <div>
-                  <strong>{v.label}</strong>
-                  <small>{v.description}</small>
+                  <strong>{__pulseText(v.label)}</strong>
+                  <small>{__pulseText(v.description)}</small>
                 </div>
                 <ArrowUpRight size={18} />
               </button>
