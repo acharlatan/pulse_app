@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
@@ -53,6 +54,7 @@ const templates: Record<string, [string, string, string][]> = {
   ],
 };
 export function Customize() {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     [pipeline, setPipeline] = useState<PipelineDefinition | null>(null),
     [field, setField] = useState<FieldDefinition | null>(null),
@@ -61,33 +63,29 @@ export function Customize() {
     <div className="page customize-page">
       <div className="page-heading">
         <div>
-          <p className="eyebrow">SIMPLE BY DEFAULT. FLEXIBLE WHEN NEEDED.</p>
+          <p className="eyebrow">{__pulseText("SIMPLE BY DEFAULT. FLEXIBLE WHEN NEEDED.")}</p>
           <h1>
-            Personalize PULSE<span className="accent">.</span>
+            {__pulseText("Personalize PULSE")}<span className="accent">.</span>
           </h1>
           <p className="subtitle">
-            Shape your workflows without changing your relationships.
-          </p>
+            {__pulseText("Shape your workflows without changing your relationships.")}</p>
         </div>
       </div>
       <Link className="button ghost" to="/pipeline">
-        Back to Pipeline
-      </Link>
+        {__pulseText("Back to Pipeline")}</Link>
       <section className="surface">
-        <h2>Pipelines & workflows</h2>
+        <h2>{__pulseText("Pipelines & workflows")}</h2>
         <p>
-          Up to 12 active pipelines, with 24 stages each. Every pipeline
-          includes open, won and lost outcomes. Archive to preserve history.
-        </p>
+          {__pulseText("Up to 12 active pipelines, with 24 stages each. Every pipeline includes open, won and lost outcomes. Archive to preserve history.")}</p>
         <div className="form-actions">
           <label className="field">
-            <span>Pipeline template</span>
+            <span>{__pulseText("Pipeline template")}</span>
             <select
               value={template}
               onChange={(e) => setTemplate(e.target.value)}
             >
               {Object.keys(templates).map((t) => (
-                <option key={t}>{t}</option>
+                <option key={t} value={t}>{__pulseText(t)}</option>
               ))}
             </select>
           </label>
@@ -105,34 +103,30 @@ export function Customize() {
               })
             }
           >
-            Create pipeline
-          </button>
+            {__pulseText("Create pipeline")}</button>
         </div>
         {p.pipelines.map((x) => (
           <article className="focus-row" key={x.id}>
             <div>
               <strong>{x.name}</strong>
               <p>
-                {x.isDefault ? "Default · " : ""}
-                {x.archived ? "Archived · " : ""}
+                {x.isDefault ? __pulseText("Default · ") : ""}
+                {x.archived ? __pulseText("Archived · ") : ""}
                 {
                   p.opportunities.filter((o) => o.pipelineId === x.id).length
                 }{" "}
-                opportunities
-              </p>
+                {__pulseText("opportunities")}</p>
             </div>
             <button className="button secondary" onClick={() => setPipeline(x)}>
-              Manage {x.name}
+              {__pulseText("Manage") + " "}{x.name}
             </button>
           </article>
         ))}
       </section>
       <section className="surface">
-        <h2>Custom fields</h2>
+        <h2>{__pulseText("Custom fields")}</h2>
         <p>
-          Up to 30 fields per record type. Types stay fixed after creation.
-          Archive to keep values; deletion removes values after confirmation.
-        </p>
+          {__pulseText("Up to 30 fields per record type. Types stay fixed after creation. Archive to keep values; deletion removes values after confirmation.")}</p>
         <button
           className="button primary"
           onClick={() =>
@@ -149,27 +143,26 @@ export function Customize() {
             })
           }
         >
-          Create custom field
-        </button>
+          {__pulseText("Create custom field")}</button>
         {p.fieldDefinitions.map((f) => (
           <article className="focus-row" key={f.id}>
             <div>
               <strong>{f.label}</strong>
               <p>
                 {f.entityType} · {f.type}
-                {f.archived ? " · Archived" : ""}
+                {f.archived ? __pulseText(" · Archived") : ""}
               </p>
             </div>
             <button className="button secondary" onClick={() => setField(f)}>
-              Edit {f.label}
+              {__pulseText("Edit") + " "}{f.label}
             </button>
           </article>
         ))}
       </section>
       <section className="surface">
-        <h2>Your daily workspace</h2>
+        <h2>{__pulseText("Your daily workspace")}</h2>
         <div className="form-grid">
-          <Field label="Home layout">
+          <Field label={__pulseText("Home layout")}>
             <select
               value={p.settings.focus.homeLayout}
               onChange={(e) =>
@@ -185,12 +178,12 @@ export function Customize() {
                 )
               }
             >
-              <option value="balanced">Balanced</option>
-              <option value="focused">Focused</option>
-              <option value="compact">Compact</option>
+              <option value="balanced">{__pulseText("Balanced")}</option>
+              <option value="focused">{__pulseText("Focused")}</option>
+              <option value="compact">{__pulseText("Compact")}</option>
             </select>
           </Field>
-          <Field label="Default landing screen">
+          <Field label={__pulseText("Default landing screen")}>
             <select
               value={p.settings.focus.landing}
               onChange={(e) =>
@@ -206,8 +199,8 @@ export function Customize() {
                 )
               }
             >
-              <option value="home">Home</option>
-              <option value="focus">My Focus</option>
+              <option value="home">{__pulseText("Home")}</option>
+              <option value="focus">{__pulseText("My Focus")}</option>
             </select>
           </Field>
           {(
@@ -218,7 +211,7 @@ export function Customize() {
             ] as const
           ).map(([key, label]) => (
             <label className="field" key={key}>
-              <span>{label}</span>
+              <span>{__pulseText(label)}</span>
               <input
                 type="checkbox"
                 checked={p.settings.focus[key]}
@@ -236,9 +229,7 @@ export function Customize() {
           ))}
         </div>
         <p className="muted">
-          Reminders appear only while PULSE is open. Focus selections never earn
-          XP.
-        </p>
+          {__pulseText("Reminders appear only while PULSE is open. Focus selections never earn XP.")}</p>
       </section>
       {pipeline && (
         <PipelineEditor
@@ -267,6 +258,7 @@ function PipelineEditor({
   template: string;
   onClose: () => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     exists = p.pipelines.some((x) => x.id === record.id);
   const [rows, setRows] = useState<PipelineStage[]>(() =>
@@ -305,7 +297,7 @@ function PipelineEditor({
   }
   return (
     <RecordForm
-      title={exists ? "Manage pipeline" : "Create pipeline"}
+      title={exists ? __pulseText("Manage pipeline") : __pulseText("Create pipeline")}
       onClose={onClose}
       onDelete={
         exists &&
@@ -333,7 +325,7 @@ function PipelineEditor({
         );
       }}
     >
-      <Field label="Pipeline name" wide>
+      <Field label={__pulseText("Pipeline name")} wide>
         <input
           name="name"
           required
@@ -341,18 +333,18 @@ function PipelineEditor({
           defaultValue={record.name}
         />
       </Field>
-      <Field label="Description" wide>
+      <Field label={__pulseText("Description")} wide>
         <textarea
           name="description"
           maxLength={2000}
           defaultValue={record.description}
         />
       </Field>
-      <Field label="Pipeline color">
+      <Field label={__pulseText("Pipeline color")}>
         <input name="color" type="color" defaultValue={record.color} />
       </Field>
       <label className="field">
-        <span>Default pipeline</span>
+        <span>{__pulseText("Default pipeline")}</span>
         <input
           name="default"
           type="checkbox"
@@ -360,21 +352,20 @@ function PipelineEditor({
         />
       </label>
       <label className="field">
-        <span>Archive pipeline</span>
+        <span>{__pulseText("Archive pipeline")}</span>
         <input
           name="archived"
           type="checkbox"
           defaultChecked={record.archived}
         />
         <small>
-          Archived records remain readable. Select another default first.
-        </small>
+          {__pulseText("Archived records remain readable. Select another default first.")}</small>
       </label>
       {rows.map((s, i) => (
         <fieldset className="wide stage-editor" key={s.id}>
-          <legend>Stage {i + 1}</legend>
+          <legend>{__pulseText("Stage") + " "}{i + 1}</legend>
           <div className="form-grid">
-            <Field label={`Stage ${i + 1} name`}>
+            <Field label={__pulseText("Stage {0} name", i + 1)}>
               <input
                 required
                 maxLength={100}
@@ -382,7 +373,7 @@ function PipelineEditor({
                 onChange={(e) => change(i, { name: e.target.value })}
               />
             </Field>
-            <Field label={`Stage ${i + 1} outcome`}>
+            <Field label={__pulseText("Stage {0} outcome", i + 1)}>
               <select
                 value={s.category}
                 onChange={(e) =>
@@ -391,12 +382,12 @@ function PipelineEditor({
                   })
                 }
               >
-                <option value="open">Open</option>
-                <option value="won">Won</option>
-                <option value="lost">Lost</option>
+                <option value="open">{__pulseText("Open")}</option>
+                <option value="won">{__pulseText("Won")}</option>
+                <option value="lost">{__pulseText("Lost")}</option>
               </select>
             </Field>
-            <Field label={`Stage ${i + 1} color`}>
+            <Field label={__pulseText("Stage {0} color", i + 1)}>
               <input
                 type="color"
                 value={s.color}
@@ -411,16 +402,14 @@ function PipelineEditor({
               disabled={i === 0}
               onClick={() => reorder(i, -1)}
             >
-              Move up
-            </button>
+              {__pulseText("Move up")}</button>
             <button
               type="button"
               className="button ghost"
               disabled={i === rows.length - 1}
               onClick={() => reorder(i, 1)}
             >
-              Move down
-            </button>
+              {__pulseText("Move down")}</button>
             <button
               type="button"
               className="button ghost destructive"
@@ -429,8 +418,7 @@ function PipelineEditor({
                 setConfirmed(false);
               }}
             >
-              Remove stage
-            </button>
+              {__pulseText("Remove stage")}</button>
           </div>
         </fieldset>
       ))}
@@ -452,14 +440,11 @@ function PipelineEditor({
           ])
         }
       >
-        Add stage
-      </button>
+        {__pulseText("Add stage")}</button>
       {removed.map((s) => (
-        <Field key={s.id} label={`Replace removed stage: ${s.name}`} wide>
+        <Field key={s.id} label={__pulseText("Replace removed stage: {0}", s.name)} wide>
           <p>
-            {p.opportunities.filter((o) => o.stageId === s.id).length} affected
-            opportunities
-          </p>
+            {p.opportunities.filter((o) => o.stageId === s.id).length} {" " + __pulseText("affected opportunities")}</p>
           <select
             value={mappings[s.id] || ""}
             onChange={(e) => {
@@ -467,7 +452,7 @@ function PipelineEditor({
               setConfirmed(false);
             }}
           >
-            <option value="">Choose replacement for used stage</option>
+            <option value="">{__pulseText("Choose replacement for used stage")}</option>
             {rows.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.name} · {r.category}
@@ -479,22 +464,16 @@ function PipelineEditor({
       {!!affected.length && (
         <label className="field wide">
           <strong>
-            Impact preview: {affected.length} opportunities change stage or
-            outcome.
-          </strong>
+            {__pulseText("Impact preview:") + " "}{affected.length} {" " + __pulseText("opportunities change stage or outcome.")}</strong>
           <p>
-            Open stages reopen closed deals and reverse applicable XP.
-            Configuration changes grant no new XP. Cancel leaves records
-            unchanged.
-          </p>
+            {__pulseText("Open stages reopen closed deals and reverse applicable XP. Configuration changes grant no new XP. Cancel leaves records unchanged.")}</p>
           <span>
             <input
               type="checkbox"
               checked={confirmed}
               onChange={(e) => setConfirmed(e.target.checked)}
             />
-            Confirm these mappings and outcome changes
-          </span>
+            {__pulseText("Confirm these mappings and outcome changes")}</span>
         </label>
       )}
     </RecordForm>
@@ -507,13 +486,14 @@ function FieldEditor({
   record: FieldDefinition;
   onClose: () => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     exists = p.fieldDefinitions.some((f) => f.id === record.id),
     [type, setType] = useState(record.type);
   const count = p.fieldValues.filter((v) => v.fieldId === record.id).length;
   return (
     <RecordForm
-      title="Custom field definition"
+      title={__pulseText("Custom field definition")}
       onClose={onClose}
       deleteLabel={`Permanently delete field and ${count} values`}
       onDelete={
@@ -544,7 +524,7 @@ function FieldEditor({
         )
       }
     >
-      <Field label="Field label" wide>
+      <Field label={__pulseText("Field label")} wide>
         <input
           name="label"
           required
@@ -552,21 +532,21 @@ function FieldEditor({
           defaultValue={record.label}
         />
       </Field>
-      <Field label="Record type">
+      <Field label={__pulseText("Record type")}>
         <select
           name="entityType"
           defaultValue={record.entityType}
           disabled={exists}
         >
           {["contact", "organization", "opportunity"].map((t) => (
-            <option key={t}>{t}</option>
+            <option key={t} value={t}>{__pulseText(t)}</option>
           ))}
         </select>
         {exists && (
           <input name="entityType" type="hidden" value={record.entityType} />
         )}
       </Field>
-      <Field label="Field type">
+      <Field label={__pulseText("Field type")}>
         <select
           value={type}
           disabled={exists}
@@ -574,12 +554,12 @@ function FieldEditor({
         >
           {["text", "longText", "number", "date", "checkbox", "select"].map(
             (t) => (
-              <option key={t}>{t}</option>
+              <option key={t} value={t}>{__pulseText(t)}</option>
             ),
           )}
         </select>
       </Field>
-      <Field label="Help text" wide>
+      <Field label={__pulseText("Help text")} wide>
         <textarea
           name="description"
           maxLength={500}
@@ -587,7 +567,7 @@ function FieldEditor({
         />
       </Field>
       {type === "select" && (
-        <Field label="Choices (one per line, up to 30)" wide>
+        <Field label={__pulseText("Choices (one per line, up to 30)")} wide>
           <textarea
             name="choices"
             required
@@ -595,7 +575,7 @@ function FieldEditor({
           />
         </Field>
       )}
-      <Field label="Display order">
+      <Field label={__pulseText("Display order")}>
         <input
           name="position"
           type="number"
@@ -605,11 +585,11 @@ function FieldEditor({
         />
       </Field>
       <label className="field">
-        <span>Visible in details</span>
+        <span>{__pulseText("Visible in details")}</span>
         <input name="visible" type="checkbox" defaultChecked={record.visible} />
       </label>
       <label className="field">
-        <span>Archive field (preserve values)</span>
+        <span>{__pulseText("Archive field (preserve values)")}</span>
         <input
           name="archived"
           type="checkbox"
@@ -617,9 +597,7 @@ function FieldEditor({
         />
       </label>
       <p className="wide">
-        {count} saved values. Renaming preserves them. Permanent deletion also
-        removes these values; saved filters then show an invalid condition.
-      </p>
+        {count} {" " + __pulseText("saved values. Renaming preserves them. Permanent deletion also removes these values; saved filters then show an invalid condition.")}</p>
     </RecordForm>
   );
 }

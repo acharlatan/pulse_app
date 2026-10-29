@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { LocalMedia } from "./local-media";
 import { useEffect, useRef, useId, type ReactNode } from "react";
 import { confirmDialogClose } from "../app/update-safety";
@@ -186,6 +187,7 @@ export function Modal({
   children: ReactNode;
   onClose: () => void;
 }) {
+  const __pulseText = useInterfaceText();
   const close = () => {
     if (confirmDialogClose(ref.current)) onClose();
   };
@@ -272,7 +274,7 @@ export function Modal({
         <h2 id={titleId}>{title}</h2>
         <button
           className="icon-button"
-          aria-label="Close dialog"
+          aria-label={__pulseText("Close dialog")}
           onClick={close}
         >
           <X size={20} />
@@ -347,14 +349,14 @@ export function Confirm({
   onClose: () => void;
   action?: string;
 }) {
+  const __pulseText = useInterfaceText();
   const busy = useRef(false);
   return (
     <Modal title={title} onClose={onClose}>
       <p className="confirm-copy">{body}</p>
       <div className="form-actions">
         <button className="button secondary" onClick={onClose}>
-          Cancel
-        </button>
+          {__pulseText("Cancel")}</button>
         <button
           className="button danger"
           onClick={async () => {

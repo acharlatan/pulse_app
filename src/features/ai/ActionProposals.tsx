@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../../i18n/useInterfaceText";
 import { useState } from "react";
 import { usePulse } from "../../app/context";
 import { acceptAITask } from "../../data/ai-repository";
@@ -15,6 +16,7 @@ export function ActionProposals({
   context: AIContext;
   inputNote: string;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     [saving, setSaving] = useState(false),
     [saved, setSaved] = useState<number[]>([]);
@@ -50,10 +52,10 @@ export function ActionProposals({
             setSaving(false);
           }}
         >
-          <h3>Proposed next step {i + 1}</h3>
+          <h3>{__pulseText("Proposed next step") + " "}{i + 1}</h3>
           <p>{a.reason}</p>
           <details>
-            <summary>Review proposed task sources</summary>
+            <summary>{__pulseText("Review proposed task sources")}</summary>
             {a.refs.length ? (
               a.refs.map((ref) => (
                 <p key={ref}>
@@ -61,19 +63,19 @@ export function ActionProposals({
                   {ref === "input-note"
                     ? inputNote
                     : context.records.find((r) => r.id === ref)?.text ||
-                      "Source unavailable"}
+                      __pulseText("Source unavailable")}
                 </p>
               ))
             ) : (
-              <p>No source was cited. Verify this suggestion independently.</p>
+              <p>{__pulseText("No source was cited. Verify this suggestion independently.")}</p>
             )}
           </details>
           {saved.includes(i) ? (
-            <p>Saved or rejected; no repeated submission.</p>
+            <p>{__pulseText("Saved or rejected; no repeated submission.")}</p>
           ) : (
             <>
               <label className="field">
-                <span>Proposed task title {i + 1}</span>
+                <span>{__pulseText("Proposed task title") + " "}{i + 1}</span>
                 <input
                   name="title"
                   required
@@ -82,16 +84,16 @@ export function ActionProposals({
                 />
               </label>
               <label className="field">
-                <span>Proposed task details {i + 1}</span>
+                <span>{__pulseText("Proposed task details") + " "}{i + 1}</span>
                 <textarea name="description" defaultValue={a.description} />
               </label>
               <label className="field">
-                <span>Task contact {i + 1}</span>
+                <span>{__pulseText("Task contact") + " "}{i + 1}</span>
                 <select
                   name="contactId"
                   defaultValue={scope === "contact" ? id : ""}
                 >
-                  <option value="">Company-level administration</option>
+                  <option value="">{__pulseText("Company-level administration")}</option>
                   {p.contacts.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -102,26 +104,23 @@ export function ActionProposals({
               <p className="muted">
                 {a.dueAt
                   ? `AI proposed ${a.dueAt}; verify against the source.`
-                  : "No certain deadline was supplied."}{" "}
-                Choose the actual due date below (device time).
-              </p>
+                  : __pulseText("No certain deadline was supplied.")}{" "}
+                {__pulseText("Choose the actual due date below (device time).")}</p>
               <label className="field">
-                <span>Reviewed due date {i + 1}</span>
+                <span>{__pulseText("Reviewed due date") + " "}{i + 1}</span>
                 <input name="due" type="datetime-local" required />
               </label>
               <button
                 className="button primary"
                 disabled={saving || !p.settings.ai.enabled}
               >
-                Save reviewed task
-              </button>
+                {__pulseText("Save reviewed task")}</button>
               <button
                 type="button"
                 className="button ghost"
                 onClick={() => setSaved((v) => [...v, i])}
               >
-                Reject proposal
-              </button>
+                {__pulseText("Reject proposal")}</button>
             </>
           )}
         </form>

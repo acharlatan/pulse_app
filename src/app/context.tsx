@@ -1,4 +1,5 @@
 import { languageChoice } from "../i18n/catalog";
+import { InterfaceLocaleProvider, translateInterface } from "../i18n/useInterfaceText";
 import { clearGoogleSession } from "../services/google-session";
 import { clearGoogleImport } from "../services/google-api";
 import { confirmLeave, markSaved } from "./update-safety";
@@ -309,6 +310,7 @@ export function WorkspaceProvider({
       </div>
     );
   return (
+    <InterfaceLocaleProvider locale={data.settings.locale}>
     <Context.Provider
       value={{
         ...data,
@@ -337,12 +339,13 @@ export function WorkspaceProvider({
           className={`toast ${toast.includes("XP") && data.settings.progress.celebrations ? "momentum-celebration" : ""}`}
           role="status"
         >
-          {toast}
+          {translateInterface(data.settings.locale, toast)}
           <button aria-label="Dismiss message" onClick={() => setToast("")}>
             ×
           </button>
         </div>
       )}
     </Context.Provider>
+    </InterfaceLocaleProvider>
   );
 }

@@ -8,7 +8,7 @@ PULSE uses four main areas: Today, People, Work, and Insights. Today brings Dail
 
 Orbit offers an interactive 3D view with local portraits, company icons, sharp HTML labels and a 2D map plus record list. Solid lines show saved associations; short dotted tethers connect displaced labels to their 3D positions. Depth does not measure closeness. Reduced motion, a non-WebGL fallback, keyboard controls, and the record list remain available. Home's 3D sculpture is decorative.
 
-The workspace menu and Settings → Appearance offer 11 language choices. Navigation, selected page labels and common editor fields are translated; other interface text remains English and the app says so beside the selector. Date and number formatting follows the selected locale. A workspace's locale is stored locally and included in backups. Contact names, notes, saved data and other user content are never translated.
+The workspace menu and Settings → Appearance offer 11 language choices. Navigation, many core page labels, common actions and editor fields use locally bundled translations; other interface text remains English and the app says so beside the selector. Translation coverage is incomplete and the wording has not received a comprehensive language-by-language review. Switching languages does not use a translation API. Date and number formatting follows the selected locale. A workspace's locale is stored locally and included in backups. Contact names, notes, saved data and other user content are never translated.
 
 ## Run
 

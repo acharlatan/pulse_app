@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { takeGoogleImport, clearGoogleImport } from "../services/google-api";
 import { markSaved } from "../app/update-safety";
 import { useEffect, useState } from "react";
@@ -37,6 +38,7 @@ const fieldNames: Partial<Record<ImportField, string>> = {
   notes: "Imported note",
 };
 export function CsvImport() {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     [googleData] = useState(() => takeGoogleImport(p.workspace)),
     [step, setStep] = useState(googleData ? 1 : 0),
@@ -91,41 +93,35 @@ export function CsvImport() {
     <div className="page import-page">
       <div className="page-heading">
         <div>
-          <p className="eyebrow">BRING YOUR RELATIONSHIPS WITH YOU</p>
+          <p className="eyebrow">{__pulseText("BRING YOUR RELATIONSHIPS WITH YOU")}</p>
           <h1>
-            Import contacts<span className="accent">.</span>
+            {__pulseText("Import contacts")}<span className="accent">.</span>
           </h1>
           <p className="subtitle">
-            A guided, local CSV import into your {p.workspace} workspace.
-            Nothing changes until you confirm the plan.
-          </p>
+            {__pulseText("A guided, local CSV import into your") + " "}{p.workspace} {" " + __pulseText("workspace. Nothing changes until you confirm the plan.")}</p>
         </div>
         <Link className="button secondary" to="/settings">
-          Privacy & data
-        </Link>
+          {__pulseText("Privacy & data")}</Link>
       </div>
-      <ol className="wizard-steps" aria-label="Import progress">
+      <ol className="wizard-steps" aria-label={__pulseText("Import progress")}>
         {steps.map((s, i) => (
           <li
             key={s}
             aria-current={i === step ? "step" : undefined}
             className={i === step ? "active" : ""}
           >
-            {i + 1}. {s}
+            {i + 1}. {__pulseText(s)}
           </li>
         ))}
       </ol>
       <section className="surface import-content" aria-busy={busy}>
         {step === 0 && (
           <>
-            <h2>Choose a UTF-8 CSV</h2>
+            <h2>{__pulseText("Choose a UTF-8 CSV")}</h2>
             <p>
-              Up to 2 MB, 2,000 data rows and 40 columns. Headers are required.
-              Quoted commas and newlines are supported. Excel workbooks are not
-              supported.
-            </p>
+              {__pulseText("Up to 2 MB, 2,000 data rows and 40 columns. Headers are required. Quoted commas and newlines are supported. Excel workbooks are not supported.")}</p>
             <label className="field">
-              <span>Contact CSV file</span>
+              <span>{__pulseText("Contact CSV file")}</span>
               <input
                 type="file"
                 accept=".csv,text/csv"
@@ -162,28 +158,25 @@ export function CsvImport() {
               />
             </label>
             <p className="field-help">
-              Import adds or selectively updates contacts. Restore replaces a
-              whole workspace. Export a backup in Settings before bulk changes.
-            </p>
+              {__pulseText("Import adds or selectively updates contacts. Restore replaces a whole workspace. Export a backup in Settings before bulk changes.")}</p>
           </>
         )}
         {csv && step === 1 && (
           <>
-            <h2>Preview your file</h2>
+            <h2>{__pulseText("Preview your file")}</h2>
             <p>
-              {file.name} · {(file.size / 1024).toFixed(1)} KB ·{" "}
-              {csv.rows.length} data rows · {csv.headers.length} columns
-            </p>
-            <Badge tone="green">CSV structure validated</Badge>
+              {file.name} · {(file.size / 1024).toFixed(1)} {" " + __pulseText("KB ·")}{" "}
+              {csv.rows.length} {" " + __pulseText("data rows ·") + " "}{csv.headers.length} {" " + __pulseText("columns")}</p>
+            <Badge tone="green">{__pulseText("CSV structure validated")}</Badge>
             <div className="csv-samples">
               {csv.rows.slice(0, 3).map((row, i) => (
                 <details key={i} open={i === 0}>
-                  <summary>Sample row {i + 2}</summary>
+                  <summary>{__pulseText("Sample row") + " "}{i + 2}</summary>
                   <dl>
                     {csv.headers.map((h, j) => (
                       <div key={h}>
                         <dt>{h}</dt>
-                        <dd>{row[j] || "Empty"}</dd>
+                        <dd>{row[j] || __pulseText("Empty")}</dd>
                       </div>
                     ))}
                   </dl>
@@ -194,21 +187,18 @@ export function CsvImport() {
         )}
         {csv && step === 2 && (
           <>
-            <h2>Map columns to PULSE</h2>
+            <h2>{__pulseText("Map columns to PULSE")}</h2>
             <p>
-              Suggestions are editable. Unmapped columns are ignored. Consent
-              fields are deliberately unsupported; import never grants
-              communication permission.
-            </p>
+              {__pulseText("Suggestions are editable. Unmapped columns are ignored. Consent fields are deliberately unsupported; import never grants communication permission.")}</p>
             <div className="mapping-grid">
               {csv.headers.map((h, i) => (
                 <label className="field" key={h}>
                   <span>{h}</span>
                   <small>
-                    Example: {csv.rows[0][i]?.slice(0, 100) || "Empty"}
+                    {__pulseText("Example:") + " "}{csv.rows[0][i]?.slice(0, 100) || __pulseText("Empty")}
                   </small>
                   <select
-                    aria-label={`Map ${h}`}
+                    aria-label={__pulseText("Map {0}", h)}
                     value={mapping[i]}
                     onChange={(e) =>
                       setMapping(
@@ -220,7 +210,7 @@ export function CsvImport() {
                   >
                     {importFields.map((f) => (
                       <option value={f} key={f}>
-                        {fieldNames[f] || f}
+                        {__pulseText(fieldNames[f] || f)}
                       </option>
                     ))}
                   </select>
@@ -228,56 +218,40 @@ export function CsvImport() {
               ))}
             </div>
             <p className="field-help">
-              Last-contact dates must be YYYY-MM-DD or ISO timestamps with
-              timezone; they retain import provenance and do not create
-              conversations. Date-only values use the start of that date in
-              device time. Tags may be separated by semicolons or |.
-            </p>
+              {__pulseText("Last-contact dates must be YYYY-MM-DD or ISO timestamps with timezone; they retain import provenance and do not create conversations. Date-only values use the start of that date in device time. Tags may be separated by semicolons or |.")}</p>
           </>
         )}
         {analysis && step === 3 && (
           <>
-            <h2>Validation results</h2>
+            <h2>{__pulseText("Validation results")}</h2>
             <p>
-              {analysis.rows.filter((r) => !r.errors.length).length} valid rows
-              · {analysis.rows.filter((r) => r.errors.length).length} invalid
-              rows. Invalid rows will be rejected without writes; go back to fix
-              mappings or correct the source file.
-            </p>
+              {analysis.rows.filter((r) => !r.errors.length).length} {" " + __pulseText("valid rows ·") + " "}{analysis.rows.filter((r) => r.errors.length).length} {" " + __pulseText("invalid rows. Invalid rows will be rejected without writes; go back to fix mappings or correct the source file.")}</p>
             {analysis.rows
               .filter((r) => r.errors.length)
               .slice(0, 50)
               .map((r) => (
                 <div className="validation-row" key={r.row}>
-                  <strong>CSV row {r.row}</strong>
+                  <strong>{__pulseText("CSV row") + " "}{r.row}</strong>
                   <p>{r.errors.join(" ")}</p>
                 </div>
               ))}
             {analysis.rows.filter((r) => r.errors.length).length > 50 && (
               <p>
-                Showing the first 50 invalid rows. Correct the file and restart
-                to validate the remaining rows.
-              </p>
+                {__pulseText("Showing the first 50 invalid rows. Correct the file and restart to validate the remaining rows.")}</p>
             )}
           </>
         )}
         {analysis && step === 4 && (
           <>
-            <h2>Review duplicates and changes</h2>
+            <h2>{__pulseText("Review duplicates and changes")}</h2>
             <p>
-              Matches default to Skip. Creating as new can create a duplicate.
-              Updates preserve blank fields and only apply the fields you
-              select. Restrictions, consent, tasks and deals are preserved.
-            </p>
+              {__pulseText("Matches default to Skip. Creating as new can create a duplicate. Updates preserve blank fields and only apply the fields you select. Restrictions, consent, tasks and deals are preserved.")}</p>
             <details className="company-matches">
               <summary>
-                Company matching · {analysis.companies.length} names
-              </summary>
+                {__pulseText("Company matching ·") + " "}{analysis.companies.length} {" " + __pulseText("names")}</summary>
               <label className="setting-toggle">
                 <span>
-                  Fill missing company industry, website and location from the
-                  first imported row. Existing values are kept.
-                </span>
+                  {__pulseText("Fill missing company industry, website and location from the first imported row. Existing values are kept.")}</span>
                 <input
                   type="checkbox"
                   checked={fill}
@@ -289,17 +263,17 @@ export function CsvImport() {
                 .map((company) => (
                   <div key={company.key} className="company-match">
                     <strong>{company.name}</strong>
-                    <span>{company.website || "No website supplied"}</span>
+                    <span>{company.website || __pulseText("No website supplied")}</span>
                     <small>{company.reason}</small>
                     {company.matches.map((o) => (
                       <p key={o.id}>
-                        Existing: {o.name} · {o.website || "No website"} ·{" "}
-                        {o.location || "No location"}
+                        {__pulseText("Existing:") + " "}{o.name} · {o.website || __pulseText("No website")} ·{" "}
+                        {o.location || __pulseText("No location")}
                       </p>
                     ))}
                     <label className="field">
                       <span>
-                        Company decision for {company.name} {company.website}
+                        {__pulseText("Company decision for") + " "}{company.name} {company.website}
                       </span>
                       <select
                         value={analysis.organizationChoices[company.key]}
@@ -313,10 +287,10 @@ export function CsvImport() {
                           })
                         }
                       >
-                        <option value="new">Create a separate company</option>
+                        <option value="new">{__pulseText("Create a separate company")}</option>
                         {p.organizations.map((o) => (
                           <option key={o.id} value={o.id}>
-                            Use {o.name}
+                            {__pulseText("Use") + " "}{o.name}
                           </option>
                         ))}
                       </select>
@@ -330,10 +304,9 @@ export function CsvImport() {
                     disabled={companyPage === 0}
                     onClick={() => setCompanyPage(companyPage - 1)}
                   >
-                    Previous companies
-                  </button>
+                    {__pulseText("Previous companies")}</button>
                   <span>
-                    Companies {companyPage * 10 + 1}–
+                    {__pulseText("Companies") + " "}{companyPage * 10 + 1}–
                     {Math.min(companyPage * 10 + 10, analysis.companies.length)}
                   </span>
                   <button
@@ -343,14 +316,13 @@ export function CsvImport() {
                     }
                     onClick={() => setCompanyPage(companyPage + 1)}
                   >
-                    Next companies
-                  </button>
+                    {__pulseText("Next companies")}</button>
                 </div>
               )}
             </details>
             <p>
-              Rows {page * 10 + 1}–
-              {Math.min((page + 1) * 10, analysis.rows.length)} of{" "}
+              {__pulseText("Rows") + " "}{page * 10 + 1}–
+              {Math.min((page + 1) * 10, analysis.rows.length)} {" " + __pulseText("of")}{" "}
               {analysis.rows.length}
             </p>
             {analysis.rows.slice(page * 10, page * 10 + 10).map((row) => {
@@ -359,39 +331,37 @@ export function CsvImport() {
                 <article className="import-row" key={row.row}>
                   <div className="section-heading">
                     <h3>
-                      Row {row.row} ·{" "}
+                      {__pulseText("Row") + " "}{row.row} ·{" "}
                       {row.values.name ||
                         [row.values.firstName, row.values.lastName]
                           .filter(Boolean)
                           .join(" ") ||
-                        "Missing name"}
+                        __pulseText("Missing name")}
                     </h3>
                     <Badge tone={row.errors.length ? "red" : ""}>
                       {row.errors.length
-                        ? "Invalid"
+                        ? __pulseText("Invalid")
                         : row.matches[0]?.confidence ||
                           (row.fileDuplicate
-                            ? "Duplicate within file"
-                            : "No match")}
+                            ? __pulseText("Duplicate within file")
+                            : __pulseText("No match"))}
                     </Badge>
                   </div>
                   <p>
-                    {row.values.email || "No email"} ·{" "}
-                    {row.values.role || "No role"} ·{" "}
-                    {row.values.company || "Independent"}
+                    {row.values.email || __pulseText("No email")} ·{" "}
+                    {row.values.role || __pulseText("No role")} ·{" "}
+                    {row.values.company || __pulseText("Independent")}
                   </p>
                   {row.fileDuplicate && (
                     <p className="restriction-note">
-                      Another file row has the same email, phone or
-                      name/company. Review before creating a separate record.
-                    </p>
+                      {__pulseText("Another file row has the same email, phone or name/company. Review before creating a separate record.")}</p>
                   )}
                   {row.errors.length ? (
                     <p className="form-error">{row.errors.join(" ")}</p>
                   ) : (
                     <>
                       <label className="field">
-                        <span>Action for row {row.row}</span>
+                        <span>{__pulseText("Action for row") + " "}{row.row}</span>
                         <select
                           value={d.mode}
                           onChange={(e) =>
@@ -400,12 +370,11 @@ export function CsvImport() {
                             })
                           }
                         >
-                          <option value="skip">Skip</option>
-                          <option value="create">Create as new</option>
+                          <option value="skip">{__pulseText("Skip")}</option>
+                          <option value="create">{__pulseText("Create as new")}</option>
                           {row.matches.length > 0 && (
                             <option value="update">
-                              Update selected existing contact
-                            </option>
+                              {__pulseText("Update selected existing contact")}</option>
                           )}
                         </select>
                       </label>
@@ -451,21 +420,19 @@ export function CsvImport() {
                                 <div key={field}>
                                   <dt>{field}</dt>
                                   <dd>
-                                    <strong>Existing:</strong> {old || "Empty"}
+                                    <strong>{__pulseText("Existing:")}</strong> {old || __pulseText("Empty")}
                                   </dd>
                                   <dd>
-                                    <strong>Imported:</strong>{" "}
-                                    {incoming || "Empty — existing value kept"}
+                                    <strong>{__pulseText("Imported:")}</strong>{" "}
+                                    {incoming || __pulseText("Empty — existing value kept")}
                                   </dd>
                                 </div>
                               );
                             })}
                             <div>
-                              <dt>Communication instructions</dt>
+                              <dt>{__pulseText("Communication instructions")}</dt>
                               <dd>
-                                {m.existing.availability} · all consent records
-                                preserved
-                              </dd>
+                                {m.existing.availability} {" " + __pulseText("· all consent records preserved")}</dd>
                             </div>
                           </dl>
                         </details>
@@ -473,7 +440,7 @@ export function CsvImport() {
                       {d.mode === "update" && (
                         <>
                           <label className="field">
-                            <span>Existing contact for row {row.row}</span>
+                            <span>{__pulseText("Existing contact for row") + " "}{row.row}</span>
                             <select
                               value={d.targetId}
                               onChange={(e) =>
@@ -489,7 +456,7 @@ export function CsvImport() {
                           </label>
                           <fieldset className="people-picker">
                             <legend>
-                              Accept imported fields · row {row.row}
+                              {__pulseText("Accept imported fields · row") + " "}{row.row}
                             </legend>
                             {mergeFields.map((f) => (
                               <label key={f}>
@@ -507,7 +474,7 @@ export function CsvImport() {
                                 <span>
                                   {f}{" "}
                                   {f === "tags"
-                                    ? "(union with existing tags)"
+                                    ? __pulseText("(union with existing tags)")
                                     : ""}
                                 </span>
                               </label>
@@ -526,21 +493,19 @@ export function CsvImport() {
                 disabled={page === 0}
                 onClick={() => setPage(page - 1)}
               >
-                Previous rows
-              </button>
+                {__pulseText("Previous rows")}</button>
               <button
                 className="button secondary"
                 disabled={(page + 1) * 10 >= analysis.rows.length}
                 onClick={() => setPage(page + 1)}
               >
-                Next rows
-              </button>
+                {__pulseText("Next rows")}</button>
             </div>
           </>
         )}
         {summary && step >= 5 && (
           <>
-            <h2>{result ? "Import complete" : "Confirm your import plan"}</h2>
+            <h2>{result ? __pulseText("Import complete") : __pulseText("Confirm your import plan")}</h2>
             <div className="import-summary">
               {(
                 [
@@ -561,11 +526,7 @@ export function CsvImport() {
             {!result && (
               <>
                 <p>
-                  Apply these changes to {p.workspace} only. Invalid rows and
-                  skipped rows will not be imported. No current records are
-                  deleted. If the workspace changes after preview, the import
-                  will stop and ask you to validate again.
-                </p>
+                  {__pulseText("Apply these changes to") + " "}{p.workspace} {" " + __pulseText("only. Invalid rows and skipped rows will not be imported. No current records are deleted. If the workspace changes after preview, the import will stop and ask you to validate again.")}</p>
                 <label className="check-confirm">
                   <input
                     type="checkbox"
@@ -573,18 +534,14 @@ export function CsvImport() {
                     onChange={(e) => setConfirmed(e.target.checked)}
                   />
                   <span>
-                    I reviewed the mappings, duplicate choices, selected updates
-                    and rejected rows.
-                  </span>
+                    {__pulseText("I reviewed the mappings, duplicate choices, selected updates and rejected rows.")}</span>
                 </label>
               </>
             )}
             {result && (
               <>
                 <p>
-                  Changes are saved on this device. Imported notes are labeled
-                  by source; missing history remains unknown.
-                </p>
+                  {__pulseText("Changes are saved on this device. Imported notes are labeled by source; missing history remains unknown.")}</p>
                 <button
                   className="button secondary"
                   onClick={() => {
@@ -599,28 +556,25 @@ export function CsvImport() {
                     setCompanyPage(0);
                   }}
                 >
-                  Import another CSV
-                </button>
+                  {__pulseText("Import another CSV")}</button>
                 <Link className="button primary" to="/network">
-                  Open your Network
-                </Link>
+                  {__pulseText("Open your Network")}</Link>
                 <Link className="button secondary" to="/review">
-                  Relationship Review
-                </Link>
+                  {__pulseText("Relationship Review")}</Link>
               </>
             )}
           </>
         )}
         {error && (
           <p className="form-error" role="alert">
-            {error}
+            {__pulseText(error)}
           </p>
         )}
         {busy && (
           <p role="status">
             {step === 5
-              ? "Applying the validated plan…"
-              : "Processing locally…"}
+              ? __pulseText("Applying the validated plan…")
+              : __pulseText("Processing locally…")}
           </p>
         )}
         <div className="form-actions">
@@ -634,13 +588,11 @@ export function CsvImport() {
                 setConfirmed(false);
               }}
             >
-              Back
-            </button>
+              {__pulseText("Back")}</button>
           )}
           {step === 1 && (
             <button className="button primary" onClick={() => setStep(2)}>
-              Continue to mapping
-            </button>
+              {__pulseText("Continue to mapping")}</button>
           )}
           {step === 2 && (
             <button
@@ -657,13 +609,11 @@ export function CsvImport() {
                 })
               }
             >
-              Validate rows
-            </button>
+              {__pulseText("Validate rows")}</button>
           )}
           {step === 3 && (
             <button className="button primary" onClick={() => setStep(4)}>
-              Review duplicates
-            </button>
+              {__pulseText("Review duplicates")}</button>
           )}
           {step === 4 && (
             <button
@@ -686,8 +636,7 @@ export function CsvImport() {
                 })
               }
             >
-              Preview import summary
-            </button>
+              {__pulseText("Preview import summary")}</button>
           )}
           {step === 5 && (
             <button
@@ -703,15 +652,15 @@ export function CsvImport() {
                 })
               }
             >
-              Apply import to {p.workspace}
+              {__pulseText("Apply import to") + " "}{p.workspace}
             </button>
           )}
         </div>
       </section>
       {step === 0 && !p.importBatches.length && (
         <Empty
-          title="Your relationships, ready for a fresh chapter"
-          body="Choose a CSV to inspect it before any changes are made."
+          title={__pulseText("Your relationships, ready for a fresh chapter")}
+          body={__pulseText("Choose a CSV to inspect it before any changes are made.")}
         />
       )}
     </div>

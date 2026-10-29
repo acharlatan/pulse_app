@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
@@ -14,6 +15,7 @@ import { OrbitGuide } from "./OrbitGuide";
 import { ConstellationScene } from "../components/ConstellationScene";
 import { OrbitWorld } from "../components/OrbitWorld";
 export function Orbit() {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const navigationState = useLocation().state as {
     profileReturn?: unknown;
@@ -153,12 +155,11 @@ export function Orbit() {
             reviewReturn: navigationState?.reviewReturn,
           }}
         >
-          ← Return to profile
-        </Link>
+          {__pulseText("← Return to profile")}</Link>
       )}
       <div className="page-heading editorial-masthead insight-masthead">
         <div>
-          <p className="eyebrow">YOUR CONNECTIONS, IN CONTEXT</p>
+          <p className="eyebrow">{__pulseText("YOUR CONNECTIONS, IN CONTEXT")}</p>
           <h1>
             {t("orbitTitle")}<span className="accent">.</span>
           </h1>
@@ -172,7 +173,7 @@ export function Orbit() {
       </div>
       <div className="orbit-filters surface">
         <label className="search-field">
-          <span className="sr-only">Search Orbit</span>
+          <span className="sr-only">{__pulseText("Search Orbit")}</span>
           <input
             aria-label={t("searchOrbit")}
             value={search}
@@ -180,7 +181,7 @@ export function Orbit() {
               setSearch(e.target.value);
               setSelected("");
             }}
-            placeholder="Find a person, company or opportunity"
+            placeholder={__pulseText("Find a person, company or opportunity")}
           />
         </label>
         <button className="button secondary orbit-filter-toggle" aria-expanded={filtersOpen} aria-controls="orbit-extra-filters" onClick={() => setFiltersOpen(!filtersOpen)}>{t("filters")}{type || priority ? " •" : ""}</button>
@@ -217,11 +218,11 @@ export function Orbit() {
           <strong>
             {params.has("company")
               ? p.organizations.find((o) => o.id === params.get("company"))
-                  ?.name || "Company"
+                  ?.name || __pulseText("Company")
               : p.contacts.find((c) => c.id === params.get("person"))?.name ||
-                "Person"}
+                __pulseText("Person")}
           </strong>{" "}
-          · Focused {params.has("company") ? "company" : "person"} view{" "}
+          {__pulseText("· Focused") + " "}{params.has("company") ? __pulseText("company") : __pulseText("person")} {" " + __pulseText("view")}{" "}
           <button
             className="button ghost"
             onClick={() => {
@@ -229,8 +230,7 @@ export function Orbit() {
               setSelected("");
             }}
           >
-            Show my network
-          </button>
+            {__pulseText("Show my network")}</button>
         </p>
       )}
       <div
@@ -238,14 +238,14 @@ export function Orbit() {
       >
         <section className="orbit-map-panel">
           <div className="orbit-toolbar">
-            <div className="orbit-stage-title"><span className="orbit-stage-icon" aria-hidden="true">✳</span><div><strong>{t("constellation")}</strong><small>{graph.nodes.length} of {graph.total} matching records · select a connection</small></div></div>
-            <div className="orbit-mode-tabs" aria-label="Map style"><button aria-pressed={mapMode === "3d"} disabled={!webglAvailable} onClick={() => setMapMode("3d")}>{t("map3d")}</button><button aria-pressed={mapMode === "2d"} onClick={() => setMapMode("2d")}>{t("map2d")}</button></div>
+            <div className="orbit-stage-title"><span className="orbit-stage-icon" aria-hidden="true">✳</span><div><strong>{t("constellation")}</strong><small>{graph.nodes.length} {" " + __pulseText("of") + " "}{graph.total} {" " + __pulseText("matching records · select a connection")}</small></div></div>
+            <div className="orbit-mode-tabs" aria-label={__pulseText("Map style")}><button aria-pressed={mapMode === "3d"} disabled={!webglAvailable} onClick={() => setMapMode("3d")}>{t("map3d")}</button><button aria-pressed={mapMode === "2d"} onClick={() => setMapMode("2d")}>{t("map2d")}</button></div>
             <div className="form-actions">
               {
                 <>
                   <button
                     className="icon-button"
-                    aria-label="Zoom out"
+                    aria-label={__pulseText("Zoom out")}
                     onClick={() => setZoom(Math.max(0.35, zoom - 0.15))}
                   >
                     −
@@ -253,7 +253,7 @@ export function Orbit() {
                   <span>{Math.round(zoom * 100)}%</span>
                   <button
                     className="icon-button"
-                    aria-label="Zoom in"
+                    aria-label={__pulseText("Zoom in")}
                     onClick={() => setZoom(Math.min(2, zoom + 0.15))}
                   >
                     +
@@ -265,16 +265,15 @@ export function Orbit() {
               }
             </div>
           </div>
-          {!webglAvailable && <p className="orbit-render-notice">3D is unavailable on this device. The 2D map and full list remain available.</p>}
+          {!webglAvailable && <p className="orbit-render-notice">{__pulseText("3D is unavailable on this device. The 2D map and full list remain available.")}</p>}
 
           {!graph.nodes.length ? (
             <Empty
-              title="Your orbit starts with a connection"
-              body="No saved records match this view. Add people or companies, or clear your filters."
+              title={__pulseText("Your orbit starts with a connection")}
+              body={__pulseText("No saved records match this view. Add people or companies, or clear your filters.")}
               action={
                 <Link className="button primary" to="/network">
-                  Open Network
-                </Link>
+                  {__pulseText("Open Network")}</Link>
               }
             />
           ) : (
@@ -283,7 +282,7 @@ export function Orbit() {
                 ref={viewport}
                 className="orbit-viewport"
                 role="group"
-                aria-label="Relationship map. Select a record or use the equivalent List view."
+                aria-label={__pulseText("Relationship map. Select a record or use the equivalent List view.")}
                 onPointerDown={(e) => {
                   if ((e.target as Element).closest("button")) return;
                   drag.current = { x: e.clientX, y: e.clientY, start: pan };
@@ -310,7 +309,7 @@ export function Orbit() {
                     viewBox="0 0 1000 760"
                     className="orbit-edges"
                     role="img"
-                    aria-label="Lines show only saved company membership and opportunity associations"
+                    aria-label={__pulseText("Lines show only saved company membership and opportunity associations")}
                   >
                     {graph.edges.map((e) => {
                       const a = byId.get(e.from)!,
@@ -358,8 +357,8 @@ export function Orbit() {
                 </div>}
               </div>
               <div className="orbit-pan">
-                <span>{mapMode === "3d" ? "Drag to rotate · Select an orb" : "Drag to explore · Pan map"}</span>
-                {mapMode === "3d" && <><button className="icon-button" aria-label="Rotate orbit left" onClick={() => setTurn((value) => value - 1)}>↶</button><button className="icon-button" aria-label="Rotate orbit right" onClick={() => setTurn((value) => value + 1)}>↷</button></>}
+                <span>{mapMode === "3d" ? __pulseText("Drag to rotate · Select an orb") : __pulseText("Drag to explore · Pan map")}</span>
+                {mapMode === "3d" && <><button className="icon-button" aria-label={__pulseText("Rotate orbit left")} onClick={() => setTurn((value) => value - 1)}>↶</button><button className="icon-button" aria-label={__pulseText("Rotate orbit right")} onClick={() => setTurn((value) => value + 1)}>↷</button></>}
                 {[
                   ["←", -80, 0],
                   ["↑", 0, -80],
@@ -369,7 +368,7 @@ export function Orbit() {
                   <button
                     className="icon-button"
                     key={label}
-                    aria-label={`Pan ${label}`}
+                    aria-label={__pulseText("Pan {0}", label)}
                     onClick={() =>
                       setPan({ x: pan.x + Number(x), y: pan.y + Number(y) })
                     }
@@ -402,8 +401,7 @@ export function Orbit() {
                     setPan({ x: 500 - mapNode.x, y: 380 - mapNode.y });
                   }}
                 >
-                  Center selected
-                </button>
+                  {__pulseText("Center selected")}</button>
               )}
                 <button
                   className="button ghost"
@@ -421,18 +419,16 @@ export function Orbit() {
           )}
           <section
             className="orbit-browse"
-            aria-label="Explore connections below the map"
+            aria-label={__pulseText("Explore connections below the map")}
           >
             <div className="orbit-browse-heading">
               <div>
-                <p className="eyebrow">EXPLORE YOUR NETWORK</p>
-                <h2>Find a starting point</h2>
+                <p className="eyebrow">{__pulseText("EXPLORE YOUR NETWORK")}</p>
+                <h2>{__pulseText("Find a starting point")}</h2>
                 <p>
-                  Browse saved records or explore by company. Select any item to
-                  see its context.
-                </p>
+                  {__pulseText("Browse saved records or explore by company. Select any item to see its context.")}</p>
               </div>
-              <div className="tabs" aria-label="Orbit presentation">
+              <div className="tabs" aria-label={__pulseText("Orbit presentation")}>
                 <button
                   aria-pressed={view === "guide"}
                   onClick={() => setView("guide")}
@@ -475,18 +471,14 @@ export function Orbit() {
             ) : (
               <>
                 <div className="orbit-list-intro">
-                  <strong>Choose a starting point.</strong>
+                  <strong>{__pulseText("Choose a starting point.")}</strong>
                   <p>
-                    List finds individual records. Explore organizes a company’s
-                    saved people and opportunities; Map shows their explicit
-                    links.
-                  </p>
+                    {__pulseText("List finds individual records. Explore organizes a company’s saved people and opportunities; Map shows their explicit links.")}</p>
                   <button
                     className="button secondary"
                     onClick={() => setView("guide")}
                   >
-                    Explore by company
-                  </button>
+                    {__pulseText("Explore by company")}</button>
                 </div>
                 <div className="orbit-record-list">
                   {fullGraph.nodes.map((n) => (
@@ -513,31 +505,26 @@ export function Orbit() {
             )}
           </section>
           <div className="orbit-legend">
-            <span>◯ Person</span>
-            <span>▢ Company</span>
-            <span>◇ Opportunity</span>
+            <span>{__pulseText("◯ Person")}</span>
+            <span>{__pulseText("▢ Company")}</span>
+            <span>{__pulseText("◇ Opportunity")}</span>
             <p>
-              Solid lines show works at · opportunity representative · company
-              opportunity. Dotted lines connect portraits to their positions. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.
-            </p>
+              {__pulseText("Solid lines show works at · opportunity representative · company opportunity. Dotted lines connect portraits to their positions. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.")}</p>
           </div>
         </section>
         <aside
           ref={detail}
           className={`orbit-detail surface ${node ? "has-selection" : ""}`}
-          aria-label="Selected relationship"
+          aria-label={__pulseText("Selected relationship")}
         >
           {!node ? (
             <>
-              <p className="eyebrow">A LITTLE PERSPECTIVE</p>
-              <h2>Every connection has context.</h2>
+              <p className="eyebrow">{__pulseText("A LITTLE PERSPECTIVE")}</p>
+              <h2>{__pulseText("Every connection has context.")}</h2>
               <p>
-                Select a record to see its saved associations and next steps. No
-                relationships are inferred.
-              </p>
+                {__pulseText("Select a record to see its saved associations and next steps. No relationships are inferred.")}</p>
               <Link to="/focus" className="button secondary">
-                Open My Focus
-              </Link>
+                {__pulseText("Open My Focus")}</Link>
             </>
           ) : (
             <>
@@ -560,17 +547,17 @@ export function Orbit() {
                   <p>
                     {person.role} ·{" "}
                     {p.organizations.find((o) => o.id === person.organizationId)
-                      ?.name || "Independent"}
+                      ?.name || __pulseText("Independent")}
                   </p>
                   <p>
-                    {person.priority} priority ·{" "}
+                    {person.priority} {" " + __pulseText("priority ·")}{" "}
                     {effectiveAvailability(person, p.restrictions)}
                   </p>
                   <p>
-                    Last conversation:{" "}
+                    {__pulseText("Last conversation:")}{" "}
                     {lastInteraction(person.id, p.interactions)
                       ? date(lastInteraction(person.id, p.interactions)!)
-                      : "Not recorded"}
+                      : __pulseText("Not recorded")}
                   </p>
                   <Link
                     className="button primary"
@@ -588,33 +575,29 @@ export function Orbit() {
                       setSelected("");
                     }}
                   >
-                    Person orbit
-                  </button>
+                    {__pulseText("Person orbit")}</button>
                   <Link
                     className="button ghost"
                     to={`/analytics?person=${encodeURIComponent(person.id)}`}
                   >
-                    View person analytics
-                  </Link>
+                    {__pulseText("View person analytics")}</Link>
                   <FocusButton type="contact" id={person.id} />
                 </>
               )}
               {company && (
                 <>
-                  <p>{company.industry || "Industry not recorded"}</p>
+                  <p>{company.industry || __pulseText("Industry not recorded")}</p>
                   <p>
                     {
                       p.contacts.filter((c) => c.organizationId === company.id)
                         .length
                     }{" "}
-                    representatives
-                  </p>
+                    {__pulseText("representatives")}</p>
                   <Link
                     className="button primary"
                     to={`/network/companies/${company.id}`}
                   >
-                    Open Company
-                  </Link>
+                    {__pulseText("Open Company")}</Link>
                   <button
                     className="button ghost"
                     onClick={() => {
@@ -625,14 +608,12 @@ export function Orbit() {
                       setSelected("");
                     }}
                   >
-                    Company orbit
-                  </button>
+                    {__pulseText("Company orbit")}</button>
                   <Link
                     className="button ghost"
                     to={`/analytics?company=${encodeURIComponent(company.id)}`}
                   >
-                    View company analytics
-                  </Link>
+                    {__pulseText("View company analytics")}</Link>
                   <FocusButton type="organization" id={company.id} />
                 </>
               )}
@@ -640,7 +621,7 @@ export function Orbit() {
                 <>
                   <p>
                     {p.organizations.find((o) => o.id === deal.organizationId)
-                      ?.name || "Independent opportunity"}
+                      ?.name || __pulseText("Independent opportunity")}
                   </p>
                   <p>
                     {p.pipelines.find((x) => x.id === deal.pipelineId)?.name} ·{" "}
@@ -653,13 +634,12 @@ export function Orbit() {
                       setEditor({ kind: "opportunity", record: deal })
                     }
                   >
-                    Open Opportunity
-                  </button>
+                    {__pulseText("Open Opportunity")}</button>
                 </>
               )}
               {company && (
                 <>
-                  <h3>Representatives</h3>
+                  <h3>{__pulseText("Representatives")}</h3>
                   {p.contacts
                     .filter((c) => c.organizationId === company.id)
                     .slice(0, 20)
@@ -675,7 +655,7 @@ export function Orbit() {
                 </>
               )}
               <details className="orbit-saved-links">
-                <summary>Saved connections in this view</summary>
+                <summary>{__pulseText("Saved connections in this view")}</summary>
                 {fullGraph.edges
                   .filter((e) => e.from === node.id || e.to === node.id)
                   .map((e) => {
@@ -697,13 +677,10 @@ export function Orbit() {
                   (e) => e.from === node.id || e.to === node.id,
                 ) && (
                   <p>
-                    No saved connection is visible with these filters. Clear
-                    filters or open a scoped company/person view to inspect
-                    more.
-                  </p>
+                    {__pulseText("No saved connection is visible with these filters. Clear filters or open a scoped company/person view to inspect more.")}</p>
                 )}
               </details>
-              <h3>Linked opportunities</h3>
+              <h3>{__pulseText("Linked opportunities")}</h3>
               {related.slice(0, 10).map((o) => (
                 <button
                   key={o.id}
@@ -713,14 +690,14 @@ export function Orbit() {
                   {o.title} · {o.status}
                 </button>
               ))}
-              {!related.length && <p className="muted">None recorded.</p>}
-              <h3>Next actions</h3>
+              {!related.length && <p className="muted">{__pulseText("None recorded.")}</p>}
+              <h3>{__pulseText("Next actions")}</h3>
               {tasks.slice(0, 5).map((t) => (
                 <p key={t.id}>
                   {t.title} · {date(t.dueAt)}
                 </p>
               ))}
-              {!tasks.length && <p className="muted">No open follow-ups.</p>}
+              {!tasks.length && <p className="muted">{__pulseText("No open follow-ups.")}</p>}
             </>
           )}
         </aside>

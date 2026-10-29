@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { usePulse } from "../app/context";
 import type { FieldDefinition, FieldValue } from "../data/expansion-models";
@@ -10,6 +11,7 @@ export function CustomFields({
   type: FieldDefinition["entityType"];
   id: string;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     [open, setOpen] = useState(false);
   const fields = p.fieldDefinitions.filter(
@@ -18,7 +20,7 @@ export function CustomFields({
   const values = p.fieldValues.filter((v) => v.recordId === id);
   return (
     <section className="surface">
-      <h2>Additional details</h2>
+      <h2>{__pulseText("Additional details")}</h2>
       {fields
         .filter((f) => values.some((v) => v.fieldId === f.id))
         .map((f) => (
@@ -29,12 +31,10 @@ export function CustomFields({
         ))}
       {!fields.length ? (
         <p className="muted">
-          Create custom fields in Settings → Personalize PULSE.
-        </p>
+          {__pulseText("Create custom fields in Settings → Personalize PULSE.")}</p>
       ) : (
         <button className="button secondary" onClick={() => setOpen(true)}>
-          Edit additional details
-        </button>
+          {__pulseText("Edit additional details")}</button>
       )}
       {open && (
         <ValuesEditor type={type} id={id} onClose={() => setOpen(false)} />
@@ -51,6 +51,7 @@ function ValuesEditor({
   id: string;
   onClose: () => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse();
   const [snapshot] = useState(() =>
     JSON.stringify(p.fieldValues.filter((v) => v.recordId === id)),
@@ -70,7 +71,7 @@ function ValuesEditor({
   );
   return (
     <RecordForm
-      title="Additional relationship details"
+      title={__pulseText("Additional relationship details")}
       onClose={onClose}
       onSave={async () => {
         if (
@@ -110,16 +111,16 @@ function ValuesEditor({
                 })
               }
             >
-              <option value="">Not set</option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
+              <option value="">{__pulseText("Not set")}</option>
+              <option value="true">{__pulseText("Yes")}</option>
+              <option value="false">{__pulseText("No")}</option>
             </select>
           ) : f.type === "select" ? (
             <select
               value={String(values[f.id] ?? "")}
               onChange={(e) => setValues({ ...values, [f.id]: e.target.value })}
             >
-              <option value="">Not set</option>
+              <option value="">{__pulseText("Not set")}</option>
               {f.choices.map((c) => (
                 <option key={c}>{c}</option>
               ))}

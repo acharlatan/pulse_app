@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, MessageCircle, ArrowRight } from "lucide-react";
 import { usePulse } from "../app/context";
@@ -15,6 +16,7 @@ export function NetworkContext({
   onEdit: (e: Editor) => void;
   networkReturn: string;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     { date, money } = useFormat();
   const latest = p.interactions
@@ -36,21 +38,21 @@ export function NetworkContext({
     <aside
       id="network-relationship-context"
       className="network-context"
-      aria-label={`Relationship context for ${c.name}`}
+      aria-label={__pulseText("Relationship context for {0}", c.name)}
     >
       <div className="context-heading">
-        <p className="eyebrow">THE RELATIONSHIP</p>
+        <p className="eyebrow">{__pulseText("THE RELATIONSHIP")}</p>
         <FocusButton type="contact" id={c.id} />
       </div>
       <div className="context-identity">
         <Avatar name={c.name} mediaId={c.avatar} size="xl" />
         <h2>{c.name}</h2>
         <Link to={`/network/people/${c.id}`} state={{ networkReturn }}>
-          Open full profile <ArrowUpRight size={15} />
+          {__pulseText("Open full profile") + " "}<ArrowUpRight size={15} />
         </Link>
       </div>
       <section className="context-conversation">
-        <p className="eyebrow">LAST CONVERSATION</p>
+        <p className="eyebrow">{__pulseText("LAST CONVERSATION")}</p>
         {latest ? (
           <>
             <span className="context-date">
@@ -68,13 +70,11 @@ export function NetworkContext({
           </>
         ) : (
           <p className="muted">
-            No past conversations logged. Add one when there’s a conversation to
-            remember.
-          </p>
+            {__pulseText("No past conversations logged. Add one when there’s a conversation to remember.")}</p>
         )}
       </section>
       <section className="context-next">
-        <p className="eyebrow">OPEN COMMITMENT</p>
+        <p className="eyebrow">{__pulseText("OPEN COMMITMENT")}</p>
         {next ? (
           <>
             <Badge
@@ -91,24 +91,24 @@ export function NetworkContext({
               className="text-link"
               onClick={() => onEdit({ kind: "task", record: next })}
             >
-              Review next step <ArrowRight size={16} />
+              {__pulseText("Review next step") + " "}<ArrowRight size={16} />
             </button>
           </>
         ) : (
           <>
-            <p className="muted">No open follow-up for this person.</p>
+            <p className="muted">{__pulseText("No open follow-up for this person.")}</p>
             <button
               className="text-link"
               onClick={() => onEdit({ kind: "task", contact: c })}
             >
-              Plan a follow-up <ArrowRight size={16} />
+              {__pulseText("Plan a follow-up") + " "}<ArrowRight size={16} />
             </button>
           </>
         )}
       </section>
       {deals.length > 0 && (
         <section className="context-deals">
-          <p className="eyebrow">RELATED OPPORTUNITIES</p>
+          <p className="eyebrow">{__pulseText("RELATED OPPORTUNITIES")}</p>
           {deals.slice(0, 2).map((o) => (
             <button
               key={o.id}
@@ -117,34 +117,30 @@ export function NetworkContext({
               <strong>{o.title}</strong>
               <span>
                 {o.value === null
-                  ? "Value not set"
+                  ? __pulseText("Value not set")
                   : money(o.value, o.currency)}{" "}
                 ·{" "}
                 {p.pipelineStages.find((s) => s.id === o.stageId)?.name ||
-                  "Open"}
+                  __pulseText("Open")}
               </span>
             </button>
           ))}
           {deals.length > 2 && (
             <Link to={`/network/people/${c.id}`} state={{ networkReturn }}>
-              View all {deals.length} opportunities
-            </Link>
+              {__pulseText("View all") + " "}{deals.length} {" " + __pulseText("opportunities")}</Link>
           )}
         </section>
       )}
       {restrictions.length > 0 && (
         <p className="restriction-note">
-          Outreach restricted: {restrictions.join("; ")}. Administrative review
-          remains available.
-        </p>
+          {__pulseText("Outreach restricted:") + " "}{restrictions.join("; ")}{__pulseText(". Administrative review remains available.")}</p>
       )}
       <button
         className="button secondary context-log"
         onClick={() => onEdit({ kind: "interaction", contact: c })}
       >
         <MessageCircle size={17} />
-        Log interaction
-      </button>
+        {__pulseText("Log interaction")}</button>
     </aside>
   );
 }

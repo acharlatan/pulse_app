@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { lazy, Suspense } from "react";
 import { HashRouter, Routes, Route, Link, useLocation } from "react-router-dom";
 import { WorkspaceProvider } from "./context";
@@ -60,6 +61,7 @@ export function WorkspaceApp({
   workspace: Workspace;
   onSwitch: (w: Workspace) => void;
 }) {
+  const __pulseText = useInterfaceText();
   return (
     <HashRouter>
       <WorkspaceProvider
@@ -72,8 +74,7 @@ export function WorkspaceApp({
             <Suspense
               fallback={
                 <div className="page" role="status">
-                  Finding your rhythm…
-                </div>
+                  {__pulseText("Finding your rhythm…")}</div>
               }
             >
               <Routes>
@@ -101,10 +102,9 @@ export function WorkspaceApp({
                   path="*"
                   element={
                     <div className="page">
-                      <h1>A little off the path.</h1>
+                      <h1>{__pulseText("A little off the path.")}</h1>
                       <Link className="button primary" to="/">
-                        Back to Daily Pulse
-                      </Link>
+                        {__pulseText("Back to Daily Pulse")}</Link>
                     </div>
                   }
                 />

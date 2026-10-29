@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { setFocus } from "../data/expansion-repository";
@@ -10,6 +11,7 @@ export function FocusButton({
   type: FocusItem["entityType"];
   id: string;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse();
   const pin = p.focusItems.find(
     (f) => f.entityType === type && f.recordId === id,
@@ -26,11 +28,12 @@ export function FocusButton({
         )
       }
     >
-      {pin ? "Unpin" : "Pin to Focus"}
+      {pin ? __pulseText("Unpin") : __pulseText("Pin to Focus")}
     </button>
   );
 }
 export function FocusSummary() {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     today = calendarDay(Date.now(), p.settings.timezone);
   const selected = p.focusItems.filter((f) => f.today === today);
@@ -40,12 +43,10 @@ export function FocusSummary() {
     .filter((t) => !!t);
   return (
     <section className="surface focus-summary">
-      <h2>Your chosen next steps</h2>
+      <h2>{__pulseText("Your chosen next steps")}</h2>
       <p>
-        {selected.length} selected for today ·{" "}
-        {tasks.filter((t) => t.completedAt).length} of {tasks.length} tasks
-        completed.
-      </p>
+        {selected.length} {" " + __pulseText("selected for today ·")}{" "}
+        {tasks.filter((t) => t.completedAt).length} {" " + __pulseText("of") + " "}{tasks.length} {" " + __pulseText("tasks completed.")}</p>
       {p.settings.focus.homeLayout === "focused" && (
         <div>
           {p.focusItems
@@ -68,8 +69,7 @@ export function FocusSummary() {
         </div>
       )}
       <Link className="button secondary" to="/focus">
-        Open My Focus
-      </Link>
+        {__pulseText("Open My Focus")}</Link>
     </section>
   );
 }

@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { FocusButton } from "./focus";
 import { CustomFields } from "./custom-fields";
 import { CalendarHandoff } from "./calendar";
@@ -27,6 +28,7 @@ export function TaskRow({
   onEdit: (editor: Editor) => void;
   compact?: boolean;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     { date } = useFormat();
   const [busy, setBusy] = useState(false);
@@ -62,7 +64,7 @@ export function TaskRow({
             }}
           >
             {t.completedAt ? <RotateCcw size={19} /> : <Check size={19} />}
-            <span>{t.completedAt ? "Reopen" : "Complete"}</span>
+            <span>{t.completedAt ? __pulseText("Reopen") : __pulseText("Complete")}</span>
           </button>
           <div className="agenda-task-copy">
             <h3 id={`agenda-title-${t.id}`}>
@@ -105,31 +107,28 @@ export function TaskRow({
               >
                 {state}
               </Badge>
-              <span>{t.priority} priority</span>
+              <span>{t.priority} {" " + __pulseText("priority")}</span>
             </div>
             {restrictions.length > 0 && (
               <p className="restriction-note">
-                Outreach restricted. Completing this task does not override
-                availability or permissions.
-              </p>
+                {__pulseText("Outreach restricted. Completing this task does not override availability or permissions.")}</p>
             )}
           </div>
           <button
             className="button ghost agenda-edit"
             onClick={() => onEdit({ kind: "task", record: t })}
           >
-            Edit task
-          </button>
+            {__pulseText("Edit task")}</button>
         </div>
         <details className="agenda-task-details">
-          <summary>Details & tools</summary>
+          <summary>{__pulseText("Details & tools")}</summary>
           <div>
             {t.description && <p>{t.description}</p>}
             {t.source && (
               <small className="muted">
-                Source:{" "}
+                {__pulseText("Source:")}{" "}
                 {t.source.startsWith("automation:")
-                  ? "Local automation"
+                  ? __pulseText("Local automation")
                   : t.source}
               </small>
             )}
@@ -137,7 +136,7 @@ export function TaskRow({
               p.settings.progress.enabled &&
               reward && (
                 <small className="muted">
-                  {reward.active ? "5 XP recorded" : "Original reward inactive"}
+                  {reward.active ? __pulseText("5 XP recorded") : __pulseText("Original reward inactive")}
                 </small>
               )}
             <div className="record-actions">
@@ -163,23 +162,21 @@ export function TaskRow({
         {!c && org && (
           <Link to={`/network/companies/${org.id}`}>{org.name}</Link>
         )}
-        <small className="muted">{t.priority} priority</small>
+        <small className="muted">{t.priority} {" " + __pulseText("priority")}</small>
         {restrictions.length > 0 && (
           <p className="restriction-note">
-            Outreach restricted. Administrative editing remains available;
-            completion does not override restrictions.
-          </p>
+            {__pulseText("Outreach restricted. Administrative editing remains available; completion does not override restrictions.")}</p>
         )}
         {p.settings.gamification && p.settings.progress.enabled && reward && (
           <small className="muted">
-            {reward.active ? "5 XP recorded" : "Original reward inactive"}
+            {reward.active ? __pulseText("5 XP recorded") : __pulseText("Original reward inactive")}
           </small>
         )}
         {t.description && <p>{t.description}</p>}
         {t.source && (
           <small className="muted">
-            Source:{" "}
-            {t.source.startsWith("automation:") ? "Local automation" : t.source}
+            {__pulseText("Source:")}{" "}
+            {t.source.startsWith("automation:") ? __pulseText("Local automation") : t.source}
           </small>
         )}
         <span>
@@ -207,8 +204,7 @@ export function TaskRow({
           className="button secondary"
           onClick={() => onEdit({ kind: "task", record: t })}
         >
-          Edit task
-        </button>
+          {__pulseText("Edit task")}</button>
         <button
           className="button ghost"
           disabled={busy}
@@ -224,7 +220,7 @@ export function TaskRow({
             setBusy(false);
           }}
         >
-          {t.completedAt ? "Reopen" : "Complete"}
+          {t.completedAt ? __pulseText("Reopen") : __pulseText("Complete")}
         </button>
       </div>
     </article>
@@ -244,6 +240,7 @@ function StoryEntry({
   interaction: Interaction;
   onEdit: (editor: Editor) => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     { date } = useFormat();
   const [expanded, setExpanded] = useState(false);
@@ -273,7 +270,7 @@ function StoryEntry({
           {c.name}
         </Link>
       )}
-      {i.source && <p className="muted">Source: {i.source}</p>}
+      {i.source && <p className="muted">{__pulseText("Source:") + " "}{i.source}</p>}
       <p className="story-copy">
         {i.summary.length > 500 && !expanded
           ? i.summary.slice(0, 500) + "…"
@@ -281,12 +278,12 @@ function StoryEntry({
       </p>
       {i.summary.length > 500 && (
         <button className="button ghost" onClick={() => setExpanded(!expanded)}>
-          {expanded ? "Show less" : "Read full entry"}
+          {expanded ? __pulseText("Show less") : __pulseText("Read full entry")}
         </button>
       )}
       {i.outcome && (
         <div className="story-outcome">
-          Outcome / next step <span>{i.outcome}</span>
+          {__pulseText("Outcome / next step") + " "}<span>{i.outcome}</span>
         </div>
       )}
       {(o || t) && (
@@ -306,7 +303,7 @@ function StoryEntry({
               className="button ghost"
               onClick={() => onEdit({ kind: "task", record: t })}
             >
-              Follow-up: {t.title}
+              {__pulseText("Follow-up:") + " "}{t.title}
             </button>
           )}
         </p>
@@ -316,12 +313,11 @@ function StoryEntry({
           className="button ghost"
           to={`/assistant?scope=${i.contactId ? "contact" : "organization"}&id=${encodeURIComponent(i.contactId || i.organizationId || "")}&note=${encodeURIComponent(i.id)}`}
         >
-          Extract next steps
-        </Link>
+          {__pulseText("Extract next steps")}</Link>
         {i.type === "Meeting" && (
           <CalendarHandoff
             id={i.id}
-            title="Recorded meeting"
+            title={__pulseText("Recorded meeting")}
             description={i.summary}
             start={i.occurredAt}
           />
@@ -330,10 +326,9 @@ function StoryEntry({
           className="button ghost"
           onClick={() => onEdit({ kind: "interaction", record: i, contact: c })}
         >
-          Edit entry
-        </button>
+          {__pulseText("Edit entry")}</button>
         {i.updatedAt !== i.createdAt && (
-          <small className="muted">Edited · {date(i.updatedAt)}</small>
+          <small className="muted">{__pulseText("Edited ·") + " "}{date(i.updatedAt)}</small>
         )}
       </div>
     </article>
@@ -346,6 +341,7 @@ export function RelationshipTimeline({
   interactions: Interaction[];
   onEdit: (editor: Editor) => void;
 }) {
+  const __pulseText = useInterfaceText();
   const [filter, setFilter] = useState("All"),
     [limit, setLimit] = useState(20);
   const filtered = interactions
@@ -354,7 +350,7 @@ export function RelationshipTimeline({
   return (
     <>
       <label className="field story-filter">
-        <span>Story filter</span>
+        <span>{__pulseText("Story filter")}</span>
         <select
           value={filter}
           onChange={(e) => {
@@ -363,7 +359,7 @@ export function RelationshipTimeline({
           }}
         >
           {["All", "Call", "Email", "Meeting", "Message", "Note"].map((t) => (
-            <option key={t}>{t}</option>
+            <option key={t} value={t}>{__pulseText(t)}</option>
           ))}
         </select>
       </label>
@@ -372,8 +368,8 @@ export function RelationshipTimeline({
       ))}
       {!filtered.length && (
         <Empty
-          title="A story waiting to be told"
-          body="No conversations in this view. Log an interaction or choose another filter."
+          title={__pulseText("A story waiting to be told")}
+          body={__pulseText("No conversations in this view. Log an interaction or choose another filter.")}
         />
       )}
       {filtered.length > limit && (
@@ -381,8 +377,7 @@ export function RelationshipTimeline({
           className="button secondary"
           onClick={() => setLimit(limit + 20)}
         >
-          Show more entries
-        </button>
+          {__pulseText("Show more entries")}</button>
       )}
     </>
   );
@@ -394,6 +389,7 @@ export function OpportunityCard({
   opportunity: Opportunity;
   onEdit: (editor: Editor) => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     { money, date } = useFormat();
   const org = p.organizations.find((v) => v.id === o.organizationId);
@@ -410,7 +406,7 @@ export function OpportunityCard({
       <h3>{o.title}</h3>
       <FocusButton type="opportunity" id={o.id} />
       <details>
-        <summary>Additional details</summary>
+        <summary>{__pulseText("Additional details")}</summary>
         <CustomFields type="opportunity" id={o.id} />
       </details>
       {org && (
@@ -419,11 +415,11 @@ export function OpportunityCard({
         </Link>
       )}
       <strong className="deal-value">
-        {o.value === null ? "Value not set" : money(o.value, o.currency)}
+        {o.value === null ? __pulseText("Value not set") : money(o.value, o.currency)}
       </strong>
       {o.expectedCloseAt && (
         <p className="muted">
-          Expected close ·{" "}
+          {__pulseText("Expected close ·")}{" "}
           {date(o.expectedCloseAt, {
             month: "short",
             day: "numeric",
@@ -434,7 +430,7 @@ export function OpportunityCard({
       {p.intelligence.opportunities.find((i) => i.opportunityId === o.id)?.flags
         .length ? (
         <details className="opportunity-flags">
-          <summary>Requires review</summary>
+          <summary>{__pulseText("Requires review")}</summary>
           <p>
             {
               p.intelligence.opportunities.find((i) => i.opportunityId === o.id)
@@ -447,8 +443,7 @@ export function OpportunityCard({
         className="button ghost"
         to={`/assistant?scope=opportunity&id=${encodeURIComponent(o.id)}`}
       >
-        Catch Me Up
-      </Link>
+        {__pulseText("Catch Me Up")}</Link>
       <p className="deal-people">
         {o.contactIds
           .map((id) => p.contacts.find((c) => c.id === id))
@@ -463,8 +458,7 @@ export function OpportunityCard({
         className="button secondary"
         onClick={() => onEdit({ kind: "opportunity", record: o })}
       >
-        View / edit opportunity
-      </button>
+        {__pulseText("View / edit opportunity")}</button>
     </article>
   );
 }
@@ -475,12 +469,13 @@ export function PermissionsPanel({
   contact: Contact;
   onEdit: (editor: Editor) => void;
 }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     { date } = useFormat();
   const reasons = restrictionReasons(c, p.permissions, p.restrictions);
   return (
     <section className="surface" id="permissions">
-      <SectionHeading title="Outreach preferences" />
+      <SectionHeading title={__pulseText("Outreach preferences")} />
       {reasons.length ? (
         <div className="restriction-note">
           {reasons.map((r, i) => (
@@ -489,9 +484,7 @@ export function PermissionsPanel({
         </div>
       ) : (
         <p className="muted">
-          Eligible for relationship review. Marketing consent must be recorded
-          separately.
-        </p>
+          {__pulseText("Eligible for relationship review. Marketing consent must be recorded separately.")}</p>
       )}
       <button
         className="button secondary"
@@ -507,23 +500,22 @@ export function PermissionsPanel({
           })
         }
       >
-        Manage availability
-      </button>
+        {__pulseText("Manage availability")}</button>
       <details className="permission-details">
-        <summary>Restrictions & history</summary>
+        <summary>{__pulseText("Restrictions & history")}</summary>
         {p.restrictions
           .filter((r) => r.contactId === c.id)
           .map((r) => (
             <div className="permission-row" key={r.id}>
               <strong>{r.type}</strong>
               <small>
-                {r.startAt ? date(r.startAt) : "Start not recorded"} →{" "}
-                {r.endAt ? date(r.endAt) : "Until ended"}
+                {r.startAt ? date(r.startAt) : __pulseText("Start not recorded")} →{" "}
+                {r.endAt ? date(r.endAt) : __pulseText("Until ended")}
               </small>
               <p>{r.reason}</p>
-              {r.source && <p className="muted">Source: {r.source}</p>}
+              {r.source && <p className="muted">{__pulseText("Source:") + " "}{r.source}</p>}
               {r.endAt && Date.parse(r.endAt) <= Date.now() ? (
-                <Badge>Ended · preserved for history</Badge>
+                <Badge>{__pulseText("Ended · preserved for history")}</Badge>
               ) : (
                 <button
                   className="button ghost"
@@ -531,15 +523,14 @@ export function PermissionsPanel({
                     onEdit({ kind: "restriction", contact: c, record: r })
                   }
                 >
-                  Edit restriction
-                </button>
+                  {__pulseText("Edit restriction")}</button>
               )}
             </div>
           ))}
       </details>
       <details className="permission-details">
-        <summary>Communication permissions</summary>
-        <p className="muted">Unrecorded channels and purposes are Unknown.</p>
+        <summary>{__pulseText("Communication permissions")}</summary>
+        <p className="muted">{__pulseText("Unrecorded channels and purposes are Unknown.")}</p>
         {p.permissions
           .filter((r) => r.contactId === c.id)
           .map((r) => (
@@ -549,7 +540,7 @@ export function PermissionsPanel({
               </strong>
               <Badge>{r.status}</Badge>
               <small>
-                Recorded {date(r.createdAt)}
+                {__pulseText("Recorded") + " "}{date(r.createdAt)}
                 {r.withdrawnAt ? ` · Withdrawn ${date(r.withdrawnAt)}` : ""}
               </small>
               <p>{r.evidence}</p>
@@ -559,22 +550,21 @@ export function PermissionsPanel({
                   onEdit({ kind: "permission", contact: c, record: r })
                 }
               >
-                Edit permission
-              </button>
+                {__pulseText("Edit permission")}</button>
             </div>
           ))}
         <button
           className="button secondary"
           onClick={() => onEdit({ kind: "permission", contact: c })}
         >
-          Record permission
-        </button>
+          {__pulseText("Record permission")}</button>
       </details>
     </section>
   );
 }
 
 export function HealthSummary({ contactId }: { contactId: string }) {
+  const __pulseText = useInterfaceText();
   const p = usePulse(),
     { date } = useFormat(),
     insight = p.intelligence.relationships.find(
@@ -584,7 +574,7 @@ export function HealthSummary({ contactId }: { contactId: string }) {
   if (!insight) return null;
   return (
     <section className="surface health-summary">
-      <SectionHeading title="Relationship pulse" />
+      <SectionHeading title={__pulseText("Relationship pulse")} />
       <Badge
         tone={
           insight.health === "Restricted"
@@ -599,20 +589,15 @@ export function HealthSummary({ contactId }: { contactId: string }) {
       <p>{insight.reason}</p>
       {insight.history === "Imported unknown" && (
         <p className="muted">
-          Imported from {contact?.importProvenance?.fileName}. No last-contact
-          date was provided.
-        </p>
+          {__pulseText("Imported from") + " "}{contact?.importProvenance?.fileName}{__pulseText(". No last-contact date was provided.")}</p>
       )}
       {insight.history === "Imported date" && (
         <p className="muted">
-          Last-contact date supplied by {contact?.importProvenance?.fileName} ·{" "}
-          {date(insight.lastAt!)}. This is imported metadata, not a logged
-          conversation.
-        </p>
+          {__pulseText("Last-contact date supplied by") + " "}{contact?.importProvenance?.fileName} ·{" "}
+          {date(insight.lastAt!)}{__pulseText(". This is imported metadata, not a logged conversation.")}</p>
       )}
       <Link className="button ghost" to="/review">
-        Open Relationship Review
-      </Link>
+        {__pulseText("Open Relationship Review")}</Link>
     </section>
   );
 }

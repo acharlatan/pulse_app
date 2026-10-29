@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { usePulse } from "../app/context";
 import { bulkTag } from "../data/expansion-repository";
@@ -9,6 +10,7 @@ export function BulkTags({
   type: "contact" | "organization";
   records: { id: string; updatedAt: string; name: string }[];
 }) {
+  const __pulseText = useInterfaceText();
   const [operation, setOperation] = useState<
     "addTag" | "removeTag" | "priority" | "pin" | "unpin"
   >("addTag");
@@ -29,23 +31,20 @@ export function BulkTags({
           setOpen(true);
         }}
       >
-        Bulk add tag
-      </button>
+        {__pulseText("Bulk add tag")}</button>
       {open && (
         <Modal
-          title="Tag selected records"
+          title={__pulseText("Tag selected records")}
           onClose={() => {
             if (!busy) setOpen(false);
           }}
         >
           <p>
-            Administrative tags only. Availability and communication permissions
-            stay authoritative. No messages or XP are generated.
-          </p>
+            {__pulseText("Administrative tags only. Availability and communication permissions stay authoritative. No messages or XP are generated.")}</p>
           {!review ? (
             <>
               <label className="field">
-                <span>Bulk action</span>
+                <span>{__pulseText("Bulk action")}</span>
                 <select
                   value={operation}
                   onChange={(e) => {
@@ -59,17 +58,17 @@ export function BulkTags({
                     );
                   }}
                 >
-                  <option value="addTag">Add tag</option>
-                  <option value="removeTag">Remove tag</option>
+                  <option value="addTag">{__pulseText("Add tag")}</option>
+                  <option value="removeTag">{__pulseText("Remove tag")}</option>
                   {type === "contact" && (
-                    <option value="priority">Assign priority</option>
+                    <option value="priority">{__pulseText("Assign priority")}</option>
                   )}
-                  <option value="pin">Pin to My Focus</option>
-                  <option value="unpin">Unpin from My Focus</option>
+                  <option value="pin">{__pulseText("Pin to My Focus")}</option>
+                  <option value="unpin">{__pulseText("Unpin from My Focus")}</option>
                 </select>
               </label>
               <label className="field">
-                <span>Tag</span>
+                <span>{__pulseText("Tag")}</span>
                 <input
                   value={tag}
                   maxLength={100}
@@ -77,9 +76,7 @@ export function BulkTags({
                 />
               </label>
               <p>
-                Select from the first 200 filtered records. Narrow your
-                directory search for other records.
-              </p>
+                {__pulseText("Select from the first 200 filtered records. Narrow your directory search for other records.")}</p>
               <div className="form-actions">
                 <button
                   type="button"
@@ -92,15 +89,13 @@ export function BulkTags({
                     )
                   }
                 >
-                  Select visible results
-                </button>
+                  {__pulseText("Select visible results")}</button>
                 <button
                   type="button"
                   className="button ghost"
                   onClick={() => setSelected([])}
                 >
-                  Clear selection
-                </button>
+                  {__pulseText("Clear selection")}</button>
               </div>
               {records.slice(0, 200).map((r) => (
                 <label className="bulk-option" key={r.id}>
@@ -123,20 +118,17 @@ export function BulkTags({
                 disabled={!tag.trim() || !selected.length}
                 onClick={() => setReview(true)}
               >
-                Review {selected.length} selected records
-              </button>
+                {__pulseText("Review") + " "}{selected.length} {" " + __pulseText("selected records")}</button>
             </>
           ) : (
             <>
               <p>
-                {operation}: “{tag}” on exactly {selected.length} selected
-                records?
-              </p>
+                {operation}: “{tag}{__pulseText("” on exactly") + " "}{selected.length} {" " + __pulseText("selected records?")}</p>
               <ul>
                 {selected.map((s) => (
                   <li key={s.id}>
                     {records.find((r) => r.id === s.id)?.name ||
-                      "Record no longer in this view"}
+                      __pulseText("Record no longer in this view")}
                   </li>
                 ))}
               </ul>
@@ -146,8 +138,7 @@ export function BulkTags({
                   disabled={busy}
                   onClick={() => setReview(false)}
                 >
-                  Back
-                </button>
+                  {__pulseText("Back")}</button>
                 <button
                   className="button primary"
                   disabled={busy}
@@ -172,12 +163,11 @@ export function BulkTags({
                     }
                   }}
                 >
-                  Confirm tag update
-                </button>
+                  {__pulseText("Confirm tag update")}</button>
               </div>
             </>
           )}
-          {error && <p role="alert">{error}</p>}
+          {error && <p role="alert">{__pulseText(error)}</p>}
         </Modal>
       )}
     </>

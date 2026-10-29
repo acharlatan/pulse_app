@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { AnalyticsBrief } from "./AnalyticsBrief";
 import {
@@ -26,6 +27,7 @@ const sections = [
   "Data quality",
 ] as const;
 export function Analytics() {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const navigationState = useLocation().state as {
     profileReturn?: unknown;
@@ -177,12 +179,11 @@ export function Analytics() {
             reviewReturn: navigationState?.reviewReturn,
           }}
         >
-          ← Return to profile
-        </Link>
+          {__pulseText("← Return to profile")}</Link>
       )}
       <div className="page-heading editorial-masthead insight-masthead">
         <div>
-          <p className="eyebrow">YOUR WORK, IN CONTEXT</p>
+          <p className="eyebrow">{__pulseText("YOUR WORK, IN CONTEXT")}</p>
           <h1>
             {t("analytics")}<span className="accent">.</span>
           </h1>
@@ -192,8 +193,7 @@ export function Analytics() {
         </div>
         <div className="form-actions">
           <Link className="button secondary" to="/automations">
-            Open Automations
-          </Link>
+            {__pulseText("Open Automations")}</Link>
           <button
             className="button secondary"
             disabled={!report}
@@ -203,10 +203,10 @@ export function Analytics() {
           </button>
         </div>
       </div>
-      <section className="analytics-filters" aria-label="Report filters">
+      <section className="analytics-filters" aria-label={__pulseText("Report filters")}>
         <div className="form-grid">
           <label className="field">
-            <span>Date range</span>
+            <span>{__pulseText("Date range")}</span>
             <select
               value={filter.preset}
               onChange={(e) => {
@@ -214,18 +214,18 @@ export function Analytics() {
                 setSelectedDay("");
               }}
             >
-              <option value="7">Last 7 days</option>
-              <option value="30">Last 30 days</option>
-              <option value="90">Last 90 days</option>
-              <option value="month">This month</option>
-              <option value="year">This year</option>
-              <option value="custom">Custom range</option>
+              <option value="7">{__pulseText("Last 7 days")}</option>
+              <option value="30">{__pulseText("Last 30 days")}</option>
+              <option value="90">{__pulseText("Last 90 days")}</option>
+              <option value="month">{__pulseText("This month")}</option>
+              <option value="year">{__pulseText("This year")}</option>
+              <option value="custom">{__pulseText("Custom range")}</option>
             </select>
           </label>
           {filter.preset === "custom" && (
             <>
               <label className="field">
-                <span>From</span>
+                <span>{__pulseText("From")}</span>
                 <input
                   type="date"
                   value={filter.start}
@@ -235,7 +235,7 @@ export function Analytics() {
                 />
               </label>
               <label className="field">
-                <span>Through</span>
+                <span>{__pulseText("Through")}</span>
                 <input
                   type="date"
                   value={filter.end}
@@ -252,24 +252,23 @@ export function Analytics() {
             onToggle={(e) => setFiltersOpen(e.currentTarget.open)}
           >
             <summary>
-              Refine report
-              {filter.personId ||
+              {__pulseText("Refine report")}{filter.personId ||
               filter.organizationId ||
               filter.priority ||
               filter.category
-                ? " · scoped"
+                ? __pulseText(" · scoped")
                 : ""}
             </summary>
             <div className="form-grid">
               <label className="field">
-                <span>Company</span>
+                <span>{__pulseText("Company")}</span>
                 <select
                   value={filter.organizationId}
                   onChange={(e) =>
                     setFilter({ ...filter, organizationId: e.target.value })
                   }
                 >
-                  <option value="">All companies</option>
+                  <option value="">{__pulseText("All companies")}</option>
                   {p.organizations.map((o) => (
                     <option key={o.id} value={o.id}>
                       {o.name}
@@ -278,14 +277,14 @@ export function Analytics() {
                 </select>
               </label>
               <label className="field">
-                <span>Person</span>
+                <span>{__pulseText("Person")}</span>
                 <select
                   value={filter.personId}
                   onChange={(e) =>
                     setFilter({ ...filter, personId: e.target.value })
                   }
                 >
-                  <option value="">All people</option>
+                  <option value="">{__pulseText("All people")}</option>
                   {p.contacts.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}
@@ -294,44 +293,44 @@ export function Analytics() {
                 </select>
               </label>
               <label className="field">
-                <span>Contact priority</span>
+                <span>{__pulseText("Contact priority")}</span>
                 <select
                   value={filter.priority}
                   onChange={(e) =>
                     setFilter({ ...filter, priority: e.target.value })
                   }
                 >
-                  <option value="">All priorities</option>
+                  <option value="">{__pulseText("All priorities")}</option>
                   {priorities.map((x) => (
-                    <option key={x}>{x}</option>
+                    <option key={x} value={x}>{__pulseText(x)}</option>
                   ))}
                 </select>
               </label>
               <label className="field">
-                <span>Contact category</span>
+                <span>{__pulseText("Contact category")}</span>
                 <select
                   value={filter.category}
                   onChange={(e) =>
                     setFilter({ ...filter, category: e.target.value })
                   }
                 >
-                  <option value="">All categories</option>
+                  <option value="">{__pulseText("All categories")}</option>
                   {categories.map((x) => (
-                    <option key={x}>{x}</option>
+                    <option key={x} value={x}>{__pulseText(x)}</option>
                   ))}
                 </select>
               </label>
               {section === "Opportunities" && (
                 <>
                   <label className="field">
-                    <span>Pipeline</span>
+                    <span>{__pulseText("Pipeline")}</span>
                     <select
                       value={filter.pipelineId}
                       onChange={(e) =>
                         setFilter({ ...filter, pipelineId: e.target.value })
                       }
                     >
-                      <option value="">All pipelines</option>
+                      <option value="">{__pulseText("All pipelines")}</option>
                       {p.pipelines.map((x) => (
                         <option key={x.id} value={x.id}>
                           {x.name}
@@ -340,33 +339,33 @@ export function Analytics() {
                     </select>
                   </label>
                   <label className="field">
-                    <span>Current outcome</span>
+                    <span>{__pulseText("Current outcome")}</span>
                     <select
                       value={filter.outcome}
                       onChange={(e) =>
                         setFilter({ ...filter, outcome: e.target.value })
                       }
                     >
-                      <option value="">All outcomes</option>
-                      <option value="open">Open</option>
-                      <option value="won">Won</option>
-                      <option value="lost">Lost</option>
+                      <option value="">{__pulseText("All outcomes")}</option>
+                      <option value="open">{__pulseText("Open")}</option>
+                      <option value="won">{__pulseText("Won")}</option>
+                      <option value="lost">{__pulseText("Lost")}</option>
                     </select>
                   </label>
                 </>
               )}
               {section === "Relationships" && (
                 <label className="field">
-                  <span>Interaction type</span>
+                  <span>{__pulseText("Interaction type")}</span>
                   <select
                     value={filter.interactionType}
                     onChange={(e) =>
                       setFilter({ ...filter, interactionType: e.target.value })
                     }
                   >
-                    <option value="">All conversations</option>
+                    <option value="">{__pulseText("All conversations")}</option>
                     {["Call", "Email", "Meeting", "Message"].map((x) => (
-                      <option key={x}>{x}</option>
+                      <option key={x} value={x}>{__pulseText(x)}</option>
                     ))}
                   </select>
                 </label>
@@ -387,17 +386,13 @@ export function Analytics() {
                 })
               }
             >
-              Clear record filters
-            </button>
+              {__pulseText("Clear record filters")}</button>
             <p className="muted">
-              Calendar dates in {p.settings.timezone}. Company activity follows
-              the company saved on each conversation. Pipeline/outcome filters
-              apply to opportunities; interaction type applies to conversations.
-            </p>
+              {__pulseText("Calendar dates in") + " "}{p.settings.timezone}{__pulseText(". Company activity follows the company saved on each conversation. Pipeline/outcome filters apply to opportunities; interaction type applies to conversations.")}</p>
           </details>
         </div>
       </section>
-      <nav className="tabs analytics-tabs" aria-label="Analytics sections">
+      <nav className="tabs analytics-tabs" aria-label={__pulseText("Analytics sections")}>
         {sections.map((s) => (
           <button
             key={s}
@@ -408,21 +403,19 @@ export function Analytics() {
               setSelectedStage("");
             }}
           >
-            {s}
+            {__pulseText(s)}
           </button>
         ))}
       </nav>
       {result.error && (
         <p role="alert" className="form-error">
-          {result.error}
+          {__pulseText(result.error)}
         </p>
       )}
       {report && (
         <>
           <p className="muted">
-            {report.range.start} through {report.range.end} · current-state
-            figures are labeled below.
-          </p>
+            {report.range.start} {" " + __pulseText("through") + " "}{report.range.end} {" " + __pulseText("· current-state figures are labeled below.")}</p>
           {section === "Overview" && (
             <>
               <AnalyticsBrief
@@ -439,27 +432,24 @@ export function Analytics() {
                 aria-labelledby="weekly-review-title"
               >
                 <div>
-                  <p className="eyebrow">A WEEK IN PERSPECTIVE</p>
+                  <p className="eyebrow">{__pulseText("A WEEK IN PERSPECTIVE")}</p>
                   <h2 id="weekly-review-title">
-                    See what moved. Decide what matters.
-                  </h2>
+                    {__pulseText("See what moved. Decide what matters.")}</h2>
                   <p>
-                    Last seven days in your workspace timezone. Current overdue
-                    work is shown separately.
-                  </p>
+                    {__pulseText("Last seven days in your workspace timezone. Current overdue work is shown separately.")}</p>
                 </div>
                 <div className="weekly-review-facts">
                   <div>
                     <strong>{weekly.interactions.length}</strong>
-                    <span>recorded conversations</span>
+                    <span>{__pulseText("recorded conversations")}</span>
                   </div>
                   <div>
                     <strong>{weekly.completed.length}</strong>
-                    <span>completed follow-ups</span>
+                    <span>{__pulseText("completed follow-ups")}</span>
                   </div>
                   <div>
                     <strong>{weekly.overdue.length}</strong>
-                    <span>overdue now</span>
+                    <span>{__pulseText("overdue now")}</span>
                   </div>
                 </div>
                 <div className="weekly-review-actions">
@@ -470,21 +460,18 @@ export function Analytics() {
                       setSection("Relationships");
                     }}
                   >
-                    Explore this week’s conversations
-                  </button>
+                    {__pulseText("Explore this week’s conversations")}</button>
                   <Link className="button ghost" to="/review">
-                    Review priorities
-                  </Link>
+                    {__pulseText("Review priorities")}</Link>
                   <Link className="button ghost" to="/focus">
-                    Plan your focus
-                  </Link>
+                    {__pulseText("Plan your focus")}</Link>
                 </div>
               </section>
               <section className="analytics-period-pulse">
                 <div className="section-heading">
                   <div>
-                    <p className="eyebrow">WHAT HAPPENED · SELECTED PERIOD</p>
-                    <h2>Your recorded rhythm.</h2>
+                    <p className="eyebrow">{__pulseText("WHAT HAPPENED · SELECTED PERIOD")}</p>
+                    <h2>{__pulseText("Your recorded rhythm.")}</h2>
                   </div>
                 </div>
                 <div className="analytics-metrics">
@@ -493,11 +480,11 @@ export function Analytics() {
                     onClick={() => setSection("Relationships")}
                   >
                     <strong>{report.interactions.length}</strong>
-                    <span>Meaningful conversations</span>
+                    <span>{__pulseText("Meaningful conversations")}</span>
                     <small>
                       {report.previousInteractions.length
                         ? `${report.interactions.length - report.previousInteractions.length >= 0 ? "+" : ""}${report.interactions.length - report.previousInteractions.length} vs previous ${report.range.days} days`
-                        : "No previous-period activity recorded"}
+                        : __pulseText("No previous-period activity recorded")}
                     </small>
                   </button>
                   <button
@@ -505,17 +492,17 @@ export function Analytics() {
                     onClick={() => setSection("Productivity")}
                   >
                     <strong>{report.completed.length}</strong>
-                    <span>Follow-ups completed</span>
-                    <small>By saved completion date</small>
+                    <span>{__pulseText("Follow-ups completed")}</span>
+                    <small>{__pulseText("By saved completion date")}</small>
                   </button>
                   <button
                     className="metric-card"
                     onClick={() => setSection("Relationships")}
                   >
                     <strong>{report.previousInteractions.length}</strong>
-                    <span>Previous-period conversations</span>
+                    <span>{__pulseText("Previous-period conversations")}</span>
                     <small>
-                      {report.range.previousStart} through{" "}
+                      {report.range.previousStart} {" " + __pulseText("through")}{" "}
                       {report.range.previousEnd}
                     </small>
                   </button>
@@ -525,20 +512,20 @@ export function Analytics() {
           )}
           {(section === "Overview" || section === "Relationships") && (
             <section className="surface analytics-chart">
-              <h2>Recorded conversations over time</h2>
+              <h2>{__pulseText("Recorded conversations over time")}</h2>
               <p className="muted">
-                Select a bar to inspect its underlying conversations.{" "}
+                {__pulseText("Select a bar to inspect its underlying conversations.")}{" "}
                 {report.range.days > 90
-                  ? "Grouped by month."
+                  ? __pulseText("Grouped by month.")
                   : section === "Overview" && report.range.days > 14
-                    ? "Seven-day groups starting at the report’s first date. Select one to inspect its exact records."
-                    : "Grouped by workspace calendar day."}
+                    ? __pulseText("Seven-day groups starting at the report’s first date. Select one to inspect its exact records.")
+                    : __pulseText("Grouped by workspace calendar day.")}
               </p>
               {report.interactions.length ? (
                 <div
                   className="analytics-bars"
                   role="group"
-                  aria-label="Conversation activity by date"
+                  aria-label={__pulseText("Conversation activity by date")}
                 >
                   {analyticsDisplayTrend(
                     report,
@@ -549,7 +536,7 @@ export function Analytics() {
                       key={d}
                       className="analytics-bar"
                       aria-pressed={selectedDay === d}
-                      title={`${n} conversations · ${d.replace("..", " through ")}`}
+                      title={__pulseText("{0} conversations · {1}", n, d.replace("..", " through "))}
                       onClick={() => {
                         setSelectedDay(selectedDay === d ? "" : d);
                         setSection("Relationships");
@@ -574,20 +561,17 @@ export function Analytics() {
                 </div>
               ) : (
                 <p>
-                  No meaningful conversations in this range.{" "}
-                  <Link to="/network">Open Network</Link> to log one.
-                </p>
+                  {__pulseText("No meaningful conversations in this range.")}{" "}
+                  <Link to="/network">{__pulseText("Open Network")}</Link> {" " + __pulseText("to log one.")}</p>
               )}
             </section>
           )}
           {section === "Relationships" && (
             <>
               <section className="surface">
-                <h2>Relationship status now</h2>
+                <h2>{__pulseText("Relationship status now")}</h2>
                 <p className="muted">
-                  Uses your existing relationship review rules; this is recorded
-                  activity, not a measure of sentiment.
-                </p>
+                  {__pulseText("Uses your existing relationship review rules; this is recorded activity, not a measure of sentiment.")}</p>
                 <div className="analytics-metrics">
                   {[
                     "Active",
@@ -606,21 +590,20 @@ export function Analytics() {
                     </div>
                   ))}
                 </div>
-                <Link to="/review">Open relationship review</Link>
+                <Link to="/review">{__pulseText("Open relationship review")}</Link>
               </section>
               <section className="surface">
                 <h2>
                   {selectedDay
                     ? `Conversations · ${selectedDay.replace("..", " through ")}`
-                    : "Conversations in this period"}
+                    : __pulseText("Conversations in this period")}
                 </h2>
                 {selectedDay && (
                   <button
                     className="button ghost"
                     onClick={() => setSelectedDay("")}
                   >
-                    Clear date selection
-                  </button>
+                    {__pulseText("Clear date selection")}</button>
                 )}
                 <ul className="analytics-records">
                   {report.interactions
@@ -636,16 +619,16 @@ export function Analytics() {
                       <li key={i.id}>
                         {i.contactId ? (
                           <Link to={`/network/people/${i.contactId}`}>
-                            {person(i.contactId)?.name || "Person"}
+                            {person(i.contactId)?.name || __pulseText("Person")}
                           </Link>
                         ) : i.organizationId ? (
                           <Link to={`/network/companies/${i.organizationId}`}>
                             {p.organizations.find(
                               (o) => o.id === i.organizationId,
-                            )?.name || "Company"}
+                            )?.name || __pulseText("Company")}
                           </Link>
                         ) : (
-                          "Unlinked"
+                          __pulseText("Unlinked")
                         )}{" "}
                         · {i.type} ·{" "}
                         {calendarDay(i.occurredAt, p.settings.timezone)}
@@ -653,7 +636,7 @@ export function Analytics() {
                     ))}
                 </ul>
                 {!report.interactions.length && (
-                  <p>No saved conversations match.</p>
+                  <p>{__pulseText("No saved conversations match.")}</p>
                 )}
                 {selectedDay &&
                   report.interactions.length > 0 &&
@@ -663,25 +646,25 @@ export function Analytics() {
                       selectedDay,
                       p.settings.timezone,
                     ),
-                  ) && <p>No conversations recorded for this selected date.</p>}
+                  ) && <p>{__pulseText("No conversations recorded for this selected date.")}</p>}
               </section>
             </>
           )}
           {section === "Opportunities" && (
             <>
               <section className="surface">
-                <h2>Current pipeline snapshot</h2>
+                <h2>{__pulseText("Current pipeline snapshot")}</h2>
                 <p>
-                  {report.active.length} open · {report.won.length} won ·{" "}
-                  {report.lost.length} lost. Win rate:{" "}
+                  {report.active.length} {" " + __pulseText("open ·") + " "}{report.won.length} {" " + __pulseText("won ·")}{" "}
+                  {report.lost.length} {" " + __pulseText("lost. Win rate:")}{" "}
                   {report.winRate === null
                     ? filter.outcome
-                      ? "Unavailable while an outcome filter is selected"
-                      : "Not applicable — no closed outcomes"
+                      ? __pulseText("Unavailable while an outcome filter is selected")
+                      : __pulseText("Not applicable — no closed outcomes")
                     : `${Math.round(report.winRate * 100)}% of currently won + lost`}
                   .
                 </p>
-                <h3>Open value by currency</h3>
+                <h3>{__pulseText("Open value by currency")}</h3>
                 {report.currency.length ? (
                   report.currency.map(([currency, value]) => (
                     <p key={currency}>
@@ -692,16 +675,15 @@ export function Analytics() {
                     </p>
                   ))
                 ) : (
-                  <p>No open values recorded.</p>
+                  <p>{__pulseText("No open values recorded.")}</p>
                 )}
-                <h3>Stage distribution</h3>
+                <h3>{__pulseText("Stage distribution")}</h3>
                 <p className="muted">
-                  Select a stage to inspect its opportunities.
-                </p>
+                  {__pulseText("Select a stage to inspect its opportunities.")}</p>
                 <div
                   className="analytics-bars"
                   role="group"
-                  aria-label="Current opportunity counts by stage"
+                  aria-label={__pulseText("Current opportunity counts by stage")}
                 >
                   {p.pipelineStages
                     .filter((s) =>
@@ -724,7 +706,7 @@ export function Analytics() {
                         <button
                           key={s.id}
                           className="analytics-bar"
-                          aria-label={`${s.name}: ${n} opportunities`}
+                          aria-label={__pulseText("{0}: {1} opportunities", s.name, n)}
                           aria-pressed={selectedStage === s.id}
                           onClick={() =>
                             setSelectedStage(selectedStage === s.id ? "" : s.id)
@@ -747,10 +729,9 @@ export function Analytics() {
                     className="button ghost"
                     onClick={() => setSelectedStage("")}
                   >
-                    Clear stage selection
-                  </button>
+                    {__pulseText("Clear stage selection")}</button>
                 )}
-                <h3>Current stages</h3>
+                <h3>{__pulseText("Current stages")}</h3>
                 {p.pipelines
                   .filter(
                     (x) => !filter.pipelineId || x.id === filter.pipelineId,
@@ -778,12 +759,9 @@ export function Analytics() {
                   ))}
               </section>
               <section className="surface">
-                <h2>Recorded stage movements</h2>
+                <h2>{__pulseText("Recorded stage movements")}</h2>
                 <p className="muted">
-                  Tracking begins with saved stage transitions. Earlier stage
-                  entry and duration are unknown. Names below were captured when
-                  each movement occurred.
-                </p>
+                  {__pulseText("Tracking begins with saved stage transitions. Earlier stage entry and duration are unknown. Names below were captured when each movement occurred.")}</p>
                 {report.transitions.length ? (
                   <ul>
                     {report.transitions
@@ -799,21 +777,20 @@ export function Analytics() {
                       ))}
                   </ul>
                 ) : (
-                  <p>No tracked movements in this period.</p>
+                  <p>{__pulseText("No tracked movements in this period.")}</p>
                 )}
-                <h3>Completed tracked stage stays</h3>
+                <h3>{__pulseText("Completed tracked stage stays")}</h3>
                 {report.completedStageDurations.length ? (
                   report.completedStageDurations.map((g) => (
                     <p key={JSON.stringify([g.pipelineId, g.stageId, g.label])}>
-                      {g.label}: {g.days.length} observed · average{" "}
-                      {g.average.toFixed(1)} days · median {g.median.toFixed(1)}{" "}
-                      days
-                    </p>
+                      {g.label}: {g.days.length} {" " + __pulseText("observed · average")}{" "}
+                      {g.average.toFixed(1)} {" " + __pulseText("days · median") + " "}{g.median.toFixed(1)}{" "}
+                      {__pulseText("days")}</p>
                   ))
                 ) : (
-                  <p>Insufficient recorded entry and exit history.</p>
+                  <p>{__pulseText("Insufficient recorded entry and exit history.")}</p>
                 )}
-                <h3>Current stage age</h3>
+                <h3>{__pulseText("Current stage age")}</h3>
                 <ul>
                   {report.currentStageAge
                     .slice(0, 50)
@@ -829,18 +806,16 @@ export function Analytics() {
                         </button>{" "}
                         ·{" "}
                         {days === null
-                          ? "Insufficient tracked history"
+                          ? __pulseText("Insufficient tracked history")
                           : `${days} days since recorded entry`}
                       </li>
                     ))}
                 </ul>
               </section>
               <section className="surface">
-                <h2>Opportunities to review</h2>
+                <h2>{__pulseText("Opportunities to review")}</h2>
                 <p className="muted">
-                  Based on the same evidence and thresholds used in Relationship
-                  Review.
-                </p>
+                  {__pulseText("Based on the same evidence and thresholds used in Relationship Review.")}</p>
                 {p.intelligence.opportunities
                   .filter(
                     (i) =>
@@ -864,18 +839,16 @@ export function Analytics() {
                             setEditor({ kind: "opportunity", record: o })
                           }
                         >
-                          Open opportunity
-                        </button>
+                          {__pulseText("Open opportunity")}</button>
                         <FocusButton type="opportunity" id={o.id} />
                       </article>
                     );
                   })}
                 <Link to="/automations">
-                  Create a reviewed automation draft
-                </Link>
+                  {__pulseText("Create a reviewed automation draft")}</Link>
               </section>
               <section className="surface">
-                <h2>Opportunity records</h2>
+                <h2>{__pulseText("Opportunity records")}</h2>
                 {report.opportunities
                   .filter((o) => !selectedStage || o.stageId === selectedStage)
                   .slice(0, 100)
@@ -898,39 +871,33 @@ export function Analytics() {
           {section === "Productivity" && (
             <>
               <section className="surface">
-                <h2>Follow-ups</h2>
+                <h2>{__pulseText("Follow-ups")}</h2>
                 <p>
-                  {report.completed.length} completed in period ·{" "}
-                  {report.due.length} due in period · {report.open.length}{" "}
-                  currently open · {report.overdue.length} currently overdue.
-                </p>
+                  {report.completed.length} {" " + __pulseText("completed in period ·")}{" "}
+                  {report.due.length} {" " + __pulseText("due in period ·") + " "}{report.open.length}{" "}
+                  {__pulseText("currently open ·") + " "}{report.overdue.length} {" " + __pulseText("currently overdue.")}</p>
                 <p className="muted">
-                  Due date and completion date are separate cohorts. Historic
-                  on-time rates are unavailable because previous due-date
-                  changes are not recorded.
-                </p>
+                  {__pulseText("Due date and completion date are separate cohorts. Historic on-time rates are unavailable because previous due-date changes are not recorded.")}</p>
                 <Link
                   className="button secondary"
                   to="/activity?filter=overdue"
                 >
-                  Review overdue follow-ups
-                </Link>
+                  {__pulseText("Review overdue follow-ups")}</Link>
                 <Link className="button ghost" to="/focus">
-                  Open My Focus
-                </Link>
+                  {__pulseText("Open My Focus")}</Link>
               </section>
               <section className="surface">
-                <h2>Completion trend</h2>
+                <h2>{__pulseText("Completion trend")}</h2>
                 <p className="muted">
-                  Select a date to inspect completed follow-ups.{" "}
+                  {__pulseText("Select a date to inspect completed follow-ups.")}{" "}
                   {report.range.days > 90
-                    ? "Grouped by month."
-                    : "Grouped by workspace calendar day."}
+                    ? __pulseText("Grouped by month.")
+                    : __pulseText("Grouped by workspace calendar day.")}
                 </p>
                 <div
                   className="analytics-bars"
                   role="group"
-                  aria-label="Completed follow-ups over time"
+                  aria-label={__pulseText("Completed follow-ups over time")}
                 >
                   {Array.from(
                     report.completed.reduce((m, t) => {
@@ -948,7 +915,7 @@ export function Analytics() {
                       <button
                         key={d}
                         className="analytics-bar"
-                        aria-label={`${d}: ${n} completed follow-ups`}
+                        aria-label={__pulseText("{0}: {1} completed follow-ups", d, n)}
                         aria-pressed={selectedDay === d}
                         onClick={() =>
                           setSelectedDay(selectedDay === d ? "" : d)
@@ -966,11 +933,11 @@ export function Analytics() {
                     ))}
                 </div>
                 {!report.completed.length && (
-                  <p>No completion trend recorded for this period.</p>
+                  <p>{__pulseText("No completion trend recorded for this period.")}</p>
                 )}
               </section>
               <section className="surface">
-                <h2>Completed in this period</h2>
+                <h2>{__pulseText("Completed in this period")}</h2>
                 {report.completed
                   .filter((t) =>
                     inAnalyticsBucket(
@@ -986,24 +953,21 @@ export function Analytics() {
                       {calendarDay(t.completedAt!, p.settings.timezone)}{" "}
                       {t.contactId && (
                         <Link to={`/network/people/${t.contactId}`}>
-                          Open person
-                        </Link>
+                          {__pulseText("Open person")}</Link>
                       )}
                     </p>
                   ))}
                 {!report.completed.length && (
-                  <p>No completed follow-ups in this period.</p>
+                  <p>{__pulseText("No completed follow-ups in this period.")}</p>
                 )}
               </section>
             </>
           )}
           {section === "Data quality" && (
             <section className="surface">
-              <h2>Details to review</h2>
+              <h2>{__pulseText("Details to review")}</h2>
               <p className="muted">
-                A missing field can be intentional; these are observations, not
-                a score.
-              </p>
+                {__pulseText("A missing field can be intentional; these are observations, not a score.")}</p>
               {[
                 ["People without a company", report.issues.noCompany],
                 ["People without email or phone", report.issues.noContact],
@@ -1026,7 +990,7 @@ export function Analytics() {
                 </div>
               ))}
               <h3>
-                Opportunities missing close dates ·{" "}
+                {__pulseText("Opportunities missing close dates ·")}{" "}
                 {report.issues.noClose.length}
               </h3>
               {report.issues.noClose.slice(0, 20).map((o) => (
@@ -1039,7 +1003,7 @@ export function Analytics() {
                 </button>
               ))}
               <h3>
-                Companies without representatives ·{" "}
+                {__pulseText("Companies without representatives ·")}{" "}
                 {report.issues.noCompanyRepresentatives.length}
               </h3>
               {report.issues.noCompanyRepresentatives.slice(0, 20).map((o) => (
@@ -1048,14 +1012,14 @@ export function Analytics() {
                 </p>
               ))}
               <h3>
-                Follow-ups without a person or company ·{" "}
+                {__pulseText("Follow-ups without a person or company ·")}{" "}
                 {report.issues.unlinkedTasks.length}
               </h3>
               {report.issues.unlinkedTasks.length > 0 && (
-                <Link to="/activity?filter=all">Review follow-ups</Link>
+                <Link to="/activity?filter=all">{__pulseText("Review follow-ups")}</Link>
               )}
               <h3>
-                Opportunities without representatives ·{" "}
+                {__pulseText("Opportunities without representatives ·")}{" "}
                 {report.issues.noRepresentative.length}
               </h3>
               {report.issues.noRepresentative.slice(0, 20).map((o) => (

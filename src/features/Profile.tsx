@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { MediaControls } from "../components/media-controls";
 import { LocalMedia } from "../components/local-media";
 import { FocusButton } from "../components/focus";
@@ -44,6 +45,7 @@ import {
   taskState,
 } from "../services/recommendations";
 export function Profile({ company = false }: { company?: boolean }) {
+  const __pulseText = useInterfaceText();
   const location = useLocation();
   const returnPath = location.state?.networkReturn;
   const reviewReturn = location.state?.reviewReturn;
@@ -65,11 +67,10 @@ export function Profile({ company = false }: { company?: boolean }) {
       <div className="page">
         <Link to="/network" className="text-link">
           <ArrowLeft size={16} />
-          Back to network
-        </Link>
+          {__pulseText("Back to network")}</Link>
         <Empty
-          title="This connection isn't here"
-          body="It may have been deleted. Your other relationships are safe."
+          title={__pulseText("This connection isn't here")}
+          body={__pulseText("It may have been deleted. Your other relationships are safe.")}
         />
       </div>
     );
@@ -108,7 +109,7 @@ export function Profile({ company = false }: { company?: boolean }) {
         className="text-link back-link"
       >
         <ArrowLeft size={16} />
-        {canReturnReview ? "Back to review" : "Back to your network"}
+        {canReturnReview ? __pulseText("Back to review") : __pulseText("Back to your network")}
       </Link>
       <section
         className={`surface profile-header ${record.coverMediaId ? "has-cover" : "without-cover"}`}
@@ -118,12 +119,12 @@ export function Profile({ company = false }: { company?: boolean }) {
             <LocalMedia
               id={record.coverMediaId}
               className="profile-cover-image"
-              alt="Profile cover"
+              alt={__pulseText("Profile cover")}
             />
           ) : (
             <div />
           )}
-          <span>EVERY RELATIONSHIP HAS A STORY.</span>
+          <span>{__pulseText("EVERY RELATIONSHIP HAS A STORY.")}</span>
         </div>
         <div className="profile-identity">
           <Avatar
@@ -148,11 +149,10 @@ export function Profile({ company = false }: { company?: boolean }) {
               }
             >
               <Pencil size={16} />
-              Edit profile
-            </button>
+              {__pulseText("Edit profile")}</button>
             <button
               className="icon-button destructive"
-              aria-label={`Delete ${company ? "company" : "contact"}`}
+              aria-label={__pulseText("Delete {0}", company ? "company" : "contact")}
               onClick={() => setDeleting(true)}
             >
               <Trash2 size={18} />
@@ -164,14 +164,14 @@ export function Profile({ company = false }: { company?: boolean }) {
             <h1>{record.name}</h1>
             {contact?.preferredName &&
               contact.preferredName !== contact.name && (
-                <p className="muted">Goes by {contact.preferredName}</p>
+                <p className="muted">{__pulseText("Goes by") + " "}{contact.preferredName}</p>
               )}
             <p className="profile-subtitle">
-              {company ? org?.industry : contact?.role || "A new connection"}
+              {company ? org?.industry : contact?.role || __pulseText("A new connection")}
               {!company && org && (
                 <>
                   {" "}
-                  at{" "}
+                  {__pulseText("at")}{" "}
                   <Link to={`/network/companies/${org.id}`}>
                     {org.name}
                     <ArrowUpRight size={14} />
@@ -184,7 +184,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                 <>
                   <Badge>{contact.category}</Badge>
                   <Badge tone="purple">{contact.stage}</Badge>
-                  <Badge tone="amber">{contact.priority} priority</Badge>
+                  <Badge tone="amber">{contact.priority} {" " + __pulseText("priority")}</Badge>
                   <Badge
                     tone={
                       eligible(contact, p.permissions, p.restrictions)
@@ -194,10 +194,10 @@ export function Profile({ company = false }: { company?: boolean }) {
                   >
                     {contact.availability === "Available" &&
                     !eligible(contact, p.permissions, p.restrictions)
-                      ? "Outreach restricted"
+                      ? __pulseText("Outreach restricted")
                       : contact.availability === "Temporarily unavailable" &&
                           eligible(contact, p.permissions, p.restrictions)
-                        ? "Timeout expired · review"
+                        ? __pulseText("Timeout expired · review")
                         : contact.availability}
                     {contact.timeoutUntil
                       ? ` · until ${date(contact.timeoutUntil)}`
@@ -218,8 +218,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                   onClick={() => setEditor({ kind: "interaction", contact })}
                 >
                   <MessageCircle size={17} />
-                  Log interaction
-                </button>
+                  {__pulseText("Log interaction")}</button>
                 <button
                   className="button secondary"
                   onClick={() =>
@@ -227,15 +226,13 @@ export function Profile({ company = false }: { company?: boolean }) {
                   }
                 >
                   <StickyNote size={17} />
-                  Add note
-                </button>
+                  {__pulseText("Add note")}</button>
                 <button
                   className="button secondary"
                   onClick={() => setEditor({ kind: "task", contact })}
                 >
                   <CalendarPlus size={17} />
-                  Follow up
-                </button>
+                  {__pulseText("Follow up")}</button>
               </>
             ) : (
               <>
@@ -245,16 +242,14 @@ export function Profile({ company = false }: { company?: boolean }) {
                     setEditor({ kind: "interaction", organizationId: id })
                   }
                 >
-                  Log interaction
-                </button>
+                  {__pulseText("Log interaction")}</button>
                 <button
                   className="button secondary"
                   onClick={() =>
                     setEditor({ kind: "task", organizationId: id })
                   }
                 >
-                  Follow up
-                </button>
+                  {__pulseText("Follow up")}</button>
                 <button
                   className="button primary"
                   onClick={() =>
@@ -262,8 +257,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                   }
                 >
                   <Plus size={17} />
-                  Add representative
-                </button>
+                  {__pulseText("Add representative")}</button>
               </>
             )}
             <button
@@ -276,18 +270,16 @@ export function Profile({ company = false }: { company?: boolean }) {
                 })
               }
             >
-              Create opportunity
-            </button>
+              {__pulseText("Create opportunity")}</button>
           </div>
           <details className="profile-secondary">
-            <summary>More relationship tools</summary>
+            <summary>{__pulseText("More relationship tools")}</summary>
             <div className="record-actions">
               <Link
                 className="button secondary"
                 to={`/assistant?scope=${company ? "organization" : "contact"}&id=${encodeURIComponent(id!)}`}
               >
-                Catch Me Up · optional AI
-              </Link>
+                {__pulseText("Catch Me Up · optional AI")}</Link>
               {contact && !company && (
                 <CommunicationHandoff contact={contact} />
               )}
@@ -297,14 +289,14 @@ export function Profile({ company = false }: { company?: boolean }) {
       </section>
       <section
         className="profile-perspective connected-profile-perspective"
-        aria-label="Relationship perspective"
+        aria-label={__pulseText("Relationship perspective")}
       >
         <div>
-          <p className="eyebrow">THE STORY SO FAR</p>
-          <h2>Context for the next move.</h2>
+          <p className="eyebrow">{__pulseText("THE STORY SO FAR")}</p>
+          <h2>{__pulseText("Context for the next move.")}</h2>
           <p>
-            Saved activity and commitments for this{" "}
-            {company ? "company" : "person"}.
+            {__pulseText("Saved activity and commitments for this")}{" "}
+            {company ? __pulseText("company") : __pulseText("person")}.
           </p>
         </div>
         <div className="profile-perspective-facts">
@@ -317,17 +309,17 @@ export function Profile({ company = false }: { company?: boolean }) {
                 ).length
               }
             </strong>
-            <span>recorded conversations</span>
+            <span>{__pulseText("recorded conversations")}</span>
           </div>
           <div>
             <strong>{tasks.filter((t) => !t.completedAt).length}</strong>
-            <span>open follow-ups</span>
+            <span>{__pulseText("open follow-ups")}</span>
           </div>
           <div>
             <strong>
               {opportunities.filter((o) => o.status === "open").length}
             </strong>
-            <span>open opportunities</span>
+            <span>{__pulseText("open opportunities")}</span>
           </div>
         </div>
       </section>
@@ -338,7 +330,7 @@ export function Profile({ company = false }: { company?: boolean }) {
         />
         <Link
           className="button ghost"
-          aria-label="View relationship analytics"
+          aria-label={__pulseText("View relationship analytics")}
           to={`/analytics?${company ? "company" : "person"}=${encodeURIComponent(record.id)}`}
           state={{
             profileReturn: `/network/${company ? "companies" : "people"}/${encodeURIComponent(record.id)}`,
@@ -346,11 +338,10 @@ export function Profile({ company = false }: { company?: boolean }) {
             reviewReturn: canReturnReview ? reviewReturn : undefined,
           }}
         >
-          Analytics
-        </Link>
+          {__pulseText("Analytics")}</Link>
         <Link
           className="button ghost"
-          aria-label="View in Relationship Orbit"
+          aria-label={__pulseText("View in Relationship Orbit")}
           to={`/orbit?${company ? "company" : "person"}=${encodeURIComponent(record.id)}`}
           state={{
             profileReturn: `/network/${company ? "companies" : "people"}/${encodeURIComponent(record.id)}`,
@@ -358,13 +349,12 @@ export function Profile({ company = false }: { company?: boolean }) {
             reviewReturn: canReturnReview ? reviewReturn : undefined,
           }}
         >
-          Orbit
-        </Link>
+          {__pulseText("Orbit")}</Link>
       </div>
 
       {company && org && Object.keys(org.customFields).length > 0 && (
         <section className="surface">
-          <h2>Legacy company details</h2>
+          <h2>{__pulseText("Legacy company details")}</h2>
           {Object.entries(org.customFields).map(([k, v]) => (
             <p key={k}>
               <strong>{k}:</strong> {v}
@@ -372,7 +362,7 @@ export function Profile({ company = false }: { company?: boolean }) {
           ))}
         </section>
       )}
-      <nav className="profile-section-nav" aria-label="Profile sections">
+      <nav className="profile-section-nav" aria-label={__pulseText("Profile sections")}>
         {[
           "overview",
           "story",
@@ -395,23 +385,23 @@ export function Profile({ company = false }: { company?: boolean }) {
       </nav>
       <section
         className="profile-commitment"
-        aria-label="Next relationship commitment"
+        aria-label={__pulseText("Next relationship commitment")}
       >
         <div>
           <p className="eyebrow">
-            {next ? "THE NEXT CHAPTER" : "LAST CONVERSATION"}
+            {next ? __pulseText("THE NEXT CHAPTER") : __pulseText("LAST CONVERSATION")}
           </p>
           <h2>
             {next
               ? next.title
               : last
                 ? date(last)
-                : "Your story starts with a conversation."}
+                : __pulseText("Your story starts with a conversation.")}
           </h2>
           <p className="muted">
             {next
               ? `${taskState(next, p.settings.timezone)} · Due ${date(next.dueAt)}`
-              : "Conversations and notes remain in the relationship story below."}
+              : __pulseText("Conversations and notes remain in the relationship story below.")}
           </p>
         </div>
         <button
@@ -428,7 +418,7 @@ export function Profile({ company = false }: { company?: boolean }) {
             )
           }
         >
-          {next ? "Review commitment" : "Start the story"}
+          {next ? __pulseText("Review commitment") : __pulseText("Start the story")}
           <ArrowUpRight size={16} />
         </button>
       </section>
@@ -437,7 +427,7 @@ export function Profile({ company = false }: { company?: boolean }) {
           {company && (
             <section className="surface" id="people">
               <SectionHeading
-                title="The people behind the company"
+                title={__pulseText("The people behind the company")}
                 action={
                   <button
                     className="button ghost"
@@ -446,8 +436,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                     }
                   >
                     <Plus size={16} />
-                    Add person
-                  </button>
+                    {__pulseText("Add person")}</button>
                 }
               />
               {p.contacts
@@ -467,7 +456,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                       <small>
                         {lastInteraction(c.id, p.interactions)
                           ? `Last conversation ${date(lastInteraction(c.id, p.interactions)!)}`
-                          : "No conversations logged"}
+                          : __pulseText("No conversations logged")}
                       </small>
                     </div>
                     <Badge tone="purple">{c.stage}</Badge>
@@ -476,15 +465,14 @@ export function Profile({ company = false }: { company?: boolean }) {
                 ))}
               {!p.contacts.some((c) => c.organizationId === id) && (
                 <p className="muted">
-                  Add your first representative to bring this company to life.
-                </p>
+                  {__pulseText("Add your first representative to bring this company to life.")}</p>
               )}
             </section>
           )}
           <section className="surface" id="story">
             <SectionHeading
-              title="Relationship story"
-              eyebrow="CONVERSATIONS & NOTES"
+              title={__pulseText("Relationship story")}
+              eyebrow={__pulseText("CONVERSATIONS & NOTES")}
               action={
                 <button
                   className="button ghost"
@@ -496,8 +484,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                     })
                   }
                 >
-                  <Plus size={16} /> Add
-                </button>
+                  <Plus size={16} /> {" " + __pulseText("Add")}</button>
               }
             />
             <RelationshipTimeline
@@ -507,7 +494,7 @@ export function Profile({ company = false }: { company?: boolean }) {
           </section>
           <section className="surface" id="next-steps">
             <SectionHeading
-              title="Next steps"
+              title={__pulseText("Next steps")}
               action={
                 <button
                   className="button ghost"
@@ -520,8 +507,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                   }
                 >
                   <Plus size={16} />
-                  Plan
-                </button>
+                  {__pulseText("Plan")}</button>
               }
             />
             {tasks.map((t) => (
@@ -529,8 +515,7 @@ export function Profile({ company = false }: { company?: boolean }) {
             ))}
             {!tasks.length && (
               <p className="muted">
-                A thoughtful follow-up is a great place to start.
-              </p>
+                {__pulseText("A thoughtful follow-up is a great place to start.")}</p>
             )}
           </section>
         </div>
@@ -541,12 +526,12 @@ export function Profile({ company = false }: { company?: boolean }) {
           />
           <section className="surface" id="overview">
             <SectionHeading
-              title={company ? "About the company" : "The little details"}
+              title={company ? __pulseText("About the company") : __pulseText("The little details")}
             />
             {company ? (
               <>
                 <p className="body-copy">
-                  {org?.description || "Add a description to tell their story."}
+                  {org?.description || __pulseText("Add a description to tell their story.")}
                 </p>
                 {org?.location && (
                   <p className="detail-line">
@@ -569,19 +554,19 @@ export function Profile({ company = false }: { company?: boolean }) {
             ) : (
               <>
                 <div className="detail-block">
-                  <span>Relationship</span>
+                  <span>{__pulseText("Relationship")}</span>
                   <strong>{contact?.category}</strong>
                 </div>
                 <div className="detail-block">
-                  <span>Last conversation</span>
+                  <span>{__pulseText("Last conversation")}</span>
                   <strong>
-                    {last ? date(last) : "No conversations logged"}
+                    {last ? date(last) : __pulseText("No conversations logged")}
                   </strong>
                 </div>
                 <div className="detail-block">
-                  <span>Next follow-up</span>
+                  <span>{__pulseText("Next follow-up")}</span>
                   <strong>
-                    {next ? date(next!.dueAt) : "Room for a next step"}
+                    {next ? date(next!.dueAt) : __pulseText("Room for a next step")}
                   </strong>
                 </div>
                 {contact?.emails.map((email) => (
@@ -650,9 +635,7 @@ export function Profile({ company = false }: { company?: boolean }) {
                 ))}
                 {contact?.availability !== "Available" && (
                   <p className="restriction-note">
-                    Outreach is restricted according to this profile. No
-                    messages are sent automatically.
-                  </p>
+                    {__pulseText("Outreach is restricted according to this profile. No messages are sent automatically.")}</p>
                 )}
               </>
             )}
@@ -661,7 +644,7 @@ export function Profile({ company = false }: { company?: boolean }) {
           {contact && <PermissionsPanel contact={contact} onEdit={setEditor} />}
           <section className="surface" id="opportunities">
             <SectionHeading
-              title="Opportunities"
+              title={__pulseText("Opportunities")}
               action={
                 <button
                   className="button ghost"
@@ -673,15 +656,14 @@ export function Profile({ company = false }: { company?: boolean }) {
                     })
                   }
                 >
-                  Create
-                </button>
+                  {__pulseText("Create")}</button>
               }
             />
             {opportunities.map((o) => (
               <OpportunityCard key={o.id} opportunity={o} onEdit={setEditor} />
             ))}
             {!opportunities.length && (
-              <p className="muted">No opportunities linked yet.</p>
+              <p className="muted">{__pulseText("No opportunities linked yet.")}</p>
             )}
           </section>
         </aside>
@@ -691,11 +673,11 @@ export function Profile({ company = false }: { company?: boolean }) {
       )}
       {deleting && (
         <Confirm
-          title={`Delete ${record.name}?`}
+          title={__pulseText("Delete {0}?", record.name)}
           body={
             company
-              ? "The company will be deleted. People, interactions, tasks, opportunities, and activity are preserved and detached from this company."
-              : "This deletes the contact and their interactions, tasks, restrictions, and activity. Linked opportunities are preserved without this person. This cannot be undone."
+              ? __pulseText("The company will be deleted. People, interactions, tasks, opportunities, and activity are preserved and detached from this company.")
+              : __pulseText("This deletes the contact and their interactions, tasks, restrictions, and activity. Linked opportunities are preserved without this person. This cannot be undone.")
           }
           onClose={() => setDeleting(false)}
           onConfirm={async () => {

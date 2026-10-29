@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { GettingStarted } from "../components/GettingStarted";
@@ -52,61 +53,50 @@ const topics = [
   ],
 ];
 export function Help() {
+  const __pulseText = useInterfaceText();
   const [what, setWhat] = useState("");
   const [expected, setExpected] = useState("");
   const [copyStatus, setCopyStatus] = useState("");
   const feedback = `What happened: ${what}\nWhat I expected: ${expected}`;
   return (
     <div className="page">
-      <p className="eyebrow">PULSE · 1.5.0-rc.1</p>
-      <h1>A little guidance.</h1>
+      <p className="eyebrow">{__pulseText("PULSE · 1.5.0-rc.1")}</p>
+      <h1>{__pulseText("A little guidance.")}</h1>
       <p className="subtitle">
-        People, conversations, opportunities and follow-ups in one local
-        workspace.
-      </p>
+        {__pulseText("People, conversations, opportunities and follow-ups in one local workspace.")}</p>
       <GettingStarted always />
       <section className="surface pulse-map">
-        <p className="eyebrow">A QUICK MAP</p>
-        <h2>Find your next step.</h2>
+        <p className="eyebrow">{__pulseText("A QUICK MAP")}</p>
+        <h2>{__pulseText("Find your next step.")}</h2>
         <p>
-          Home plans today; Network keeps the people and context; Review
-          explains what needs a look. Choose priorities in Focus, explore
-          patterns in Analytics, and see saved connections in Orbit.
-        </p>
+          {__pulseText("Home plans today; Network keeps the people and context; Review explains what needs a look. Choose priorities in Focus, explore patterns in Analytics, and see saved connections in Orbit.")}</p>
         <div className="form-actions">
           <Link className="button secondary" to="/">
-            Daily Pulse
-          </Link>
+            {__pulseText("Daily Pulse")}</Link>
           <Link className="button secondary" to="/network">
-            Network
-          </Link>
+            {__pulseText("Network")}</Link>
           <Link className="button secondary" to="/analytics">
-            Analytics
-          </Link>
+            {__pulseText("Analytics")}</Link>
         </div>
       </section>
       <section className="surface help-content">
-        <h2>Work at your own rhythm</h2>
+        <h2>{__pulseText("Work at your own rhythm")}</h2>
         {topics.map(([title, body]) => (
-          <details key={title}>
-            <summary>{title}</summary>
-            <p>{body}</p>
+          <details key={__pulseText(title)}>
+            <summary>{__pulseText(title)}</summary>
+            <p>{__pulseText(body)}</p>
           </details>
         ))}
         <Link className="button secondary" to="/settings?section=data">
-          Open Privacy & data
-        </Link>
+          {__pulseText("Open Privacy & data")}</Link>
       </section>
       <section className="surface beta-feedback">
-        <p className="eyebrow">HELP SHAPE PULSE</p>
-        <h2>Share feedback in your own words.</h2>
+        <p className="eyebrow">{__pulseText("HELP SHAPE PULSE")}</p>
+        <h2>{__pulseText("Share feedback in your own words.")}</h2>
         <p>
-          Describe a problem or idea. Nothing is sent automatically; copy the
-          text and share it with the person running your beta. Avoid including
-          private contact details.
-        </p>
+          {__pulseText("Describe a problem or idea. Nothing is sent automatically; copy the text and share it with the person running your beta. Avoid including private contact details.")}</p>
         <label className="field">
-          <span>What happened or felt confusing?</span>
+          <span>{__pulseText("What happened or felt confusing?")}</span>
           <textarea
             value={what}
             onChange={(e) => setWhat(e.target.value)}
@@ -114,7 +104,7 @@ export function Help() {
           />
         </label>
         <label className="field">
-          <span>What did you expect instead?</span>
+          <span>{__pulseText("What did you expect instead?")}</span>
           <textarea
             value={expected}
             onChange={(e) => setExpected(e.target.value)}
@@ -137,19 +127,15 @@ export function Help() {
             }
           }}
         >
-          Copy feedback
-        </button>
-        <p role="status">{copyStatus}</p>
+          {__pulseText("Copy feedback")}</button>
+        <p role="status">{__pulseText(copyStatus)}</p>
         <label className="field">
-          <span>Feedback text for manual copying</span>
+          <span>{__pulseText("Feedback text for manual copying")}</span>
           <textarea readOnly value={feedback} rows={3} />
         </label>
       </section>
       <p className="muted">
-        Release candidate: automated Chromium checks are not physical-device or
-        accessibility certification. Closed-app push, cloud sync and OAuth
-        account synchronization are not available.
-      </p>
+        {__pulseText("Release candidate: automated Chromium checks are not physical-device or accessibility certification. Closed-app push, cloud sync and OAuth account synchronization are not available.")}</p>
     </div>
   );
 }

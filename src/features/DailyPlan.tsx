@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
@@ -21,6 +22,7 @@ import { restrictionReasons, taskState } from "../services/recommendations";
 import { dailyPulse } from "../services/daily-pulse";
 type Selection = { type: FocusItem["entityType"]; id: string };
 export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const p = usePulse(),
     { date, money } = useFormat();
@@ -136,15 +138,13 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
     >
       <div className="section-heading">
         <div>
-          <p className="eyebrow">A STARTING POINT, NOT A DEMAND</p>
-          <h2 id="daily-suggestions-title">Up to three places to look.</h2>
+          <p className="eyebrow">{__pulseText("A STARTING POINT, NOT A DEMAND")}</p>
+          <h2 id="daily-suggestions-title">{__pulseText("Up to three places to look.")}</h2>
           <p>
-            Suggestions share Analytics’ evidence. You decide what belongs in
-            today.
-          </p>
+            {__pulseText("Suggestions share Analytics’ evidence. You decide what belongs in today.")}</p>
         </div>
         <Link className="text-link" to="/analytics">
-          See the full picture <ArrowUpRight size={16} />
+          {__pulseText("See the full picture") + " "}<ArrowUpRight size={16} />
         </Link>
       </div>
       <div className="daily-suggestion-grid">
@@ -165,13 +165,13 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
                 disabled={busy}
                 onClick={() => void choose(s.type, s.id)}
               >
-                Choose today <Target size={15} />
+                {__pulseText("Choose today") + " "}<Target size={15} />
               </button>
               <button
                 className="button ghost"
                 onClick={() => inspect({ type: s.type, id: s.id })}
               >
-                Inspect <ArrowRight size={15} />
+                {__pulseText("Inspect") + " "}<ArrowRight size={15} />
               </button>
             </div>
           </article>
@@ -181,38 +181,29 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
         <div className="daily-clear">
           <CheckCheck size={24} />
           <p>
-            No additional suggestions right now. Your chosen work is in your
-            daily plan; your network is here when you need it.
-          </p>
+            {__pulseText("No additional suggestions right now. Your chosen work is in your daily plan; your network is here when you need it.")}</p>
         </div>
       )}
       <details className="daily-explanation">
-        <summary>How are these suggested?</summary>
+        <summary>{__pulseText("How are these suggested?")}</summary>
         <p>
-          One saved commitment, one eligible opportunity review and one eligible
-          relationship review come first when available. Remaining spaces use
-          the same evidence lanes. Already chosen records are excluded; fewer
-          than three is fine. Relationship and opportunity reviews honor
-          snoozes, dismissals and shared eligibility rules. A task is an
-          administrative commitment to inspect, never permission to contact
-          someone.
-        </p>
+          {__pulseText("One saved commitment, one eligible opportunity review and one eligible relationship review come first when available. Remaining spaces use the same evidence lanes. Already chosen records are excluded; fewer than three is fine. Relationship and opportunity reviews honor snoozes, dismissals and shared eligibility rules. A task is an administrative commitment to inspect, never permission to contact someone.")}</p>
         <Link className="text-link" to="/review">
-          Review all relationship signals <ArrowUpRight size={15} />
+          {__pulseText("Review all relationship signals") + " "}<ArrowUpRight size={15} />
         </Link>
       </details>
     </section>
   );
   const workspace = (
-    <section className="daily-workspace" aria-label="Your daily plan">
+    <section className="daily-workspace" aria-label={__pulseText("Your daily plan")}>
       <section
         className="priority-feature daily-inspector"
-        aria-label="Your next commitment"
+        aria-label={__pulseText("Your next commitment")}
       >
         <div className="priority-kicker">
           <span className="pulse-tick" aria-hidden="true" />
           <p className="eyebrow">
-            {selection ? "YOUR SELECTED PRIORITY" : "A PLACE TO BEGIN"}
+            {selection ? __pulseText("YOUR SELECTED PRIORITY") : __pulseText("A PLACE TO BEGIN")}
           </p>
           {task && (
             <Badge
@@ -244,7 +235,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
             <span>
               <strong>{(person || company)!.name}</strong>
               <small>
-                {person?.role || "Saved company"}
+                {person?.role || __pulseText("Saved company")}
                 {person?.role && company ? ` · ${company.name}` : ""}
               </small>
             </span>
@@ -253,7 +244,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
         )}
         {task && (
           <p className="daily-record-meta">
-            Saved follow-up · Due {date(task.dueAt)}
+            {__pulseText("Saved follow-up · Due") + " "}{date(task.dueAt)}
           </p>
         )}
         {opportunity && (
@@ -262,14 +253,14 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
               opportunity.status}{" "}
             ·{" "}
             {opportunity.value === null
-              ? "No value recorded"
+              ? __pulseText("No value recorded")
               : money(opportunity.value, opportunity.currency)}
           </p>
         )}
         {conversation ? (
           <div className="priority-evidence">
             <span className="eyebrow">
-              LAST CONVERSATION · {date(conversation.occurredAt)}
+              {__pulseText("LAST CONVERSATION ·") + " "}{date(conversation.occurredAt)}
             </span>
             <p>
               {conversation.summary.slice(0, 240)}
@@ -283,19 +274,15 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
           </p>
         ) : person ? (
           <p className="priority-description">
-            Review the saved relationship, permissions and next step on this
-            person’s profile.
-          </p>
+            {__pulseText("Review the saved relationship, permissions and next step on this person’s profile.")}</p>
         ) : company ? (
           <p className="priority-description">
             {company.description.slice(0, 240) ||
-              "Explore this company’s saved people and work."}
+              __pulseText("Explore this company’s saved people and work.")}
           </p>
         ) : !record ? (
           <p>
-            Choose a priority, explore your network or plan a follow-up. There
-            is no required daily quota.
-          </p>
+            {__pulseText("Choose a priority, explore your network or plan a follow-up. There is no required daily quota.")}</p>
         ) : null}
         {opportunity?.notes && (
           <p className="priority-description">
@@ -305,9 +292,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
         )}
         {restrictions.length > 0 && (
           <p className="restriction-note">
-            Outreach restricted. Review availability and permissions on the
-            profile; completing a task does not grant permission.
-          </p>
+            {__pulseText("Outreach restricted. Review availability and permissions on the profile; completing a task does not grant permission.")}</p>
         )}
         <div className="priority-actions">
           {task ? (
@@ -316,7 +301,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
                 className="button primary"
                 onClick={() => onEdit({ kind: "task", record: task })}
               >
-                Open commitment <ArrowRight size={17} />
+                {__pulseText("Open commitment") + " "}<ArrowRight size={17} />
               </button>
               <button
                 className="button ghost"
@@ -332,7 +317,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
                 }}
               >
                 <Check size={17} />
-                {task.completedAt ? "Completed" : "Mark complete"}
+                {task.completedAt ? __pulseText("Completed") : __pulseText("Mark complete")}
               </button>
             </>
           ) : opportunity ? (
@@ -342,25 +327,25 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
                 onEdit({ kind: "opportunity", record: opportunity })
               }
             >
-              Review opportunity <ArrowRight size={17} />
+              {__pulseText("Review opportunity") + " "}<ArrowRight size={17} />
             </button>
           ) : person ? (
             <Link
               className="button primary"
               to={`/network/people/${person.id}`}
             >
-              Open profile <ArrowRight size={17} />
+              {__pulseText("Open profile") + " "}<ArrowRight size={17} />
             </Link>
           ) : company ? (
             <Link
               className="button primary"
               to={`/network/companies/${company.id}`}
             >
-              Open company <ArrowRight size={17} />
+              {__pulseText("Open company") + " "}<ArrowRight size={17} />
             </Link>
           ) : (
             <Link className="button primary" to="/network">
-              Find a connection <ArrowRight size={17} />
+              {__pulseText("Find a connection") + " "}<ArrowRight size={17} />
             </Link>
           )}
           {active && record && (
@@ -369,7 +354,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
               disabled={busy || pin?.today === plan.day || !!task?.completedAt}
               onClick={() => void choose(active.type, active.id)}
             >
-              {pin?.today === plan.day ? "Chosen for today" : "Choose today"}
+              {pin?.today === plan.day ? __pulseText("Chosen for today") : __pulseText("Choose today")}
             </button>
           )}
         </div>
@@ -377,43 +362,34 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
           <div className="daily-completion" role="status">
             <CheckCheck size={22} />
             <p>
-              This commitment is complete. Review what remains in your Today
-              list, or choose another next step.
-            </p>
+              {__pulseText("This commitment is complete. Review what remains in your Today list, or choose another next step.")}</p>
           </div>
         )}
         <small className="priority-footnote">
-          Saved context, kept in place. Open a record to edit or reschedule,
-          then return here.
-        </small>
+          {__pulseText("Saved context, kept in place. Open a record to edit or reschedule, then return here.")}</small>
       </section>
       <div className="daily-chosen">
         {p.settings.focus.shortcuts ? (
           <>
             <div className="section-heading">
               <div>
-                <p className="eyebrow">CHOSEN BY YOU</p>
+                <p className="eyebrow">{__pulseText("CHOSEN BY YOU")}</p>
                   <h2>{t("yourPriorities")}</h2>
               </div>
               <Link className="text-link" to="/focus">
-                My Focus <ArrowUpRight size={16} />
+                {__pulseText("My Focus") + " "}<ArrowUpRight size={16} />
               </Link>
             </div>
             <p className="muted">
-              Select a record to work here. Completion only applies to saved
-              follow-ups.
-            </p>
+              {__pulseText("Select a record to work here. Completion only applies to saved follow-ups.")}</p>
             {plan.chosen.length === 0 ? (
               <div className="daily-chosen-empty">
                 <Target size={30} />
-                <h3>Give today a little direction.</h3>
+                <h3>{__pulseText("Give today a little direction.")}</h3>
                 <p>
-                  Choose a suggestion, or select your own priorities in My
-                  Focus. Nothing is assigned automatically.
-                </p>
+                  {__pulseText("Choose a suggestion, or select your own priorities in My Focus. Nothing is assigned automatically.")}</p>
                 <Link className="button secondary" to="/focus">
-                  Choose your own priorities
-                </Link>
+                  {__pulseText("Choose your own priorities")}</Link>
               </div>
             ) : (
               <ol className="daily-chosen-list">
@@ -440,14 +416,14 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
                           <strong>{label(f)}</strong>
                           <small>
                             {done
-                              ? "Completed follow-up"
+                              ? __pulseText("Completed follow-up")
                               : f.entityType === "task"
-                                ? "Follow-up"
+                                ? __pulseText("Follow-up")
                                 : f.entityType === "contact"
-                                  ? "Person"
+                                  ? __pulseText("Person")
                                   : f.entityType === "organization"
-                                    ? "Company"
-                                    : "Opportunity"}
+                                    ? __pulseText("Company")
+                                    : __pulseText("Opportunity")}
                           </small>
                         </span>
                         <ArrowRight size={15} />
@@ -455,7 +431,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
                       <button
                         className="daily-remove"
                         disabled={busy}
-                        aria-label={`Remove from today: ${label(f)}`}
+                        aria-label={__pulseText("Remove from today: {0}", label(f))}
                         onClick={() =>
                           void p.run(
                             () =>
@@ -469,8 +445,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
                           )
                         }
                       >
-                        Remove from today
-                      </button>
+                        {__pulseText("Remove from today")}</button>
                     </li>
                   );
                 })}
@@ -482,27 +457,24 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
                 onClick={() => setShowAll(!showAll)}
               >
                 {showAll
-                  ? "Show fewer priorities"
+                  ? __pulseText("Show fewer priorities")
                   : `Show all ${plan.chosen.length} priorities`}
               </button>
             )}
           </>
         ) : (
           <div className="section-heading">
-            <h2>Your schedule</h2>
+            <h2>{__pulseText("Your schedule")}</h2>
             <Link className="text-link" to="/focus">
-              Open My Focus <ArrowUpRight size={16} />
+              {__pulseText("Open My Focus") + " "}<ArrowUpRight size={16} />
             </Link>
           </div>
         )}
         <details className="daily-later">
           <summary>
-            What can wait? · {plan.later.length} scheduled later
-          </summary>
+            {__pulseText("What can wait? ·") + " "}{plan.later.length} {" " + __pulseText("scheduled later")}</summary>
           <p>
-            These saved follow-ups are due after today in your workspace
-            timezone. This is their schedule, not a judgment of importance.
-          </p>
+            {__pulseText("These saved follow-ups are due after today in your workspace timezone. This is their schedule, not a judgment of importance.")}</p>
           {plan.later.slice(0, 3).map((t) => (
             <button
               className="daily-later-record"
@@ -513,9 +485,9 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
               <span>{date(t.dueAt)}</span>
             </button>
           ))}
-          {!plan.later.length && <p>No later follow-ups scheduled.</p>}
+          {!plan.later.length && <p>{__pulseText("No later follow-ups scheduled.")}</p>}
           <Link className="text-link" to="/activity?filter=upcoming">
-            All upcoming follow-ups <ArrowUpRight size={15} />
+            {__pulseText("All upcoming follow-ups") + " "}<ArrowUpRight size={15} />
           </Link>
         </details>
       </div>
@@ -523,95 +495,88 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
   );
   return (
     <div className="daily-plan">
-      <section className="daily-orientation" aria-label="Your day at a glance">
+      <section className="daily-orientation" aria-label={__pulseText("Your day at a glance")}>
         <div className="daily-intent">
           <Compass size={25} />
           <div>
-            <p className="eyebrow">LESS SCATTER. MORE INTENTION.</p>
-            <h2>A day with direction.</h2>
-            <p>Small steps make room for meaningful progress.</p>
+            <p className="eyebrow">{__pulseText("LESS SCATTER. MORE INTENTION.")}</p>
+            <h2>{__pulseText("A day with direction.")}</h2>
+            <p>{__pulseText("Small steps make room for meaningful progress.")}</p>
           </div>
         </div>
         <div className="daily-status-strip">
           <div>
             <Target size={19} aria-hidden="true" />
             <strong>{plan.remaining.length}</strong>
-            <span>chosen & open</span>
+            <span>{__pulseText("chosen & open")}</span>
           </div>
           <div>
             <ListChecks size={19} aria-hidden="true" />
             <strong>{plan.attention.length}</strong>
-            <span>follow-ups to review</span>
+            <span>{__pulseText("follow-ups to review")}</span>
           </div>
           <div>
             <CalendarDays size={19} aria-hidden="true" />
             <strong>{plan.later.length}</strong>
-            <span>scheduled for later</span>
+            <span>{__pulseText("scheduled for later")}</span>
           </div>
         </div>
       </section>
       {workspace}
-      <section className="daily-extra-grid" aria-label="More from your workspace">
+      <section className="daily-extra-grid" aria-label={__pulseText("More from your workspace")}>
         <article className="daily-extra-panel">
-          <div className="section-heading"><h2>{t("comingUp")}</h2><Link className="text-link" to="/activity?filter=upcoming">View follow-ups <ArrowUpRight size={16} /></Link></div>
+          <div className="section-heading"><h2>{t("comingUp")}</h2><Link className="text-link" to="/activity?filter=upcoming">{__pulseText("View follow-ups") + " "}<ArrowUpRight size={16} /></Link></div>
           {plan.later.length ? plan.later.slice(0, 3).map((item) => (
             <button className="daily-extra-row" key={item.id} onClick={() => inspect({ type: "task", id: item.id })}>
               <CalendarDays size={20} /><span><strong>{item.title}</strong><small>{date(item.dueAt)}</small></span><ArrowRight size={16} />
             </button>
-          )) : <p className="muted">No later follow-ups scheduled yet.</p>}
+          )) : <p className="muted">{__pulseText("No later follow-ups scheduled yet.")}</p>}
         </article>
         <article className="daily-extra-panel">
-          <div className="section-heading"><h2>{t("recentConversations")}</h2><Link className="text-link" to="/activity">View activity <ArrowUpRight size={16} /></Link></div>
+          <div className="section-heading"><h2>{t("recentConversations")}</h2><Link className="text-link" to="/activity">{__pulseText("View activity") + " "}<ArrowUpRight size={16} /></Link></div>
           {p.interactions.filter((item) => item.type !== "Note" && Date.parse(item.occurredAt) <= Date.now()).slice(0, 3).map((item) => {
             const contact = p.contacts.find((person) => person.id === item.contactId);
             return <button className="daily-extra-row" key={item.id} onClick={() => onEdit({kind: "interaction", record: item})}>
               {contact ? <Avatar name={contact.name} mediaId={contact.avatar} /> : <Compass size={20} />}
-              <span><strong>{contact?.name || "Saved conversation"}</strong><small>{item.type} · {date(item.occurredAt)}</small></span><ArrowRight size={16} />
+              <span><strong>{contact?.name || __pulseText("Saved conversation")}</strong><small>{item.type} · {date(item.occurredAt)}</small></span><ArrowRight size={16} />
             </button>;
           })}
-          {!p.interactions.some((item) => item.type !== "Note" && Date.parse(item.occurredAt) <= Date.now()) && <p className="muted">Your saved conversations will appear here.</p>}
+          {!p.interactions.some((item) => item.type !== "Note" && Date.parse(item.occurredAt) <= Date.now()) && <p className="muted">{__pulseText("Your saved conversations will appear here.")}</p>}
         </article>
         <article className="daily-extra-panel daily-network-snapshot">
-          <div className="section-heading"><h2>{t("yourNetwork")}</h2><Link className="text-link" to="/network">Explore <ArrowUpRight size={16} /></Link></div>
-          <div className="daily-network-circle"><strong>{p.contacts.length}</strong><span>people</span></div>
-          <p>{p.organizations.length} companies saved in this workspace.</p>
-          <Link className="text-link" to="/analytics">See relationship insights <ArrowUpRight size={16} /></Link>
+          <div className="section-heading"><h2>{t("yourNetwork")}</h2><Link className="text-link" to="/network">{__pulseText("Explore") + " "}<ArrowUpRight size={16} /></Link></div>
+          <div className="daily-network-circle"><strong>{p.contacts.length}</strong><span>{__pulseText("people")}</span></div>
+          <p>{p.organizations.length} {" " + __pulseText("companies saved in this workspace.")}</p>
+          <Link className="text-link" to="/analytics">{__pulseText("See relationship insights") + " "}<ArrowUpRight size={16} /></Link>
         </article>
       </section>
       {suggestions}
       <section className="daily-wrap" aria-labelledby="daily-wrap-title">
         <div className="daily-wrap-intro">
           <CheckCheck size={28} />
-          <p className="eyebrow">A MOMENT TO TAKE STOCK</p>
-          <h2 id="daily-wrap-title">What moved forward?</h2>
+          <p className="eyebrow">{__pulseText("A MOMENT TO TAKE STOCK")}</p>
+          <h2 id="daily-wrap-title">{__pulseText("What moved forward?")}</h2>
           <p>
-            Today’s saved evidence, in your workspace timezone. No score to
-            chase.
-          </p>
+            {__pulseText("Today’s saved evidence, in your workspace timezone. No score to chase.")}</p>
         </div>
         <div className="daily-wrap-facts">
           <div>
             <strong>{plan.completed.length}</strong>
-            <span>follow-ups completed today</span>
+            <span>{__pulseText("follow-ups completed today")}</span>
           </div>
           <div>
             <strong>{plan.conversations.length}</strong>
-            <span>conversations dated today</span>
+            <span>{__pulseText("conversations dated today")}</span>
           </div>
           <div>
             <strong>{plan.remaining.length}</strong>
-            <span>chosen records still open</span>
+            <span>{__pulseText("chosen records still open")}</span>
           </div>
         </div>
         <details>
-          <summary>See today’s evidence</summary>
+          <summary>{__pulseText("See today’s evidence")}</summary>
           <p>
-            Completions use the current saved completion date; reopened tasks
-            stop counting. Conversations use their occurred date, exclude notes
-            and future entries, and are not a measure of relationship quality.
-            People, companies and opportunities stay open until you remove them
-            from Today.
-          </p>
+            {__pulseText("Completions use the current saved completion date; reopened tasks stop counting. Conversations use their occurred date, exclude notes and future entries, and are not a measure of relationship quality. People, companies and opportunities stay open until you remove them from Today.")}</p>
           {plan.completed.slice(0, 5).map((t) => (
             <button
               className="daily-evidence-record"
@@ -620,7 +585,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
             >
               <Check size={15} />
               <span>{t.title}</span>
-              <span>Completed · {date(t.completedAt!)}</span>
+              <span>{__pulseText("Completed ·") + " "}{date(t.completedAt!)}</span>
             </button>
           ))}
           {plan.conversations.slice(0, 5).map((i) => (
@@ -634,19 +599,17 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
                 {p.contacts.find((c) => c.id === i.contactId)?.name ||
                   p.organizations.find((o) => o.id === i.organizationId)
                     ?.name ||
-                  "Saved conversation"}
+                  __pulseText("Saved conversation")}
               </span>
               <span>{date(i.occurredAt)}</span>
             </button>
           ))}
           {!plan.completed.length && !plan.conversations.length && (
             <p>
-              No completions or conversations dated today yet. A quiet day is
-              valid too.
-            </p>
+              {__pulseText("No completions or conversations dated today yet. A quiet day is valid too.")}</p>
           )}
           <Link className="text-link" to="/activity">
-            Open activity <ArrowUpRight size={15} />
+            {__pulseText("Open activity") + " "}<ArrowUpRight size={15} />
           </Link>
         </details>
       </section>

@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useRef, useState } from "react";
 import { GoogleCalendar } from "./google-calendar";
 import { Modal } from "./ui";
@@ -13,16 +14,16 @@ export function CalendarHandoff({
   description: string;
   start: string;
 }) {
+  const __pulseText = useInterfaceText();
   const form = useRef<HTMLFormElement>(null);
   const [open, setOpen] = useState(false),
     [error, setError] = useState("");
   return (
     <>
       <button className="button ghost" onClick={() => setOpen(true)}>
-        Calendar export
-      </button>
+        {__pulseText("Calendar export")}</button>
       {open && (
-        <Modal title="Review calendar event" onClose={() => setOpen(false)}>
+        <Modal title={__pulseText("Review calendar event")} onClose={() => setOpen(false)}>
           <form
             ref={form}
             onSubmit={(e) => {
@@ -53,11 +54,11 @@ export function CalendarHandoff({
             }}
           >
             <label className="field">
-              <span>Event title</span>
+              <span>{__pulseText("Event title")}</span>
               <input name="title" required defaultValue={title} />
             </label>
             <label className="field">
-              <span>Start (device time)</span>
+              <span>{__pulseText("Start (device time)")}</span>
               <input
                 type="datetime-local"
                 name="start"
@@ -71,7 +72,7 @@ export function CalendarHandoff({
               />
             </label>
             <label className="field">
-              <span>Duration in minutes</span>
+              <span>{__pulseText("Duration in minutes")}</span>
               <input
                 type="number"
                 min="5"
@@ -82,24 +83,20 @@ export function CalendarHandoff({
               />
             </label>
             <label className="setting-toggle">
-              All-day event (uses selected device calendar date)
-              <input type="checkbox" name="allDay" />
+              {__pulseText("All-day event (uses selected device calendar date)")}<input type="checkbox" name="allDay" />
             </label>
             <p className="muted">
-              The .ics download works without an account. It does not synchronize,
-              invite attendees or complete the follow-up.
-            </p>
+              {__pulseText("The .ics download works without an account. It does not synchronize, invite attendees or complete the follow-up.")}</p>
             <GoogleCalendar id={id} form={form} />
-            {error && <p role="alert">{error}</p>}
+            {error && <p role="alert">{__pulseText(error)}</p>}
             <div className="form-actions">
               <button
                 type="button"
                 className="button secondary"
                 onClick={() => setOpen(false)}
               >
-                Cancel
-              </button>
-              <button className="button primary">Download .ics</button>
+                {__pulseText("Cancel")}</button>
+              <button className="button primary">{__pulseText("Download .ics")}</button>
             </div>
           </form>
         </Modal>

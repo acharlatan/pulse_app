@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -12,6 +13,7 @@ import { DailyPlan } from "./DailyPlan";
 import { Focus } from "./Focus";
 import { ConstellationScene } from "../components/ConstellationScene";
 export function Home({ focus = false }: { focus?: boolean }) {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const p = usePulse(),
     { date } = useFormat(),
@@ -48,7 +50,7 @@ export function Home({ focus = false }: { focus?: boolean }) {
     p.organizations.length ||
     p.opportunities.length ||
     p.tasks.length;
-  const todayTabs = <nav className="today-view-tabs" aria-label="Today views"><Link to="/" aria-current={!focus ? "page" : undefined} className={!focus ? "active" : ""}>{t("dailyPulse")}</Link><Link to="/focus" aria-current={focus ? "page" : undefined} className={focus ? "active" : ""}>{t("focus")}</Link></nav>;
+  const todayTabs = <nav className="today-view-tabs" aria-label={__pulseText("Today views")}><Link to="/" aria-current={!focus ? "page" : undefined} className={!focus ? "active" : ""}>{t("dailyPulse")}</Link><Link to="/focus" aria-current={focus ? "page" : undefined} className={focus ? "active" : ""}>{t("focus")}</Link></nav>;
   if (focus) return <div className="page home-page editorial-home daily-home today-focus-page">{todayTabs}<Focus embedded /></div>;
   return (
     <div
@@ -63,8 +65,7 @@ export function Home({ focus = false }: { focus?: boolean }) {
               month: "long",
               day: "numeric",
             })}{" "}
-            · DAILY PULSE
-          </p>
+            {__pulseText("· DAILY PULSE")}</p>
           <h1>
             {t("today")}<span className="accent">.</span>
           </h1>
@@ -89,15 +90,15 @@ export function Home({ focus = false }: { focus?: boolean }) {
         </div>
       </header>
 
-      <section className="pulse-opening" aria-label="Your relationship workspace">
+      <section className="pulse-opening" aria-label={__pulseText("Your relationship workspace")}>
         <div className="pulse-opening-copy">
-          <span className="pulse-opening-label"><span className="opening-spark">✳</span> YOUR SPACE · YOUR PACE</span>
+          <span className="pulse-opening-label"><span className="opening-spark">✳</span> {" " + __pulseText("YOUR SPACE · YOUR PACE")}</span>
           <h2>{t("hero1")}<br /><em>{t("hero2")}</em><span>.</span></h2>
           <p>{t("heroCopy")}</p>
           <div className="opening-actions"><Link className="pulse-opening-link" to="/network">{t("exploreNetwork")} <ArrowUpRight size={17} /></Link><Link className="opening-orbit-link" to="/orbit">{t("enterOrbit")} ↗</Link></div>
-          {p.contacts.length > 0 && <div className="opening-people"><div className="opening-avatar-stack">{p.contacts.slice(0, 5).map((person) => <Avatar key={person.id} name={person.name} mediaId={person.avatar} />)}</div><span><strong>{p.contacts.length} {p.contacts.length === 1 ? "person" : "people"}</strong> in your world</span></div>}
+          {p.contacts.length > 0 && <div className="opening-people"><div className="opening-avatar-stack">{p.contacts.slice(0, 5).map((person) => <Avatar key={person.id} name={person.name} mediaId={person.avatar} />)}</div><span><strong>{p.contacts.length} {p.contacts.length === 1 ? __pulseText("person") : __pulseText("people")}</strong> {" " + __pulseText("in your world")}</span></div>}
         </div>
-        <div className="opening-art"><div className="opening-art-fallback" aria-hidden="true" /><ConstellationScene variant="home" /><span className="opening-art-caption" aria-hidden="true">A WORLD OF CONNECTIONS <b>✳</b></span></div>
+        <div className="opening-art"><div className="opening-art-fallback" aria-hidden="true" /><ConstellationScene variant="home" /><span className="opening-art-caption" aria-hidden="true">{__pulseText("A WORLD OF CONNECTIONS") + " "}<b>✳</b></span></div>
       </section>
 
       {p.workspace === "personal" &&
@@ -110,38 +111,35 @@ export function Home({ focus = false }: { focus?: boolean }) {
           const last = p.settings.onboarding.exportInitiatedAt;
           const stale = !last || Date.now() - Date.parse(last) >= 30 * 86400000;
           return stale ? (
-            <aside className="backup-nudge" aria-label="Backup reminder">
+            <aside className="backup-nudge" aria-label={__pulseText("Backup reminder")}>
               <div>
-                <strong>Keep a copy of your work.</strong>
+                <strong>{__pulseText("Keep a copy of your work.")}</strong>
                 <p>
                   {last
                     ? `Last backup download requested ${date(last)}.`
-                    : "No backup download has been requested yet."}{" "}
-                  Records live in this browser. Check your downloaded file and
-                  keep it somewhere safe.
-                </p>
+                    : __pulseText("No backup download has been requested yet.")}{" "}
+                  {__pulseText("Records live in this browser. Check your downloaded file and keep it somewhere safe.")}</p>
               </div>
               <Link className="button secondary" to="/settings?section=data">
-                Review backups
-              </Link>
+                {__pulseText("Review backups")}</Link>
             </aside>
           ) : null;
         })()}
       <GettingStarted />
-      {p.workspace === "demo" && <details className="demo-quickstart"><summary>New to PULSE? Take a quick tour</summary><div className="demo-quickstart-content"><p>Try these steps with fictional records. Your demo edits stay in this browser and are separate from your personal workspace.</p><div><button className="button secondary" onClick={() => setEditor({ kind: "contact" })}>1 · Add a person</button><Link className="button secondary" to="/network">2 · Open a profile & log a conversation</Link><button className="button secondary" onClick={() => setEditor({ kind: "task" })}>3 · Plan a follow-up</button></div></div></details>}
+      {p.workspace === "demo" && <details className="demo-quickstart"><summary>{__pulseText("New to PULSE? Take a quick tour")}</summary><div className="demo-quickstart-content"><p>{__pulseText("Try these steps with fictional records. Your demo edits stay in this browser and are separate from your personal workspace.")}</p><div><button className="button secondary" onClick={() => setEditor({ kind: "contact" })}>{__pulseText("1 · Add a person")}</button><Link className="button secondary" to="/network">{__pulseText("2 · Open a profile & log a conversation")}</Link><button className="button secondary" onClick={() => setEditor({ kind: "task" })}>{__pulseText("3 · Plan a follow-up")}</button></div></div></details>}
       {active ? (
         <>
           <DailyPlan onEdit={setEditor} />
           <section className="editorial-people">
             <div className="section-heading">
               <div>
-                <p className="eyebrow">KEEP CLOSE</p>
+                <p className="eyebrow">{__pulseText("KEEP CLOSE")}</p>
                 <h2>
                   {pins.length ? t("pinned") : t("yourPeople")}
                 </h2>
               </div>
               <Link className="text-link" to="/network">
-                Open network <ArrowUpRight size={16} />
+                {__pulseText("Open network") + " "}<ArrowUpRight size={16} />
               </Link>
             </div>
             <div className="editorial-people-strip">
@@ -159,7 +157,7 @@ export function Home({ focus = false }: { focus?: boolean }) {
                         <Avatar name={c.name} mediaId={c.avatar} size="large" />
                         <span>
                           <strong>{c.name}</strong>
-                          <small>Pinned by you</small>
+                          <small>{__pulseText("Pinned by you")}</small>
                         </span>
                       </Link>
                     ) : null;
@@ -169,7 +167,7 @@ export function Home({ focus = false }: { focus?: boolean }) {
                       <Avatar name={c.name} mediaId={c.avatar} size="large" />
                       <span>
                         <strong>{c.name}</strong>
-                        <small>{c.role || "Person"}</small>
+                        <small>{c.role || __pulseText("Person")}</small>
                       </span>
                     </Link>
                   ))}
@@ -177,7 +175,7 @@ export function Home({ focus = false }: { focus?: boolean }) {
           </section>
           {reminders.length > 0 && (
             <details className="editorial-reminders">
-              <summary>Recent local reminders</summary>
+              <summary>{__pulseText("Recent local reminders")}</summary>
               {reminders.map((r) => (
                 <p key={r.id}>
                   {(r.sourceType === "contact"
@@ -185,11 +183,11 @@ export function Home({ focus = false }: { focus?: boolean }) {
                     : r.sourceType === "task"
                       ? p.tasks.find((t) => t.id === r.sourceId)?.title
                       : p.opportunities.find((o) => o.id === r.sourceId)
-                          ?.title) || "Record removed"}{" "}
+                          ?.title) || __pulseText("Record removed")}{" "}
                   · {date(r.at)}
                 </p>
               ))}
-              <Link to="/automations">Open automation history</Link>
+              <Link to="/automations">{__pulseText("Open automation history")}</Link>
             </details>
           )}
 
@@ -197,25 +195,21 @@ export function Home({ focus = false }: { focus?: boolean }) {
         </>
       ) : (
         <section className="daily-first-use surface">
-          <p className="eyebrow">YOUR FIRST USEFUL MOVE</p>
-          <h2>Start with a person. Give the next step a home.</h2>
+          <p className="eyebrow">{__pulseText("YOUR FIRST USEFUL MOVE")}</p>
+          <h2>{__pulseText("Start with a person. Give the next step a home.")}</h2>
           <p>
-            Add a real connection, a possible opportunity and a follow-up. Your
-            Daily Pulse will take shape from what you save.
-          </p>
+            {__pulseText("Add a real connection, a possible opportunity and a follow-up. Your Daily Pulse will take shape from what you save.")}</p>
           <div className="daily-first-steps">
             <button
               className="button secondary"
               onClick={() => setEditor({ kind: "contact" })}
             >
-              Add someone
-            </button>
+              {__pulseText("Add someone")}</button>
             <button
               className="button secondary"
               onClick={() => setEditor({ kind: "opportunity" })}
             >
-              Create opportunity
-            </button>
+              {__pulseText("Create opportunity")}</button>
             <button
               className="button secondary"
               onClick={() => setEditor({ kind: "task" })}
@@ -225,17 +219,14 @@ export function Home({ focus = false }: { focus?: boolean }) {
           </div>
           <div className="form-actions">
             <Link className="text-link" to="/import">
-              Import contacts
-            </Link>
+              {__pulseText("Import contacts")}</Link>
             <button
               className="text-link"
               onClick={() => setEditor({ kind: "company" })}
             >
-              Add a company
-            </button>
+              {__pulseText("Add a company")}</button>
             <Link className="text-link" to="/help">
-              Getting started
-            </Link>
+              {__pulseText("Getting started")}</Link>
           </div>
         </section>
       )}

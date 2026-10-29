@@ -1,3 +1,4 @@
+import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { NetworkContext } from "./NetworkContext";
 import { SmartLists } from "./SmartLists";
@@ -25,6 +26,7 @@ import {
 } from "../services/smart-lists";
 import { priorities, stages, availabilities, categories } from "../data/models";
 export function Network() {
+  const __pulseText = useInterfaceText();
   const t = useTranslation();
   const p = usePulse();
   const { date } = useFormat();
@@ -132,7 +134,7 @@ export function Network() {
     <div className="page network-page">
       <header className="page-heading editorial-masthead network-masthead">
         <div>
-          <p className="eyebrow">YOUR RELATIONSHIPS, REMEMBERED</p>
+          <p className="eyebrow">{__pulseText("YOUR RELATIONSHIPS, REMEMBERED")}</p>
           <h1>
             {t("network")}<span className="accent">.</span>
           </h1>
@@ -153,23 +155,21 @@ export function Network() {
           </button>
         </div>
       </header>
-      <section className="network-orientation" aria-label="Network overview">
+      <section className="network-orientation" aria-label={__pulseText("Network overview")}>
         <div>
-          <p className="eyebrow">YOUR RELATIONSHIP LANDSCAPE</p>
-          <h2>Every connection has a next chapter.</h2>
+          <p className="eyebrow">{__pulseText("YOUR RELATIONSHIP LANDSCAPE")}</p>
+          <h2>{__pulseText("Every connection has a next chapter.")}</h2>
           <p>
-            Find a person or company, revisit the context, and choose a
-            thoughtful next step.
-          </p>
+            {__pulseText("Find a person or company, revisit the context, and choose a thoughtful next step.")}</p>
         </div>
         <div className="network-orientation-facts">
           <div>
             <strong>{contacts.length}</strong>
-            <span>saved people</span>
+            <span>{__pulseText("saved people")}</span>
           </div>
           <div>
             <strong>{organizations.length}</strong>
-            <span>saved companies</span>
+            <span>{__pulseText("saved companies")}</span>
           </div>
           <div>
             <strong>
@@ -181,28 +181,28 @@ export function Network() {
                 ).length
               }
             </strong>
-            <span>pinned connections</span>
+            <span>{__pulseText("pinned connections")}</span>
           </div>
         </div>
         <div className="network-orientation-links">
           <Link to="/review">
-            Review relationships <ArrowUpRight size={16} />
+            {__pulseText("Review relationships") + " "}<ArrowUpRight size={16} />
           </Link>
           <Link to="/orbit">
-            Explore Orbit <ArrowUpRight size={16} />
+            {__pulseText("Explore Orbit") + " "}<ArrowUpRight size={16} />
           </Link>
           <Link to="/analytics">
-            Understand your network <ArrowUpRight size={16} />
+            {__pulseText("Understand your network") + " "}<ArrowUpRight size={16} />
           </Link>
         </div>
       </section>
       {recentPeople.length > 0 && (
         <section className="network-recent" aria-labelledby="network-recent-title">
-          <div className="network-recent-heading"><div><p className="eyebrow">A LITTLE CLOSER</p><h2 id="network-recent-title">{t("recently")}<span>.</span></h2><p>{t("recentDesc")}</p></div><span className="network-recent-count">{openFollowups} open {openFollowups === 1 ? "follow-up" : "follow-ups"}</span></div>
+          <div className="network-recent-heading"><div><p className="eyebrow">{__pulseText("A LITTLE CLOSER")}</p><h2 id="network-recent-title">{t("recently")}<span>.</span></h2><p>{t("recentDesc")}</p></div><span className="network-recent-count">{openFollowups} {" " + __pulseText("open") + " "}{openFollowups === 1 ? __pulseText("follow-up") : __pulseText("follow-ups")}</span></div>
           <div className="network-recent-people">{recentPeople.map((contact) => {
             const organization = organizations.find((org) => org.id === contact.organizationId);
             return <Link className="network-recent-person" key={contact.id} to={`/network/people/${contact.id}`} state={{ networkReturn: "/network" + (params.size ? "?" + params.toString() : "") }}>
-              <Avatar name={contact.name} mediaId={contact.avatar} size="large" /><span><strong>{contact.name}</strong><small>{contact.role || "Connection"}{organization ? ` · ${organization.name}` : ""}</small></span><ArrowUpRight size={18} />
+              <Avatar name={contact.name} mediaId={contact.avatar} size="large" /><span><strong>{contact.name}</strong><small>{contact.role || __pulseText("Connection")}{organization ? ` · ${organization.name}` : ""}</small></span><ArrowUpRight size={18} />
             </Link>;
           })}</div>
         </section>
@@ -211,7 +211,7 @@ export function Network() {
         <div
           className="tabs"
           role="tablist"
-          aria-label="Directory view"
+          aria-label={__pulseText("Directory view")}
           onKeyDown={(e) => {
             if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key))
               return;
@@ -279,17 +279,17 @@ export function Network() {
             value={sort}
             onChange={(e) => setSort(e.target.value)}
           >
-            <option value="name">Name A–Z</option>
-            <option value="recent">Recently updated</option>
+            <option value="name">{__pulseText("Name A–Z")}</option>
+            <option value="recent">{__pulseText("Recently updated")}</option>
             {tab === "people" && (
-              <option value="priority">Highest priority</option>
+              <option value="priority">{__pulseText("Highest priority")}</option>
             )}
           </select>
         </div>
       </div>
       <div className="network-viewbar">
         {tab === "people" && (
-          <div className="network-segments" aria-label="Relationship segments">
+          <div className="network-segments" aria-label={__pulseText("Relationship segments")}>
             {[
               ["all", t("everyone")],
               ["overdue", t("overdue")],
@@ -333,7 +333,7 @@ export function Network() {
               </select>
             </label>
 <button className="button secondary" aria-expanded={showLists} aria-controls="network-saved-lists" onClick={() => setShowLists(!showLists)}>{t("manageLists")}</button></div>
-        <div className="tabs directory-display" aria-label="Directory presentation">
+        <div className="tabs directory-display" aria-label={__pulseText("Directory presentation")}>
           <button aria-pressed={display === "cards"} onClick={() => setDisplay("cards")}>{t("cards")}</button>
           <button aria-pressed={display === "list"} onClick={() => setDisplay("list")}>{t("compact")}</button>
         </div>
@@ -346,56 +346,51 @@ export function Network() {
             />
 
             <Link className="button ghost" to="/import">
-              Import contacts
-            </Link>
+              {__pulseText("Import contacts")}</Link>
           </div>
         </details>
       </div>
-      {showLists && <section className="network-lists-panel" id="network-saved-lists" aria-label="Manage saved lists"><SmartLists embedded /></section>}
+      {showLists && <section className="network-lists-panel" id="network-saved-lists" aria-label={__pulseText("Manage saved lists")}><SmartLists embedded /></section>}
       {filters && tab === "people" && (
         <div className="filter-panel">
           <label>
-            Priority
-            <select
+            {__pulseText("Priority")}<select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
             >
-              <option value="">All priorities</option>
+              <option value="">{__pulseText("All priorities")}</option>
               {priorities.map((v) => (
-                <option key={v}>{v}</option>
+                <option key={v} value={v}>{__pulseText(v)}</option>
               ))}
             </select>
           </label>
           <label>
-            Stage
-            <select value={stage} onChange={(e) => setStage(e.target.value)}>
-              <option value="">All stages</option>
+            {__pulseText("Stage")}<select value={stage} onChange={(e) => setStage(e.target.value)}>
+              <option value="">{__pulseText("All stages")}</option>
               {stages.map((v) => (
-                <option key={v}>{v}</option>
+                <option key={v} value={v}>{__pulseText(v)}</option>
               ))}
             </select>
           </label>
           <label>
-            Availability
-            <select
+            {__pulseText("Availability")}<select
               value={availability}
               onChange={(e) => setAvailability(e.target.value)}
             >
-              <option value="">All availability</option>
+              <option value="">{__pulseText("All availability")}</option>
               {availabilities.map((v) => (
-                <option key={v}>{v}</option>
+                <option key={v} value={v}>{__pulseText(v)}</option>
               ))}
             </select>
           </label>
           <label>
-            Relationship
-            <select
+            {__pulseText("Relationship")}<select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
-              <option value="">All relationships</option>
+              <option value="">{__pulseText("All relationships")}</option>
               {categories.map((v) => (
-                <option key={v}>{v}</option>
+                <option key={v} value={v}>{__pulseText(v)}</option>
               ))}
             </select>
           </label>
@@ -410,15 +405,14 @@ export function Network() {
               setSmart("all");
             }}
           >
-            Clear filters
-          </button>
+            {__pulseText("Clear filters")}</button>
         </div>
       )}
       <div className="results-label">
         <h2>
           {tab === "people" ? people.length : companies.length}{" "}
-          {tab === "people" ? "people" : "companies"}
-          {smart !== "all" ? " in this view" : " in your network"}
+          {tab === "people" ? __pulseText("people") : __pulseText("companies")}
+          {smart !== "all" ? __pulseText(" in this view") : __pulseText(" in your network")}
         </h2>
       </div>
       <div
@@ -474,46 +468,46 @@ export function Network() {
                           />
                           {["VIP", "High"].includes(c.priority) ? (
                             <Badge tone="amber">
-                              {c.priority === "VIP" ? "★ VIP" : "High priority"}
+                              {c.priority === "VIP" ? __pulseText("★ VIP") : __pulseText("High priority")}
                             </Badge>
                           ) : (
                             <ArrowUpRight size={18} className="muted" />
                           )}
                         </div>
                         <h3>{c.name}</h3>
-                        <p>{c.role || "A new connection"}</p>
+                        <p>{c.role || __pulseText("A new connection")}</p>
                         <div className="company-line">
                           <Building2 size={14} />
-                          {org?.name || "Independent"}
+                          {org?.name || __pulseText("Independent")}
                         </div>
                         <div className="network-row-context">
                           <span className="network-row-label">
                             {next
-                              ? "NEXT STEP"
+                              ? __pulseText("NEXT STEP")
                               : latest
-                                ? "LAST CONVERSATION"
-                                : "RELATIONSHIP"}
+                                ? __pulseText("LAST CONVERSATION")
+                                : __pulseText("RELATIONSHIP")}
                           </span>
                           <strong>
                             {next?.title ||
                               (latest
                                 ? latest.summary.slice(0, 100) +
                                   (latest.summary.length > 100 ? "…" : "")
-                                : "No conversations logged")}
+                                : __pulseText("No conversations logged"))}
                           </strong>
                           <small>
                             {next
                               ? `${taskState(next, p.settings.timezone)} · ${date(next.dueAt)}`
                               : latest
                                 ? `${latest.type} · ${date(latest.occurredAt)}`
-                                : "A story waiting to be told"}
+                                : __pulseText("A story waiting to be told")}
                           </small>
                         </div>
                         <div className="profile-card-bottom">
                           <Badge tone="purple">
                             {p.intelligence.relationships.find(
                               (r) => r.contactId === c.id,
-                            )?.health || "Not enough history"}
+                            )?.health || __pulseText("Not enough history")}
                           </Badge>
                           <Badge
                             tone={
@@ -536,10 +530,10 @@ export function Network() {
                           >
                             <i />
                             {insights.get(c.id)?.availability === "Available"
-                              ? "Available"
+                              ? __pulseText("Available")
                               : insights.get(c.id)?.availability ===
                                   "Temporarily unavailable"
-                                ? "Paused"
+                                ? __pulseText("Paused")
                                 : insights.get(c.id)?.availability}
                           </span>
                         </div>
@@ -547,12 +541,12 @@ export function Network() {
                       <button
                         className="network-context-toggle"
                         aria-controls="network-relationship-context"
-                        aria-label={`View context for ${c.name}`}
+                        aria-label={__pulseText("View context for {0}", c.name)}
                         aria-pressed={selected}
                         onClick={() => setSelectedId(c.id)}
                       >
                         <ArrowUpRight size={17} />
-                        <span>Context</span>
+                        <span>{__pulseText("Context")}</span>
                       </button>
                     </article>
                   );
@@ -575,15 +569,15 @@ export function Network() {
                         company
                         size="large"
                       />
-                      <Badge>{o.industry || "Company"}</Badge>
+                      <Badge>{o.industry || __pulseText("Company")}</Badge>
                     </div>
                     <h3>{o.name}</h3>
                     <p className="company-description">
-                      {o.description || "The next chapter starts here."}
+                      {o.description || __pulseText("The next chapter starts here.")}
                     </p>
                     <div className="company-line">
                       <MapPin size={14} />
-                      {o.location || "Location not added"}
+                      {o.location || __pulseText("Location not added")}
                     </div>
                     <div className="profile-card-bottom">
                       <span className="company-line">
@@ -592,8 +586,7 @@ export function Network() {
                           contacts.filter((c) => c.organizationId === o.id)
                             .length
                         }{" "}
-                        people
-                      </span>
+                        {__pulseText("people")}</span>
                       <ArrowUpRight size={17} />
                     </div>
                   </Link>
@@ -604,8 +597,7 @@ export function Network() {
               className="button secondary"
               onClick={() => setLimit(limit + 60)}
             >
-              Show more connections
-            </button>
+              {__pulseText("Show more connections")}</button>
           )}
           {!(tab === "people" ? people.length : companies.length) && (
             <Empty
@@ -616,10 +608,10 @@ export function Network() {
                 availability ||
                 category ||
                 smart !== "all"
-                  ? "No connections found"
-                  : "A little space for possibility"
+                  ? __pulseText("No connections found")
+                  : __pulseText("A little space for possibility")
               }
-              body="Try a different search, or add your first connection."
+              body={__pulseText("Try a different search, or add your first connection.")}
               action={
                 search ||
                 stage ||
@@ -638,8 +630,7 @@ export function Network() {
                       setCategory("");
                     }}
                   >
-                    Reset search & filters
-                  </button>
+                    {__pulseText("Reset search & filters")}</button>
                 ) : (
                   <button
                     className="button primary"
@@ -650,7 +641,7 @@ export function Network() {
                     }
                   >
                     <Plus size={17} />
-                    Add {tab === "people" ? "person" : "company"}
+                    {__pulseText("Add") + " "}{tab === "people" ? __pulseText("person") : __pulseText("company")}
                   </button>
                 )
               }
