@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { languageChoice, languageOptions, messageKeys, translate } from "../src/i18n/catalog";
 import { translateInterface } from "../src/i18n/useInterfaceText";
+import interfaceMessages from "../src/i18n/interface-messages.json";
 
 describe("workspace language catalogue", () => {
   it("provides nonempty labels and supported date locales for every advertised language", () => {
@@ -31,5 +32,15 @@ describe("workspace language catalogue", () => {
   it("inserts user-entered values without translating or interpreting them", () => {
     expect(translateInterface("es-ES", "Delete {0}?", "Marketing {1}")).toBe("¿Eliminar Marketing {1}?");
     expect(translateInterface("en-US", "Delete {0}?", "Olivia")).toBe("Delete Olivia?");
+  });
+  it("preserves placeholders in every stored translation", () => {
+    for (const [source, translations] of Object.entries(interfaceMessages)) {
+      expect(translations, source).toHaveLength(10);
+      const expected = [...source.matchAll(/\{\d+\}/g)].map((x) => x[0]).sort();
+      for (const value of translations) {
+        if (!value) continue; // An unavailable translation falls back to English.
+        expect([...value.matchAll(/\{\d+\}/g)].map((x) => x[0]).sort(), source).toEqual(expected);
+      }
+    }
   });
 });
