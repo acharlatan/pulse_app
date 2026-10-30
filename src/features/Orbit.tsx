@@ -23,6 +23,7 @@ export function Orbit() {
     profileReturn?: unknown;
     networkReturn?: unknown;
     reviewReturn?: unknown;
+    focusReturn?: unknown;
   } | null;
   const profileReturn =
     typeof navigationState?.profileReturn === "string" &&
@@ -182,6 +183,7 @@ export function Orbit() {
           state={{
             networkReturn: navigationState?.networkReturn,
             reviewReturn: navigationState?.reviewReturn,
+            focusReturn: navigationState?.focusReturn,
           }}
         >
           {__pulseText("← Return to profile")}</Link>

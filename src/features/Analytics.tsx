@@ -38,6 +38,7 @@ export function Analytics() {
     profileReturn?: unknown;
     networkReturn?: unknown;
     reviewReturn?: unknown;
+    focusReturn?: unknown;
   } | null;
   const profileReturn =
     typeof navigationState?.profileReturn === "string" &&
@@ -46,6 +47,7 @@ export function Analytics() {
     )
       ? navigationState.profileReturn
       : null;
+  const focusReturn = typeof navigationState?.focusReturn === "string" && /^\/focus(?:\?view=(today|ahead|saved|completed))?$/.test(navigationState.focusReturn) ? navigationState.focusReturn : null;
   const p = usePulse(),
     [params] = useSearchParams(),
     transitions = useLiveQuery(() => p.db.transitions.toArray(), [p.db]) || [];
@@ -183,10 +185,12 @@ export function Analytics() {
           state={{
             networkReturn: navigationState?.networkReturn,
             reviewReturn: navigationState?.reviewReturn,
+            focusReturn: navigationState?.focusReturn,
           }}
         >
           {__pulseText("← Return to profile")}</Link>
       )}
+      {!profileReturn && focusReturn && <Link className="text-link connected-return" to={focusReturn}>{__pulseText("← Back to My Focus")}</Link>}
       <div className="page-heading editorial-masthead insight-masthead">
         <div>
           <p className="eyebrow">{__pulseText("YOUR WORK, IN CONTEXT")}</p>

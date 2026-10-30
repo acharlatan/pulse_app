@@ -1,4 +1,5 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
+import { profileSnapshot } from "../services/profile-snapshot";
 import { MediaControls } from "../components/media-controls";
 import { LocalMedia } from "../components/local-media";
 import { FocusButton } from "../components/focus";
@@ -52,6 +53,8 @@ export function Profile({ company = false }: { company?: boolean }) {
   const location = useLocation();
   const returnPath = location.state?.networkReturn;
   const reviewReturn = location.state?.reviewReturn;
+  const rawFocusReturn = location.state?.focusReturn;
+  const focusReturn = typeof rawFocusReturn === "string" && /^\/focus(?:\?view=(today|ahead|saved|completed))?$/.test(rawFocusReturn) ? rawFocusReturn : null;
   const canReturnReview =
     typeof reviewReturn === "string" && /^\/review(?:\?|$)/.test(reviewReturn);
   const { id } = useParams();
@@ -62,7 +65,7 @@ export function Profile({ company = false }: { company?: boolean }) {
   const { date } = useFormat();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const contact = p.contacts.find((c) => c.id === id);
+  const contact = company ? undefined : p.contacts.find((c) => c.id === id);
   const org = p.organizations.find(
     (o) => o.id === (company ? id : contact?.organizationId),
   );
@@ -88,33 +91,28 @@ export function Profile({ company = false }: { company?: boolean }) {
   const opportunities = p.opportunities.filter((o) =>
     company ? o.organizationId === id : o.contactIds.includes(id!),
   );
-  const last = company
-    ? interactions
-        .filter(
-          (i) => i.type !== "Note" && Date.parse(i.occurredAt) <= Date.now(),
-        )
-        .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))[0]?.occurredAt
-    : contact
-      ? lastInteraction(contact.id, p.interactions)
-      : undefined;
-  const next = tasks
-    .filter((t) => !t.completedAt)
-    .sort((a, b) => a.dueAt.localeCompare(b.dueAt))[0];
+  const snapshot = profileSnapshot(interactions, tasks, opportunities);
+  const last = snapshot.lastConversation?.occurredAt;
+  const next = snapshot.nextTask;
+  const peopleAtCompany = company ? p.contacts.filter((c) => c.organizationId === id) : [];
+  const scrollTo = (target: string) => document.getElementById(target)?.scrollIntoView({
+    behavior: p.settings.reducedMotion ? "instant" : "smooth", block: "start",
+  });
   return (
     <div className="page profile-page editorial-profile">
       <Link
         to={
-          canReturnReview
+          focusReturn || (canReturnReview
             ? reviewReturn
             : typeof returnPath === "string" &&
                 /^\/network(?:\?|$)/.test(returnPath)
               ? returnPath
-              : "/network"
+              : "/network")
         }
         className="text-link back-link"
       >
         <ArrowLeft size={16} />
-        {canReturnReview ? __pulseText("Back to review") : __pulseText("Back to your network")}
+        {focusReturn ? __pulseText("Back to My Focus") : canReturnReview ? __pulseText("Back to review") : __pulseText("Back to your network")}
       </Link>
       <section
         className={`surface profile-header ${record.coverMediaId ? "has-cover" : "without-cover"}`}
@@ -292,24 +290,45 @@ export function Profile({ company = false }: { company?: boolean }) {
           </details>
         </div>
       </section>
-      <section className="profile-connection-brief" aria-label={__pulseText("Relationship overview")}><div><p className="eyebrow">{__pulseText("THE CONNECTION AT A GLANCE")}</p><h2>{__pulseText("The context behind the connection.")}</h2><p>{__pulseText("A little of what you have saved, brought together for your next step.")}</p></div><div className="connection-brief-grid"><article><span>{__pulseText("LAST CONVERSATION")}</span><strong>{last ? date(last) : __pulseText("Not recorded")}</strong><small>{__pulseText("From saved conversations")}</small></article><article><span>{__pulseText("OPEN FOLLOW-UPS")}</span><strong>{tasks.filter(t => !t.completedAt).length}</strong><small>{next ? next.title : __pulseText("No open follow-up")}</small></article><article><span>{__pulseText("OPEN OPPORTUNITIES")}</span><strong>{opportunities.filter(o => o.status === "open").length}</strong><small>{__pulseText("Currently linked")}</small></article></div></section>
-      {contact && !company && <section className="journey-person-story" aria-label={__pulseText("Your relationship story")}><div className="journey-story-intro"><p className="eyebrow">{__pulseText("THE RELATIONSHIP JOURNAL")}</p><h2>{__pulseText("Every connection has a story.")}</h2><p>{__pulseText("The conversations, details and commitments you’ve saved together.")}</p></div><div className="journey-story-cards"><article><span>{__pulseText("LAST CONVERSATION")}</span>{(() => {const entry=interactions.filter(i=>i.type!=="Note" && Date.parse(i.occurredAt)<=Date.now()).sort((a,b)=>b.occurredAt.localeCompare(a.occurredAt))[0];return entry ? <><strong>{date(entry.occurredAt)} · {__pulseText(entry.type)}</strong><p>{entry.summary.length>150 ? `${entry.summary.slice(0,150)}…` : entry.summary}</p><button onClick={()=>setEditor({kind:"interaction",record:entry})}>{__pulseText("Review conversation")} ↗</button></> : <><strong>{__pulseText("No conversation recorded yet")}</strong><button onClick={()=>setEditor({kind:"interaction",contact})}>{__pulseText("Log a conversation")} ↗</button></>;})()}</article><article><span>{__pulseText("YOUR NEXT STEP")}</span>{next ? <><strong>{next.title}</strong><p>{taskState(next,p.settings.timezone)} · {date(next.dueAt)}</p><button onClick={()=>setEditor({kind:"task",record:next})}>{__pulseText("Review follow-up")} ↗</button></> : <><strong>{__pulseText("No open follow-up")}</strong><p>{__pulseText("Make room for a next step when you’re ready.")}</p><button onClick={()=>setEditor({kind:"task",contact})}>{__pulseText("Plan a follow-up")} ↗</button></>}</article><article><span>{__pulseText("REMEMBER THIS")}</span>{(() => {const note=interactions.filter(i=>i.type==="Note" && Date.parse(i.occurredAt)<=Date.now()).sort((a,b)=>b.occurredAt.localeCompare(a.occurredAt))[0];return note ? <><strong>{date(note.occurredAt)}</strong><p>{note.summary.length>150 ? `${note.summary.slice(0,150)}…` : note.summary}</p><button onClick={()=>setEditor({kind:"interaction",record:note})}>{__pulseText("Open note")} ↗</button></> : <><strong>{__pulseText("No notes yet")}</strong><p>{__pulseText("Save the little details that matter.")}</p><button onClick={()=>setEditor({kind:"interaction",contact,note:true})}>{__pulseText("Add a note")} ↗</button></>;})()}</article></div></section>}
-      {company && org && (
-        <section className="company-command surface" aria-label={__pulseText("Company overview")}>
-          <div className="company-command-heading">
-            <div><p className="eyebrow">{__pulseText("THE STORY SO FAR")}</p><h2>{__pulseText("Context for the next move.")}</h2></div>
-            <button className="button secondary" onClick={() => setEditor({ kind: "interaction", organizationId: org.id })}>{__pulseText("Log interaction")}</button>
+      <section className="profile-story-snapshot" aria-label={__pulseText("Relationship overview")}>
+        <div className="snapshot-story">
+          <p className="eyebrow">{__pulseText("THE STORY SO FAR")}</p>
+          <h2>{__pulseText("The details that bring you back.")}</h2>
+          {snapshot.lastConversation ? <div className="snapshot-conversation">
+            <span>{__pulseText("LAST CONVERSATION")} · {date(snapshot.lastConversation.occurredAt)} · {__pulseText(snapshot.lastConversation.type)}</span>
+            <p>{snapshot.lastConversation.summary}</p>
+            <button className="snapshot-link" onClick={() => setEditor({kind:"interaction",record:snapshot.lastConversation})}>{__pulseText("Review conversation")} <ArrowUpRight size={16}/></button>
+          </div> : <div className="snapshot-conversation snapshot-empty">
+            <span>{__pulseText("LAST CONVERSATION")}</span>
+            <p>{__pulseText("No conversation recorded yet")}</p>
+            <button className="snapshot-link" onClick={() => setEditor({kind:"interaction",contact,organizationId:company ? id : undefined})}>{__pulseText("Log a conversation")} <ArrowUpRight size={16}/></button>
+          </div>}
+          {company && <small className="snapshot-caption">{__pulseText("Company activity uses the company saved on each conversation.")}</small>}
+        </div>
+        <div className="snapshot-next">
+          <p className="eyebrow">{__pulseText("YOUR NEXT STEP")}</p>
+          {next ? <><h3>{next.title}</h3><p>{__pulseText(taskState(next,p.settings.timezone))} · {__pulseText("Due")} {date(next.dueAt)}</p><button className="button secondary" onClick={() => setEditor({kind:"task",record:next})}>{__pulseText("Review follow-up")} <ArrowUpRight size={16}/></button></> : <><h3>{__pulseText("Room for a next step.")}</h3><p>{__pulseText("No open follow-up")}</p><button className="button secondary" onClick={() => setEditor({kind:"task",contact,organizationId:company ? id : undefined})}>{__pulseText("Plan a follow-up")} <ArrowUpRight size={16}/></button></>}
+          <div className="snapshot-facts">
+            <button onClick={() => scrollTo("next-steps")}><strong>{snapshot.openTasks}</strong><span>{__pulseText("open follow-ups")}</span></button>
+            <button onClick={() => scrollTo("opportunities")}><strong>{snapshot.openOpportunities.length}</strong><span>{__pulseText("open opportunities")}</span></button>
           </div>
-          <div className="company-command-grid">
-            <div><span>{__pulseText("Last conversation")}</span><strong>{last ? date(last) : __pulseText("Not recorded")}</strong></div>
-            <div><span>{__pulseText("Next follow-up")}</span>{next ? <button className="text-link" onClick={() => setEditor({kind:"task",record:next})}>{next.title} · {date(next.dueAt)}</button> : <strong>{__pulseText("No open follow-ups.")}</strong>}</div>
-            <div><span>{__pulseText("Open opportunities")}</span><strong>{opportunities.filter(o => o.status === "open").length}</strong></div>
-          </div>
-          <div className="company-command-people">
-            {p.contacts.filter(c => c.organizationId === org.id).slice(0, 6).map(c => <Link key={c.id} to={`/network/people/${c.id}`}><Avatar name={c.name} mediaId={c.avatar} /><span><strong>{c.name}</strong><small>{effectiveAvailability(c, p.restrictions)}</small></span></Link>)}
-          </div>
-        </section>
-      )}
+          <button className="snapshot-note" onClick={() => snapshot.lastNote ? setEditor({kind:"interaction",record:snapshot.lastNote}) : setEditor({kind:"interaction",contact,organizationId:company ? id : undefined,note:true})}>
+            <StickyNote size={16}/><span>{snapshot.lastNote ? `${__pulseText("Latest note")} · ${date(snapshot.lastNote.occurredAt)}` : __pulseText("Add a note")}</span><ArrowUpRight size={15}/>
+          </button>
+        </div>
+      </section>
+      {company && org && <section className="company-world" aria-label={__pulseText("People and opportunities at this company")}>
+        <div className="company-world-heading"><div><p className="eyebrow">{__pulseText("THE COMPANY CONNECTIONS")}</p><h2>{__pulseText("The people and work around this company.")}</h2><p>{__pulseText("Explore the records you have linked here.")}</p></div><Link className="button secondary" to={`/orbit?company=${encodeURIComponent(org.id)}`} state={{profileReturn:`/network/companies/${encodeURIComponent(org.id)}`,networkReturn:returnPath,reviewReturn:canReturnReview ? reviewReturn : undefined,focusReturn}}>{__pulseText("Explore in Orbit")} <ArrowUpRight size={16}/></Link></div>
+        <div className="company-world-grid"><div className="company-world-group"><div className="company-world-label"><strong>{__pulseText("People")}</strong><span>{peopleAtCompany.length}</span></div>
+          {peopleAtCompany.slice(0,4).map(c => <Link className="company-world-person" key={c.id} to={`/network/people/${encodeURIComponent(c.id)}`} state={{networkReturn:returnPath,reviewReturn:canReturnReview ? reviewReturn : undefined,focusReturn}}><Avatar name={c.name} mediaId={c.avatar}/><span><strong>{c.name}</strong><small>{c.role || __pulseText("Person")}</small></span><ArrowUpRight size={16}/></Link>)}
+          {!peopleAtCompany.length && <p className="muted">{__pulseText("No people linked yet.")}</p>}
+          {peopleAtCompany.length > 4 && <button className="text-link" onClick={() => scrollTo("people")}>{__pulseText("See all people")} <ArrowUpRight size={15}/></button>}
+        </div><div className="company-world-group"><div className="company-world-label"><strong>{__pulseText("Open opportunities")}</strong><span>{snapshot.openOpportunities.length}</span></div>
+          {snapshot.openOpportunities.slice(0,3).map(o => <button className="company-world-deal" key={o.id} onClick={() => setBriefId(o.id)}><span><strong>{o.title}</strong><small>{p.pipelineStages.find(stage => stage.id === o.stageId)?.name || __pulseText("Stage")}</small></span><ArrowUpRight size={16}/></button>)}
+          {!snapshot.openOpportunities.length && <p className="muted">{__pulseText("No open opportunities linked yet.")}</p>}
+          {opportunities.length > 0 && <button className="text-link" onClick={() => scrollTo("opportunities")}>{__pulseText("See all opportunities")} <ArrowUpRight size={15}/></button>}
+        </div></div>
+      </section>}
       <div className="profile-quick-links connected-profile-tools">
         <FocusButton
           type={company ? "organization" : "contact"}
@@ -323,6 +342,7 @@ export function Profile({ company = false }: { company?: boolean }) {
             profileReturn: `/network/${company ? "companies" : "people"}/${encodeURIComponent(record.id)}`,
             networkReturn: returnPath,
             reviewReturn: canReturnReview ? reviewReturn : undefined,
+            focusReturn,
           }}
         >
           {__pulseText("Analytics")}</Link>
@@ -334,6 +354,7 @@ export function Profile({ company = false }: { company?: boolean }) {
             profileReturn: `/network/${company ? "companies" : "people"}/${encodeURIComponent(record.id)}`,
             networkReturn: returnPath,
             reviewReturn: canReturnReview ? reviewReturn : undefined,
+            focusReturn,
           }}
         >
           {__pulseText("Orbit")}</Link>
@@ -370,45 +391,6 @@ export function Profile({ company = false }: { company?: boolean }) {
           </button>
         ))}
       </nav>
-      <section
-        className="profile-commitment"
-        aria-label={__pulseText("Next relationship commitment")}
-      >
-        <div>
-          <p className="eyebrow">
-            {next ? __pulseText("THE NEXT CHAPTER") : __pulseText("LAST CONVERSATION")}
-          </p>
-          <h2>
-            {next
-              ? next.title
-              : last
-                ? date(last)
-                : __pulseText("Your story starts with a conversation.")}
-          </h2>
-          <p className="muted">
-            {next
-              ? `${taskState(next, p.settings.timezone)} · Due ${date(next.dueAt)}`
-              : __pulseText("Conversations and notes remain in the relationship story below.")}
-          </p>
-        </div>
-        <button
-          className="button secondary"
-          onClick={() =>
-            setEditor(
-              next
-                ? { kind: "task", record: next }
-                : {
-                    kind: "interaction",
-                    contact: company ? undefined : contact,
-                    organizationId: company ? id : undefined,
-                  },
-            )
-          }
-        >
-          {next ? __pulseText("Review commitment") : __pulseText("Start the story")}
-          <ArrowUpRight size={16} />
-        </button>
-      </section>
       <div className="profile-columns">
         <div className="profile-story">
           {company && (

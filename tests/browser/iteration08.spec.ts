@@ -87,10 +87,11 @@ test("custom pipeline, stable rename, custom company field, segmentation and foc
     .first()
     .click();
   await page.goto("/#/focus");
+  await page.getByRole("navigation", { name: "Focus views" }).getByRole("button", { name: /Saved for later/ }).click();
   await expect(
     page.locator(".focus-row").filter({ hasText: "Forma Studio" }),
   ).toHaveCount(1);
-  await page.getByText("Add a priority", { exact: true }).click();
+  await page.getByRole("button", { name: "Add a priority", exact: true }).first().click();
   await page
     .getByRole("combobox", { name: "Record type", exact: true })
     .selectOption("task");
@@ -107,6 +108,7 @@ test("custom pipeline, stable rename, custom company field, segmentation and foc
     page.getByRole("status").filter({ hasText: "Follow-up completed" }),
   ).toBeVisible();
   await page.reload();
+  await page.getByRole("navigation", { name: "Focus views" }).getByRole("button", { name: /Recently completed/ }).click();
   await expect(
     page.locator("section").filter({
       has: page.getByRole("heading", { name: "Recently completed" }),
