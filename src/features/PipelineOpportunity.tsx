@@ -7,13 +7,16 @@ import { FocusButton } from "../components/focus";
 import { CustomFields } from "../components/custom-fields";
 import type { Opportunity } from "../data/models";
 import type { Editor } from "../components/forms";
-import { taskState } from "../services/recommendations";
+import { restrictionReasons, taskState } from "../services/recommendations";
+import { opportunityFollowUp } from "../services/pipeline-studio";
 export function PipelineOpportunity({
   opportunity: o,
   onEdit,
+  onReview,
 }: {
   opportunity: Opportunity;
   onEdit: (e: Editor) => void;
+  onReview: (id: string) => void;
 }) {
   const __pulseText = useInterfaceText();
   const p = usePulse(),
@@ -23,14 +26,10 @@ export function PipelineOpportunity({
     .map((id) => p.contacts.find((c) => c.id === id))
     .filter((c) => !!c);
   const stage = p.pipelineStages.find((s) => s.id === o.stageId);
-  const next = p.tasks
-    .filter(
-      (t) =>
-        !t.completedAt &&
-        ((o.organizationId && t.organizationId === o.organizationId) ||
-          (t.contactId && o.contactIds.includes(t.contactId))),
-    )
-    .sort((a, b) => a.dueAt.localeCompare(b.dueAt))[0];
+  const followUp = opportunityFollowUp(o, p.tasks, p.interactions);
+  const next = followUp?.task;
+  const last = p.interactions.filter((i) => i.opportunityId === o.id && i.type !== "Note" && Date.parse(i.occurredAt) <= Date.now()).sort((a,b) => b.occurredAt.localeCompare(a.occurredAt))[0];
+  const restricted = people.some((c) => restrictionReasons(c, p.permissions, p.restrictions).length > 0);
   const insight = p.intelligence.opportunities.find(
     (i) => i.opportunityId === o.id,
   );
@@ -53,7 +52,7 @@ export function PipelineOpportunity({
       <h4>
         <button
           className="board-title"
-          onClick={() => onEdit({ kind: "opportunity", record: o })}
+          onClick={() => onReview(o.id)}
         >
           {o.title}
         </button>
@@ -86,9 +85,11 @@ export function PipelineOpportunity({
           )}
         </div>
       )}
+      {restricted && <p className="studio-deal-restriction">{__pulseText("A representative has outreach restrictions. Review their profile before contacting them.")}</p>}
+      {o.status === "open" && insight?.flags.length ? <p className="studio-deal-flag"><strong>{__pulseText("WHY REVIEW")}</strong><span>{insight.reason}</span></p> : null}
       {o.status === "open" && (
         <div className="board-next">
-          <p className="eyebrow">{__pulseText("RELATED FOLLOW-UP")}</p>
+          <p className="eyebrow">{__pulseText("NEXT STEP")}</p>
           {next ? (
             <>
               <button onClick={() => onEdit({ kind: "task", record: next })}>
@@ -104,18 +105,15 @@ export function PipelineOpportunity({
                 {taskState(next, p.settings.timezone)} · {date(next.dueAt)}
               </small>
               <small>
-                {__pulseText("Via")}{" "}
-                {next.organizationId === o.organizationId && o.organizationId
-                  ? __pulseText("company")
-                  : __pulseText("representative")}{" "}
-                {__pulseText("· may support other work")}</small>
+                {followUp?.relation === "linked" ? __pulseText("Linked through a saved interaction") : __pulseText("Related through company or representative · may support other work")}</small>
             </>
           ) : (
-            <p className="muted">
-              {__pulseText("No open follow-up for this company or its representatives.")}</p>
+            <><p className="muted">{__pulseText("No related open follow-up recorded.")}</p><button onClick={() => onEdit({kind:"task", contact:people[0], organizationId:o.organizationId || undefined})}>{__pulseText("Plan a follow-up")}</button></>
           )}
         </div>
       )}
+      {last && <div className="studio-deal-conversation"><span>{__pulseText("LAST LINKED CONVERSATION")} · {date(last.occurredAt)}</span><p>{last.summary.length > 150 ? `${last.summary.slice(0,150)}…` : last.summary}</p></div>}
+      <button className="studio-deal-open" onClick={() => onReview(o.id)}>{__pulseText("Review opportunity")} <ArrowUpRight size={15}/></button>
       <details className="board-card-tools">
         <summary>
           {__pulseText("Details & tools")}{insight?.flags.length ? __pulseText(" · review needed") : ""}

@@ -70,10 +70,10 @@ export function Activity() {
             })}{" "}
             {__pulseText("· YOUR WORKING DAY")}</p>
           <h1>
-            {t("activityTitle")}<span className="accent">.</span>
+            {tab === "tasks" ? __pulseText("Follow-ups") : t("activityTitle")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            {t("activityIntro")}
+            {tab === "tasks" ? __pulseText("Your commitments, the people behind them, and the next step in one place.") : t("activityIntro")}
           </p>
         </div>
         <button
@@ -84,6 +84,7 @@ export function Activity() {
           {t("planFollowup")}
         </button>
       </header>
+      <div className="activity-intro-strip"><span>✳</span><div><strong>{__pulseText("KEEP THE PROMISES THAT MATTER")}</strong><p>{__pulseText("Choose a time horizon to see your saved follow-ups. Completing a task never sends a message.")}</p></div><Link to="/focus">{__pulseText("Go to My Focus")} <ArrowUpRight size={16}/></Link></div>
       <nav className="activity-ledger" aria-label={__pulseText("Follow-up overview")}>
         {[
           ["overdue", "Overdue"],

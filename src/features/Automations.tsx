@@ -43,6 +43,12 @@ export function Automations() {
     [recordEditor, setRecordEditor] = useState<Editor | null>(null);
   const visible = rules.filter((r) => !r.archived),
     pipelines = p.pipelines.filter((x) => !x.archived);
+  const scenarios = {
+    stage: ["When an opportunity moves", "Prepare a follow-up when an opportunity enters a stage you choose."],
+    closing: ["When a close date is near", "Prepare a follow-up for an open opportunity approaching its saved close date."],
+    inactive: ["When it is time to review", "Record a reminder when a person reaches your chosen inactivity threshold."],
+    overdue: ["When a follow-up is overdue", "Record an in-app reminder so a saved commitment stays visible."],
+  } as const;
   function draft(template: "stage" | "closing" | "inactive" | "overdue") {
     const pipe = pipelines[0],
       stage =
@@ -123,15 +129,16 @@ export function Automations() {
             {__pulseText("Automations")}<span className="accent">.</span>
           </h1>
           <p className="editorial-deck">
-            {__pulseText("Choose a trigger and a safe local action. You stay in control.")}</p>
+            {__pulseText("Choose what to watch for, then decide what PULSE should prepare. You stay in control.")}</p>
         </div>
         <Link className="button secondary" to="/analytics">
           {__pulseText("Open Analytics")}</Link>
       </div>
-      <section className="surface">
-        <h2>{__pulseText("Start with a template")}</h2>
+      <section className="automation-studio-intro"><div><p className="eyebrow">{__pulseText("YOUR WORKFLOW, MADE LIGHTER")}</p><h2>{__pulseText("Give good intentions a little structure.")}</h2><p>{__pulseText("Start with a recipe, make it yours, and enable it when you’re ready. PULSE checks while the app is open; it never sends messages automatically.")}</p></div><div className="automation-studio-steps"><span><b>01</b>{__pulseText("Choose a moment")}</span><ArrowRight size={17}/><span><b>02</b>{__pulseText("Choose an action")}</span><ArrowRight size={17}/><span><b>03</b>{__pulseText("Review & enable")}</span></div></section>
+      <section className="surface automation-recipe-section">
+        <div className="automation-recipe-heading"><div><p className="eyebrow">{__pulseText("START SOMETHING USEFUL")}</p><h2>{__pulseText("Choose a recipe.")}</h2></div><span>{visible.filter((r) => r.enabled).length} {__pulseText("enabled rules")}</span></div>
         <p className="muted">
-          {__pulseText("Templates open as disabled drafts. Review and enable each rule yourself.")}</p>
+          {__pulseText("Every recipe opens as a disabled draft for you to review.")}</p>
         <div className="automation-templates">
           {(["stage", "closing", "inactive", "overdue"] as const).map((k) => (
             <button
@@ -151,15 +158,16 @@ export function Automations() {
                 }[k];
                 return <Icon size={26} />;
               })()}
-              <h3>{draft(k).name}</h3>
-              <span className="template-trigger">{triggers[k]}</span>
+              <h3>{__pulseText(scenarios[k][0])}</h3>
+              <span className="template-scenario">{__pulseText(scenarios[k][1])}</span>
+              <span className="template-trigger">{__pulseText(triggers[k])}</span>
               <ArrowRight className="template-arrow" size={20} />
               <span className="template-action">
                 {k === "stage" || k === "closing"
                   ? __pulseText("Create a local follow-up")
                   : __pulseText("Record a local reminder")}
               </span>
-              <small>{__pulseText("Configure a disabled draft →")}</small>
+              <small>{__pulseText("Set up rule →")}</small>
             </button>
           ))}
         </div>
@@ -205,9 +213,9 @@ export function Automations() {
         </p>
       </details>
       <section className="surface">
-        <h2>{__pulseText("Your rules")}</h2>
+        <div className="automation-recipe-heading"><div><p className="eyebrow">{__pulseText("YOUR AUTOMATIONS")}</p><h2>{__pulseText("Your rules")}</h2></div><span>{visible.length} {__pulseText("saved")}</span></div>
         {!visible.length && (
-          <p>{__pulseText("No rules yet. Choose a template to make your first draft.")}</p>
+          <div className="automation-empty"><strong>{__pulseText("Your first recipe is waiting.")}</strong><p>{__pulseText("Choose a recipe above to create a draft. Nothing runs until you enable it.")}</p></div>
         )}
         {visible.map((r) => (
           <article className="automation-rule" key={r.id}>
@@ -360,6 +368,7 @@ export function Automations() {
           <form onSubmit={(e) => void save(e)}>
             <p>
               {__pulseText("Rules are saved disabled. Editing an enabled rule disables it until you review and enable it again.")}</p>
+            <div className="automation-form-steps"><span><b>01</b> {__pulseText("When")}</span><ArrowRight size={15}/><span><b>02</b> {__pulseText("Then")}</span><ArrowRight size={15}/><span><b>03</b> {__pulseText("Review")}</span></div>
             <div className="form-grid">
               <label className="field wide">
                 <span>{__pulseText("Rule name")}</span>
