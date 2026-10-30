@@ -177,6 +177,7 @@ export function AnalyticsBrief({
           </details>
         </div>
       </section>
+      <details className="analytics-deeper-context"><summary>{__pulseText("Explore coverage and company context")}</summary>
       <section className="analytics-perspectives">
         <article className="coverage-panel">
           <p className="eyebrow">{__pulseText("RELATIONSHIP COVERAGE · SELECTED PERIOD")}</p>
@@ -318,6 +319,7 @@ export function AnalyticsBrief({
           </button>
         </details>
       </section>
+      </details>
     </>
   );
 }

@@ -12,6 +12,8 @@ import { EditorModal, type Editor } from "../components/forms";
 import { lastInteraction, restrictionReasons, taskState } from "../services/recommendations";
 import { ProgressSummary } from "../components/progress";
 import type { FocusItem } from "../data/expansion-models";
+import { OpportunityBrief } from "./OpportunityBrief";
+import { focusHorizon } from "../services/focus-horizon";
 import { ContextTip } from "../components/context-tip";
 export function Focus({ embedded = false }: { embedded?: boolean }) {
   const __pulseText = useInterfaceText();
@@ -20,6 +22,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
     day = calendarDay(Date.now(), p.settings.timezone);
   const { date, money } = useFormat();
   const [editor, setEditor] = useState<Editor | null>(null);
+  const [briefId, setBriefId] = useState<string | null>(null);
   const picker = useRef<HTMLDetailsElement>(null);
   const [type, setType] = useState<FocusItem["entityType"]>("contact"),
     [id, setId] = useState(""),
@@ -32,6 +35,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
         : type === "task"
           ? p.tasks
           : p.opportunities;
+  const horizon = focusHorizon(p.focusItems.filter(f => f.entityType !== "task" || !p.tasks.find(t => t.id === f.recordId)?.completedAt), day);
   const name = (r: { name?: string; title?: string }) =>
     r.name || r.title || "Untitled";
   const label = (f: FocusItem) => {
@@ -58,24 +62,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
         </div>
       </div>
       <ContextTip title="Make space for what matters" >Pin people, companies, follow-ups or opportunities to save them for later. Choose a few for today; completing a follow-up is always your choice.</ContextTip>
-      <div className="focus-day-brief">
-        <span className="eyebrow">{__pulseText("TODAY · CHOSEN BY YOU")}</span>
-        <strong>
-          {p.focusItems.filter((f) => f.today === day).length}
-          <small>{__pulseText("selected")}</small>
-        </strong>
-        <p>
-          {
-            p.focusItems.filter(
-              (f) =>
-                f.today === day &&
-                f.entityType === "task" &&
-                p.tasks.some((t) => t.id === f.recordId && t.completedAt),
-            ).length
-          }{" "}
-          {__pulseText("completed follow-ups in today’s selections. You choose what belongs here.")}</p>
-        <button className="button focus-brief-button" onClick={() => { if (picker.current) { picker.current.open = true; picker.current.scrollIntoView({block:"center", behavior:p.settings.reducedMotion ? "auto" : "smooth"}); } }}><Plus size={16}/>{__pulseText("Add a priority")}</button>
-      </div>
+      <section className="focus-horizon" aria-label={__pulseText("Your focus horizon")}><div><span className="eyebrow">{__pulseText("A LITTLE SPACE TO THINK")}</span><h2>{__pulseText("Make room for what matters.")}</h2><p>{__pulseText("A few intentional choices can give the day direction. Your pins stay close until you are ready for them.")}</p><button className="button secondary" onClick={() => { if (picker.current) { picker.current.open = true; picker.current.scrollIntoView({block:"center", behavior:p.settings.reducedMotion ? "auto" : "smooth"}); } }}><Plus size={16}/>{__pulseText("Add a priority")}</button></div><div className="focus-horizon-counts"><div><strong>{horizon.today.length}</strong><span>{__pulseText("chosen today")}</span></div><div><strong>{horizon.ahead.length}</strong><span>{__pulseText("planned ahead")}</span></div><div><strong>{horizon.later.length}</strong><span>{__pulseText("saved for later")}</span></div></div></section>
       {p.workspace === "demo" &&
         p.focusItems.length === 0 &&
         (p.contacts.some((item) => item.id === "contact-0") ||
@@ -237,6 +224,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
       {(
         [
           "Today",
+          "Planned ahead",
           "Pinned relationships",
           "Opportunities in focus",
           "Next actions",
@@ -253,7 +241,9 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
             ? f.today === day && !done
             : section === "Recently completed"
               ? !!done
-              : f.today === day
+              : section === "Planned ahead"
+                ? !!f.today && f.today > day && !done
+              : f.today && f.today >= day
                 ? false
                 : section === "Pinned relationships"
                   ? ["contact", "organization"].includes(f.entityType)
@@ -261,13 +251,14 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                     ? f.entityType === "opportunity"
                     : f.entityType === "task" && !done;
         });
+        if (section === "Planned ahead") items.sort((a, b) => (a.today || "").localeCompare(b.today || "") || a.id.localeCompare(b.id));
         if (!items.length && section !== "Today") return null;
         return (
           <section
             className={`surface focus-collection ${section === "Today" ? "focus-today" : ""}`}
             key={section}
           >
-            <div className="focus-collection-heading"><div><p className="eyebrow">{section === "Today" ? __pulseText("YOUR CHOSEN WORK") : __pulseText("SAVED FOR LATER")}</p><h2>{__pulseText(section)}</h2></div><span>{items.length}</span></div>
+            <div className="focus-collection-heading"><div><p className="eyebrow">{section === "Today" ? __pulseText("YOUR CHOSEN WORK") : section === "Planned ahead" ? __pulseText("YOUR UPCOMING PRIORITIES") : __pulseText("SAVED FOR LATER")}</p><h2>{__pulseText(section)}</h2></div><span>{items.length}</span></div>
             {section === "Today" && <p className="focus-collection-description">{__pulseText("Your selected priorities for today. Pinned records stay saved until you remove them.")}</p>}
             {!items.length && (
               <Empty
@@ -358,7 +349,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                   )}
                 </div>
                 <div className="form-actions">
-                  {f.entityType === "opportunity" && <button className="button secondary" onClick={() => setEditor({kind:"opportunity",record:p.opportunities.find((o)=>o.id===f.recordId)})}>{__pulseText("Review opportunity")} <ArrowUpRight size={15}/></button>}
+                  {f.entityType === "opportunity" && <button className="button secondary" onClick={() => setBriefId(f.recordId)}>{__pulseText("Review opportunity")} <ArrowUpRight size={15}/></button>}
                   <button
                     className="button ghost"
                     onClick={() =>
@@ -401,12 +392,13 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                         {__pulseText("Complete task")}</button>
                     )}
                 </div>
-                {f.today === day && <details className="focus-move-date"><summary><Sparkles size={14}/>{__pulseText("Choose another day")}</summary><form onSubmit={(e) => {e.preventDefault(); const chosen = String(new FormData(e.currentTarget).get("focusDate") || ""); if (chosen) void p.run(() => setFocus(p.db, f.entityType, f.recordId, "today", chosen), "Focus updated");}}><label><span>{__pulseText("Focus date")}</span><input name="focusDate" type="date" min={day} required/></label><button className="button secondary">{__pulseText("Save date")}</button></form><small>{__pulseText("This changes your focus date, not the follow-up due date.")}</small></details>}
+                {f.today && <details className="focus-move-date"><summary><Sparkles size={14}/>{__pulseText("Choose another day")}</summary><form onSubmit={(e) => {e.preventDefault(); const chosen = String(new FormData(e.currentTarget).get("focusDate") || ""); if (chosen) void p.run(() => setFocus(p.db, f.entityType, f.recordId, "today", chosen), "Focus updated");}}><label><span>{__pulseText("Focus date")}</span><input name="focusDate" type="date" min={day} required/></label><button className="button secondary">{__pulseText("Save date")}</button></form><small>{__pulseText("This changes your focus date, not the follow-up due date.")}</small></details>}
               </article>
             ))}
           </section>
         );
       })}
+      {briefId && <OpportunityBrief id={briefId} onClose={() => setBriefId(null)} onEdit={(next) => {setBriefId(null); setEditor(next);}} />}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}

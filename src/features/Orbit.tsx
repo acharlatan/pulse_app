@@ -171,6 +171,7 @@ export function Orbit() {
           {t("backNetwork")}
         </Link>
       </div>
+      <section className="orbit-orientation"><div><p className="eyebrow">{__pulseText("YOUR NETWORK, MAPPED")}</p><h2>{__pulseText("Start anywhere. Follow what connects.")}</h2><p>{__pulseText("Select a portrait to explore its saved people, companies and opportunities. Lines represent saved links; distance does not measure closeness.")}</p></div><div className="orbit-orientation-steps"><span><b>01</b>{__pulseText("Choose a connection")}</span><span><b>02</b>{__pulseText("Explore saved links")}</span><span><b>03</b>{__pulseText("Open the full story")}</span></div></section>
       <div className="orbit-filters surface">
         <label className="search-field">
           <span className="sr-only">{__pulseText("Search Orbit")}</span>

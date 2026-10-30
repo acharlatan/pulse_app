@@ -12,6 +12,8 @@ The Relationship Workspace update brings Daily Pulse suggestions forward, adds a
 
 The Relationship Journey update adds job-search, networking and other onboarding intentions, an explicit demo-to-personal entry point, a personal home summary based on saved people and open follow-ups, and a relationship journal on person profiles. The selected intention updates the guide and can change the order of eligible suggestions; it does not send outreach. New interface strings may remain in English until translated and reviewed.
 
+The Clarity Workspace refresh adds an evidence-led Analytics decision desk, a Focus horizon with separately ordered future selections, concise relationship context, clearer Review categories and an Orbit orientation. Opportunity reviews from Focus and Review open the detailed opportunity brief. Some interface strings have additional bundled translations, but coverage remains incomplete.
+
 Relationship Review adds a seven-day view of open upcoming commitments with user-selected focus dates. Relationship stories show recorded stage changes for opportunities currently linked to a profile, with a clear warning that historical profile links were not captured. Earlier stage history may be unavailable.
 
 Relationship Intelligence adds optional contextual help across Focus, Analytics, Pipeline, Reviews, Follow-ups and Automations. Daily suggestions can be reordered by onboarding intention after the existing eligibility rules; no new contact is made eligible. Person and company stories include follow-ups alongside interactions, labeled by creation date and current status. Analytics has section-specific introductions and a weekly count of recorded stage changes.

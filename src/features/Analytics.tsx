@@ -1,5 +1,6 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
+import { DecisionDesk } from "./DecisionDesk";
 import { AnalyticsBrief } from "./AnalyticsBrief";
 import { setFocus } from "../data/expansion-repository";
 import { upcomingCommitments } from "../services/weekly-review";
@@ -414,7 +415,7 @@ export function Analytics() {
         ))}
       </nav>
       <ContextTip title="Read the story behind the numbers">Choose a section to explore relationships, opportunities, productivity or missing context. Date filters describe recorded activity; current-state counts are labeled separately.</ContextTip>
-      <div className="analytics-section-intro" key={section}><p className="eyebrow">{__pulseText("YOUR WORK THROUGH A DIFFERENT LENS")}</p><h2>{__pulseText(section === "Overview" ? "Start with the big picture." : section === "Relationships" ? "See who is part of your story." : section === "Opportunities" ? "Follow the possibilities in motion." : section === "Productivity" ? "Make room for meaningful progress." : "Give your records more context.")}</h2><p>{__pulseText(section === "Overview" ? "A thoughtful starting point for where your attention could go." : section === "Relationships" ? "Explore recorded conversations and the relationships behind them." : section === "Opportunities" ? "Explore saved values, stages, and actual movement." : section === "Productivity" ? "Review follow-ups and activity you have recorded." : "Find missing details that can make your workspace more useful.")}</p></div>
+      {section !== "Overview" && <div className="analytics-section-intro" key={section}><p className="eyebrow">{__pulseText("YOUR WORK THROUGH A DIFFERENT LENS")}</p><h2>{__pulseText(section === "Relationships" ? "See who is part of your story." : section === "Opportunities" ? "Follow the possibilities in motion." : section === "Productivity" ? "Make room for meaningful progress." : "Give your records more context.")}</h2><p>{__pulseText(section === "Relationships" ? "Explore recorded conversations and the relationships behind them." : section === "Opportunities" ? "Explore saved values, stages, and actual movement." : section === "Productivity" ? "Review follow-ups and activity you have recorded." : "Find missing details that can make your workspace more useful.")}</p></div>}
       {result.error && (
         <p role="alert" className="form-error">
           {__pulseText(result.error)}
@@ -426,6 +427,7 @@ export function Analytics() {
             {report.range.start} {" " + __pulseText("through") + " "}{report.range.end} {" " + __pulseText("· current-state figures are labeled below.")}</p>
           {section === "Overview" && (
             <>
+              <DecisionDesk report={report} onSection={setSection} />
               <AnalyticsBrief
                 report={report}
                 onEdit={setEditor}
