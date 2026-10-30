@@ -63,13 +63,14 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
         const halo = new T.Mesh(new T.TorusGeometry(0.41, 0.012, 6, 48), new T.MeshBasicMaterial({ color: colors[node.kind], transparent: true, opacity: 0.75 }));
         halo.position.copy(position); halo.rotation.set(0.3, 0.5, 0); galaxy.add(halo);
       }
+      const lines: { edge: OrbitEdge; line: import("three").Line }[] = [];
       for (const edge of edges) {
         const a = positions.get(edge.from), b = positions.get(edge.to);
         if (!a || !b) continue;
         const middle = a.clone().add(b).multiplyScalar(0.5); middle.z += 0.35;
         const curve = new T.QuadraticBezierCurve3(a, middle, b);
         const line = new T.Line(new T.BufferGeometry().setFromPoints(curve.getPoints(20)), new T.LineBasicMaterial({ color: 0xd8d2ff, transparent: true, opacity: 0.6 }));
-        galaxy.add(line);
+        galaxy.add(line); lines.push({ edge, line });
       }
       const orbitRing = new T.Mesh(new T.TorusGeometry(5.25, 0.012, 5, 140), new T.MeshBasicMaterial({ color: 0xa89ad5, transparent: true, opacity: 0.24 }));
       orbitRing.rotation.set(0.8, 0.4, 0); galaxy.add(orbitRing);
@@ -141,7 +142,7 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
       const up = (event: PointerEvent) => { if (!drag) return; event.stopPropagation(); if (drag.total < 7) { const rect = renderer.domElement.getBoundingClientRect(); mouse.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1); raycaster.setFromCamera(mouse, camera); const hit = raycaster.intersectObjects(targets)[0]?.object.userData.nodeId; const node = nodes.find((item) => item.id === hit); if (node) selectionCallback.current(node); } drag = null; };
       renderer.domElement.addEventListener("pointerdown", down); renderer.domElement.addEventListener("pointermove", move); renderer.domElement.addEventListener("pointerup", up); renderer.domElement.addEventListener("pointercancel", up);
       controls.current = {
-        select: (id) => { bodies.forEach((body, key) => { body.scale.setScalar(key === id ? 1.45 : 1); const material = body.material as import("three").MeshPhysicalMaterial; material.emissiveIntensity = key === id ? 0.7 : 0.16; }); render(); },
+        select: (id) => { bodies.forEach((body, key) => { body.scale.setScalar(key === id ? 1.45 : 1); const material = body.material as import("three").MeshPhysicalMaterial; material.emissiveIntensity = key === id ? 0.7 : 0.16; }); lines.forEach(({edge,line}) => { const material = line.material as import("three").LineBasicMaterial; const active = !!id && (edge.from === id || edge.to === id); material.color.setHex(active ? 0xd9f28e : 0xd8d2ff); material.opacity = id ? (active ? 1 : 0.18) : 0.6; }); render(); },
         move: (scale, offset) => { camera.position.set(-offset.x * 0.012, offset.y * 0.012, 14 / Math.max(0.35, scale)); render(); },
         turn: (amount) => { galaxy.rotation.y += amount; render(); },
         reset: () => { galaxy.rotation.set(-0.12, -0.18, 0); render(); },

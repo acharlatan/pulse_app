@@ -8362,5 +8362,101 @@
     "保存済みの会話から",
     "저장된 대화 기준",
     "来自已保存的对话"
+  ],
+  "View selected details": [
+    "Ver detalles seleccionados",
+    "Voir les détails sélectionnés",
+    "Ver detalhes selecionados",
+    "Ausgewählte Details anzeigen",
+    "Visualizza dettagli selezionati",
+    "Lihat detail pilihan",
+    "Tingnan ang napiling detalye",
+    "選択した詳細を見る",
+    "선택한 상세 정보 보기",
+    "查看所选详情"
+  ],
+  "Relationship details and next actions": [
+    "Detalles y próximos pasos",
+    "Détails de la relation et prochaines actions",
+    "Detalhes e próximas ações",
+    "Beziehungsdetails und nächste Schritte",
+    "Dettagli della relazione e prossime azioni",
+    "Detail relasi dan tindakan berikutnya",
+    "Detalye ng relasyon at susunod na hakbang",
+    "関係の詳細と次のアクション",
+    "관계 상세 정보 및 다음 단계",
+    "关系详情和下一步"
+  ],
+  "Explore saved connections": [
+    "Explorar conexiones guardadas",
+    "Explorer les relations enregistrées",
+    "Explorar conexões salvas",
+    "Gespeicherte Verbindungen erkunden",
+    "Esplora connessioni salvate",
+    "Jelajahi koneksi tersimpan",
+    "Tingnan ang mga naka-save na koneksyon",
+    "保存済みのつながりを見る",
+    "저장된 연결 살펴보기",
+    "查看已保存的关系"
+  ],
+  "Recent recorded activity": [
+    "Actividad registrada reciente",
+    "Activité récente enregistrée",
+    "Atividade recente registrada",
+    "Zuletzt erfasste Aktivitäten",
+    "Attività registrate di recente",
+    "Aktivitas terbaru yang tercatat",
+    "Kamakailang naitalang aktibidad",
+    "最近記録された活動",
+    "최근 기록된 활동",
+    "最近记录的活动"
+  ],
+  "No recorded activity for this selection yet.": [
+    "Aún no hay actividad registrada para esta selección.",
+    "Aucune activité enregistrée pour cette sélection.",
+    "Ainda não há atividade registrada para esta seleção.",
+    "Für diese Auswahl wurden noch keine Aktivitäten erfasst.",
+    "Nessuna attività registrata per questa selezione.",
+    "Belum ada aktivitas yang tercatat untuk pilihan ini.",
+    "Wala pang naitalang aktibidad para sa napili.",
+    "この選択項目に記録された活動はまだありません。",
+    "선택한 항목에 기록된 활동이 없습니다.",
+    "此选项尚无已记录的活动。"
+  ],
+  "Open opportunity details": [
+    "Abrir detalles de la oportunidad",
+    "Ouvrir les détails de l’opportunité",
+    "Abrir detalhes da oportunidade",
+    "Chancendetails öffnen",
+    "Apri dettagli opportunità",
+    "Buka detail peluang",
+    "Buksan ang detalye ng oportunidad",
+    "商談の詳細を開く",
+    "기회 상세 정보 열기",
+    "打开机会详情"
+  ],
+  "Show more": [
+    "Mostrar más",
+    "Afficher plus",
+    "Mostrar mais",
+    "Mehr anzeigen",
+    "Mostra altro",
+    "Tampilkan lebih banyak",
+    "Magpakita ng higit pa",
+    "さらに表示",
+    "더 보기",
+    "显示更多"
+  ],
+  "Showing": [
+    "Mostrando",
+    "Affichage de",
+    "Mostrando",
+    "Angezeigt",
+    "Visualizzati",
+    "Menampilkan",
+    "Ipinapakita",
+    "表示中",
+    "표시 중",
+    "显示"
   ]
 }

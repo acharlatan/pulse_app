@@ -395,6 +395,7 @@ export function Orbit() {
               >
                 {t("reset")}
               </button>
+              {node && <button className="button secondary" onClick={() => detail.current?.scrollIntoView({block:"start", behavior:p.settings.reducedMotion ? "instant" : "smooth"})}>{__pulseText("View selected details")}</button>}
               {node && graph.nodes.some((n) => n.id === node.id) && (
                 <button
                   className="button secondary"
@@ -422,101 +423,6 @@ export function Orbit() {
               </div>
             </>
           )}
-          <section
-            className="orbit-browse"
-            aria-label={__pulseText("Explore connections below the map")}
-          >
-            <div className="orbit-browse-heading">
-              <div>
-                <p className="eyebrow">{__pulseText("EXPLORE YOUR NETWORK")}</p>
-                <h2>{__pulseText("Find a starting point")}</h2>
-                <p>
-                  {__pulseText("Browse saved records or explore by company. Select any item to see its context.")}</p>
-              </div>
-              <div className="tabs" aria-label={__pulseText("Orbit presentation")}>
-                <button
-                  aria-pressed={view === "guide"}
-                  onClick={() => setView("guide")}
-                >
-                  {t("explore")}
-                </button>
-                <button
-                  onClick={() => {
-                    viewport.current?.scrollIntoView({
-                      block: "center",
-                      behavior: "instant",
-                    });
-                  }}
-                >
-                  {t("map")}
-                </button>
-                <button
-                  aria-pressed={view === "list"}
-                  onClick={() => setView("list")}
-                >
-                  {t("list")}
-                </button>
-              </div>{" "}
-            </div>
-            {view === "guide" ? (
-              <OrbitGuide
-                graph={fullGraph}
-                scoped={params.has("company") || params.has("person")}
-                search={search}
-                selected={selected}
-                onSelect={selectFromBrowse}
-                onCompany={(id) => {
-                  setParams({ company: id }, { state: navigationState });
-                  setSearch("");
-                  setType("");
-                  setPriority("");
-                  setSelected("");
-                }}
-              />
-            ) : (
-              <>
-                <div className="orbit-list-intro">
-                  <strong>{__pulseText("Choose a starting point.")}</strong>
-                  <p>
-                    {__pulseText("List finds individual records. Explore organizes a company’s saved people and opportunities; Map shows their explicit links.")}</p>
-                  <button
-                    className="button secondary"
-                    onClick={() => setView("guide")}
-                  >
-                    {__pulseText("Explore by company")}</button>
-                </div>
-                <div className="orbit-record-list">
-                  {fullGraph.nodes.map((n) => (
-                    <button
-                      key={n.id}
-                      className={`orbit-list-item ${selected === n.id ? "selected" : ""}`}
-                      onClick={() => selectFromBrowse(n)}
-                      aria-pressed={selected === n.id}
-                    >
-                      <Avatar
-                        name={n.label}
-                        mediaId={n.mediaId}
-                        company={n.kind === "company"}
-                      />
-                      <span>
-                        <strong>{n.label}</strong>
-                        <small>{n.kind}</small>
-                      </span>
-                      <span aria-hidden="true">↗</span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
-          </section>
-          <div className="orbit-legend">
-            <span>{__pulseText("◯ Person")}</span>
-            <span>{__pulseText("▢ Company")}</span>
-            <span>{__pulseText("◇ Opportunity")}</span>
-            <p>
-              {__pulseText("Solid lines show works at · opportunity representative · company opportunity. Dotted lines connect portraits to their positions. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.")}</p>
-          </div>
-        </section>
         <aside
           ref={detail}
           className={`orbit-detail surface ${node ? "has-selection" : ""}`}
@@ -533,6 +439,7 @@ export function Orbit() {
             </>
           ) : (
             <>
+              <div className="orbit-selected-header"><div className="orbit-selected-identity">
               <button
                 className="button ghost orbit-close"
                 onClick={() => setSelected("")}
@@ -546,11 +453,12 @@ export function Orbit() {
                 company={node.kind === "company"}
               />
               <Badge>{node.kind === "person" ? t("person") : node.kind === "company" ? t("company") : t("opportunity")}</Badge>
-              <h2>{node.label}</h2>
+              <h2>{node.label}</h2></div></div>
               <div className="orbit-workbench"><p className="eyebrow">{__pulseText("CONNECTION DESK")}</p><h3>{__pulseText("A place to explore and act.")}</h3><p>{__pulseText("Use saved context to decide your next step. Nothing is sent automatically.")}</p><div className="orbit-workbench-actions">{(person || company) && <><button className="button secondary" onClick={() => setEditor({kind:"interaction", contact:person, organizationId:company?.id})}>{__pulseText("Log interaction")}</button><button className="button secondary" onClick={() => setEditor({kind:"task", contact:person, organizationId:company?.id})}>{__pulseText("Plan a follow-up")}</button></>}{deal && <button className="button secondary" onClick={() => setBriefId(deal.id)}>{__pulseText("Open opportunity details")}</button>}</div>
                 <div className="orbit-workbench-block"><h4>{__pulseText("Explore saved connections")}</h4><p>{__pulseText("Select a linked record to explore it here. This list reflects the current filters and list limit.")}</p><div className="orbit-link-cards">{connections.slice(0,8).map(({edge,other}) => other && <button key={edge.id} onClick={() => selectFromBrowse(other)}><Avatar name={other.label} mediaId={other.mediaId} company={other.kind === "company"}/><span><strong>{other.label}</strong><small>{__pulseText(edge.label)}</small></span><b aria-hidden="true">↗</b></button>)}</div>{connections.length > 8 && <p>{__pulseText("More saved connections appear in the expanded list below.")}</p>}{!connections.length && <p>{__pulseText("No saved links are visible in this view.")}</p>}</div>
                 <div className="orbit-workbench-block"><h4>{__pulseText("Recent recorded activity")}</h4>{recent.map(i => <button className="orbit-activity-entry" key={i.id} onClick={() => setEditor({kind:"interaction",record:i})}><span>{__pulseText(i.type)} · {date(i.occurredAt)}</span><strong>{i.summary}</strong></button>)}{!recent.length && <p>{__pulseText("No recorded activity for this selection yet.")}</p>}{company && <small>{__pulseText("Company activity uses the company saved on each conversation.")}</small>}{deal && <small>{__pulseText("Only interactions directly linked to this opportunity appear here.")}</small>}</div>
               </div>
+              <details className="orbit-more-details"><summary>{__pulseText("Relationship details and next actions")}</summary><div className="orbit-more-content">
               {person && (
                 <>
                   <p>
@@ -707,9 +615,106 @@ export function Orbit() {
                 </button>
               ))}
               {!tasks.length && <p className="muted">{__pulseText("No open follow-ups.")}</p>}
+              </div></details>
             </>
           )}
         </aside>
+          <section
+            className="orbit-browse"
+            aria-label={__pulseText("Explore connections below the map")}
+          >
+            <div className="orbit-browse-heading">
+              <div>
+                <p className="eyebrow">{__pulseText("EXPLORE YOUR NETWORK")}</p>
+                <h2>{__pulseText("Find a starting point")}</h2>
+                <p>
+                  {__pulseText("Browse saved records or explore by company. Select any item to see its context.")}</p>
+              </div>
+              <div className="tabs" aria-label={__pulseText("Orbit presentation")}>
+                <button
+                  aria-pressed={view === "guide"}
+                  onClick={() => setView("guide")}
+                >
+                  {t("explore")}
+                </button>
+                <button
+                  onClick={() => {
+                    viewport.current?.scrollIntoView({
+                      block: "center",
+                      behavior: "instant",
+                    });
+                  }}
+                >
+                  {t("map")}
+                </button>
+                <button
+                  aria-pressed={view === "list"}
+                  onClick={() => setView("list")}
+                >
+                  {t("list")}
+                </button>
+              </div>{" "}
+            </div>
+            {view === "guide" ? (
+              <OrbitGuide
+                graph={fullGraph}
+                scoped={params.has("company") || params.has("person")}
+                search={search}
+                selected={selected}
+                onSelect={selectFromBrowse}
+                onCompany={(id) => {
+                  setParams({ company: id }, { state: navigationState });
+                  setSearch("");
+                  setType("");
+                  setPriority("");
+                  setSelected("");
+                }}
+              />
+            ) : (
+              <>
+                <div className="orbit-list-intro">
+                  <strong>{__pulseText("Choose a starting point.")}</strong>
+                  <p>
+                    {__pulseText("List finds individual records. Explore organizes a company’s saved people and opportunities; Map shows their explicit links.")}</p>
+                  <button
+                    className="button secondary"
+                    onClick={() => setView("guide")}
+                  >
+                    {__pulseText("Explore by company")}</button>
+                </div>
+                <div className="orbit-record-list">
+                  {fullGraph.nodes.map((n) => (
+                    <button
+                      key={n.id}
+                      className={`orbit-list-item ${selected === n.id ? "selected" : ""}`}
+                      onClick={() => selectFromBrowse(n)}
+                      aria-pressed={selected === n.id}
+                    >
+                      <Avatar
+                        name={n.label}
+                        mediaId={n.mediaId}
+                        company={n.kind === "company"}
+                      />
+                      <span>
+                        <strong>{n.label}</strong>
+                        <small>{n.kind}</small>
+                      </span>
+                      <span aria-hidden="true">↗</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+          <div className="orbit-legend">
+            <span>{__pulseText("◯ Person")}</span>
+            <span>{__pulseText("▢ Company")}</span>
+            <span>{__pulseText("◇ Opportunity")}</span>
+            <p>
+              {__pulseText("Solid lines show works at · opportunity representative · company opportunity. Dotted lines connect portraits to their positions. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.")}</p>
+          </div>
+        </section>
+
       </div>
       {briefId && <OpportunityBrief id={briefId} onClose={() => setBriefId(null)} onEdit={(next) => {setBriefId(null); setEditor(next);}} />}
       {editor && (

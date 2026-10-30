@@ -25,3 +25,20 @@
 .orbit-activity-entry strong { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; line-height:1.4; }
 @media(max-width:800px) { .analytics-room-nav { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:380px) { .analytics-room-nav button { padding:12px; } .analytics-room-nav button strong { font-size:15px; } }
+/* Keep the selected record in the map flow, with enough room for context. */
+.orbit-page .orbit-layout.orbit-has-selection { grid-template-columns:minmax(0,1fr); }
+.orbit-page .orbit-map-panel > .orbit-detail { position:static; display:block; margin:0; padding:clamp(20px,3vw,36px); border:0; border-radius:0; border-top:1px solid var(--border); box-shadow:none; scroll-margin-top:80px; }
+.orbit-page .orbit-detail:not(.has-selection) { display:none; }
+.orbit-selected-header { position:relative; }
+.orbit-selected-identity { display:flex; align-items:center; flex-wrap:wrap; gap:12px; min-width:0; padding-right:140px; }
+.orbit-selected-identity h2 { margin:0; overflow-wrap:anywhere; font-size:clamp(24px,3vw,34px); }
+.orbit-selected-identity .orbit-close { position:absolute; right:0; top:0; }
+.orbit-page .orbit-workbench { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 24px; margin:20px 0; }
+.orbit-workbench > .eyebrow,.orbit-workbench > h3,.orbit-workbench > p,.orbit-workbench > .orbit-workbench-actions { grid-column:1/-1; margin:0; }
+.orbit-workbench > .orbit-workbench-actions { margin:8px 0; }
+.orbit-link-cards { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.orbit-more-details { border:1px solid var(--border); border-radius:16px; padding:14px 18px; }
+.orbit-more-details > summary { cursor:pointer; color:var(--primary-text); font-weight:750; min-height:32px; }
+.orbit-more-content { padding-top:10px; overflow-wrap:anywhere; }
+@media(max-width:767px) { .orbit-page .orbit-workbench { grid-template-columns:1fr; } .orbit-workbench > .eyebrow,.orbit-workbench > h3,.orbit-workbench > p,.orbit-workbench > .orbit-workbench-actions { grid-column:auto; } .orbit-selected-identity { padding-right:0; padding-top:42px; } }
+@media(max-width:480px) { .orbit-link-cards { grid-template-columns:1fr; } }
