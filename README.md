@@ -18,6 +18,8 @@ Relationship Review adds a seven-day view of open upcoming commitments with user
 
 Relationship Intelligence adds optional contextual help across Focus, Analytics, Pipeline, Reviews, Follow-ups and Automations. Daily suggestions can be reordered by onboarding intention after the existing eligibility rules; no new contact is made eligible. Person and company stories include follow-ups alongside interactions, labeled by creation date and current status. Analytics has section-specific introductions and a weekly count of recorded stage changes.
 
+Orbit places the selected record in a full-width panel directly below the map, with connections and activity alongside one another. In 3D, selection emphasizes saved edges to the selected node. Analytics focus evidence can be expanded and opportunity evidence opens its detailed source.
+
 Analytics groups follow-up productivity and data quality under Workspace health, while retaining their individual reports and exports. Orbit’s connection desk offers direct saved-link exploration, recent recorded activity and user-initiated actions for a selected record. Its links are limited to the current filters and bounded list; company activity uses historical company snapshots.
 
 Orbit offers an interactive 3D view with local portraits, company icons, sharp HTML labels and a 2D map plus record list. Solid lines show saved associations; short dotted tethers connect displaced labels to their 3D positions. Depth does not measure closeness. Reduced motion, a non-WebGL fallback, keyboard controls, and the record list remain available. Home's 3D sculpture is decorative and retains a CSS fallback.

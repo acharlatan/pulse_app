@@ -1,3 +1,4 @@
+import { OpportunityBrief } from "./OpportunityBrief";
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -59,6 +60,8 @@ export function AnalyticsBrief({
     },
   ];
   const [choice, setChoice] = useState("");
+  const [evidenceLimit, setEvidenceLimit] = useState(3);
+  const [briefId, setBriefId] = useState<string | null>(null);
   const [companyLimit, setCompanyLimit] = useState(4);
   const active =
     lanes.find((l) => l.id === choice) ||
@@ -70,7 +73,7 @@ export function AnalyticsBrief({
       if (record) onEdit({ kind: "task", record });
     } else if (t.type === "opportunity") {
       const record = p.opportunities.find((r) => r.id === t.id);
-      if (record) onEdit({ kind: "opportunity", record });
+      if (record) setBriefId(record.id);
     }
   }
   return (
@@ -101,7 +104,7 @@ export function AnalyticsBrief({
             <button
               key={l.id}
               aria-pressed={active.id === l.id}
-              onClick={() => setChoice(l.id)}
+              onClick={() => { setChoice(l.id); setEvidenceLimit(3); }}
             >
               <span className="lane-number">0{i + 1}</span>
               <strong>{l.rows.length}</strong>
@@ -122,7 +125,7 @@ export function AnalyticsBrief({
             </Link>
           </div>
           {active.rows.length ? (
-            active.rows.slice(0, 3).map((t) => (
+            active.rows.slice(0, evidenceLimit).map((t) => (
               <article className="focus-evidence" key={t.type + ":" + t.id}>
                 <div>
                   <h4>{t.title}</h4>
@@ -156,9 +159,9 @@ export function AnalyticsBrief({
               <p>{__pulseText(active.empty)}</p>
             </div>
           )}
-          {active.rows.length > 3 && (
+          {active.rows.length > evidenceLimit && (
             <p className="muted">
-              {__pulseText("Showing 3 of") + " "}{active.rows.length}.{" "}
+              {__pulseText("Showing")} {Math.min(evidenceLimit, active.rows.length)} {__pulseText("of")} {active.rows.length}. <button className="text-link" onClick={() => setEvidenceLimit(evidenceLimit + 6)}>{__pulseText("Show more")}</button>{" "}
               <Link
                 to={
                   active.id === "commitments"
@@ -320,6 +323,7 @@ export function AnalyticsBrief({
         </details>
       </section>
       </details>
+      {briefId && <OpportunityBrief id={briefId} onClose={() => setBriefId(null)} onEdit={(next) => {setBriefId(null); onEdit(next);}} />}
     </>
   );
 }
