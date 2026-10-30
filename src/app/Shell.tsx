@@ -118,6 +118,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <div className="workspace-switcher-menu">
                 <strong>{t("switchWorkspace")}</strong>
                 <p>{__pulseText("Demo and Personal have separate records on this device.")}</p>
+                <p>{workspace === "demo" ? __pulseText("You are exploring fictional people and companies. Your personal workspace starts with your own records.") : __pulseText("You are using your personal records. The demo is a separate fictional workspace.")}</p>
                 <button
                   type="button"
                   className="button secondary"

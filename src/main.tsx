@@ -37,3 +37,5 @@ import "./atelier.css";
 import "./relationship-workspace.css";
 
 import "./pipeline-studio.css";
+
+import "./relationship-journey.css";

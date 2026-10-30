@@ -104,6 +104,9 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
               <option value="clients">{__pulseText("Manage clients")}</option>
               <option value="partnerships">{__pulseText("Build partnerships")}</option>
               <option value="opportunities">{__pulseText("Move opportunities forward")}</option>
+              <option value="job_search">{__pulseText("Organize a job search")}</option>
+              <option value="networking">{__pulseText("Grow my network")}</option>
+              <option value="other">{__pulseText("Something else")}</option>
             </select>
           </label>
           {intention && (
@@ -112,7 +115,10 @@ export function GettingStarted({ always = false }: { always?: boolean }) {
                 ? __pulseText("Keep client conversations and commitments together.")
                 : intention === "partnerships"
                   ? __pulseText("Make space for thoughtful partnership follow-ups.")
-                  : __pulseText("Keep opportunities and their next steps visible.")}
+                  : intention === "opportunities" ? __pulseText("Keep opportunities and their next steps visible.")
+                  : intention === "job_search" ? __pulseText("Keep conversations, organizations and follow-ups together as you explore roles.")
+                  : intention === "networking" ? __pulseText("Remember the people you meet and the conversations that matter.")
+                  : __pulseText("Make this space work for your relationships, your way.")}
             </p>
           )}
           <ol>

@@ -300,7 +300,7 @@ export const settingsSchema = z.object({
     .object({
       hidden: z.boolean().default(false),
       intention: z
-        .enum(["", "clients", "partnerships", "opportunities"])
+        .enum(["", "clients", "partnerships", "opportunities", "job_search", "networking", "other"])
         .default(""),
       exportInitiatedAt: z.string().datetime().nullable().default(null),
     })
