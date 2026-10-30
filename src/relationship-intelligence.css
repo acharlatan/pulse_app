@@ -1,0 +1,16 @@
+.context-tip { margin:14px 0; border:1px solid var(--border); border-radius:16px; background:var(--surface); color:var(--text); }
+.context-tip summary { display:flex; align-items:center; gap:10px; padding:14px 17px; color:var(--primary-text); font-weight:750; cursor:pointer; min-height:48px; }
+.context-tip summary::after { content:'+'; margin-left:auto; font-size:20px; }
+.context-tip[open] summary::after { content:'−'; }
+.context-tip p { margin:0; padding:0 17px 16px 44px; color:var(--muted); line-height:1.55; max-width:800px; }
+.analytics-section-intro { position:relative; overflow:hidden; margin:18px 0; border-radius:22px; padding:clamp(22px,3vw,34px); background:#2c203a; color:#fffaff; }
+.analytics-section-intro::after { content:'✳'; position:absolute; right:5%; top:-25px; font-size:150px; line-height:1; color:#dff58f; opacity:.13; pointer-events:none; }
+.analytics-section-intro .eyebrow { color:#dff58f; }
+.analytics-section-intro h2 { position:relative; color:#fffaff; font-size:clamp(25px,3vw,38px); letter-spacing:-.045em; margin:8px 0; }
+.analytics-section-intro p:not(.eyebrow) { color:#f2eaf6; line-height:1.5; margin-bottom:0; max-width:600px; }
+.analytics-page .analytics-metrics > div { border:1px solid var(--border); border-radius:16px; padding:16px; background:var(--surface-secondary); }
+.analytics-page .analytics-metrics > div strong { font-size:28px; letter-spacing:-.05em; }
+.weekly-review-facts { flex-wrap:wrap; }
+.story-followup { border-left:3px solid var(--primary); padding-left:16px; }
+.focus-page .context-tip { margin:4px 0 14px; }
+@media(max-width:700px) { .analytics-section-intro { padding:22px; } .analytics-section-intro::after { font-size:100px; } .context-tip summary { font-size:15px; } }

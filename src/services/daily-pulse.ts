@@ -28,6 +28,7 @@ export function dailyPulse(
   data: DailyPulseData,
   timezone: string,
   now = Date.now(),
+  intention = "",
 ) {
   const day = calendarDay(now, timezone);
   const exists = (f: FocusItem) =>
@@ -86,14 +87,14 @@ export function dailyPulse(
     lane: "Keep a commitment",
     reason: `${taskState(t, timezone, now)} · Saved follow-up due ${calendarDay(t.dueAt, timezone)}. Review the commitment and any contact restrictions.`,
   }));
-  const lanes: DailySuggestion[][] = [
-    commitments,
-    guidance.opportunities.map((r) => ({
+  const opportunityLane: DailySuggestion[] = guidance.opportunities.map((r) => ({
       ...r,
       lane: "Protect an opportunity",
-    })),
-    guidance.relationships.map((r) => ({ ...r, lane: "Renew a connection" })),
-  ];
+    }));
+  const relationshipLane: DailySuggestion[] = guidance.relationships.map((r) => ({ ...r, lane: "Renew a connection" }));
+  // The preference changes presentation order only, never eligibility or restriction checks.
+  const relationshipsFirst = ["clients", "partnerships", "networking", "job_search"].includes(intention);
+  const lanes: DailySuggestion[][] = relationshipsFirst ? [commitments, relationshipLane, opportunityLane] : [commitments, opportunityLane, relationshipLane];
   const suggestions: DailySuggestion[] = [];
   const seen = new Set(selected);
   // One per evidence lane first, then fill available spaces; never invent three targets.

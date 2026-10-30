@@ -10,6 +10,7 @@ import { EditorModal, type Editor } from "../components/forms";
 import { TaskRow } from "../components/relationship";
 import { priorities } from "../data/models";
 import { taskState } from "../services/recommendations";
+import { ContextTip } from "../components/context-tip";
 export function Activity() {
   const __pulseText = useInterfaceText();
   const t = useTranslation();
@@ -84,6 +85,7 @@ export function Activity() {
           {t("planFollowup")}
         </button>
       </header>
+      <ContextTip title="Keep your commitments in view">Filter by overdue, today or upcoming. Open a follow-up to edit its details, or complete it when you are ready. No message is sent automatically.</ContextTip>
       <div className="activity-intro-strip"><span>✳</span><div><strong>{__pulseText("KEEP THE PROMISES THAT MATTER")}</strong><p>{__pulseText("Choose a time horizon to see your saved follow-ups. Completing a task never sends a message.")}</p></div><Link to="/focus">{__pulseText("Go to My Focus")} <ArrowUpRight size={16}/></Link></div>
       <nav className="activity-ledger" aria-label={__pulseText("Follow-up overview")}>
         {[
