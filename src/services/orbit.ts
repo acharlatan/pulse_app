@@ -30,6 +30,8 @@ export function deriveOrbit(
     priority?: string;
     balance?: boolean;
     preferredId?: string;
+    preferredIds?: string[];
+    includeIds?: ReadonlySet<string>;
   } = {},
 ) {
   const limit = Math.max(1, Math.min(options.limit || 60, 80)),
@@ -77,7 +79,8 @@ export function deriveOrbit(
     .filter(
       (n) =>
         (!q || n.label.toLowerCase().includes(q)) &&
-        (!options.type || n.kind === options.type),
+        (!options.type || n.kind === options.type) &&
+        (!options.includeIds || options.includeIds.has(n.id)),
     )
     .sort((a, b) => a.id.localeCompare(b.id));
   // For a bounded map, interleave kinds so people are not hidden behind an
@@ -102,6 +105,16 @@ export function deriveOrbit(
     }
     return chosen;
   })() : candidates.slice(0, limit);
+  // Prioritize an explicitly revealed record and its saved neighbors within the existing cap.
+  // Filtered-out neighbors remain available in the detail list, never invented as map edges.
+  const preferredSet = new Set([options.preferredId, ...(options.preferredIds || [])].filter((id): id is string => !!id));
+  const prioritized = candidates.filter((candidate) => preferredSet.has(candidate.id));
+  for (const candidate of prioritized.slice().reverse()) {
+    const index = shown.findIndex((item) => item.id === candidate.id);
+    if (index >= 0) shown.splice(index, 1);
+    shown.unshift(candidate);
+  }
+  if (shown.length > limit) shown.length = limit;
   // An explicit "show on map" request keeps the selected saved record within the bound.
   const preferred = options.preferredId && candidates.find((n) => n.id === options.preferredId);
   if (preferred && !shown.some((n) => n.id === preferred.id)) shown[shown.length - 1] = preferred;
