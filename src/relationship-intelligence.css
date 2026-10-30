@@ -14,3 +14,18 @@
 .story-followup { border-left:3px solid var(--primary); padding-left:16px; }
 .focus-page .context-tip { margin:4px 0 14px; }
 @media(max-width:700px) { .analytics-section-intro { padding:22px; } .analytics-section-intro::after { font-size:100px; } .context-tip summary { font-size:15px; } }
+
+.story-history-note { padding: 14px 16px; border-radius: 12px; background: var(--surface-secondary); color: var(--text); line-height: 1.5; }
+.story-transition { border-left: 3px solid var(--primary); padding-left: 16px; overflow-wrap: anywhere; }
+.weekly-next { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 24px; border-top: 1px solid currentColor; padding-top: 24px; }
+.weekly-next h3 { font-size: 23px; margin: 8px 0; }
+.weekly-next-list { min-width: 0; display: grid; gap: 10px; }
+.weekly-next-list article { display: flex; gap: 12px; justify-content: space-between; align-items: center; flex-wrap: wrap; border-radius: 14px; background: var(--surface); color: var(--text); padding: 14px; }
+.weekly-next-list article > div { display: grid; gap: 5px; min-width: 0; overflow-wrap: anywhere; }
+.weekly-next-list article small { color: var(--muted); }
+.weekly-task-link { color: var(--primary-text); text-align: left; font-weight: 750; text-decoration: underline; background: none; border: 0; padding: 0; cursor: pointer; }
+.weekly-next-list form { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.weekly-next-list label { display: grid; gap: 4px; font-size: 13px; }
+.weekly-next-list label span { color: var(--text); }
+.weekly-next-list input { min-width: 0; max-width: 100%; }
+@media (max-width: 767px) { .weekly-next { grid-column: auto; grid-template-columns: 1fr; } .weekly-review-facts { grid-template-columns: repeat(2, minmax(0,1fr)); } }

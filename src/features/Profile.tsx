@@ -6,6 +6,8 @@ import { CustomFields } from "../components/custom-fields";
 import { CommunicationHandoff } from "../components/communication";
 import { outreachReasons } from "../ai/context";
 import { useState } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
+import { OpportunityBrief } from "./OpportunityBrief";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
@@ -55,6 +57,8 @@ export function Profile({ company = false }: { company?: boolean }) {
   const { id } = useParams();
   const p = usePulse();
   const navigate = useNavigate();
+  const transitions = useLiveQuery(() => p.db.transitions.toArray(), [p.db]) || [];
+  const [briefId, setBriefId] = useState<string | null>(null);
   const { date } = useFormat();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -508,6 +512,9 @@ export function Profile({ company = false }: { company?: boolean }) {
             <RelationshipTimeline
               interactions={interactions}
               tasks={tasks}
+              opportunities={opportunities}
+              transitions={transitions}
+              onOpenOpportunity={setBriefId}
               onEdit={setEditor}
             />
           </section>
@@ -687,6 +694,7 @@ export function Profile({ company = false }: { company?: boolean }) {
           </section>
         </aside>
       </div>
+      {briefId && <OpportunityBrief id={briefId} onClose={() => setBriefId(null)} onEdit={(next) => { setBriefId(null); setEditor(next); }} />}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}
