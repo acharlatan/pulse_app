@@ -13,6 +13,7 @@ import {
 } from "../data/repository";
 import { lastInteraction, restrictionReasons, type Recommendation } from "../services/recommendations";
 import { opportunityFollowUp } from "../services/pipeline-studio";
+import { OpportunityBrief } from "./OpportunityBrief";
 import { ContextTip } from "../components/context-tip";
 export function Review() {
   const __pulseText = useInterfaceText();
@@ -39,6 +40,7 @@ export function Review() {
         : "urgency",
     ),
     [editor, setEditor] = useState<Editor | null>(null),
+    [briefId, setBriefId] = useState<string | null>(null),
     [snooze, setSnooze] = useState<Recommendation | null>(null),
     [days, setDays] = useState(String(p.settings.intelligence.snoozeDays)),
     [limit, setLimit] = useState(20);
@@ -163,7 +165,8 @@ export function Review() {
             related = o ? opportunityFollowUp(o,p.tasks,p.interactions) : null,
             sharedReview = related ? available.find((item) => item.taskId === related.task.id) : undefined;
           return (
-            <article className="surface review-card" key={r.key}>
+            <article className={`surface review-card review-kind-${r.blocked ? "paused" : r.taskId ? "commitment" : r.opportunityId ? "opportunity" : "relationship"}`} key={r.key}>
+              <div className="review-kind-label">{__pulseText(r.blocked ? "PAUSED · REVIEW ONLY" : r.taskId ? "A COMMITMENT TO REVIEW" : r.opportunityId ? "AN OPPORTUNITY TO EXPLORE" : "A RELATIONSHIP TO CONSIDER")}</div>
               <div className="review-identity">
                 <Avatar
                   name={c?.name || o?.title || "Opportunity"}
@@ -247,7 +250,7 @@ export function Review() {
                   <button
                     className="button primary"
                     onClick={() =>
-                      setEditor({ kind: "opportunity", record: o })
+                      setBriefId(o.id)
                     }
                   >
                     {__pulseText("Review opportunity")}</button>
@@ -315,6 +318,7 @@ export function Review() {
         >
           {__pulseText("Show more reviews")}</button>
       )}
+      {briefId && <OpportunityBrief id={briefId} onClose={() => setBriefId(null)} onEdit={(next) => {setBriefId(null); setEditor(next);}} />}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}

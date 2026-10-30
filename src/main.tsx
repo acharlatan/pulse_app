@@ -41,3 +41,5 @@ import "./pipeline-studio.css";
 import "./relationship-journey.css";
 
 import "./relationship-intelligence.css";
+
+import "./clarity-workspace.css";

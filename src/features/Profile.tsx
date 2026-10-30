@@ -292,43 +292,8 @@ export function Profile({ company = false }: { company?: boolean }) {
           </details>
         </div>
       </section>
+      <section className="profile-connection-brief" aria-label={__pulseText("Relationship overview")}><div><p className="eyebrow">{__pulseText("THE CONNECTION AT A GLANCE")}</p><h2>{__pulseText("The context behind the connection.")}</h2><p>{__pulseText("A little of what you have saved, brought together for your next step.")}</p></div><div className="connection-brief-grid"><article><span>{__pulseText("LAST CONVERSATION")}</span><strong>{last ? date(last) : __pulseText("Not recorded")}</strong><small>{__pulseText("From saved conversations")}</small></article><article><span>{__pulseText("OPEN FOLLOW-UPS")}</span><strong>{tasks.filter(t => !t.completedAt).length}</strong><small>{next ? next.title : __pulseText("No open follow-up")}</small></article><article><span>{__pulseText("OPEN OPPORTUNITIES")}</span><strong>{opportunities.filter(o => o.status === "open").length}</strong><small>{__pulseText("Currently linked")}</small></article></div></section>
       {contact && !company && <section className="journey-person-story" aria-label={__pulseText("Your relationship story")}><div className="journey-story-intro"><p className="eyebrow">{__pulseText("THE RELATIONSHIP JOURNAL")}</p><h2>{__pulseText("Every connection has a story.")}</h2><p>{__pulseText("The conversations, details and commitments you’ve saved together.")}</p></div><div className="journey-story-cards"><article><span>{__pulseText("LAST CONVERSATION")}</span>{(() => {const entry=interactions.filter(i=>i.type!=="Note" && Date.parse(i.occurredAt)<=Date.now()).sort((a,b)=>b.occurredAt.localeCompare(a.occurredAt))[0];return entry ? <><strong>{date(entry.occurredAt)} · {__pulseText(entry.type)}</strong><p>{entry.summary.length>150 ? `${entry.summary.slice(0,150)}…` : entry.summary}</p><button onClick={()=>setEditor({kind:"interaction",record:entry})}>{__pulseText("Review conversation")} ↗</button></> : <><strong>{__pulseText("No conversation recorded yet")}</strong><button onClick={()=>setEditor({kind:"interaction",contact})}>{__pulseText("Log a conversation")} ↗</button></>;})()}</article><article><span>{__pulseText("YOUR NEXT STEP")}</span>{next ? <><strong>{next.title}</strong><p>{taskState(next,p.settings.timezone)} · {date(next.dueAt)}</p><button onClick={()=>setEditor({kind:"task",record:next})}>{__pulseText("Review follow-up")} ↗</button></> : <><strong>{__pulseText("No open follow-up")}</strong><p>{__pulseText("Make room for a next step when you’re ready.")}</p><button onClick={()=>setEditor({kind:"task",contact})}>{__pulseText("Plan a follow-up")} ↗</button></>}</article><article><span>{__pulseText("REMEMBER THIS")}</span>{(() => {const note=interactions.filter(i=>i.type==="Note" && Date.parse(i.occurredAt)<=Date.now()).sort((a,b)=>b.occurredAt.localeCompare(a.occurredAt))[0];return note ? <><strong>{date(note.occurredAt)}</strong><p>{note.summary.length>150 ? `${note.summary.slice(0,150)}…` : note.summary}</p><button onClick={()=>setEditor({kind:"interaction",record:note})}>{__pulseText("Open note")} ↗</button></> : <><strong>{__pulseText("No notes yet")}</strong><p>{__pulseText("Save the little details that matter.")}</p><button onClick={()=>setEditor({kind:"interaction",contact,note:true})}>{__pulseText("Add a note")} ↗</button></>;})()}</article></div></section>}
-      {!company && <section
-        className="profile-perspective connected-profile-perspective"
-        aria-label={__pulseText("Relationship perspective")}
-      >
-        <div>
-          <p className="eyebrow">{__pulseText("THE STORY SO FAR")}</p>
-          <h2>{__pulseText("Context for the next move.")}</h2>
-          <p>
-            {__pulseText("Saved activity and commitments for this")}{" "}
-            {company ? __pulseText("company") : __pulseText("person")}.
-          </p>
-        </div>
-        <div className="profile-perspective-facts">
-          <div>
-            <strong>
-              {
-                interactions.filter(
-                  (i) =>
-                    i.type !== "Note" && Date.parse(i.occurredAt) <= Date.now(),
-                ).length
-              }
-            </strong>
-            <span>{__pulseText("recorded conversations")}</span>
-          </div>
-          <div>
-            <strong>{tasks.filter((t) => !t.completedAt).length}</strong>
-            <span>{__pulseText("open follow-ups")}</span>
-          </div>
-          <div>
-            <strong>
-              {opportunities.filter((o) => o.status === "open").length}
-            </strong>
-            <span>{__pulseText("open opportunities")}</span>
-          </div>
-        </div>
-      </section>}
       {company && org && (
         <section className="company-command surface" aria-label={__pulseText("Company overview")}>
           <div className="company-command-heading">
@@ -401,7 +366,7 @@ export function Profile({ company = false }: { company?: boolean }) {
               })
             }
           >
-            {section.replace("-", " ")}
+            {__pulseText(section === "overview" ? "Overview" : section === "story" ? "Story" : section === "next-steps" ? "Next steps" : section === "opportunities" ? "Opportunities" : section === "people" ? "People" : "Permissions")}
           </button>
         ))}
       </nav>
