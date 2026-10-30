@@ -117,7 +117,7 @@ export async function initialize(db: PulseDB) {
           type: i % 2 ? ("Call" as const) : ("Meeting" as const),
           occurredAt: day(-[25, 2, 9, 1, 31, 4][i % 6]),
           summary: [
-            "Discussed the brand refresh. Olivia is excited about a thoughtful, long-term collaboration. Send over the updated proposal.",
+            `Discussed the brand refresh. ${c.preferredName} is interested in a thoughtful, long-term collaboration. Share the updated proposal.`,
             "Great discovery call. Their team is growing and needs support with the next launch.",
             "Explored partnership goals and agreed to reconnect after their planning session.",
           ][i % 3],

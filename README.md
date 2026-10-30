@@ -6,6 +6,8 @@
 
 PULSE uses four main areas: Today, People, Work, and Insights. Today brings Daily Pulse and My Focus together; People contains the directory, Orbit, and relationship review, with saved-list management in the directory; Work contains the pipeline, follow-ups, activity, and automations. Settings, backups, imports, personalization, help, and the optional assistant are in the workspace menu. Existing route URLs remain valid.
 
+The Insight Story update separates activity in the selected reporting period from current priorities, with a source-linked timeline and evidence-led lanes for commitments, relationships and opportunities. Orbit's full-width connection desk follows saved associations across people, companies and opportunities, offers a trail back through selections, and exposes follow-ups, recorded activity and source records. The map remains bounded; connections in the desk are retrieved from the saved data rather than limited to the visible map. Existing demo and personal records are not rewritten.
+
 The Atelier visual refresh uses a compact two-part Daily Pulse opening, a combined People overview, stronger navigation, distinct Work and Insights colors, and higher-contrast dark surfaces. Portrait links in the Home opening use saved contacts and open their existing profiles; an empty workspace does not show invented people.
 
 The Relationship Workspace update brings Daily Pulse suggestions forward, adds an at-a-glance company overview and actionable Orbit follow-ups, and makes the selected Insights focus more prominent. The interaction editor can continue into a separate follow-up form with the same person or company; the interaction is saved before that optional step, and cancelling the follow-up does not undo it. A newly created follow-up is a separate record, not automatically linked to the interaction; an existing follow-up can be linked in the interaction editor.
@@ -20,7 +22,7 @@ Relationship Intelligence adds optional contextual help across Focus, Analytics,
 
 Orbit places the selected record in a full-width panel directly below the map, with connections and activity alongside one another. In 3D, selection emphasizes saved edges to the selected node. Analytics focus evidence can be expanded and opportunity evidence opens its detailed source.
 
-Analytics groups follow-up productivity and data quality under Workspace health, while retaining their individual reports and exports. Orbit’s connection desk offers direct saved-link exploration, recent recorded activity and user-initiated actions for a selected record. Its links are limited to the current filters and bounded list; company activity uses historical company snapshots.
+Analytics groups follow-up productivity and data quality under Workspace health, while retaining their individual reports and exports. Orbit’s connection desk offers direct saved-link exploration, recent recorded activity and user-initiated actions for a selected record. Its links come from saved associations, even outside the bounded map and list; company activity uses historical company snapshots.
 
 Orbit offers an interactive 3D view with local portraits, company icons, sharp HTML labels and a 2D map plus record list. Solid lines show saved associations; short dotted tethers connect displaced labels to their 3D positions. Depth does not measure closeness. Reduced motion, a non-WebGL fallback, keyboard controls, and the record list remain available. Home's 3D sculpture is decorative and retains a CSS fallback.
 

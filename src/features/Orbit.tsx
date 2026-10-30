@@ -5,6 +5,7 @@ import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty, useFormat } from "../components/ui";
 import { deriveOrbit, type OrbitNode } from "../services/orbit";
+import { savedOrbitConnections, savedOrbitNode } from "../services/orbit-connections";
 import { EditorModal, type Editor } from "../components/forms";
 import {
   lastInteraction,
@@ -42,6 +43,10 @@ export function Orbit() {
     [turn, setTurn] = useState(0),
     [resetScene, setResetScene] = useState(0),
     [selected, setSelected] = useState(""),
+    [selectionTrail, setSelectionTrail] = useState<string[]>([]),
+    [mapAnchor, setMapAnchor] = useState(""),
+    [connectionLimit, setConnectionLimit] = useState(6),
+    [taskLimit, setTaskLimit] = useState(3),
     [zoom, setZoom] = useState(1),
     [pan, setPan] = useState({ x: 0, y: 0 }),
     [editor, setEditor] = useState<Editor | null>(null),
@@ -64,8 +69,9 @@ export function Orbit() {
         person: params.get("person") || "",
         limit: matchMedia("(max-width:600px)").matches ? (mapMode === "3d" ? 12 : 18) : 24,
         balance: true,
+        preferredId: mapAnchor,
       }),
-    [p, search, type, priority, params, mapMode],
+    [p, search, type, priority, params, mapMode, mapAnchor],
   );
   const fullGraph = useMemo(
     () =>
@@ -79,9 +85,8 @@ export function Orbit() {
       }),
     [p, search, type, priority, params],
   );
-  const node = fullGraph.nodes.find((n) => n.id === selected),
-    byId = new Map(graph.nodes.map((n) => [n.id, n])),
-    allById = new Map(fullGraph.nodes.map((n) => [n.id, n]));
+  const node = selected ? savedOrbitNode(p, selected) : undefined,
+    byId = new Map(graph.nodes.map((n) => [n.id, n]));
   const person =
       node?.kind === "person"
         ? p.contacts.find((c) => c.id === node.recordId)
@@ -115,7 +120,9 @@ export function Orbit() {
             : false),
   );
   const recent = p.interactions.filter((i) => Date.parse(i.occurredAt) <= Date.now() && (person ? i.contactId === person.id : company ? i.organizationId === company.id : deal ? i.opportunityId === deal.id : false)).sort((a,b) => b.occurredAt.localeCompare(a.occurredAt)).slice(0, 3);
-  const connections = node ? fullGraph.edges.filter(e => e.from === node.id || e.to === node.id).map(e => ({ edge:e, other:allById.get(e.from === node.id ? e.to : e.from) })).filter(item => !!item.other) : [];
+  const connections = node ? savedOrbitConnections(p, node) : [];
+  const orderedTasks = [...tasks].sort((a,b) => a.dueAt.localeCompare(b.dueAt) || a.id.localeCompare(b.id));
+  const isOnMap = !!node && graph.nodes.some((item) => item.id === node.id);
   function fit() {
     setZoom(
       Math.min(
@@ -139,7 +146,25 @@ export function Orbit() {
     return () => observer.disconnect();
   }, [graph.nodes.length]);
   function select(n: OrbitNode) {
-    setSelected(n.id);
+    if (selected && selected !== n.id) setSelectionTrail((trail) => [...trail, selected].slice(-20));
+    setSelected(n.id); setConnectionLimit(6); setTaskLimit(3);
+  }
+  function selectPrevious() {
+    let index = selectionTrail.length - 1;
+    while (index >= 0 && !savedOrbitNode(p, selectionTrail[index])) index--;
+    if (index < 0) { setSelectionTrail([]); return; }
+    const previous = selectionTrail[index];
+    setSelectionTrail(selectionTrail.slice(0, index));
+    setSelected(previous); setConnectionLimit(6); setTaskLimit(3);
+  }
+  function clearSelection() {
+    setSelected(""); setSelectionTrail([]); setMapAnchor("");
+  }
+  function revealOnMap() {
+    if (!node) return;
+    setSearch(""); setType(""); setPriority(""); setParams({}, { state: navigationState });
+    setMapAnchor(node.id);
+    requestAnimationFrame(() => viewport.current?.scrollIntoView({ block:"center", behavior:p.settings.reducedMotion ? "instant" : "smooth" }));
   }
   function selectFromBrowse(n: OrbitNode) {
     select(n);
@@ -184,7 +209,7 @@ export function Orbit() {
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              setSelected("");
+              clearSelection();
             }}
             placeholder={__pulseText("Find a person, company or opportunity")}
           />
@@ -196,7 +221,7 @@ export function Orbit() {
             value={type}
             onChange={(e) => {
               setType(e.target.value);
-              setSelected("");
+              clearSelection();
             }}
           >
             <option value="">{t("allRecords")}</option>
@@ -209,7 +234,7 @@ export function Orbit() {
           <span>{t("contactPriority")}</span>
           <select
             value={priority}
-            onChange={(e) => setPriority(e.target.value)}
+            onChange={(e) => { setPriority(e.target.value); clearSelection(); }}
           >
             <option value="">{t("allPriorities")}</option>
             {["VIP", "High", "Normal", "Low"].map((x) => (
@@ -232,7 +257,7 @@ export function Orbit() {
             className="button ghost"
             onClick={() => {
               setParams({}, { state: navigationState });
-              setSelected("");
+              clearSelection();
             }}
           >
             {__pulseText("Show my network")}</button>
@@ -345,7 +370,7 @@ export function Orbit() {
                       key={n.id}
                       className={`orbit-node ${n.kind} ${n.id === selected ? "selected" : ""}`}
                       style={{ left: n.x, top: n.y }}
-                      title={`${n.label} · ${n.kind}`}
+                      title={`${n.label} · ${n.kind === "person" ? t("person") : n.kind === "company" ? t("company") : t("opportunity")}`}
                       aria-pressed={n.id === selected}
                       onClick={() => select(n)}
                     >
@@ -356,7 +381,7 @@ export function Orbit() {
                         size="large"
                       />
                       <span>{n.label}</span>
-                      <small>{n.kind}</small>
+                      <small>{n.kind === "person" ? t("person") : n.kind === "company" ? t("company") : t("opportunity")}</small>
                     </button>
                   ))}
                 </div>}
@@ -386,7 +411,7 @@ export function Orbit() {
                 onClick={() => {
                   fit();
                   setResetScene((value) => value + 1);
-                  setSelected("");
+                  clearSelection();
                   setSearch("");
                   setType("");
                   setPriority("");
@@ -423,202 +448,36 @@ export function Orbit() {
               </div>
             </>
           )}
-        <aside
-          ref={detail}
-          className={`orbit-detail surface ${node ? "has-selection" : ""}`}
-          aria-label={__pulseText("Selected relationship")}
-        >
-          {!node ? (
-            <>
-              <p className="eyebrow">{__pulseText("A LITTLE PERSPECTIVE")}</p>
-              <h2>{__pulseText("Every connection has context.")}</h2>
-              <p>
-                {__pulseText("Select a record to see its saved associations and next steps. No relationships are inferred.")}</p>
-              <Link to="/focus" className="button secondary">
-                {__pulseText("Open My Focus")}</Link>
-            </>
-          ) : (
-            <>
-              <div className="orbit-selected-header"><div className="orbit-selected-identity">
-              <button
-                className="button ghost orbit-close"
-                onClick={() => setSelected("")}
-              >
-                {t("closeSelection")}
-              </button>
-              <Avatar
-                name={node.label}
-                mediaId={node.mediaId}
-                size="xl"
-                company={node.kind === "company"}
-              />
+          <aside ref={detail} className={`orbit-detail surface ${node ? "has-selection" : ""}`} aria-label={__pulseText("Selected relationship")}>
+          {node && <>
+            <div className="orbit-selected-header"><div className="orbit-selected-identity">
+              <button className="button ghost orbit-close" onClick={clearSelection}>{t("closeSelection")}</button>
+              <Avatar name={node.label} mediaId={node.mediaId} size="xl" company={node.kind === "company"}/>
               <Badge>{node.kind === "person" ? t("person") : node.kind === "company" ? t("company") : t("opportunity")}</Badge>
-              <h2>{node.label}</h2></div></div>
-              <div className="orbit-workbench"><p className="eyebrow">{__pulseText("CONNECTION DESK")}</p><h3>{__pulseText("A place to explore and act.")}</h3><p>{__pulseText("Use saved context to decide your next step. Nothing is sent automatically.")}</p><div className="orbit-workbench-actions">{(person || company) && <><button className="button secondary" onClick={() => setEditor({kind:"interaction", contact:person, organizationId:company?.id})}>{__pulseText("Log interaction")}</button><button className="button secondary" onClick={() => setEditor({kind:"task", contact:person, organizationId:company?.id})}>{__pulseText("Plan a follow-up")}</button></>}{deal && <button className="button secondary" onClick={() => setBriefId(deal.id)}>{__pulseText("Open opportunity details")}</button>}</div>
-                <div className="orbit-workbench-block"><h4>{__pulseText("Explore saved connections")}</h4><p>{__pulseText("Select a linked record to explore it here. This list reflects the current filters and list limit.")}</p><div className="orbit-link-cards">{connections.slice(0,8).map(({edge,other}) => other && <button key={edge.id} onClick={() => selectFromBrowse(other)}><Avatar name={other.label} mediaId={other.mediaId} company={other.kind === "company"}/><span><strong>{other.label}</strong><small>{__pulseText(edge.label)}</small></span><b aria-hidden="true">↗</b></button>)}</div>{connections.length > 8 && <p>{__pulseText("More saved connections appear in the expanded list below.")}</p>}{!connections.length && <p>{__pulseText("No saved links are visible in this view.")}</p>}</div>
-                <div className="orbit-workbench-block"><h4>{__pulseText("Recent recorded activity")}</h4>{recent.map(i => <button className="orbit-activity-entry" key={i.id} onClick={() => setEditor({kind:"interaction",record:i})}><span>{__pulseText(i.type)} · {date(i.occurredAt)}</span><strong>{i.summary}</strong></button>)}{!recent.length && <p>{__pulseText("No recorded activity for this selection yet.")}</p>}{company && <small>{__pulseText("Company activity uses the company saved on each conversation.")}</small>}{deal && <small>{__pulseText("Only interactions directly linked to this opportunity appear here.")}</small>}</div>
+              <div><p className="eyebrow">{__pulseText("THE SELECTED CONNECTION")}</p><h2>{node.label}</h2><p className="orbit-selected-subtitle">{person ? [person.role, p.organizations.find(o => o.id === person.organizationId)?.name].filter(Boolean).join(" · ") || __pulseText("Independent") : company ? company.industry || __pulseText("Industry not recorded") : deal ? [p.organizations.find(o => o.id === deal.organizationId)?.name, p.pipelineStages.find(stage => stage.id === deal.stageId)?.name].filter(Boolean).join(" · ") : ""}</p></div>
+            </div></div>
+            <div className="orbit-context-strip">
+              <div><strong>{connections.length}</strong><span>{__pulseText("saved connections")}</span></div>
+              <div><strong>{orderedTasks.length}</strong><span>{__pulseText("open follow-ups")}</span></div>
+              {deal ? <div><strong>{__pulseText(deal.status)}</strong><span>{__pulseText("opportunity status")}</span></div> : <div><strong>{related.filter(o => o.status === "open").length}</strong><span>{__pulseText("open opportunities")}</span></div>}
+              <div className="orbit-context-actions">{selectionTrail.length > 0 && <button className="button secondary" onClick={selectPrevious}>← {__pulseText("Back to previous selection")}</button>}{!isOnMap && <button className="button secondary" onClick={revealOnMap}>{__pulseText("Show this record on the map")}</button>}</div>
+            </div>
+            <div className="orbit-workbench orbit-workbench-v2">
+              <div className="orbit-workbench-lead"><p className="eyebrow">{__pulseText("CONNECTION DESK")}</p><h3>{__pulseText("Explore the story, then choose your next step.")}</h3><p>{__pulseText("Only saved associations are shown. Actions remain yours to choose.")}</p></div>
+              <div className="orbit-workbench-actions">{person && <Link className="button secondary" to={`/network/people/${encodeURIComponent(person.id)}`}>{t("openProfile")}</Link>}{company && <><Link className="button secondary" to={`/network/companies/${encodeURIComponent(company.id)}`}>{__pulseText("Open Company")}</Link><button className="button secondary" onClick={() => {setParams({company:company.id},{state:navigationState});setSearch("");setType("");setPriority("");setMapAnchor(node.id);setView("guide");}}>{__pulseText("Explore this company")}</button></>}{(person || company) && <><button className="button secondary" onClick={() => setEditor({kind:"interaction", contact:person, organizationId:company?.id})}>{__pulseText("Log interaction")}</button><button className="button secondary" onClick={() => setEditor({kind:"task", contact:person, organizationId:company?.id})}>{__pulseText("Plan a follow-up")}</button></>}{deal && <button className="button secondary" onClick={() => setBriefId(deal.id)}>{__pulseText("Open opportunity details")}</button>}{person && <FocusButton type="contact" id={person.id}/ >}{company && <FocusButton type="organization" id={company.id}/ >}{deal && <FocusButton type="opportunity" id={deal.id}/ >}</div>
+              <div className="orbit-workbench-columns">
+                <section className="orbit-workbench-block"><div className="orbit-block-heading"><h4>{__pulseText("Saved connections")}</h4><span>{connections.length}</span></div><p>{__pulseText("Choose a connection to explore it here.")}</p><div className="orbit-link-cards">{connections.slice(0,connectionLimit).map(({id,label,node:other}) => <button key={id} onClick={() => select(other)}><Avatar name={other.label} mediaId={other.mediaId} company={other.kind === "company"}/><span><strong>{other.label}</strong><small>{__pulseText(label)}</small></span><b aria-hidden="true">↗</b></button>)}</div>{connections.length > connectionLimit && <button className="button secondary" onClick={() => setConnectionLimit(connectionLimit + 6)}>{__pulseText("Show more connections")}</button>}{!connections.length && <p>{__pulseText("No saved connections for this record yet.")}</p>}</section>
+                <section className="orbit-workbench-block"><div className="orbit-block-heading"><h4>{__pulseText("Open follow-ups")}</h4><span>{orderedTasks.length}</span></div>{deal && <p>{__pulseText("These follow-ups are related through the company or a representative and may support other work.")}</p>}{orderedTasks.slice(0,taskLimit).map(task => <button key={task.id} className="orbit-activity-entry" onClick={() => setEditor({kind:"task",record:task})}><span>{__pulseText("Due")} · {date(task.dueAt)}</span><strong>{task.title}</strong></button>)}{orderedTasks.length > taskLimit && <button className="button secondary" onClick={() => setTaskLimit(taskLimit + 5)}>{__pulseText("Show more follow-ups")}</button>}{!orderedTasks.length && <p>{__pulseText("No open follow-ups.")}</p>}</section>
+                <section className="orbit-workbench-block"><div className="orbit-block-heading"><h4>{__pulseText("Recent recorded activity")}</h4></div>{recent.map(i => <button className="orbit-activity-entry" key={i.id} onClick={() => setEditor({kind:"interaction",record:i})}><span>{__pulseText(i.type)} · {date(i.occurredAt)}</span><strong>{i.summary}</strong></button>)}{!recent.length && <p>{__pulseText("No recorded activity for this selection yet.")}</p>}{company && <small>{__pulseText("Company activity uses the company saved on each conversation.")}</small>}{deal && <small>{__pulseText("Only interactions directly linked to this opportunity appear here.")}</small>}</section>
               </div>
-              <details className="orbit-more-details"><summary>{__pulseText("Relationship details and next actions")}</summary><div className="orbit-more-content">
-              {person && (
-                <>
-                  <p>
-                    {person.role} ·{" "}
-                    {p.organizations.find((o) => o.id === person.organizationId)
-                      ?.name || __pulseText("Independent")}
-                  </p>
-                  <p>
-                    {person.priority} {" " + __pulseText("priority ·")}{" "}
-                    {effectiveAvailability(person, p.restrictions)}
-                  </p>
-                  <p>
-                    {__pulseText("Last conversation:")}{" "}
-                    {lastInteraction(person.id, p.interactions)
-                      ? date(lastInteraction(person.id, p.interactions)!)
-                      : __pulseText("Not recorded")}
-                  </p>
-                  <Link
-                    className="button primary"
-                    to={`/network/people/${person.id}`}
-                  >
-                    {t("openProfile")}
-                  </Link>
-                  <button
-                    className="button ghost"
-                    onClick={() => {
-                      setParams(
-                        { person: person.id },
-                        { state: navigationState },
-                      );
-                      setSelected("");
-                    }}
-                  >
-                    {__pulseText("Person orbit")}</button>
-                  <Link
-                    className="button ghost"
-                    to={`/analytics?person=${encodeURIComponent(person.id)}`}
-                  >
-                    {__pulseText("View person analytics")}</Link>
-                  <FocusButton type="contact" id={person.id} />
-                </>
-              )}
-              {company && (
-                <>
-                  <p>{company.industry || __pulseText("Industry not recorded")}</p>
-                  <p>
-                    {
-                      p.contacts.filter((c) => c.organizationId === company.id)
-                        .length
-                    }{" "}
-                    {__pulseText("representatives")}</p>
-                  <Link
-                    className="button primary"
-                    to={`/network/companies/${company.id}`}
-                  >
-                    {__pulseText("Open Company")}</Link>
-                  <button
-                    className="button ghost"
-                    onClick={() => {
-                      setParams(
-                        { company: company.id },
-                        { state: navigationState },
-                      );
-                      setSelected("");
-                    }}
-                  >
-                    {__pulseText("Company orbit")}</button>
-                  <Link
-                    className="button ghost"
-                    to={`/analytics?company=${encodeURIComponent(company.id)}`}
-                  >
-                    {__pulseText("View company analytics")}</Link>
-                  <FocusButton type="organization" id={company.id} />
-                </>
-              )}
-              {deal && (
-                <>
-                  <p>
-                    {p.organizations.find((o) => o.id === deal.organizationId)
-                      ?.name || __pulseText("Independent opportunity")}
-                  </p>
-                  <p>
-                    {p.pipelines.find((x) => x.id === deal.pipelineId)?.name} ·{" "}
-                    {p.pipelineStages.find((x) => x.id === deal.stageId)?.name}{" "}
-                    · {deal.status}
-                  </p>
-                  <button
-                    className="button primary"
-                    onClick={() =>
-                      setBriefId(deal.id)
-                    }
-                  >
-                    {__pulseText("Open Opportunity")}</button>
-                </>
-              )}
-              {company && (
-                <>
-                  <h3>{__pulseText("Representatives")}</h3>
-                  {p.contacts
-                    .filter((c) => c.organizationId === company.id)
-                    .slice(0, 20)
-                    .map((c) => (
-                      <Link
-                        className="orbit-related"
-                        key={c.id}
-                        to={`/network/people/${c.id}`}
-                      >
-                        {c.name}
-                      </Link>
-                    ))}
-                </>
-              )}
-              <details className="orbit-saved-links">
-                <summary>{__pulseText("Saved connections in this view")}</summary>
-                {fullGraph.edges
-                  .filter((e) => e.from === node.id || e.to === node.id)
-                  .map((e) => {
-                    const other = allById.get(
-                      e.from === node.id ? e.to : e.from,
-                    )!;
-                    return (
-                      <button
-                        key={e.id}
-                        className="orbit-related"
-                        onClick={() => select(other)}
-                      >
-                        <strong>{other.label}</strong>
-                        <small>{e.label}</small>
-                      </button>
-                    );
-                  })}
-                {!fullGraph.edges.some(
-                  (e) => e.from === node.id || e.to === node.id,
-                ) && (
-                  <p>
-                    {__pulseText("No saved connection is visible with these filters. Clear filters or open a scoped company/person view to inspect more.")}</p>
-                )}
-              </details>
-              <h3>{__pulseText("Linked opportunities")}</h3>
-              {related.slice(0, 10).map((o) => (
-                <button
-                  key={o.id}
-                  className="orbit-related"
-                  onClick={() => setBriefId(o.id)}
-                >
-                  {o.title} · {o.status}
-                </button>
-              ))}
-              {!related.length && <p className="muted">{__pulseText("None recorded.")}</p>}
-              <h3>{__pulseText("Next actions")}</h3>
-              {tasks.slice().sort((a,b) => a.dueAt.localeCompare(b.dueAt)).slice(0, 5).map((task) => (
-                <button key={task.id} className="orbit-related" onClick={() => setEditor({kind:"task",record:task})}>
-                  <strong>{task.title}</strong><small>{date(task.dueAt)}</small>
-                </button>
-              ))}
-              {!tasks.length && <p className="muted">{__pulseText("No open follow-ups.")}</p>}
-              </div></details>
-            </>
-          )}
-        </aside>
+            </div>
+            <details className="orbit-more-details"><summary>{__pulseText("Relationship details and next actions")}</summary><div className="orbit-more-content">
+              {person && <><p>{person.priority} {__pulseText("priority ·")} {effectiveAvailability(person,p.restrictions)}</p><p>{__pulseText("Last conversation:")} {lastInteraction(person.id,p.interactions) ? date(lastInteraction(person.id,p.interactions)!) : __pulseText("Not recorded")}</p><button className="button ghost" onClick={() => {setParams({person:person.id},{state:navigationState});setSearch("");setType("");setPriority("");}}>{__pulseText("Person orbit")}</button><Link className="button ghost" to={`/analytics?person=${encodeURIComponent(person.id)}`}>{__pulseText("View person analytics")}</Link></>}
+              {company && <><button className="button ghost" onClick={() => {setParams({company:company.id},{state:navigationState});setSearch("");setType("");setPriority("");}}>{__pulseText("Company orbit")}</button><Link className="button ghost" to={`/analytics?company=${encodeURIComponent(company.id)}`}>{__pulseText("View company analytics")}</Link></>}
+              {deal && <p>{p.pipelines.find(x => x.id === deal.pipelineId)?.name} · {p.pipelineStages.find(x => x.id === deal.stageId)?.name} · {__pulseText(deal.status)}</p>}
+            </div></details>
+          </>}
+          </aside>
           <section
             className="orbit-browse"
             aria-label={__pulseText("Explore connections below the map")}
@@ -667,7 +526,7 @@ export function Orbit() {
                   setSearch("");
                   setType("");
                   setPriority("");
-                  setSelected("");
+                  clearSelection();
                 }}
               />
             ) : (
@@ -697,7 +556,7 @@ export function Orbit() {
                       />
                       <span>
                         <strong>{n.label}</strong>
-                        <small>{n.kind}</small>
+                        <small>{n.kind === "person" ? t("person") : n.kind === "company" ? t("company") : t("opportunity")}</small>
                       </span>
                       <span aria-hidden="true">↗</span>
                     </button>
