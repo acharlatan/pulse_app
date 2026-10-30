@@ -1,3 +1,7 @@
+# Focus and Relationship Workspace — 30 October 2026
+
+A managed desktop preview exercised demo priority creation, scheduled Focus dates while preserving actual due dates, completion and reopening, profile follow-up editing, timeline filtering, a company-linked opportunity, and the Focus → profile → Orbit → profile → Focus return journey. Empty Personal Focus and light/dark desktop appearances were inspected. The preview did not expose WebGL, mobile viewport controls, native screen readers, or physical devices; those checks remain open. A browser regression spec is provided for the new journey and responsive widths, but the Playwright browser suite was not run in this managed preview. The release continues to use the existing database/backup version and user-controlled repository writes.
+
 # Relationship Workspace verification
 
 30 October 2026: typecheck, lint, and 208 automated tests passed. A managed Chrome preview verified the company overview, the optional interaction-to-follow-up flow and the Insights briefing using fictional demo records. Home, company profile and Insights were checked for horizontal document overflow and axe WCAG 2 A/AA violations at 320, 375, 390, 430, 768, 1024, 1280 and 1440 CSS pixels; none were reported in those checks. These checks do not establish full accessibility compliance. Physical devices, screen readers, installed-PWA behavior and hardware WebGL remain unverified for this release.

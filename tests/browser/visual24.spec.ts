@@ -14,9 +14,13 @@ test("demo portraits, example priorities, navigation and themes", async ({page},
   }
   await page.goto("/#/focus");
   await page.getByRole("button", {name:"Add example priorities"}).click();
-  await expect(page.locator(".focus-row")).toHaveCount(3);
+  await expect(page.locator(".focus-row")).toHaveCount(1);
+  await page.getByRole("navigation", {name:"Focus views"}).getByRole("button", {name:/Saved for later/}).click();
+  await expect(page.locator(".focus-row")).toHaveCount(2);
   await page.reload();
-  await expect(page.locator(".focus-row")).toHaveCount(3);
+  await expect(page.locator(".focus-row")).toHaveCount(2);
+  await page.getByRole("navigation", {name:"Focus views"}).getByRole("button", {name:/Today/}).click();
+  await expect(page.locator(".focus-row")).toHaveCount(1);
   await page.goto("/#/");
   await page.getByRole("heading", {name:"Today.", exact:true}).waitFor();
   for (const theme of ["light", "dark"]) {

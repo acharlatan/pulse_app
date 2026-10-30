@@ -33,6 +33,7 @@ test("Analytics turns saved evidence into an inspected and pinned Focus record",
     target.getByRole("button", { name: "Unpin", exact: true }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Open My Focus", exact: true }).click();
+  await page.getByRole("navigation", { name: "Focus views" }).getByRole("button", { name: /Saved for later/ }).click();
   const row = page.locator(".focus-row").filter({ hasText: title });
   await expect(row).toHaveCount(1);
   await row.getByRole("button", { name: "Choose today", exact: true }).click();

@@ -20,6 +20,7 @@ import type { Interaction, Opportunity, Task, Contact } from "../data/models";
 import type { OpportunityTransition } from "../data/intelligence-models";
 import { completeTask, reopenTask } from "../data/repository";
 import { taskState, restrictionReasons } from "../services/recommendations";
+import { relationshipStory } from "../services/relationship-story";
 export function TaskRow({
   task: t,
   onEdit,
@@ -355,16 +356,12 @@ export function RelationshipTimeline({
   const { date } = useFormat();
   const [filter, setFilter] = useState("All"),
     [limit, setLimit] = useState(20);
-  const filtered = interactions
-    .filter((i) => filter === "All" || i.type === filter)
-    .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
-  const entries = [
-    ...filtered.map((record) => ({ kind: "interaction" as const, at: record.occurredAt, record })),
-    ...(filter === "All" || filter === "Follow-ups" ? tasks.map((record) => ({ kind: "task" as const, at: record.createdAt, record })) : []),
-    ...(filter === "All" || filter === "Stage changes" ? transitions.filter((record) => opportunities.some((o) => o.id === record.opportunityId)).map((record) => ({ kind: "transition" as const, at: record.occurredAt, record })) : []),
-  ].sort((a,b) => b.at.localeCompare(a.at) || a.record.id.localeCompare(b.record.id));
+  const entries = relationshipStory(interactions, tasks, opportunities, transitions, filter);
   return (
     <>
+      <div className="story-quick-filters" role="group" aria-label={__pulseText("Relationship story filters")}>
+        {[["All", "All activity"], ["Conversations", "Conversations"], ["Note", "Notes"], ["Follow-ups", "Follow-ups"], ["Stage changes", "Stage changes"]].map(([value, label]) => <button key={value} aria-pressed={filter === value} onClick={() => {setFilter(value); setLimit(20);}}>{__pulseText(label)}</button>)}
+      </div>
       <label className="field story-filter">
         <span>{__pulseText("Story filter")}</span>
         <select
@@ -374,13 +371,13 @@ export function RelationshipTimeline({
             setLimit(20);
           }}
         >
-          {["All", "Call", "Email", "Meeting", "Message", "Note", "Follow-ups", "Stage changes"].map((t) => (
+          {["All", "Conversations", "Call", "Email", "Meeting", "Message", "Note", "Follow-ups", "Stage changes"].map((t) => (
             <option key={t} value={t}>{__pulseText(t)}</option>
           ))}
         </select>
       </label>
       {transitions.some((tr) => opportunities.some((o) => o.id === tr.opportunityId)) && (filter === "All" || filter === "Stage changes") && <p className="story-history-note">{__pulseText("Stage changes belong to opportunities currently linked here. Past links to this person or company were not recorded; older stage history may be unavailable.")}</p>}
-      {entries.slice(0, limit).map((entry) => entry.kind === "transition" ? <article className="story-entry story-transition" key={`transition:${entry.record.id}`}><div className="story-meta"><span className="soft-icon" aria-hidden="true">↗</span><strong>{__pulseText("Opportunity stage changed")}</strong><time dateTime={entry.at}>{date(entry.at)}</time></div><p className="story-copy">{opportunities.find((o) => o.id === entry.record.opportunityId)?.title}</p><p>{entry.record.previousPipelineName} / {entry.record.previousStageName} → {entry.record.pipelineName} / {entry.record.stageName}</p>{entry.record.source === "configuration" && <p className="muted">{__pulseText("Changed during pipeline configuration")}</p>}<button className="button secondary" onClick={() => onOpenOpportunity(entry.record.opportunityId)}>{__pulseText("Open opportunity")}</button></article> : entry.kind === "interaction" ? <StoryEntry key={`interaction:${entry.record.id}`} interaction={entry.record} onEdit={onEdit} /> : <article className="story-entry story-followup" key={`task:${entry.record.id}`}><div className="story-meta"><span className="soft-icon"><Calendar size={17}/></span><strong>{__pulseText("Follow-up planned")}</strong><time dateTime={entry.at}>{date(entry.at)}</time></div><p className="story-copy">{entry.record.title}</p><p className="muted">{__pulseText("Current status:")} {entry.record.completedAt ? __pulseText("Completed") : __pulseText("Open")}</p><button className="button secondary" onClick={() => onEdit({kind:"task",record:entry.record})}>{__pulseText("Open follow-up")}</button></article>)}
+      {entries.slice(0, limit).map((entry) => entry.kind === "transition" ? <article className="story-entry story-transition" key={`transition:${entry.record.id}`}><div className="story-meta"><span className="soft-icon" aria-hidden="true">↗</span><strong>{__pulseText(entry.record.previousStageId === entry.record.stageId && entry.record.previousPipelineId === entry.record.pipelineId ? "Outcome updated" : "Opportunity stage changed")}</strong><time dateTime={entry.at}>{date(entry.at)}</time></div><p className="story-copy">{opportunities.find((o) => o.id === entry.record.opportunityId)?.title}</p><p>{entry.record.previousStageId === entry.record.stageId && entry.record.previousPipelineId === entry.record.pipelineId ? `${__pulseText(entry.record.previousOutcome)} → ${__pulseText(entry.record.outcome)}` : `${entry.record.previousPipelineName} / ${entry.record.previousStageName} → ${entry.record.pipelineName} / ${entry.record.stageName}`}</p>{entry.record.source === "configuration" && <p className="muted">{__pulseText("Changed during pipeline configuration")}</p>}<button className="button secondary" onClick={() => onOpenOpportunity(entry.record.opportunityId)}>{__pulseText("Open opportunity")}</button></article> : entry.kind === "interaction" ? <StoryEntry key={`interaction:${entry.record.id}`} interaction={entry.record} onEdit={onEdit} /> : <article className="story-entry story-followup" key={`task:${entry.record.id}`}><div className="story-meta"><span className="soft-icon"><Calendar size={17}/></span><strong>{__pulseText("Follow-up planned")}</strong><time dateTime={entry.at}>{date(entry.at)}</time></div><p className="story-copy">{entry.record.title}</p><p className="muted">{__pulseText("Current status:")} {entry.record.completedAt ? __pulseText("Completed") : __pulseText("Open")}</p><button className="button secondary" onClick={() => onEdit({kind:"task",record:entry.record})}>{__pulseText("Open follow-up")}</button></article>)}
       {!entries.length && (
         <Empty
           title={__pulseText("A story waiting to be told")}

@@ -70,6 +70,7 @@ test("Daily Pulse chooses, reschedules and completes a saved commitment in place
   await chosen.getByRole("button", { name: /Remove from today:/ }).click();
   await expect(chosen).toHaveCount(0);
   await page.goto("/#/focus");
+  await page.getByRole("navigation", { name: "Focus views" }).getByRole("button", { name: /Recently completed/ }).click();
   await expect(
     page.locator(".focus-row").filter({ hasText: title }),
   ).toHaveCount(1);
