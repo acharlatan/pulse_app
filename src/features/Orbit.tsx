@@ -6,6 +6,7 @@ import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty, useFormat } from "../components/ui";
 import { deriveOrbit, type OrbitNode } from "../services/orbit";
 import { savedOrbitConnections, savedOrbitNode } from "../services/orbit-connections";
+import { orbitSignals, type OrbitLens, type OrbitSignal } from "../services/orbit-signals";
 import { EditorModal, type Editor } from "../components/forms";
 import {
   lastInteraction,
@@ -39,6 +40,8 @@ export function Orbit() {
     [filtersOpen, setFiltersOpen] = useState(false),
     [priority, setPriority] = useState(""),
     [view, setView] = useState("list"),
+    [lens, setLens] = useState<OrbitLens>("all"),
+    [mobileMap, setMobileMap] = useState(() => matchMedia("(max-width:600px)").matches),
     [mapMode, setMapMode] = useState<"3d" | "2d">("3d"),
     [webglAvailable, setWebglAvailable] = useState(true),
     [turn, setTurn] = useState(0),
@@ -48,6 +51,7 @@ export function Orbit() {
     [mapAnchor, setMapAnchor] = useState(""),
     [connectionLimit, setConnectionLimit] = useState(6),
     [taskLimit, setTaskLimit] = useState(3),
+    [dealLimit, setDealLimit] = useState(3),
     [zoom, setZoom] = useState(1),
     [pan, setPan] = useState({ x: 0, y: 0 }),
     [editor, setEditor] = useState<Editor | null>(null),
@@ -60,6 +64,16 @@ export function Orbit() {
       start: { x: number; y: number };
     } | null>(null);
   const { date } = useFormat();
+  useEffect(() => {
+    const query = matchMedia("(max-width:600px)");
+    const update = () => setMobileMap(query.matches);
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+  const signals = useMemo(() => orbitSignals(p), [p]);
+  const visibleIds = lens === "all" ? undefined : signals.ids[lens];
+  const anchorNode = mapAnchor ? savedOrbitNode(p, mapAnchor) : undefined;
+  const anchorNeighbors = anchorNode ? savedOrbitConnections(p, anchorNode).map((connection) => connection.node.id) : [];
   const graph = useMemo(
     () =>
       deriveOrbit(p, {
@@ -68,11 +82,13 @@ export function Orbit() {
         priority,
         company: params.get("company") || "",
         person: params.get("person") || "",
-        limit: matchMedia("(max-width:600px)").matches ? (mapMode === "3d" ? 12 : 18) : 24,
+        limit: mobileMap ? (mapMode === "3d" ? 12 : 18) : 24,
         balance: true,
         preferredId: mapAnchor,
+        preferredIds: anchorNeighbors,
+        includeIds: visibleIds,
       }),
-    [p, search, type, priority, params, mapMode, mapAnchor],
+    [p, search, type, priority, params, mapMode, mapAnchor, mobileMap, visibleIds],
   );
   const fullGraph = useMemo(
     () =>
@@ -83,8 +99,9 @@ export function Orbit() {
         company: params.get("company") || "",
         person: params.get("person") || "",
         limit: 60,
+        includeIds: visibleIds,
       }),
-    [p, search, type, priority, params],
+    [p, search, type, priority, params, visibleIds],
   );
   const node = selected ? savedOrbitNode(p, selected) : undefined,
     byId = new Map(graph.nodes.map((n) => [n.id, n]));
@@ -122,6 +139,8 @@ export function Orbit() {
   );
   const recent = p.interactions.filter((i) => Date.parse(i.occurredAt) <= Date.now() && (person ? i.contactId === person.id : company ? i.organizationId === company.id : deal ? i.opportunityId === deal.id : false)).sort((a,b) => b.occurredAt.localeCompare(a.occurredAt)).slice(0, 3);
   const connections = node ? savedOrbitConnections(p, node) : [];
+  const connectedOnMap = new Set(graph.edges.flatMap((edge) => edge.from === selected ? [edge.to] : edge.to === selected ? [edge.from] : []));
+  const openDeals = related.filter((opportunity) => opportunity.status === "open");
   const orderedTasks = [...tasks].sort((a,b) => a.dueAt.localeCompare(b.dueAt) || a.id.localeCompare(b.id));
   const isOnMap = !!node && graph.nodes.some((item) => item.id === node.id);
   function fit() {
@@ -148,7 +167,14 @@ export function Orbit() {
   }, [graph.nodes.length]);
   function select(n: OrbitNode) {
     if (selected && selected !== n.id) setSelectionTrail((trail) => [...trail, selected].slice(-20));
-    setSelected(n.id); setConnectionLimit(6); setTaskLimit(3);
+    setSelected(n.id); setConnectionLimit(6); setTaskLimit(3); setDealLimit(3);
+  }
+  function focusSelectedHeading() {
+    requestAnimationFrame(() => detail.current?.querySelector<HTMLElement>("h2")?.focus({ preventScroll: true }));
+  }
+  function selectLinked(n: OrbitNode) {
+    select(n);
+    focusSelectedHeading();
   }
   function selectPrevious() {
     let index = selectionTrail.length - 1;
@@ -156,22 +182,27 @@ export function Orbit() {
     if (index < 0) { setSelectionTrail([]); return; }
     const previous = selectionTrail[index];
     setSelectionTrail(selectionTrail.slice(0, index));
-    setSelected(previous); setConnectionLimit(6); setTaskLimit(3);
+    setSelected(previous); setConnectionLimit(6); setTaskLimit(3); setDealLimit(3); focusSelectedHeading();
   }
   function clearSelection() {
     setSelected(""); setSelectionTrail([]); setMapAnchor("");
   }
   function revealOnMap() {
     if (!node) return;
-    setSearch(""); setType(""); setPriority(""); setParams({}, { state: navigationState });
+    setSearch(""); setType(""); setPriority(""); setLens("all"); setParams({}, { state: navigationState });
     setMapAnchor(node.id);
     requestAnimationFrame(() => viewport.current?.scrollIntoView({ block:"center", behavior:p.settings.reducedMotion ? "instant" : "smooth" }));
+  }
+  function selectSignal(signal: OrbitSignal) {
+    setLens(signal.kind); setSearch(""); setType(""); setPriority("");
+    setParams({}, { state: navigationState }); setMapAnchor(signal.node.id); select(signal.node);
+    requestAnimationFrame(() => { detail.current?.scrollIntoView({ block: "start", behavior: "instant" }); focusSelectedHeading(); });
   }
   function selectFromBrowse(n: OrbitNode) {
     select(n);
     if (matchMedia("(max-width:767px)").matches)
       requestAnimationFrame(() =>
-        detail.current?.scrollIntoView({ block: "start", behavior: "instant" }),
+        { detail.current?.scrollIntoView({ block: "start", behavior: "instant" }); focusSelectedHeading(); },
       );
   }
   return (
@@ -202,7 +233,19 @@ export function Orbit() {
           {t("backNetwork")}
         </Link>
       </div>
-      <section className="orbit-orientation"><div><p className="eyebrow">{__pulseText("YOUR NETWORK, MAPPED")}</p><h2>{__pulseText("Start anywhere. Follow what connects.")}</h2><p>{__pulseText("Select a portrait to explore its saved people, companies and opportunities. Lines represent saved links; distance does not measure closeness.")}</p></div><div className="orbit-orientation-steps"><span><b>01</b>{__pulseText("Choose a connection")}</span><span><b>02</b>{__pulseText("Explore saved links")}</span><span><b>03</b>{__pulseText("Open the full story")}</span></div></section>
+      <section className="orbit-radar" aria-label={__pulseText("Orbit starting points")}>
+        <div className="orbit-radar-heading"><div><p className="eyebrow">{__pulseText("YOUR NETWORK, IN MOTION")}</p><h2>{__pulseText("A good place to begin.")}</h2><p>{__pulseText("A live view of the work and activity you have saved. Choose a thread or explore the whole map.")}</p></div>{p.contacts.length + p.organizations.length + p.opportunities.length > 0 ? <button className="orbit-radar-all" onClick={() => { setLens("all"); setSearch(""); setType(""); setPriority(""); setParams({}, {state:navigationState}); setMapAnchor(""); requestAnimationFrame(() => viewport.current?.scrollIntoView({block:"center",behavior:"instant"})); }}>{__pulseText("Explore the whole network")} <span aria-hidden="true">↗</span></button> : <Link className="orbit-radar-all" to="/network">{__pulseText("Add your first connection")} <span aria-hidden="true">↗</span></Link>}</div>
+        <div className="orbit-radar-grid">{([
+          ["followups", "01", "Linked follow-ups due", "Overdue and next 7 days", signals.followups],
+          ["opportunities", "02", "Open opportunities", "Current saved work", signals.opportunities],
+          ["activity", "03", "Recently recorded", "Last 30 days, including notes", signals.activity],
+        ] as const).map(([kind, number, title, description, items]) => <section className={`orbit-radar-lane ${kind}`} key={kind}>
+          <div className="orbit-radar-label"><span>{number} / {__pulseText(title)}</span><strong>{items.length}</strong></div><p>{__pulseText(description)}</p>
+          {items.length ? items.slice(0,2).map((item) => <button className="orbit-signal" key={item.id} onClick={() => selectSignal(item)}><Avatar name={item.node.label} mediaId={item.node.mediaId} company={item.node.kind === "company"}/><span><strong>{item.node.label}</strong><small>{item.kind === "followups" ? `${__pulseText("Due")} ${date(item.date!)} · ${item.title}` : item.kind === "activity" ? `${__pulseText(item.activityType!)} · ${date(item.date!)} · ${item.title}` : p.pipelineStages.find((stage) => stage.id === item.stageId)?.name || __pulseText("Open opportunity")}</small></span><b aria-hidden="true">↗</b></button>) : <div className="orbit-radar-empty">{__pulseText(kind === "followups" ? "No linked follow-ups due in this window." : kind === "opportunities" ? "No open opportunities yet." : "No activity recorded in the last 30 days.")}</div>}
+          <button className="orbit-radar-filter" aria-pressed={lens === kind} onClick={() => {setLens(lens === kind ? "all" : kind); setMapAnchor("");}}>{__pulseText(lens === kind ? "Showing this on the map" : "Show related records on map")} →</button>
+        </section>)}</div>
+      </section>
+      <div className="orbit-lens-bar" aria-label={__pulseText("Map filters")}><span>{__pulseText("MAP VIEW")}</span>{([ ["all", "All records"], ["followups", "Follow-ups"], ["opportunities", "Open opportunities"], ["activity", "Recent activity"] ] as const).map(([value, label]) => <button key={value} aria-pressed={lens === value} onClick={() => {setLens(value); setMapAnchor("");}}>{__pulseText(label)}</button>)}<small>{__pulseText("Filters include records directly linked to saved work.")}</small></div>
       <div className="orbit-filters surface">
         <label className="search-field">
           <span className="sr-only">{__pulseText("Search Orbit")}</span>
@@ -339,7 +382,7 @@ export function Orbit() {
                 >
                   <svg
                     viewBox="0 0 1000 760"
-                    className="orbit-edges"
+                    className={`orbit-edges ${selected && isOnMap ? "has-selection" : ""}`}
                     role="img"
                     aria-label={__pulseText("Lines show only saved company membership and opportunity associations")}
                   >
@@ -370,7 +413,7 @@ export function Orbit() {
                   {graph.nodes.map((n) => (
                     <button
                       key={n.id}
-                      className={`orbit-node ${n.kind} ${n.id === selected ? "selected" : ""}`}
+                      className={`orbit-node ${n.kind} ${n.id === selected ? "selected" : ""} ${connectedOnMap.has(n.id) ? "connected" : ""} ${selected && isOnMap && n.id !== selected && !connectedOnMap.has(n.id) ? "unrelated" : ""}`}
                       style={{ left: n.x, top: n.y }}
                       title={`${n.label} · ${n.kind === "person" ? t("person") : n.kind === "company" ? t("company") : t("opportunity")}`}
                       aria-pressed={n.id === selected}
@@ -417,6 +460,7 @@ export function Orbit() {
                   setSearch("");
                   setType("");
                   setPriority("");
+                  setLens("all");
                   setParams({}, { state: navigationState });
                 }}
               >
@@ -456,20 +500,21 @@ export function Orbit() {
               <button className="button ghost orbit-close" onClick={clearSelection}>{t("closeSelection")}</button>
               <Avatar name={node.label} mediaId={node.mediaId} size="xl" company={node.kind === "company"}/>
               <Badge>{node.kind === "person" ? t("person") : node.kind === "company" ? t("company") : t("opportunity")}</Badge>
-              <div><p className="eyebrow">{__pulseText("THE SELECTED CONNECTION")}</p><h2>{node.label}</h2><p className="orbit-selected-subtitle">{person ? [person.role, p.organizations.find(o => o.id === person.organizationId)?.name].filter(Boolean).join(" · ") || __pulseText("Independent") : company ? company.industry || __pulseText("Industry not recorded") : deal ? [p.organizations.find(o => o.id === deal.organizationId)?.name, p.pipelineStages.find(stage => stage.id === deal.stageId)?.name].filter(Boolean).join(" · ") : ""}</p></div>
+              <div><p className="eyebrow">{__pulseText("THE SELECTED CONNECTION")}</p><h2 tabIndex={-1}>{node.label}</h2><p className="orbit-selected-subtitle">{person ? [person.role, p.organizations.find(o => o.id === person.organizationId)?.name].filter(Boolean).join(" · ") || __pulseText("Independent") : company ? company.industry || __pulseText("Industry not recorded") : deal ? [p.organizations.find(o => o.id === deal.organizationId)?.name, p.pipelineStages.find(stage => stage.id === deal.stageId)?.name].filter(Boolean).join(" · ") : ""}</p></div>
             </div></div>
             <div className="orbit-context-strip">
               <div><strong>{connections.length}</strong><span>{__pulseText("saved connections")}</span></div>
               <div><strong>{orderedTasks.length}</strong><span>{__pulseText("open follow-ups")}</span></div>
-              {deal ? <div><strong>{__pulseText(deal.status)}</strong><span>{__pulseText("opportunity status")}</span></div> : <div><strong>{related.filter(o => o.status === "open").length}</strong><span>{__pulseText("open opportunities")}</span></div>}
+              {deal ? <div><strong>{__pulseText(deal.status)}</strong><span>{__pulseText("opportunity status")}</span></div> : <div><strong>{openDeals.length}</strong><span>{__pulseText("open opportunities")}</span></div>}
               <div className="orbit-context-actions">{selectionTrail.length > 0 && <button className="button secondary" onClick={selectPrevious}>← {__pulseText("Back to previous selection")}</button>}{!isOnMap && <button className="button secondary" onClick={revealOnMap}>{__pulseText("Show this record on the map")}</button>}</div>
             </div>
             <div className="orbit-workbench orbit-workbench-v2">
-              <div className="orbit-workbench-lead"><p className="eyebrow">{__pulseText("CONNECTION DESK")}</p><h3>{__pulseText("Explore the story, then choose your next step.")}</h3><p>{__pulseText("Only saved associations are shown. Actions remain yours to choose.")}</p></div>
-              <div className="orbit-workbench-actions">{person && <Link className="button secondary" to={`/network/people/${encodeURIComponent(person.id)}`}>{t("openProfile")}</Link>}{company && <><Link className="button secondary" to={`/network/companies/${encodeURIComponent(company.id)}`}>{__pulseText("Open Company")}</Link><button className="button secondary" onClick={() => {setParams({company:company.id},{state:navigationState});setSearch("");setType("");setPriority("");setMapAnchor(node.id);setView("guide");}}>{__pulseText("Explore this company")}</button></>}{(person || company) && <><button className="button secondary" onClick={() => setEditor({kind:"interaction", contact:person, organizationId:company?.id})}>{__pulseText("Log interaction")}</button><button className="button secondary" onClick={() => setEditor({kind:"task", contact:person, organizationId:company?.id})}>{__pulseText("Plan a follow-up")}</button></>}{deal && <button className="button secondary" onClick={() => setBriefId(deal.id)}>{__pulseText("Open opportunity details")}</button>}{person && <FocusButton type="contact" id={person.id}/ >}{company && <FocusButton type="organization" id={company.id}/ >}{deal && <FocusButton type="opportunity" id={deal.id}/ >}</div>
+              <div className="orbit-workbench-lead"><p className="eyebrow">{__pulseText("CONNECTION DESK")}</p><h3>{__pulseText("The story around this connection.")}</h3></div>
+              <div className="orbit-workbench-actions">{person && <Link className="button secondary" to={`/network/people/${encodeURIComponent(person.id)}`}>{t("openProfile")}</Link>}{company && <><Link className="button secondary" to={`/network/companies/${encodeURIComponent(company.id)}`}>{__pulseText("Open Company")}</Link><button className="button secondary" onClick={() => {setParams({company:company.id},{state:navigationState});setSearch("");setType("");setPriority("");setLens("all");setMapAnchor(node.id);setView("guide");}}>{__pulseText("Explore this company")}</button></>}{(person || company) && <><button className="button secondary" onClick={() => setEditor({kind:"interaction", contact:person, organizationId:company?.id})}>{__pulseText("Log interaction")}</button><button className="button secondary" onClick={() => setEditor({kind:"task", contact:person, organizationId:company?.id})}>{__pulseText("Plan a follow-up")}</button></>}{deal && <button className="button secondary" onClick={() => setBriefId(deal.id)}>{__pulseText("Open opportunity details")}</button>}{person && <FocusButton type="contact" id={person.id}/ >}{company && <FocusButton type="organization" id={company.id}/ >}{deal && <FocusButton type="opportunity" id={deal.id}/ >}</div>
               <div className="orbit-workbench-columns">
-                <section className="orbit-workbench-block"><div className="orbit-block-heading"><h4>{__pulseText("Saved connections")}</h4><span>{connections.length}</span></div><p>{__pulseText("Choose a connection to explore it here.")}</p><div className="orbit-link-cards">{connections.slice(0,connectionLimit).map(({id,label,node:other}) => <button key={id} onClick={() => select(other)}><Avatar name={other.label} mediaId={other.mediaId} company={other.kind === "company"}/><span><strong>{other.label}</strong><small>{__pulseText(label)}</small></span><b aria-hidden="true">↗</b></button>)}</div>{connections.length > connectionLimit && <button className="button secondary" onClick={() => setConnectionLimit(connectionLimit + 6)}>{__pulseText("Show more connections")}</button>}{!connections.length && <p>{__pulseText("No saved connections for this record yet.")}</p>}</section>
+                <section className="orbit-workbench-block"><div className="orbit-block-heading"><h4>{__pulseText("Saved connections")}</h4><span>{connections.length}</span></div><p>{__pulseText("Choose a connection to explore it here.")}</p><div className="orbit-link-cards">{connections.slice(0,connectionLimit).map(({id,label,node:other}) => <button key={id} onClick={() => selectLinked(other)}><Avatar name={other.label} mediaId={other.mediaId} company={other.kind === "company"}/><span><strong>{other.label}</strong><small>{__pulseText(label)}</small></span><b aria-hidden="true">↗</b></button>)}</div>{connections.length > connectionLimit && <button className="button secondary" onClick={() => setConnectionLimit(connectionLimit + 6)}>{__pulseText("Show more connections")}</button>}{!connections.length && <p>{__pulseText("No saved connections for this record yet.")}</p>}</section>
                 <section className="orbit-workbench-block"><div className="orbit-block-heading"><h4>{__pulseText("Open follow-ups")}</h4><span>{orderedTasks.length}</span></div>{deal && <p>{__pulseText("These follow-ups are related through the company or a representative and may support other work.")}</p>}{orderedTasks.slice(0,taskLimit).map(task => <button key={task.id} className="orbit-activity-entry" onClick={() => setEditor({kind:"task",record:task})}><span>{__pulseText("Due")} · {date(task.dueAt)}</span><strong>{task.title}</strong></button>)}{orderedTasks.length > taskLimit && <button className="button secondary" onClick={() => setTaskLimit(taskLimit + 5)}>{__pulseText("Show more follow-ups")}</button>}{!orderedTasks.length && <p>{__pulseText("No open follow-ups.")}</p>}</section>
+                <section className="orbit-workbench-block"><div className="orbit-block-heading"><h4>{__pulseText("Open opportunities")}</h4><span>{openDeals.length}</span></div>{openDeals.slice(0,dealLimit).map((opportunity) => <button key={opportunity.id} className="orbit-activity-entry" onClick={() => setBriefId(opportunity.id)}><span>{p.pipelineStages.find(stage => stage.id === opportunity.stageId)?.name || __pulseText("Open")}</span><strong>{opportunity.title}</strong></button>)}{openDeals.length > dealLimit && <button className="button secondary" onClick={() => setDealLimit(dealLimit + 5)}>{__pulseText("Show more opportunities")}</button>}{!openDeals.length && <p>{__pulseText("No open opportunities for this selection.")}</p>}</section>
                 <section className="orbit-workbench-block"><div className="orbit-block-heading"><h4>{__pulseText("Recent recorded activity")}</h4></div>{recent.map(i => <button className="orbit-activity-entry" key={i.id} onClick={() => setEditor({kind:"interaction",record:i})}><span>{__pulseText(i.type)} · {date(i.occurredAt)}</span><strong>{i.summary}</strong></button>)}{!recent.length && <p>{__pulseText("No recorded activity for this selection yet.")}</p>}{company && <small>{__pulseText("Company activity uses the company saved on each conversation.")}</small>}{deal && <small>{__pulseText("Only interactions directly linked to this opportunity appear here.")}</small>}</section>
               </div>
             </div>
@@ -528,6 +573,7 @@ export function Orbit() {
                   setSearch("");
                   setType("");
                   setPriority("");
+                  setLens("all");
                   clearSelection();
                 }}
               />

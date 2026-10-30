@@ -142,7 +142,7 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
       const up = (event: PointerEvent) => { if (!drag) return; event.stopPropagation(); if (drag.total < 7) { const rect = renderer.domElement.getBoundingClientRect(); mouse.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1); raycaster.setFromCamera(mouse, camera); const hit = raycaster.intersectObjects(targets)[0]?.object.userData.nodeId; const node = nodes.find((item) => item.id === hit); if (node) selectionCallback.current(node); } drag = null; };
       renderer.domElement.addEventListener("pointerdown", down); renderer.domElement.addEventListener("pointermove", move); renderer.domElement.addEventListener("pointerup", up); renderer.domElement.addEventListener("pointercancel", up);
       controls.current = {
-        select: (id) => { bodies.forEach((body, key) => { body.scale.setScalar(key === id ? 1.45 : 1); const material = body.material as import("three").MeshPhysicalMaterial; material.emissiveIntensity = key === id ? 0.7 : 0.16; }); lines.forEach(({edge,line}) => { const material = line.material as import("three").LineBasicMaterial; const active = !!id && (edge.from === id || edge.to === id); material.color.setHex(active ? 0xd9f28e : 0xd8d2ff); material.opacity = id ? (active ? 1 : 0.18) : 0.6; }); render(); },
+        select: (id) => { const visibleId = positions.has(id) ? id : ""; bodies.forEach((body, key) => { body.scale.setScalar(key === visibleId ? 1.45 : 1); const material = body.material as import("three").MeshPhysicalMaterial; material.emissiveIntensity = key === visibleId ? 0.7 : 0.16; }); lines.forEach(({edge,line}) => { const material = line.material as import("three").LineBasicMaterial; const active = !!visibleId && (edge.from === visibleId || edge.to === visibleId); material.color.setHex(active ? 0xd9f28e : 0xd8d2ff); material.opacity = visibleId ? (active ? 1 : 0.18) : 0.6; }); render(); },
         move: (scale, offset) => { camera.position.set(-offset.x * 0.012, offset.y * 0.012, 14 / Math.max(0.35, scale)); render(); },
         turn: (amount) => { galaxy.rotation.y += amount; render(); },
         reset: () => { galaxy.rotation.set(-0.12, -0.18, 0); render(); },
@@ -162,10 +162,12 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
   useEffect(() => { latestView.current.zoom = zoom; latestView.current.pan = pan; controls.current?.move(zoom, pan); }, [zoom, pan]);
   useEffect(() => { const delta = turn - previousTurn.current; previousTurn.current = turn; if (delta) controls.current?.turn(delta * 0.35); }, [turn]);
   useEffect(() => { if (reset) controls.current?.reset(); }, [reset]);
+  const selectedOnMap = nodes.some((node) => node.id === selected);
+  const connected = new Set(edges.flatMap((edge) => edge.from === selected ? [edge.to] : edge.to === selected ? [edge.from] : []));
   return <div className="orbit-world" ref={host}>
     <svg className="orbit-marker-leaders" aria-hidden="true">{nodes.map((node) => <line key={node.id} ref={(element) => { if (element) leaderRefs.current.set(node.id, element); else leaderRefs.current.delete(node.id); }} />)}</svg>
     <div className="orbit-dom-nodes" role="group" aria-label={__pulseText("3D relationship nodes")}>
-      {nodes.map((node) => <button key={node.id} ref={(element) => { if (element) markerRefs.current.set(node.id, element); else markerRefs.current.delete(node.id); }} className={`orbit-3d-node ${node.kind}${node.id === selected ? " selected" : ""}`} aria-pressed={node.id === selected} title={node.label} onClick={() => onSelect(node)}>
+      {nodes.map((node) => <button key={node.id} ref={(element) => { if (element) markerRefs.current.set(node.id, element); else markerRefs.current.delete(node.id); }} className={`orbit-3d-node ${node.kind}${node.id === selected ? " selected" : ""}${connected.has(node.id) ? " connected" : ""}${selectedOnMap && node.id !== selected && !connected.has(node.id) ? " unrelated" : ""}`} aria-pressed={node.id === selected} title={node.label} onClick={() => onSelect(node)}>
         <Avatar name={node.label} mediaId={node.mediaId} company={node.kind === "company"} ariaHidden={false} />{" "}
         <span className="orbit-3d-label">{node.label}</span><span className="sr-only"> {node.kind === "person" ? t("person") : node.kind === "company" ? t("company") : t("opportunity")}</span>
       </button>)}
