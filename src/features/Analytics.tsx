@@ -1,6 +1,9 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { AnalyticsBrief } from "./AnalyticsBrief";
+import { setFocus } from "../data/expansion-repository";
+import { upcomingCommitments } from "../services/weekly-review";
+import { useFormat } from "../components/ui";
 import { ContextTip } from "../components/context-tip";
 import {
   analyticsDisplayTrend,
@@ -30,6 +33,7 @@ const sections = [
 export function Analytics() {
   const __pulseText = useInterfaceText();
   const t = useTranslation();
+  const { date } = useFormat();
   const navigationState = useLocation().state as {
     profileReturn?: unknown;
     networkReturn?: unknown;
@@ -110,6 +114,7 @@ export function Analytics() {
       ),
     [p, transitions, filter, section],
   );
+  const upcoming = upcomingCommitments(weekly.open, p.settings.timezone);
   const person = (id: string | null) => p.contacts.find((c) => c.id === id);
   function exportCsv() {
     if (!report) return;
@@ -455,6 +460,10 @@ export function Analytics() {
                     <span>{__pulseText("overdue now")}</span>
                   </div>
                   <div><strong>{weekly.transitions.length}</strong><span>{__pulseText("recorded stage changes")}</span></div>
+                </div>
+                <div className="weekly-next">
+                  <div><p className="eyebrow">{__pulseText("LOOKING AHEAD · NEXT 7 DAYS")}</p><h3>{__pulseText("Keep your commitments close.")}</h3><p>{__pulseText("Open follow-ups due today or in the next six days, in your workspace timezone. Choose a focus date without changing the due date.")}</p></div>
+                  <div className="weekly-next-list">{upcoming.slice(0, 4).map((task) => <article key={task.id}><div><button className="weekly-task-link" onClick={() => setEditor({kind: "task", record: task})}>{task.title}</button><small>{__pulseText("Due")} {date(task.dueAt)}</small></div><form onSubmit={(e) => { e.preventDefault(); const chosen = String(new FormData(e.currentTarget).get("day") || ""); if (chosen) void p.run(() => setFocus(p.db, "task", task.id, "today", chosen), "Focus updated"); }}><label><span>{__pulseText("Focus date")}</span><input type="date" name="day" min={today} defaultValue={today} required /></label><button className="button secondary">{__pulseText("Add to Focus")}</button></form></article>)}{!upcoming.length && <p>{__pulseText("No open follow-ups due in the next seven days. Visit My Focus to choose what matters next.")}</p>}{upcoming.length > 4 && <Link to="/activity">{__pulseText("See all follow-ups")}</Link>}</div>
                 </div>
                 <div className="weekly-review-actions">
                   <button

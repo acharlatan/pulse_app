@@ -17,6 +17,7 @@ import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty, SectionHeading, useFormat } from "./ui";
 import type { Editor } from "./forms";
 import type { Interaction, Opportunity, Task, Contact } from "../data/models";
+import type { OpportunityTransition } from "../data/intelligence-models";
 import { completeTask, reopenTask } from "../data/repository";
 import { taskState, restrictionReasons } from "../services/recommendations";
 export function TaskRow({
@@ -338,10 +339,16 @@ function StoryEntry({
 export function RelationshipTimeline({
   interactions,
   tasks,
+  opportunities,
+  transitions,
+  onOpenOpportunity,
   onEdit,
 }: {
   interactions: Interaction[];
   tasks: Task[];
+  opportunities: Opportunity[];
+  transitions: OpportunityTransition[];
+  onOpenOpportunity: (id: string) => void;
   onEdit: (editor: Editor) => void;
 }) {
   const __pulseText = useInterfaceText();
@@ -354,6 +361,7 @@ export function RelationshipTimeline({
   const entries = [
     ...filtered.map((record) => ({ kind: "interaction" as const, at: record.occurredAt, record })),
     ...(filter === "All" || filter === "Follow-ups" ? tasks.map((record) => ({ kind: "task" as const, at: record.createdAt, record })) : []),
+    ...(filter === "All" || filter === "Stage changes" ? transitions.filter((record) => opportunities.some((o) => o.id === record.opportunityId)).map((record) => ({ kind: "transition" as const, at: record.occurredAt, record })) : []),
   ].sort((a,b) => b.at.localeCompare(a.at) || a.record.id.localeCompare(b.record.id));
   return (
     <>
@@ -366,12 +374,13 @@ export function RelationshipTimeline({
             setLimit(20);
           }}
         >
-          {["All", "Call", "Email", "Meeting", "Message", "Note", "Follow-ups"].map((t) => (
+          {["All", "Call", "Email", "Meeting", "Message", "Note", "Follow-ups", "Stage changes"].map((t) => (
             <option key={t} value={t}>{__pulseText(t)}</option>
           ))}
         </select>
       </label>
-      {entries.slice(0, limit).map((entry) => entry.kind === "interaction" ? <StoryEntry key={`interaction:${entry.record.id}`} interaction={entry.record} onEdit={onEdit} /> : <article className="story-entry story-followup" key={`task:${entry.record.id}`}><div className="story-meta"><span className="soft-icon"><Calendar size={17}/></span><strong>{__pulseText("Follow-up planned")}</strong><time dateTime={entry.at}>{date(entry.at)}</time></div><p className="story-copy">{entry.record.title}</p><p className="muted">{__pulseText("Current status:")} {entry.record.completedAt ? __pulseText("Completed") : __pulseText("Open")}</p><button className="button secondary" onClick={() => onEdit({kind:"task",record:entry.record})}>{__pulseText("Open follow-up")}</button></article>)}
+      {transitions.some((tr) => opportunities.some((o) => o.id === tr.opportunityId)) && (filter === "All" || filter === "Stage changes") && <p className="story-history-note">{__pulseText("Stage changes belong to opportunities currently linked here. Past links to this person or company were not recorded; older stage history may be unavailable.")}</p>}
+      {entries.slice(0, limit).map((entry) => entry.kind === "transition" ? <article className="story-entry story-transition" key={`transition:${entry.record.id}`}><div className="story-meta"><span className="soft-icon" aria-hidden="true">↗</span><strong>{__pulseText("Opportunity stage changed")}</strong><time dateTime={entry.at}>{date(entry.at)}</time></div><p className="story-copy">{opportunities.find((o) => o.id === entry.record.opportunityId)?.title}</p><p>{entry.record.previousPipelineName} / {entry.record.previousStageName} → {entry.record.pipelineName} / {entry.record.stageName}</p>{entry.record.source === "configuration" && <p className="muted">{__pulseText("Changed during pipeline configuration")}</p>}<button className="button secondary" onClick={() => onOpenOpportunity(entry.record.opportunityId)}>{__pulseText("Open opportunity")}</button></article> : entry.kind === "interaction" ? <StoryEntry key={`interaction:${entry.record.id}`} interaction={entry.record} onEdit={onEdit} /> : <article className="story-entry story-followup" key={`task:${entry.record.id}`}><div className="story-meta"><span className="soft-icon"><Calendar size={17}/></span><strong>{__pulseText("Follow-up planned")}</strong><time dateTime={entry.at}>{date(entry.at)}</time></div><p className="story-copy">{entry.record.title}</p><p className="muted">{__pulseText("Current status:")} {entry.record.completedAt ? __pulseText("Completed") : __pulseText("Open")}</p><button className="button secondary" onClick={() => onEdit({kind:"task",record:entry.record})}>{__pulseText("Open follow-up")}</button></article>)}
       {!entries.length && (
         <Empty
           title={__pulseText("A story waiting to be told")}

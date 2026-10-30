@@ -12,6 +12,8 @@ The Relationship Workspace update brings Daily Pulse suggestions forward, adds a
 
 The Relationship Journey update adds job-search, networking and other onboarding intentions, an explicit demo-to-personal entry point, a personal home summary based on saved people and open follow-ups, and a relationship journal on person profiles. The selected intention updates the guide and can change the order of eligible suggestions; it does not send outreach. New interface strings may remain in English until translated and reviewed.
 
+Relationship Review adds a seven-day view of open upcoming commitments with user-selected focus dates. Relationship stories show recorded stage changes for opportunities currently linked to a profile, with a clear warning that historical profile links were not captured. Earlier stage history may be unavailable.
+
 Relationship Intelligence adds optional contextual help across Focus, Analytics, Pipeline, Reviews, Follow-ups and Automations. Daily suggestions can be reordered by onboarding intention after the existing eligibility rules; no new contact is made eligible. Person and company stories include follow-ups alongside interactions, labeled by creation date and current status. Analytics has section-specific introductions and a weekly count of recorded stage changes.
 
 Orbit offers an interactive 3D view with local portraits, company icons, sharp HTML labels and a 2D map plus record list. Solid lines show saved associations; short dotted tethers connect displaced labels to their 3D positions. Depth does not measure closeness. Reduced motion, a non-WebGL fallback, keyboard controls, and the record list remain available. Home's 3D sculpture is decorative and retains a CSS fallback.
