@@ -13,6 +13,7 @@ import {
 } from "../data/repository";
 import { lastInteraction, restrictionReasons, type Recommendation } from "../services/recommendations";
 import { opportunityFollowUp } from "../services/pipeline-studio";
+import { ContextTip } from "../components/context-tip";
 export function Review() {
   const __pulseText = useInterfaceText();
   const p = usePulse(),
@@ -107,6 +108,7 @@ export function Review() {
         <Link className="button secondary" to="/lists">
           {__pulseText("Smart Lists")}</Link>
       </div>
+      <ContextTip title="A thoughtful place to begin">Each review explains the saved evidence behind it. Open the record, snooze the suggestion, or add it to Focus; nothing is sent automatically.</ContextTip>
       <section className="review-inbox-intro" aria-label={__pulseText("Review overview")}>
         <div><p className="eyebrow">{__pulseText("YOUR RELATIONSHIP INBOX")}</p><h2>{__pulseText("A little context goes a long way.")}</h2><p>{__pulseText("Review the evidence, decide what matters, and choose your next step. Counts are reviews; a record may appear more than once.")}</p></div>
         <div className="review-inbox-stats">{overview.map((item) => <button key={item.view} aria-pressed={view === item.view} onClick={() => {setView(item.view);setLimit(20);}}><strong>{item.count.toString().padStart(2,"0")}</strong><span>{__pulseText(item.title)}</span><small>{__pulseText(item.caption)}</small><span aria-hidden="true">↗</span></button>)}</div>

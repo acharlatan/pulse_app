@@ -97,6 +97,7 @@ it("offers one commitment, eligible opportunity and relationship before filling 
     "contact",
   ]);
   expect(p.suggestions[2].reason).toBe("Existing shared review evidence");
+  expect(dailyPulse(d, "UTC", now, "networking").suggestions.map((s) => s.type)).toEqual(["task", "contact", "opportunity"]);
 });
 it("excludes chosen and completed records, fills available slots and never treats ordinary pins as today's selections", async () => {
   const d = await data(),
@@ -144,6 +145,7 @@ it("honors blocked and deferred queue evidence without inventing conversation el
   ];
   const p = dailyPulse(d, "UTC", now);
   expect(p.suggestions.map((s) => s.id)).toEqual([c.id]);
+  expect(dailyPulse(d, "UTC", now, "job_search").suggestions.map((s) => s.id)).toEqual([c.id]);
 });
 it("separates future scheduled work from administrative due work in workspace time", async () => {
   const d = await data(),

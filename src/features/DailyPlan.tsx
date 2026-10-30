@@ -33,6 +33,8 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
       opportunityInsights: p.intelligence.opportunities,
     },
     p.settings.timezone,
+    Date.now(),
+    p.settings.onboarding.intention,
   );
   const inspector = useRef<HTMLHeadingElement>(null);
   function inspect(next: Selection) {
@@ -141,7 +143,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
           <p className="eyebrow">{__pulseText("A STARTING POINT, NOT A DEMAND")}</p>
           <h2 id="daily-suggestions-title">{__pulseText("Up to three places to look.")}</h2>
           <p>
-            {__pulseText("Suggestions share Analytics’ evidence. You decide what belongs in today.")}</p>
+            {__pulseText("Suggestions share Analytics’ evidence. Your chosen intention can change their order; you decide what belongs in today.")}</p>
         </div>
         <Link className="text-link" to="/analytics">
           {__pulseText("See the full picture") + " "}<ArrowUpRight size={16} />

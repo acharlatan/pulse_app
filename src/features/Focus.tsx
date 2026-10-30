@@ -12,6 +12,7 @@ import { EditorModal, type Editor } from "../components/forms";
 import { lastInteraction, restrictionReasons, taskState } from "../services/recommendations";
 import { ProgressSummary } from "../components/progress";
 import type { FocusItem } from "../data/expansion-models";
+import { ContextTip } from "../components/context-tip";
 export function Focus({ embedded = false }: { embedded?: boolean }) {
   const __pulseText = useInterfaceText();
   const t = useTranslation();
@@ -56,6 +57,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
             {__pulseText("Keep relationships close. Choose what to move forward today.")}</p>
         </div>
       </div>
+      <ContextTip title="Make space for what matters" >Pin people, companies, follow-ups or opportunities to save them for later. Choose a few for today; completing a follow-up is always your choice.</ContextTip>
       <div className="focus-day-brief">
         <span className="eyebrow">{__pulseText("TODAY · CHOSEN BY YOU")}</span>
         <strong>

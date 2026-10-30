@@ -337,17 +337,24 @@ function StoryEntry({
 }
 export function RelationshipTimeline({
   interactions,
+  tasks,
   onEdit,
 }: {
   interactions: Interaction[];
+  tasks: Task[];
   onEdit: (editor: Editor) => void;
 }) {
   const __pulseText = useInterfaceText();
+  const { date } = useFormat();
   const [filter, setFilter] = useState("All"),
     [limit, setLimit] = useState(20);
   const filtered = interactions
     .filter((i) => filter === "All" || i.type === filter)
     .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
+  const entries = [
+    ...filtered.map((record) => ({ kind: "interaction" as const, at: record.occurredAt, record })),
+    ...(filter === "All" || filter === "Follow-ups" ? tasks.map((record) => ({ kind: "task" as const, at: record.createdAt, record })) : []),
+  ].sort((a,b) => b.at.localeCompare(a.at) || a.record.id.localeCompare(b.record.id));
   return (
     <>
       <label className="field story-filter">
@@ -359,21 +366,19 @@ export function RelationshipTimeline({
             setLimit(20);
           }}
         >
-          {["All", "Call", "Email", "Meeting", "Message", "Note"].map((t) => (
+          {["All", "Call", "Email", "Meeting", "Message", "Note", "Follow-ups"].map((t) => (
             <option key={t} value={t}>{__pulseText(t)}</option>
           ))}
         </select>
       </label>
-      {filtered.slice(0, limit).map((i) => (
-        <StoryEntry key={i.id} interaction={i} onEdit={onEdit} />
-      ))}
-      {!filtered.length && (
+      {entries.slice(0, limit).map((entry) => entry.kind === "interaction" ? <StoryEntry key={`interaction:${entry.record.id}`} interaction={entry.record} onEdit={onEdit} /> : <article className="story-entry story-followup" key={`task:${entry.record.id}`}><div className="story-meta"><span className="soft-icon"><Calendar size={17}/></span><strong>{__pulseText("Follow-up planned")}</strong><time dateTime={entry.at}>{date(entry.at)}</time></div><p className="story-copy">{entry.record.title}</p><p className="muted">{__pulseText("Current status:")} {entry.record.completedAt ? __pulseText("Completed") : __pulseText("Open")}</p><button className="button secondary" onClick={() => onEdit({kind:"task",record:entry.record})}>{__pulseText("Open follow-up")}</button></article>)}
+      {!entries.length && (
         <Empty
           title={__pulseText("A story waiting to be told")}
           body={__pulseText("No conversations in this view. Log an interaction or choose another filter.")}
         />
       )}
-      {filtered.length > limit && (
+      {entries.length > limit && (
         <button
           className="button secondary"
           onClick={() => setLimit(limit + 20)}

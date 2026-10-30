@@ -11,6 +11,7 @@ import { OpportunityBrief } from "./OpportunityBrief";
 import { EditorModal, type Editor } from "../components/forms";
 import { moveOpportunity } from "../data/repository";
 import { pipelineStudio } from "../services/pipeline-studio";
+import { ContextTip } from "../components/context-tip";
 
 export function Pipeline() {
   const text = useInterfaceText(), t = useTranslation(), { money, date } = useFormat(), p = usePulse();
@@ -73,6 +74,7 @@ export function Pipeline() {
         </div>
         <div className="studio-hero-art" aria-hidden="true"><div className="studio-orbit studio-orbit-a"/><div className="studio-orbit studio-orbit-b"/><div className="studio-orbit-core">✳</div><span className="studio-orbit-dot dot-one"/><span className="studio-orbit-dot dot-two"/><span className="studio-orbit-dot dot-three"/><small>{text("A LITTLE MOMENTUM, EVERY DAY")}</small></div>
       </header>
+      <ContextTip title="Turn possibilities into next steps">Explore the overview, board or list. Open an opportunity to see its people and related work; use the stage control to record its progress.</ContextTip>
       <section className="studio-pipeline-summary" aria-label={text("Pipeline value overview")}>
         <div className="studio-summary-top"><div><span className="eyebrow">{text("THE OPPORTUNITY PICTURE")}</span><h2>{text("Your work, at a glance.")}</h2><p>{selected?.name} · {text("current pipeline snapshot")}</p></div><span className="studio-summary-badge">{text("SAVED DATA · NOT A FORECAST")}</span></div>
         <div className="studio-metrics">

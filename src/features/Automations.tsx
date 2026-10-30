@@ -15,6 +15,7 @@ import {
 } from "../data/automation-repository";
 import { Modal } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
+import { ContextTip } from "../components/context-tip";
 const triggers: Record<AutomationRule["trigger"], string> = {
   stage: "Opportunity enters a stage",
   closing: "Opportunity closing soon",
@@ -134,6 +135,7 @@ export function Automations() {
         <Link className="button secondary" to="/analytics">
           {__pulseText("Open Analytics")}</Link>
       </div>
+      <ContextTip title="Build a helpful routine">Choose a recipe and review the trigger and action. Rules start disabled; enable one only when it is ready. Checks run while Pulse is open.</ContextTip>
       <section className="automation-studio-intro"><div><p className="eyebrow">{__pulseText("YOUR WORKFLOW, MADE LIGHTER")}</p><h2>{__pulseText("Give good intentions a little structure.")}</h2><p>{__pulseText("Start with a recipe, make it yours, and enable it when you’re ready. PULSE checks while the app is open; it never sends messages automatically.")}</p></div><div className="automation-studio-steps"><span><b>01</b>{__pulseText("Choose a moment")}</span><ArrowRight size={17}/><span><b>02</b>{__pulseText("Choose an action")}</span><ArrowRight size={17}/><span><b>03</b>{__pulseText("Review & enable")}</span></div></section>
       <section className="surface automation-recipe-section">
         <div className="automation-recipe-heading"><div><p className="eyebrow">{__pulseText("START SOMETHING USEFUL")}</p><h2>{__pulseText("Choose a recipe.")}</h2></div><span>{visible.filter((r) => r.enabled).length} {__pulseText("enabled rules")}</span></div>

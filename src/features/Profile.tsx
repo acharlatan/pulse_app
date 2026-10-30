@@ -507,6 +507,7 @@ export function Profile({ company = false }: { company?: boolean }) {
             />
             <RelationshipTimeline
               interactions={interactions}
+              tasks={tasks}
               onEdit={setEditor}
             />
           </section>

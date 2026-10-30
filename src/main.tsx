@@ -39,3 +39,5 @@ import "./relationship-workspace.css";
 import "./pipeline-studio.css";
 
 import "./relationship-journey.css";
+
+import "./relationship-intelligence.css";
