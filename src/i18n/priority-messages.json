@@ -1,0 +1,1146 @@
+{
+  "Relationship workspace": [
+    "Espacio de relaciones",
+    "Espace relations"
+  ],
+  "RELATIONSHIPS · EXPLORE THE EVIDENCE": [
+    "RELACIONES · EXPLORA LOS DATOS",
+    "RELATIONS · EXPLORER LES DONNÉES"
+  ],
+  "Get to know your network.": [
+    "Conoce tu red.",
+    "Découvrez votre réseau."
+  ],
+  "Find a person and see the conversations, commitments and opportunities you have saved together.": [
+    "Busca una persona y consulta las conversaciones, compromisos y oportunidades que has guardado.",
+    "Recherchez une personne et consultez les conversations, engagements et opportunités enregistrés."
+  ],
+  "people in scope": [
+    "personas en esta vista",
+    "personnes dans cette vue"
+  ],
+  "Relationship views": [
+    "Vistas de relaciones",
+    "Vues des relations"
+  ],
+  "All people": [
+    "Todas las personas",
+    "Toutes les personnes"
+  ],
+  "Recorded activity": [
+    "Actividad registrada",
+    "Activité enregistrée"
+  ],
+  "Open follow-ups": [
+    "Seguimientos abiertos",
+    "Suivis ouverts"
+  ],
+  "Open opportunities": [
+    "Oportunidades abiertas",
+    "Opportunités ouvertes"
+  ],
+  "Search people in this report": [
+    "Buscar personas en este informe",
+    "Rechercher des personnes dans ce rapport"
+  ],
+  "Search people": [
+    "Buscar personas",
+    "Rechercher des personnes"
+  ],
+  "PERSON": [
+    "PERSONA",
+    "PERSONNE"
+  ],
+  "SELECTED ACTIVITY / CURRENT WORK": [
+    "ACTIVIDAD SELECCIONADA / TRABAJO ACTUAL",
+    "ACTIVITÉ SÉLECTIONNÉE / TRAVAIL EN COURS"
+  ],
+  "Role not recorded": [
+    "Cargo no registrado",
+    "Fonction non renseignée"
+  ],
+  "period": [
+    "período",
+    "période"
+  ],
+  "open": [
+    "abiertos",
+    "ouverts"
+  ],
+  "No people match this view.": [
+    "Ninguna persona coincide con esta vista.",
+    "Aucune personne ne correspond à cette vue."
+  ],
+  "Try another filter or add someone to your network.": [
+    "Prueba otro filtro o añade a alguien a tu red.",
+    "Essayez un autre filtre ou ajoutez une personne à votre réseau."
+  ],
+  "Open Network": [
+    "Abrir Red",
+    "Ouvrir Réseau"
+  ],
+  "Showing the first 100 people. Search to narrow the list.": [
+    "Se muestran las primeras 100 personas. Busca para reducir la lista.",
+    "Les 100 premières personnes sont affichées. Effectuez une recherche pour affiner la liste."
+  ],
+  "SELECTED PERSON": [
+    "PERSONA SELECCIONADA",
+    "PERSONNE SÉLECTIONNÉE"
+  ],
+  "No role or company recorded": [
+    "Sin cargo ni empresa registrados",
+    "Aucune fonction ni entreprise renseignée"
+  ],
+  "Current review status": [
+    "Estado actual de revisión",
+    "État actuel de révision"
+  ],
+  "Not available": [
+    "No disponible",
+    "Indisponible"
+  ],
+  "LATEST CONVERSATION · SELECTED DATES": [
+    "ÚLTIMA CONVERSACIÓN · FECHAS SELECCIONADAS",
+    "DERNIÈRE CONVERSATION · DATES SÉLECTIONNÉES"
+  ],
+  "No conversation recorded in these dates.": [
+    "No hay conversaciones registradas en estas fechas.",
+    "Aucune conversation enregistrée à ces dates."
+  ],
+  "OPEN FOLLOW-UPS · NOW": [
+    "SEGUIMIENTOS ABIERTOS · AHORA",
+    "SUIVIS OUVERTS · ACTUELLEMENT"
+  ],
+  "No directly linked open follow-ups.": [
+    "No hay seguimientos abiertos vinculados directamente.",
+    "Aucun suivi ouvert directement lié."
+  ],
+  "{0} more open follow-ups": [
+    "{0} seguimientos abiertos más",
+    "{0} autres suivis ouverts"
+  ],
+  "OPEN OPPORTUNITIES · NOW": [
+    "OPORTUNIDADES ABIERTAS · AHORA",
+    "OPPORTUNITÉS OUVERTES · ACTUELLEMENT"
+  ],
+  "No directly linked open opportunities.": [
+    "No hay oportunidades abiertas vinculadas directamente.",
+    "Aucune opportunité ouverte directement liée."
+  ],
+  "{0} more open opportunities": [
+    "{0} oportunidades abiertas más",
+    "{0} autres opportunités ouvertes"
+  ],
+  "Open full profile": [
+    "Abrir perfil completo",
+    "Ouvrir le profil complet"
+  ],
+  "YOUR RELATIONSHIPS, IN CONTEXT": [
+    "TUS RELACIONES, EN CONTEXTO",
+    "VOS RELATIONS EN CONTEXTE"
+  ],
+  "Every number has a person behind it.": [
+    "Detrás de cada número hay una persona.",
+    "Derrière chaque chiffre, il y a une personne."
+  ],
+  "Select someone from the list to see their saved context and open work.": [
+    "Selecciona a alguien de la lista para ver su contexto guardado y sus tareas abiertas.",
+    "Sélectionnez une personne dans la liste pour voir son contexte enregistré et son travail en cours."
+  ],
+  "Conversation counts follow the selected dates. Follow-ups and opportunities show their current state and only direct saved links.": [
+    "Las conversaciones corresponden a las fechas seleccionadas. Los seguimientos y las oportunidades muestran su estado actual y solo los vínculos directos guardados.",
+    "Les conversations correspondent aux dates sélectionnées. Les suivis et opportunités indiquent leur état actuel et uniquement les liens directs enregistrés."
+  ],
+  "{0}: {1} conversations in the selected period, {2} open follow-ups, {3} open opportunities": [
+    "{0}: conversaciones en el período seleccionado: {1}; seguimientos abiertos: {2}; oportunidades abiertas: {3}",
+    "{0} : conversations sur la période sélectionnée : {1} ; suivis ouverts : {2} ; opportunités ouvertes : {3}"
+  ],
+  "Your focus workspace": [
+    "Tu espacio de enfoque",
+    "Votre espace de priorités"
+  ],
+  "YOUR CHOSEN PRIORITY · TODAY": [
+    "TU PRIORIDAD ELEGIDA · HOY",
+    "VOTRE PRIORITÉ CHOISIE · AUJOURD’HUI"
+  ],
+  "Open profile": [
+    "Abrir perfil",
+    "Ouvrir le profil"
+  ],
+  "Open company": [
+    "Abrir empresa",
+    "Ouvrir l’entreprise"
+  ],
+  "Review follow-up": [
+    "Revisar seguimiento",
+    "Examiner le suivi"
+  ],
+  "Review opportunity": [
+    "Revisar oportunidad",
+    "Examiner l’opportunité"
+  ],
+  "{0} chosen for today": [
+    "Elegidas para hoy: {0}",
+    "Choisies pour aujourd’hui : {0}"
+  ],
+  "Start with one thing that matters.": [
+    "Empieza por algo importante.",
+    "Commencez par ce qui compte."
+  ],
+  "Choose a saved record for today and it will appear here.": [
+    "Elige un registro guardado para hoy y aparecerá aquí.",
+    "Choisissez un élément enregistré pour aujourd’hui et il apparaîtra ici."
+  ],
+  "Choose a priority": [
+    "Elegir una prioridad",
+    "Choisir une priorité"
+  ],
+  "YOUR SAVED FOLLOW-UPS": [
+    "TUS SEGUIMIENTOS GUARDADOS",
+    "VOS SUIVIS ENREGISTRÉS"
+  ],
+  "Keep the next steps close.": [
+    "Ten a mano los próximos pasos.",
+    "Gardez les prochaines étapes à portée de main."
+  ],
+  "Ordered by due date, across your saved priorities.": [
+    "Ordenados por fecha de vencimiento entre tus prioridades guardadas.",
+    "Classés par date d’échéance parmi vos priorités enregistrées."
+  ],
+  "Pin a follow-up to keep it in view here.": [
+    "Fija un seguimiento para tenerlo visible aquí.",
+    "Épinglez un suivi pour le garder en vue ici."
+  ],
+  "See all follow-ups": [
+    "Ver todos los seguimientos",
+    "Voir tous les suivis"
+  ],
+  "Search priorities": [
+    "Buscar prioridades",
+    "Rechercher des priorités"
+  ],
+  "Find a saved priority": [
+    "Buscar una prioridad guardada",
+    "Rechercher une priorité enregistrée"
+  ],
+  "Show": [
+    "Mostrar",
+    "Afficher"
+  ],
+  "All types": [
+    "Todos los tipos",
+    "Tous les types"
+  ],
+  "{0} matching priorities": [
+    "Coincidencias: {0}",
+    "Résultats : {0}"
+  ],
+  "No priorities match these filters.": [
+    "Ninguna prioridad coincide con estos filtros.",
+    "Aucune priorité ne correspond à ces filtres."
+  ],
+  "Try another search or clear your filters.": [
+    "Prueba otra búsqueda o borra los filtros.",
+    "Essayez une autre recherche ou effacez les filtres."
+  ],
+  "Your focus horizon": [
+    "Tu horizonte de enfoque",
+    "Votre horizon de priorités"
+  ],
+  "Make room for what matters.": [
+    "Haz espacio para lo importante.",
+    "Faites place à l’essentiel."
+  ],
+  "Your people, opportunities and commitments, gathered in one intentional place.": [
+    "Tus personas, oportunidades y compromisos reunidos en un lugar pensado para ti.",
+    "Vos relations, opportunités et engagements réunis dans un espace dédié."
+  ],
+  "YOUR SPACE TO FOCUS": [
+    "TU ESPACIO DE ENFOQUE",
+    "VOTRE ESPACE DE PRIORITÉS"
+  ],
+  "Saved for later": [
+    "Guardado para después",
+    "Enregistré pour plus tard"
+  ],
+  "Preview how your focus can look. These fictional examples are not yet pinned.": [
+    "Descubre cómo puede verse tu enfoque. Estos ejemplos ficticios aún no están fijados.",
+    "Découvrez à quoi peuvent ressembler vos priorités. Ces exemples fictifs ne sont pas encore épinglés."
+  ],
+  "YOUR PRIORITIES, YOUR PACE": [
+    "TUS PRIORIDADES, A TU RITMO",
+    "VOS PRIORITÉS, À VOTRE RYTHME"
+  ],
+  "A little more room to move.": [
+    "Un poco más de espacio para avanzar.",
+    "Un peu plus d’espace pour avancer."
+  ],
+  "Choose where to spend your attention. Your saved records stay yours to manage.": [
+    "Elige dónde poner tu atención. Tú decides cómo gestionar tus registros guardados.",
+    "Choisissez où concentrer votre attention. Vous gardez la maîtrise de vos éléments enregistrés."
+  ],
+  "Explore Analytics": [
+    "Explorar análisis",
+    "Explorer les analyses"
+  ],
+  "Focus views": [
+    "Vistas de enfoque",
+    "Vues des priorités"
+  ],
+  "Nothing planned ahead yet": [
+    "Aún no hay nada planificado",
+    "Rien de prévu pour le moment"
+  ],
+  "Nothing saved for later yet": [
+    "Aún no has guardado nada para después",
+    "Rien d’enregistré pour plus tard"
+  ],
+  "No completed priorities yet": [
+    "Aún no hay prioridades completadas",
+    "Aucune priorité terminée pour le moment"
+  ],
+  "Choose a date for a saved priority to see it here.": [
+    "Elige una fecha para una prioridad guardada y aparecerá aquí.",
+    "Choisissez une date pour une priorité enregistrée afin de la voir ici."
+  ],
+  "Pin a person, company, opportunity or follow-up to keep it close.": [
+    "Fija una persona, empresa, oportunidad o seguimiento para tenerlo a mano.",
+    "Épinglez une personne, une entreprise, une opportunité ou un suivi pour le garder à portée de main."
+  ],
+  "Completed follow-ups you pinned will appear here.": [
+    "Los seguimientos fijados que completes aparecerán aquí.",
+    "Les suivis épinglés et terminés apparaîtront ici."
+  ],
+  "YOUR CHOSEN WORK": [
+    "EL TRABAJO QUE ELEGISTE",
+    "VOTRE TRAVAIL CHOISI"
+  ],
+  "YOUR UPCOMING PRIORITIES": [
+    "TUS PRÓXIMAS PRIORIDADES",
+    "VOS PRIORITÉS À VENIR"
+  ],
+  "COMPLETED WORK": [
+    "TRABAJO COMPLETADO",
+    "TRAVAIL TERMINÉ"
+  ],
+  "SAVED FOR LATER": [
+    "GUARDADO PARA DESPUÉS",
+    "ENREGISTRÉ POUR PLUS TARD"
+  ],
+  "Your selected priorities for today. Pinned records stay saved until you remove them.": [
+    "Tus prioridades elegidas para hoy. Los registros fijados siguen guardados hasta que los quites.",
+    "Vos priorités choisies pour aujourd’hui. Les éléments épinglés restent enregistrés jusqu’à leur retrait."
+  ],
+  "Open Add a priority to choose a person, company, opportunity or follow-up. Find your other pins in Saved for later.": [
+    "Abre Añadir prioridad para elegir una persona, empresa, oportunidad o seguimiento. Encontrarás los demás elementos en Guardado para después.",
+    "Ouvrez Ajouter une priorité pour choisir une personne, une entreprise, une opportunité ou un suivi. Retrouvez vos autres éléments dans Enregistré pour plus tard."
+  ],
+  "Add a person or company to your workspace, then choose what belongs in your focus.": [
+    "Añade una persona o empresa a tu espacio y elige tus prioridades.",
+    "Ajoutez une personne ou une entreprise à votre espace, puis choisissez vos priorités."
+  ],
+  "No person or company linked": [
+    "Sin persona ni empresa vinculada",
+    "Aucune personne ni entreprise liée"
+  ],
+  "Outreach restricted": [
+    "Contacto restringido",
+    "Prise de contact limitée"
+  ],
+  "Last conversation": [
+    "Última conversación",
+    "Dernière conversation"
+  ],
+  "No conversation recorded": [
+    "Sin conversaciones registradas",
+    "Aucune conversation enregistrée"
+  ],
+  "saved people at this company": [
+    "personas guardadas en esta empresa",
+    "personnes enregistrées dans cette entreprise"
+  ],
+  "View pipeline": [
+    "Ver embudo",
+    "Voir le pipeline"
+  ],
+  "Choose another day": [
+    "Elegir otro día",
+    "Choisir un autre jour"
+  ],
+  "Save date": [
+    "Guardar fecha",
+    "Enregistrer la date"
+  ],
+  "This changes your focus date, not the follow-up due date.": [
+    "Esto cambia la fecha de enfoque, no la fecha de vencimiento del seguimiento.",
+    "Cela modifie la date de priorité, pas l’échéance du suivi."
+  ],
+  "Search to narrow the first 100 matches.": [
+    "Busca para reducir las primeras 100 coincidencias.",
+    "Effectuez une recherche pour affiner les 100 premiers résultats."
+  ],
+  "Up to 100 pins and 20 daily priorities. Pins stay until removed; daily selections remain on their chosen date. Removing a priority does not reschedule its task.": [
+    "Hasta 100 elementos fijados y 20 prioridades diarias. Los elementos permanecen fijados hasta que los quites; las selecciones diarias conservan su fecha. Quitar una prioridad no cambia la fecha de su tarea.",
+    "Jusqu’à 100 éléments épinglés et 20 priorités par jour. Les éléments restent épinglés jusqu’à leur retrait ; les sélections quotidiennes conservent leur date. Retirer une priorité ne replanifie pas sa tâche."
+  ],
+  "Selected": [
+    "Seleccionado",
+    "Sélectionné"
+  ],
+  "Due": [
+    "Vence",
+    "Échéance"
+  ],
+  "Focus date": [
+    "Fecha de enfoque",
+    "Date de priorité"
+  ],
+  "Planned ahead": [
+    "Planificado",
+    "Prévu"
+  ],
+  "Recently completed": [
+    "Completado recientemente",
+    "Terminé récemment"
+  ],
+  "← Back to My Focus": [
+    "← Volver a Mi enfoque",
+    "← Retour à Mes priorités"
+  ],
+  "YOUR WORK, IN CONTEXT": [
+    "TU TRABAJO, EN CONTEXTO",
+    "VOTRE TRAVAIL EN CONTEXTE"
+  ],
+  "Open Automations": [
+    "Abrir automatizaciones",
+    "Ouvrir les automatisations"
+  ],
+  "Report filters": [
+    "Filtros del informe",
+    "Filtres du rapport"
+  ],
+  "From": [
+    "Desde",
+    "Du"
+  ],
+  "Through": [
+    "Hasta",
+    "Au"
+  ],
+  "through": [
+    "hasta",
+    "au"
+  ],
+  "Contact category": [
+    "Categoría de contacto",
+    "Catégorie de contact"
+  ],
+  "Current outcome": [
+    "Resultado actual",
+    "Résultat actuel"
+  ],
+  "Clear record filters": [
+    "Borrar filtros de registros",
+    "Effacer les filtres des éléments"
+  ],
+  "Workspace health views": [
+    "Vistas del estado del espacio",
+    "Vues de l’état de l’espace"
+  ],
+  "Review your week and upcoming commitments": [
+    "Revisa tu semana y tus próximos compromisos",
+    "Examinez votre semaine et vos engagements à venir"
+  ],
+  "See what moved. Decide what matters.": [
+    "Mira lo que avanzó. Decide qué importa.",
+    "Voyez ce qui a évolué. Décidez de l’essentiel."
+  ],
+  "Last seven days in your workspace timezone. Current overdue work is shown separately.": [
+    "Últimos siete días en la zona horaria de tu espacio. El trabajo vencido actual se muestra por separado.",
+    "Sept derniers jours dans le fuseau horaire de votre espace. Le travail actuellement en retard est affiché séparément."
+  ],
+  "completed follow-ups": [
+    "seguimientos completados",
+    "suivis terminés"
+  ],
+  "overdue now": [
+    "vencidos ahora",
+    "en retard actuellement"
+  ],
+  "recorded stage changes": [
+    "cambios de etapa registrados",
+    "changements d’étape enregistrés"
+  ],
+  "LOOKING AHEAD · NEXT 7 DAYS": [
+    "MIRANDO ADELANTE · PRÓXIMOS 7 DÍAS",
+    "À VENIR · 7 PROCHAINS JOURS"
+  ],
+  "Keep your commitments close.": [
+    "Mantén tus compromisos a mano.",
+    "Gardez vos engagements à portée de main."
+  ],
+  "Open follow-ups due today or in the next six days, in your workspace timezone. Choose a focus date without changing the due date.": [
+    "Seguimientos abiertos que vencen hoy o en los próximos seis días, en la zona horaria de tu espacio. Elige una fecha de enfoque sin cambiar la fecha de vencimiento.",
+    "Suivis ouverts arrivant à échéance aujourd’hui ou dans les six prochains jours, dans le fuseau horaire de votre espace. Choisissez une date de priorité sans modifier l’échéance."
+  ],
+  "Add to Focus": [
+    "Añadir a Enfoque",
+    "Ajouter aux priorités"
+  ],
+  "No open follow-ups due in the next seven days. Visit My Focus to choose what matters next.": [
+    "No hay seguimientos abiertos con vencimiento en los próximos siete días. Visita Mi enfoque para elegir lo siguiente.",
+    "Aucun suivi ouvert n’arrive à échéance dans les sept prochains jours. Consultez Mes priorités pour choisir la suite."
+  ],
+  "Explore this week’s conversations": [
+    "Explorar las conversaciones de esta semana",
+    "Explorer les conversations de la semaine"
+  ],
+  "Plan your focus": [
+    "Planificar tu enfoque",
+    "Planifier vos priorités"
+  ],
+  "Conversations in this period": [
+    "Conversaciones en este período",
+    "Conversations de cette période"
+  ],
+  "Clear date selection": [
+    "Borrar selección de fechas",
+    "Effacer la sélection de dates"
+  ],
+  "Unlinked": [
+    "Sin vincular",
+    "Non lié"
+  ],
+  "Open conversation": [
+    "Abrir conversación",
+    "Ouvrir la conversation"
+  ],
+  "No saved conversations match.": [
+    "Ninguna conversación guardada coincide.",
+    "Aucune conversation enregistrée ne correspond."
+  ],
+  "No conversations recorded for this selected date.": [
+    "No hay conversaciones registradas para la fecha seleccionada.",
+    "Aucune conversation enregistrée pour cette date."
+  ],
+  "Detailed stages, values and outcomes": [
+    "Etapas, valores y resultados detallados",
+    "Détail des étapes, valeurs et résultats"
+  ],
+  "Current pipeline snapshot": [
+    "Estado actual del embudo",
+    "État actuel du pipeline"
+  ],
+  "Open value by currency": [
+    "Valor abierto por moneda",
+    "Valeur ouverte par devise"
+  ],
+  "No open values recorded.": [
+    "No hay valores abiertos registrados.",
+    "Aucune valeur ouverte enregistrée."
+  ],
+  "Stage distribution": [
+    "Distribución por etapa",
+    "Répartition par étape"
+  ],
+  "Select a stage to inspect its opportunities.": [
+    "Selecciona una etapa para revisar sus oportunidades.",
+    "Sélectionnez une étape pour examiner ses opportunités."
+  ],
+  "Current opportunity counts by stage": [
+    "Número actual de oportunidades por etapa",
+    "Nombre actuel d’opportunités par étape"
+  ],
+  "Clear stage selection": [
+    "Borrar selección de etapa",
+    "Effacer la sélection d’étape"
+  ],
+  "Current stages": [
+    "Etapas actuales",
+    "Étapes actuelles"
+  ],
+  "Recorded stage movements": [
+    "Cambios de etapa registrados",
+    "Changements d’étape enregistrés"
+  ],
+  "No tracked movements in this period.": [
+    "No hay movimientos registrados en este período.",
+    "Aucun changement suivi sur cette période."
+  ],
+  "Completed tracked stage stays": [
+    "Permanencias registradas y completadas en etapas",
+    "Durées d’étape suivies et terminées"
+  ],
+  "Insufficient recorded entry and exit history.": [
+    "El historial registrado de entrada y salida es insuficiente.",
+    "Historique d’entrée et de sortie enregistré insuffisant."
+  ],
+  "Current stage age": [
+    "Tiempo en la etapa actual",
+    "Temps dans l’étape actuelle"
+  ],
+  "Insufficient tracked history": [
+    "Historial registrado insuficiente",
+    "Historique suivi insuffisant"
+  ],
+  "Opportunities to review": [
+    "Oportunidades para revisar",
+    "Opportunités à examiner"
+  ],
+  "No matching opportunity reviews in this scope.": [
+    "No hay revisiones de oportunidades coincidentes en esta vista.",
+    "Aucune opportunité à examiner ne correspond à cette vue."
+  ],
+  "Create a reviewed automation draft": [
+    "Crear un borrador de automatización para revisión",
+    "Créer un brouillon d’automatisation à examiner"
+  ],
+  "Opportunity records": [
+    "Registros de oportunidades",
+    "Éléments d’opportunité"
+  ],
+  "No saved opportunities match these filters.": [
+    "Ninguna oportunidad guardada coincide con estos filtros.",
+    "Aucune opportunité enregistrée ne correspond à ces filtres."
+  ],
+  "Completed follow-ups": [
+    "Seguimientos completados",
+    "Suivis terminés"
+  ],
+  "Completed in this period": [
+    "Completados en este período",
+    "Terminés pendant cette période"
+  ],
+  "No completed follow-ups for this selection.": [
+    "No hay seguimientos completados para esta selección.",
+    "Aucun suivi terminé pour cette sélection."
+  ],
+  "Details to review": [
+    "Detalles para revisar",
+    "Détails à examiner"
+  ],
+  "A missing field can be intentional; these are observations, not a score.": [
+    "Un campo vacío puede ser intencional; son observaciones, no una puntuación.",
+    "Un champ vide peut être intentionnel ; ce sont des observations, pas un score."
+  ],
+  "Review follow-ups": [
+    "Revisar seguimientos",
+    "Examiner les suivis"
+  ],
+  "Focus briefing": [
+    "Resumen de enfoque",
+    "Synthèse des priorités"
+  ],
+  "Focus lanes": [
+    "Áreas de enfoque",
+    "Axes de priorité"
+  ],
+  "Open the full work queue": [
+    "Abrir la lista completa de trabajo",
+    "Ouvrir la liste complète du travail"
+  ],
+  "Why these focus lanes?": [
+    "¿Por qué estas áreas de enfoque?",
+    "Pourquoi ces axes de priorité ?"
+  ],
+  "There is no recorded activity in this period yet. Log a conversation or plan a follow-up to build your picture.": [
+    "Aún no hay actividad registrada en este período. Registra una conversación o planifica un seguimiento para empezar.",
+    "Aucune activité enregistrée sur cette période. Consignez une conversation ou planifiez un suivi pour commencer."
+  ],
+  "Activity follows the selected date range. Current priorities are shown separately. Older stage history may be unavailable.": [
+    "La actividad corresponde al intervalo seleccionado. Las prioridades actuales se muestran por separado. Es posible que el historial de etapas anterior no esté disponible.",
+    "L’activité correspond à la période sélectionnée. Les priorités actuelles sont affichées séparément. L’historique antérieur des étapes peut être indisponible."
+  ],
+  "Explore coverage and company context": [
+    "Explorar cobertura y contexto de empresas",
+    "Explorer la couverture et le contexte des entreprises"
+  ],
+  "RELATIONSHIP COVERAGE · SELECTED PERIOD": [
+    "COBERTURA DE RELACIONES · PERÍODO SELECCIONADO",
+    "COUVERTURE DES RELATIONS · PÉRIODE SÉLECTIONNÉE"
+  ],
+  "Who is part of the conversation?": [
+    "¿Quién forma parte de la conversación?",
+    "Qui participe à la conversation ?"
+  ],
+  "current people": [
+    "personas actuales",
+    "personnes actuelles"
+  ],
+  "People with a recorded conversation in the period": [
+    "Personas con una conversación registrada en el período",
+    "Personnes avec une conversation enregistrée sur la période"
+  ],
+  "Coverage describes recorded activity, not relationship quality. It includes paused and restricted people; a missing conversation is not permission to contact them.": [
+    "La cobertura describe actividad registrada, no la calidad de la relación. Incluye personas pausadas o restringidas; la ausencia de conversación no autoriza a contactarlas.",
+    "La couverture décrit l’activité enregistrée, pas la qualité des relations. Elle inclut les personnes en pause ou soumises à des restrictions ; l’absence de conversation n’autorise pas à les contacter."
+  ],
+  "Explore relationship evidence": [
+    "Explorar datos de relaciones",
+    "Explorer les données des relations"
+  ],
+  "OPEN OPPORTUNITIES · CURRENT SNAPSHOT": [
+    "OPORTUNIDADES ABIERTAS · ESTADO ACTUAL",
+    "OPPORTUNITÉS OUVERTES · ÉTAT ACTUEL"
+  ],
+  "What is still in play?": [
+    "¿Qué sigue en curso?",
+    "Qu’est-ce qui est encore en cours ?"
+  ],
+  "No open values recorded in this scope.": [
+    "No hay valores abiertos registrados en esta vista.",
+    "Aucune valeur ouverte enregistrée dans cette vue."
+  ],
+  "Saved values stay separate by currency. This is neither a revenue forecast nor a measure of how much an action will earn.": [
+    "Los valores guardados se mantienen separados por moneda. Esto no es una previsión de ingresos ni una medida de lo que generará una acción.",
+    "Les valeurs enregistrées restent séparées par devise. Il ne s’agit ni d’une prévision de revenus ni d’une estimation du gain d’une action."
+  ],
+  "Inspect the pipeline": [
+    "Examinar el embudo",
+    "Examiner le pipeline"
+  ],
+  "EFFORT & OPEN WORK": [
+    "ACTIVIDAD Y TRABAJO ABIERTO",
+    "ACTIVITÉ ET TRAVAIL EN COURS"
+  ],
+  "Look at the company behind the numbers.": [
+    "Mira la empresa detrás de los números.",
+    "Découvrez l’entreprise derrière les chiffres."
+  ],
+  "Compare recorded conversations with current open work, then inspect a company’s records.": [
+    "Compara las conversaciones registradas con el trabajo abierto actual y revisa los registros de una empresa.",
+    "Comparez les conversations enregistrées au travail actuellement en cours, puis examinez les éléments d’une entreprise."
+  ],
+  "Conversations in period": [
+    "Conversaciones en el período",
+    "Conversations sur la période"
+  ],
+  "Open opportunities now": [
+    "Oportunidades abiertas ahora",
+    "Opportunités ouvertes actuellement"
+  ],
+  "Overdue now": [
+    "Vencidos ahora",
+    "En retard actuellement"
+  ],
+  "No matching conversation or open-work records yet.": [
+    "Aún no hay conversaciones ni trabajo abierto que coincidan.",
+    "Aucune conversation ni travail en cours ne correspond pour le moment."
+  ],
+  "How can I use this without chasing the busiest company?": [
+    "¿Cómo puedo usar esto sin perseguir a la empresa más activa?",
+    "Comment utiliser ces données sans privilégier l’entreprise la plus active ?"
+  ],
+  "Review missing context": [
+    "Revisar el contexto faltante",
+    "Examiner le contexte manquant"
+  ],
+  "Recorded conversations over time": [
+    "Conversaciones registradas a lo largo del tiempo",
+    "Conversations enregistrées au fil du temps"
+  ],
+  "RELATIONSHIP ACTIVITY · SELECTED PERIOD": [
+    "ACTIVIDAD DE RELACIONES · PERÍODO SELECCIONADO",
+    "ACTIVITÉ DES RELATIONS · PÉRIODE SÉLECTIONNÉE"
+  ],
+  "The story in your numbers.": [
+    "La historia detrás de tus números.",
+    "L’histoire derrière vos chiffres."
+  ],
+  "Conversations, in motion.": [
+    "Conversaciones en movimiento.",
+    "Les conversations en mouvement."
+  ],
+  "{0} recorded in the previous equal-length period": [
+    "{0} registradas en el período anterior de igual duración",
+    "{0} enregistrées sur la période précédente de même durée"
+  ],
+  "Notes excluded · unrecorded activity is not estimated": [
+    "Notas excluidas · no se estima la actividad no registrada",
+    "Notes exclues · l’activité non enregistrée n’est pas estimée"
+  ],
+  "YOUR ACTIVITY": [
+    "TU ACTIVIDAD",
+    "VOTRE ACTIVITÉ"
+  ],
+  "Conversation activity by date": [
+    "Actividad de conversaciones por fecha",
+    "Activité des conversations par date"
+  ],
+  "Select a bar to inspect the conversations. Seven-day groups for ranges of 15–90 days; longer ranges group by month.": [
+    "Selecciona una barra para revisar las conversaciones. Los intervalos de 15 a 90 días se agrupan por semanas; los más largos, por meses.",
+    "Sélectionnez une barre pour examiner les conversations. Les périodes de 15 à 90 jours sont regroupées par semaine ; les périodes plus longues, par mois."
+  ],
+  "No recorded conversations in this period.": [
+    "No hay conversaciones registradas en este período.",
+    "Aucune conversation enregistrée sur cette période."
+  ],
+  "Log a conversation to see your activity take shape here.": [
+    "Registra una conversación para ver tu actividad aquí.",
+    "Consignez une conversation pour voir votre activité prendre forme ici."
+  ],
+  "Current workspace snapshot": [
+    "Estado actual del espacio",
+    "État actuel de l’espace"
+  ],
+  "YOUR NETWORK · NOW": [
+    "TU RED · AHORA",
+    "VOTRE RÉSEAU · ACTUELLEMENT"
+  ],
+  "people in this scope": [
+    "personas en esta vista",
+    "personnes dans cette vue"
+  ],
+  "Explore recorded relationship activity": [
+    "Explorar la actividad de relaciones registrada",
+    "Explorer l’activité enregistrée des relations"
+  ],
+  "OPEN WORK · NOW": [
+    "TRABAJO ABIERTO · AHORA",
+    "TRAVAIL EN COURS · ACTUELLEMENT"
+  ],
+  "Explore the current pipeline": [
+    "Explorar el embudo actual",
+    "Explorer le pipeline actuel"
+  ],
+  "COMMITMENTS · NOW": [
+    "COMPROMISOS · AHORA",
+    "ENGAGEMENTS · ACTUELLEMENT"
+  ],
+  "overdue follow-ups": [
+    "seguimientos vencidos",
+    "suivis en retard"
+  ],
+  "{0} other open follow-ups": [
+    "{0} seguimientos abiertos más",
+    "{0} autres suivis ouverts"
+  ],
+  "No open follow-ups": [
+    "Sin seguimientos abiertos",
+    "Aucun suivi ouvert"
+  ],
+  "Relationship status now": [
+    "Estado actual de las relaciones",
+    "État actuel des relations"
+  ],
+  "RELATIONSHIPS · CURRENT SNAPSHOT": [
+    "RELACIONES · ESTADO ACTUAL",
+    "RELATIONS · ÉTAT ACTUEL"
+  ],
+  "Your network, in context.": [
+    "Tu red, en contexto.",
+    "Votre réseau en contexte."
+  ],
+  "Based on your existing review rules and recorded activity, not sentiment. Select a category to see the people behind it.": [
+    "Basado en tus reglas de revisión y en la actividad registrada, no en sentimientos. Selecciona una categoría para ver las personas que la forman.",
+    "Fondé sur vos règles de révision et l’activité enregistrée, pas sur les sentiments. Sélectionnez une catégorie pour voir les personnes concernées."
+  ],
+  "Open relationship review": [
+    "Abrir revisión de relaciones",
+    "Ouvrir la révision des relations"
+  ],
+  "people with a current review status": [
+    "personas con un estado de revisión actual",
+    "personnes avec un état de révision actuel"
+  ],
+  "No people in this category.": [
+    "No hay personas en esta categoría.",
+    "Aucune personne dans cette catégorie."
+  ],
+  "OPPORTUNITIES · CURRENT SNAPSHOT": [
+    "OPORTUNIDADES · ESTADO ACTUAL",
+    "OPPORTUNITÉS · ÉTAT ACTUEL"
+  ],
+  "See what’s in motion.": [
+    "Mira lo que está en marcha.",
+    "Voyez ce qui est en cours."
+  ],
+  "Current saved stages and outcomes. Select a stage to inspect its opportunities.": [
+    "Etapas y resultados actuales guardados. Selecciona una etapa para revisar sus oportunidades.",
+    "Étapes et résultats actuels enregistrés. Sélectionnez une étape pour examiner ses opportunités."
+  ],
+  "open now": [
+    "abiertas ahora",
+    "ouvertes actuellement"
+  ],
+  "won now": [
+    "ganadas actualmente",
+    "gagnées actuellement"
+  ],
+  "lost now": [
+    "perdidas actualmente",
+    "perdues actuellement"
+  ],
+  "Current outcomes, not a history of when deals closed.": [
+    "Resultados actuales, no un historial de cuándo se cerraron los acuerdos.",
+    "Résultats actuels, et non historique des dates de clôture."
+  ],
+  "open value": [
+    "valor abierto",
+    "valeur ouverte"
+  ],
+  "No open value recorded.": [
+    "No hay valor abierto registrado.",
+    "Aucune valeur ouverte enregistrée."
+  ],
+  "Values remain separate by currency and are not forecasts.": [
+    "Los valores se mantienen separados por moneda y no son previsiones.",
+    "Les valeurs restent séparées par devise et ne sont pas des prévisions."
+  ],
+  "open opportunities have no saved value.": [
+    "oportunidades abiertas no tienen un valor guardado.",
+    "opportunités ouvertes n’ont pas de valeur enregistrée."
+  ],
+  "Saved stages": [
+    "Etapas guardadas",
+    "Étapes enregistrées"
+  ],
+  "All matching outcomes": [
+    "Todos los resultados coincidentes",
+    "Tous les résultats correspondants"
+  ],
+  "No opportunities match this view. Add an opportunity to start a pipeline.": [
+    "Ninguna oportunidad coincide con esta vista. Añade una para empezar tu embudo.",
+    "Aucune opportunité ne correspond à cette vue. Ajoutez-en une pour commencer votre pipeline."
+  ],
+  "Opportunities in this stage": [
+    "Oportunidades en esta etapa",
+    "Opportunités dans cette étape"
+  ],
+  "Value not recorded": [
+    "Valor no registrado",
+    "Valeur non renseignée"
+  ],
+  "The full matching list is available below.": [
+    "La lista completa de coincidencias está disponible abajo.",
+    "La liste complète des résultats se trouve ci-dessous."
+  ],
+  "COMMITMENTS · CURRENT & PERIOD": [
+    "COMPROMISOS · ACTUALES Y DEL PERÍODO",
+    "ENGAGEMENTS · ACTUELS ET SUR LA PÉRIODE"
+  ],
+  "Make space for what’s next.": [
+    "Haz espacio para lo que viene.",
+    "Faites place à la suite."
+  ],
+  "Current open work and completed activity are different views of your saved follow-ups.": [
+    "El trabajo abierto actual y la actividad completada son distintas vistas de tus seguimientos guardados.",
+    "Le travail en cours et l’activité terminée sont deux vues différentes de vos suivis enregistrés."
+  ],
+  "Review overdue follow-ups": [
+    "Revisar seguimientos vencidos",
+    "Examiner les suivis en retard"
+  ],
+  "Due dates can change; no on-time rate is inferred.": [
+    "Las fechas de vencimiento pueden cambiar; no se infiere una tasa de puntualidad.",
+    "Les échéances peuvent changer ; aucun taux de ponctualité n’est déduit."
+  ],
+  "due in the selected period": [
+    "con vencimiento en el período seleccionado",
+    "à échéance sur la période sélectionnée"
+  ],
+  "Completed in the selected period": [
+    "Completados en el período seleccionado",
+    "Terminés sur la période sélectionnée"
+  ],
+  "Completed follow-ups over time": [
+    "Seguimientos completados a lo largo del tiempo",
+    "Suivis terminés au fil du temps"
+  ],
+  "Select a bar to inspect completed follow-ups below.": [
+    "Selecciona una barra para revisar abajo los seguimientos completados.",
+    "Sélectionnez une barre pour examiner les suivis terminés ci-dessous."
+  ],
+  "No completed follow-ups in this period yet.": [
+    "Aún no hay seguimientos completados en este período.",
+    "Aucun suivi terminé sur cette période pour le moment."
+  ],
+  "Open follow-ups by due date": [
+    "Seguimientos abiertos por fecha de vencimiento",
+    "Suivis ouverts par échéance"
+  ],
+  "No open follow-ups in this scope.": [
+    "No hay seguimientos abiertos en esta vista.",
+    "Aucun suivi ouvert dans cette vue."
+  ],
+  "People with activity": [
+    "Personas con actividad",
+    "Personnes avec activité"
+  ],
+  "With follow-ups": [
+    "Con seguimientos",
+    "Avec suivis"
+  ],
+  "With opportunities": [
+    "Con oportunidades",
+    "Avec opportunités"
+  ],
+  "A snapshot of recorded review statuses, not a measure of relationship quality.": [
+    "Una instantánea de los estados de revisión registrados, no una medida de la calidad de las relaciones.",
+    "Un aperçu des états de révision enregistrés, pas une mesure de la qualité des relations."
+  ],
+  "Commitments": [
+    "Compromisos",
+    "Engagements"
+  ],
+  "Skip to content": [
+    "Saltar al contenido",
+    "Aller au contenu"
+  ],
+  "Create a new record": [
+    "Crear un registro",
+    "Créer un élément"
+  ],
+  "Every relationship has a story.": [
+    "Cada relación tiene una historia.",
+    "Chaque relation a une histoire."
+  ],
+  "Made for meaningful connections.": [
+    "Creado para conexiones significativas.",
+    "Conçu pour des relations qui comptent."
+  ],
+  "Make space for what matters": [
+    "Haz espacio para lo importante",
+    "Faites place à l’essentiel"
+  ],
+  "Pin people, companies, follow-ups or opportunities to save them for later. Choose a few for today; completing a follow-up is always your choice.": [
+    "Fija personas, empresas, seguimientos u oportunidades para guardarlos para después. Elige algunos para hoy; completar un seguimiento siempre es tu decisión.",
+    "Épinglez des personnes, entreprises, suivis ou opportunités pour les retrouver plus tard. Choisissez-en quelques-uns pour aujourd’hui ; terminer un suivi reste toujours votre choix."
+  ],
+  "Read the story behind the numbers": [
+    "Descubre la historia detrás de los números",
+    "Découvrez l’histoire derrière les chiffres"
+  ],
+  "Choose a section to explore relationships, opportunities, productivity or missing context. Date filters describe recorded activity; current-state counts are labeled separately.": [
+    "Elige una sección para explorar relaciones, oportunidades, productividad o contexto faltante. Los filtros de fechas describen la actividad registrada; los recuentos actuales se identifican por separado.",
+    "Choisissez une section pour explorer les relations, les opportunités, la productivité ou le contexte manquant. Les filtres de dates décrivent l’activité enregistrée ; les chiffres actuels sont indiqués séparément."
+  ],
+  "Your momentum": [
+    "Tu progreso",
+    "Votre progression"
+  ],
+  "Optional encouragement for meaningful work. Turn on tracking to start earning XP; existing records are never backfilled.": [
+    "Un incentivo opcional para tu trabajo. Activa el seguimiento para empezar a ganar XP; los registros existentes no se cuentan retroactivamente.",
+    "Un encouragement facultatif pour votre travail. Activez le suivi pour commencer à gagner des XP ; les éléments existants ne sont jamais comptés rétroactivement."
+  ],
+  "Configure progress in Settings": [
+    "Configurar el progreso en Ajustes",
+    "Configurer la progression dans les paramètres"
+  ],
+  "Your progress": [
+    "Tu progreso",
+    "Votre progression"
+  ],
+  "Today’s reward limit is reached. Your CRM work remains available; new grants resume on the next progress day.": [
+    "Alcanzaste el límite de recompensas de hoy. Puedes seguir trabajando; las nuevas recompensas se reanudan el próximo día de progreso.",
+    "La limite de récompenses du jour est atteinte. Vous pouvez continuer à travailler ; les nouvelles récompenses reprendront le jour de progression suivant."
+  ],
+  "Current level progress": [
+    "Progreso del nivel actual",
+    "Progression du niveau actuel"
+  ],
+  "qualifying follow-ups this week": [
+    "seguimientos válidos esta semana",
+    "suivis admissibles cette semaine"
+  ],
+  "See progress & criteria": [
+    "Ver progreso y criterios",
+    "Voir la progression et les critères"
+  ],
+  "Small preferences that make PULSE feel more like you.": [
+    "Pequeñas preferencias para que PULSE se sienta más tuyo.",
+    "De petits réglages pour que PULSE vous ressemble davantage."
+  ],
+  "Local-first, always": [
+    "Local ante todo, siempre",
+    "Local avant tout, toujours"
+  ],
+  "MY WORKSPACE · LOCAL IDENTITY": [
+    "MI ESPACIO · IDENTIDAD LOCAL",
+    "MON ESPACE · IDENTITÉ LOCALE"
+  ],
+  "Make this space yours.": [
+    "Haz tuyo este espacio.",
+    "Faites de cet espace le vôtre."
+  ],
+  "Your workspace identity stays on this device.": [
+    "La identidad de tu espacio permanece en este dispositivo.",
+    "L’identité de votre espace reste sur cet appareil."
+  ],
+  "Workspace photo": [
+    "Foto del espacio",
+    "Photo de l’espace"
+  ],
+  "Relationship rhythm": [
+    "Ritmo de relaciones",
+    "Rythme des relations"
+  ],
+  "Notifications": [
+    "Notificaciones",
+    "Notifications"
+  ],
+  "Privacy & data": [
+    "Privacidad y datos",
+    "Confidentialité et données"
+  ],
+  "Integrations": [
+    "Integraciones",
+    "Intégrations"
+  ],
+  "Keep transitions quiet. Device preferences are also respected.": [
+    "Reduce las transiciones. También se respetan las preferencias del dispositivo.",
+    "Réduit les transitions. Les préférences de l’appareil sont également respectées."
+  ],
+  "Light": [
+    "Claro",
+    "Clair"
+  ],
+  "Dark": [
+    "Oscuro",
+    "Sombre"
+  ],
+  "Follow device": [
+    "Seguir el dispositivo",
+    "Suivre l’appareil"
+  ],
+  "Cooling": [
+    "En enfriamiento",
+    "À renouer"
+  ],
+  "Restricted": [
+    "Restringida",
+    "Contact limité"
+  ],
+  "Dormant": [
+    "Inactiva",
+    "En sommeil"
+  ],
+  "MAKE YOURSELF AT HOME": [
+    "SIÉNTETE COMO EN CASA",
+    "BIENVENUE CHEZ VOUS"
+  ],
+  "APPEARANCE": [
+    "APARIENCIA",
+    "APPARENCE"
+  ],
+  "Personalize PULSE · Pipelines & custom fields": [
+    "Personalizar PULSE · Embudos y campos personalizados",
+    "Personnaliser PULSE · Pipelines et champs personnalisés"
+  ],
+  "Show more activity": [
+    "Mostrar más actividad",
+    "Afficher plus d’activité"
+  ],
+  "Preferences saved": [
+    "Preferencias guardadas",
+    "Préférences enregistrées"
+  ],
+  "Choose a language": [
+    "Elige un idioma",
+    "Choisir une langue"
+  ],
+  "Your previous language is no longer supported. The interface uses English until you choose a language; your saved date format is unchanged.": [
+    "Tu idioma anterior ya no está disponible. La interfaz usa inglés hasta que elijas un idioma; tu formato de fecha guardado no cambia.",
+    "Votre langue précédente n’est plus disponible. L’interface utilise l’anglais jusqu’à ce que vous choisissiez une langue ; votre format de date enregistré reste inchangé."
+  ]
+}
