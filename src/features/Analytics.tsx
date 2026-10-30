@@ -399,21 +399,10 @@ export function Analytics() {
           </details>
         </div>
       </section>
-      <nav className="tabs analytics-tabs" aria-label={__pulseText("Analytics sections")}>
-        {sections.map((s) => (
-          <button
-            key={s}
-            aria-pressed={section === s}
-            onClick={() => {
-              setSection(s);
-              setSelectedDay("");
-              setSelectedStage("");
-            }}
-          >
-            {__pulseText(s)}
-          </button>
-        ))}
+      <nav className="analytics-room-nav" aria-label={__pulseText("Analytics sections")}>
+        {([ ["Overview", "The big picture", "Summary and direction"], ["Relationships", "Relationships", "Conversations and people"], ["Opportunities", "Opportunities", "Pipeline and movement"], ["Productivity", "Workspace health", "Follow-ups and data quality"] ] as const).map(([target, title, description], i) => <button key={target} aria-pressed={target === "Productivity" ? section === "Productivity" || section === "Data quality" : section === target} onClick={() => {setSection(target); setSelectedDay(""); setSelectedStage("");}}><span>0{i+1}</span><strong>{__pulseText(title)}</strong><small>{__pulseText(description)}</small></button>)}
       </nav>
+      {(section === "Productivity" || section === "Data quality") && <nav className="analytics-health-nav" aria-label={__pulseText("Workspace health views")}><button aria-pressed={section === "Productivity"} onClick={() => setSection("Productivity")}>{__pulseText("Follow-ups")}</button><button aria-pressed={section === "Data quality"} onClick={() => setSection("Data quality")}>{__pulseText("Data quality")}</button></nav>}
       <ContextTip title="Read the story behind the numbers">Choose a section to explore relationships, opportunities, productivity or missing context. Date filters describe recorded activity; current-state counts are labeled separately.</ContextTip>
       {section !== "Overview" && <div className="analytics-section-intro" key={section}><p className="eyebrow">{__pulseText("YOUR WORK THROUGH A DIFFERENT LENS")}</p><h2>{__pulseText(section === "Relationships" ? "See who is part of your story." : section === "Opportunities" ? "Follow the possibilities in motion." : section === "Productivity" ? "Make room for meaningful progress." : "Give your records more context.")}</h2><p>{__pulseText(section === "Relationships" ? "Explore recorded conversations and the relationships behind them." : section === "Opportunities" ? "Explore saved values, stages, and actual movement." : section === "Productivity" ? "Review follow-ups and activity you have recorded." : "Find missing details that can make your workspace more useful.")}</p></div>}
       {result.error && (

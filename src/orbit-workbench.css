@@ -1,0 +1,27 @@
+.analytics-room-nav { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:20px 0 12px; }
+.analytics-room-nav button { text-align:left; min-width:0; display:grid; gap:6px; padding:18px; border:1px solid var(--border); border-radius:16px; background:var(--surface); color:var(--text); cursor:pointer; }
+.analytics-room-nav button[aria-pressed=true] { background:#302642; border-color:#a89bdb; color:#fffaff; }
+.analytics-room-nav button span { color:var(--primary-text); font-size:12px; font-weight:800; }
+.analytics-room-nav button[aria-pressed=true] span { color:#d9f28e; }
+.analytics-room-nav button strong { font-size:17px; }
+.analytics-room-nav button small { color:var(--muted); font-size:13px; }
+.analytics-room-nav button[aria-pressed=true] small { color:#eee8f4; }
+.analytics-health-nav { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
+.analytics-health-nav button { padding:10px 16px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--text); cursor:pointer; }
+.analytics-health-nav button[aria-pressed=true] { background:#302642; color:#fffaff; }
+.orbit-workbench { margin:20px 0; padding:20px; border:1px solid #625a72; border-radius:20px; background:#2c253c; color:#fffaff; overflow-wrap:anywhere; }
+.orbit-workbench .eyebrow { color:#d9f28e; }
+.orbit-workbench h3,.orbit-workbench h4 { color:#fffaff; margin:8px 0; }
+.orbit-workbench p,.orbit-workbench small { color:#ede6f3; line-height:1.5; }
+.orbit-workbench-actions { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+.orbit-workbench-block { border-top:1px solid #71677d; margin-top:17px; padding-top:16px; }
+.orbit-link-cards { display:grid; gap:8px; }
+.orbit-link-cards button,.orbit-activity-entry { display:flex; align-items:center; gap:10px; width:100%; text-align:left; border:1px solid #756b85; border-radius:12px; padding:10px; color:#fffaff; background:#443b53; cursor:pointer; }
+.orbit-link-cards button span,.orbit-activity-entry { min-width:0; }
+.orbit-link-cards button span { display:grid; gap:3px; overflow-wrap:anywhere; }
+.orbit-link-cards button b { margin-left:auto; color:#d9f28e; }
+.orbit-activity-entry { display:grid; margin:8px 0; }
+.orbit-activity-entry span { color:#ddd2e8; font-size:13px; }
+.orbit-activity-entry strong { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; line-height:1.4; }
+@media(max-width:800px) { .analytics-room-nav { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:380px) { .analytics-room-nav button { padding:12px; } .analytics-room-nav button strong { font-size:15px; } }

@@ -11,6 +11,7 @@ import {
   effectiveAvailability,
 } from "../services/recommendations";
 import { FocusButton } from "../components/focus";
+import { OpportunityBrief } from "./OpportunityBrief";
 import { OrbitGuide } from "./OrbitGuide";
 import { ConstellationScene } from "../components/ConstellationScene";
 import { OrbitWorld } from "../components/OrbitWorld";
@@ -44,6 +45,7 @@ export function Orbit() {
     [zoom, setZoom] = useState(1),
     [pan, setPan] = useState({ x: 0, y: 0 }),
     [editor, setEditor] = useState<Editor | null>(null),
+    [briefId, setBriefId] = useState<string | null>(null),
     viewport = useRef<HTMLDivElement>(null),
     detail = useRef<HTMLElement>(null),
     drag = useRef<{
@@ -112,6 +114,8 @@ export function Orbit() {
                 t.organizationId === deal.organizationId)
             : false),
   );
+  const recent = p.interactions.filter((i) => Date.parse(i.occurredAt) <= Date.now() && (person ? i.contactId === person.id : company ? i.organizationId === company.id : deal ? i.opportunityId === deal.id : false)).sort((a,b) => b.occurredAt.localeCompare(a.occurredAt)).slice(0, 3);
+  const connections = node ? fullGraph.edges.filter(e => e.from === node.id || e.to === node.id).map(e => ({ edge:e, other:allById.get(e.from === node.id ? e.to : e.from) })).filter(item => !!item.other) : [];
   function fit() {
     setZoom(
       Math.min(
@@ -543,6 +547,10 @@ export function Orbit() {
               />
               <Badge>{node.kind === "person" ? t("person") : node.kind === "company" ? t("company") : t("opportunity")}</Badge>
               <h2>{node.label}</h2>
+              <div className="orbit-workbench"><p className="eyebrow">{__pulseText("CONNECTION DESK")}</p><h3>{__pulseText("A place to explore and act.")}</h3><p>{__pulseText("Use saved context to decide your next step. Nothing is sent automatically.")}</p><div className="orbit-workbench-actions">{(person || company) && <><button className="button secondary" onClick={() => setEditor({kind:"interaction", contact:person, organizationId:company?.id})}>{__pulseText("Log interaction")}</button><button className="button secondary" onClick={() => setEditor({kind:"task", contact:person, organizationId:company?.id})}>{__pulseText("Plan a follow-up")}</button></>}{deal && <button className="button secondary" onClick={() => setBriefId(deal.id)}>{__pulseText("Open opportunity details")}</button>}</div>
+                <div className="orbit-workbench-block"><h4>{__pulseText("Explore saved connections")}</h4><p>{__pulseText("Select a linked record to explore it here. This list reflects the current filters and list limit.")}</p><div className="orbit-link-cards">{connections.slice(0,8).map(({edge,other}) => other && <button key={edge.id} onClick={() => selectFromBrowse(other)}><Avatar name={other.label} mediaId={other.mediaId} company={other.kind === "company"}/><span><strong>{other.label}</strong><small>{__pulseText(edge.label)}</small></span><b aria-hidden="true">↗</b></button>)}</div>{connections.length > 8 && <p>{__pulseText("More saved connections appear in the expanded list below.")}</p>}{!connections.length && <p>{__pulseText("No saved links are visible in this view.")}</p>}</div>
+                <div className="orbit-workbench-block"><h4>{__pulseText("Recent recorded activity")}</h4>{recent.map(i => <button className="orbit-activity-entry" key={i.id} onClick={() => setEditor({kind:"interaction",record:i})}><span>{__pulseText(i.type)} · {date(i.occurredAt)}</span><strong>{i.summary}</strong></button>)}{!recent.length && <p>{__pulseText("No recorded activity for this selection yet.")}</p>}{company && <small>{__pulseText("Company activity uses the company saved on each conversation.")}</small>}{deal && <small>{__pulseText("Only interactions directly linked to this opportunity appear here.")}</small>}</div>
+              </div>
               {person && (
                 <>
                   <p>
@@ -632,7 +640,7 @@ export function Orbit() {
                   <button
                     className="button primary"
                     onClick={() =>
-                      setEditor({ kind: "opportunity", record: deal })
+                      setBriefId(deal.id)
                     }
                   >
                     {__pulseText("Open Opportunity")}</button>
@@ -686,7 +694,7 @@ export function Orbit() {
                 <button
                   key={o.id}
                   className="orbit-related"
-                  onClick={() => setEditor({ kind: "opportunity", record: o })}
+                  onClick={() => setBriefId(o.id)}
                 >
                   {o.title} · {o.status}
                 </button>
@@ -703,6 +711,7 @@ export function Orbit() {
           )}
         </aside>
       </div>
+      {briefId && <OpportunityBrief id={briefId} onClose={() => setBriefId(null)} onEdit={(next) => {setBriefId(null); setEditor(next);}} />}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}
