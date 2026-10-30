@@ -109,6 +109,7 @@ export function TaskRow({
               </Badge>
               <span>{t.priority} {" " + __pulseText("priority")}</span>
             </div>
+            {t.description && <p className="agenda-task-excerpt">{t.description.length > 160 ? `${t.description.slice(0,160)}…` : t.description}</p>}
             {restrictions.length > 0 && (
               <p className="restriction-note">
                 {__pulseText("Outreach restricted. Completing this task does not override availability or permissions.")}</p>

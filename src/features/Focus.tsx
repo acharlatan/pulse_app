@@ -1,6 +1,7 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { ArrowUpRight, Plus, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { calendarDay } from "../services/progress";
@@ -8,7 +9,7 @@ import { setFocus } from "../data/expansion-repository";
 import { completeTask } from "../data/repository";
 import { Avatar, Badge, Empty, useFormat } from "../components/ui";
 import { EditorModal, type Editor } from "../components/forms";
-import { taskState } from "../services/recommendations";
+import { lastInteraction, restrictionReasons, taskState } from "../services/recommendations";
 import { ProgressSummary } from "../components/progress";
 import type { FocusItem } from "../data/expansion-models";
 export function Focus({ embedded = false }: { embedded?: boolean }) {
@@ -18,6 +19,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
     day = calendarDay(Date.now(), p.settings.timezone);
   const { date, money } = useFormat();
   const [editor, setEditor] = useState<Editor | null>(null);
+  const picker = useRef<HTMLDetailsElement>(null);
   const [type, setType] = useState<FocusItem["entityType"]>("contact"),
     [id, setId] = useState(""),
     [search, setSearch] = useState("");
@@ -69,7 +71,8 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                 p.tasks.some((t) => t.id === f.recordId && t.completedAt),
             ).length
           }{" "}
-          {__pulseText("completed follow-ups in today’s selections. Choose a manageable next step; there is no automatic prioritization.")}</p>
+          {__pulseText("completed follow-ups in today’s selections. You choose what belongs here.")}</p>
+        <button className="button focus-brief-button" onClick={() => { if (picker.current) { picker.current.open = true; picker.current.scrollIntoView({block:"center", behavior:p.settings.reducedMotion ? "auto" : "smooth"}); } }}><Plus size={16}/>{__pulseText("Add a priority")}</button>
       </div>
       {p.workspace === "demo" &&
         p.focusItems.length === 0 &&
@@ -161,7 +164,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
               {__pulseText("Add example priorities")}</button>
           </aside>
         )}
-      <details className="surface focus-picker">
+      <details ref={picker} className="surface focus-picker">
         <summary>{__pulseText("Add a priority")}</summary>
         <div className="form-grid">
           <label className="field">
@@ -262,7 +265,8 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
             className={`surface focus-collection ${section === "Today" ? "focus-today" : ""}`}
             key={section}
           >
-            <h2>{section}</h2>
+            <div className="focus-collection-heading"><div><p className="eyebrow">{section === "Today" ? __pulseText("YOUR CHOSEN WORK") : __pulseText("SAVED FOR LATER")}</p><h2>{__pulseText(section)}</h2></div><span>{items.length}</span></div>
+            {section === "Today" && <p className="focus-collection-description">{__pulseText("Your selected priorities for today. Pinned records stay saved until you remove them.")}</p>}
             {!items.length && (
               <Empty
                 title={__pulseText("Give today a little direction.")}
@@ -301,6 +305,8 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                               ?.name || __pulseText("Stage")}{" "}
                             · {o.status}
                           </Badge>
+                          {p.organizations.find((org) => org.id === o.organizationId)?.name && <span>{p.organizations.find((org) => org.id === o.organizationId)?.name}</span>}
+                          {p.intelligence.opportunities.find((i) => i.opportunityId === o.id)?.flags.length ? <span className="focus-context-evidence">{p.intelligence.opportunities.find((i) => i.opportunityId === o.id)?.reason}</span> : null}
                         </p>
                       );
                     })()}
@@ -317,11 +323,14 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                             }
                           >
                             {__pulseText("Edit task")}</button>
+                          <span className="focus-context-evidence">{[p.contacts.find((c) => c.id === t.contactId)?.name, p.organizations.find((org) => org.id === t.organizationId)?.name].filter(Boolean).join(" · ") || __pulseText("No person or company linked")}{t.description ? ` · ${t.description.length > 110 ? `${t.description.slice(0,110)}…` : t.description}` : ""}</span>
                         </p>
                       );
                     })()}
+                  {f.entityType === "contact" && (() => { const c = p.contacts.find((item) => item.id === f.recordId)!; const last = lastInteraction(c.id, p.interactions); const org = p.organizations.find((item) => item.id === c.organizationId); const restricted = restrictionReasons(c,p.permissions,p.restrictions).length > 0; return <p className="focus-context-evidence">{[c.role, org?.name].filter(Boolean).join(" · ")}{(c.role || org) ? " · " : ""}{last ? `${__pulseText("Last conversation")} ${date(last)}` : __pulseText("No conversation recorded")}{restricted ? ` · ${__pulseText("Outreach restricted")}` : ""}</p>; })()}
+                  {f.entityType === "organization" && (() => { const count = p.contacts.filter((c) => c.organizationId === f.recordId).length; return <p className="focus-context-evidence">{count} {__pulseText("saved people at this company")}</p>; })()}
                   <p className="muted">
-                    {f.entityType} {" " + __pulseText("· Personally pinned")}{" "}
+                    {__pulseText(f.entityType === "contact" ? "Person" : f.entityType === "organization" ? "Company" : f.entityType === "task" ? "Follow-up" : "Opportunity")} {" " + __pulseText("· Personally pinned")}{" "}
                     {f.today === day
                       ? __pulseText("· Selected today")
                       : f.today
@@ -347,6 +356,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                   )}
                 </div>
                 <div className="form-actions">
+                  {f.entityType === "opportunity" && <button className="button secondary" onClick={() => setEditor({kind:"opportunity",record:p.opportunities.find((o)=>o.id===f.recordId)})}>{__pulseText("Review opportunity")} <ArrowUpRight size={15}/></button>}
                   <button
                     className="button ghost"
                     onClick={() =>
@@ -389,6 +399,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                         {__pulseText("Complete task")}</button>
                     )}
                 </div>
+                {f.today === day && <details className="focus-move-date"><summary><Sparkles size={14}/>{__pulseText("Choose another day")}</summary><form onSubmit={(e) => {e.preventDefault(); const chosen = String(new FormData(e.currentTarget).get("focusDate") || ""); if (chosen) void p.run(() => setFocus(p.db, f.entityType, f.recordId, "today", chosen), "Focus updated");}}><label><span>{__pulseText("Focus date")}</span><input name="focusDate" type="date" min={day} required/></label><button className="button secondary">{__pulseText("Save date")}</button></form><small>{__pulseText("This changes your focus date, not the follow-up due date.")}</small></details>}
               </article>
             ))}
           </section>
