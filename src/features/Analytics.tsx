@@ -1,14 +1,12 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { AnalyticsBrief } from "./AnalyticsBrief";
+import { ConversationVisual, OverviewSignals, RelationshipVisual, PipelineVisual, CommitmentVisual } from "./AnalyticsVisual";
 import { setFocus } from "../data/expansion-repository";
 import { upcomingCommitments } from "../services/weekly-review";
 import { useFormat } from "../components/ui";
 import { ContextTip } from "../components/context-tip";
-import {
-  analyticsDisplayTrend,
-  inAnalyticsBucket,
-} from "../services/analytics-guidance";
+import { inAnalyticsBucket } from "../services/analytics-guidance";
 import { useMemo, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
@@ -403,11 +401,9 @@ export function Analytics() {
         </div>
       </section>
       <nav className="analytics-room-nav" aria-label={__pulseText("Analytics sections")}>
-        {([ ["Overview", "The big picture", "Summary and direction"], ["Relationships", "Relationships", "Conversations and people"], ["Opportunities", "Opportunities", "Pipeline and movement"], ["Productivity", "Workspace health", "Follow-ups and data quality"] ] as const).map(([target, title, description], i) => <button key={target} aria-pressed={target === "Productivity" ? section === "Productivity" || section === "Data quality" : section === target} onClick={() => {setSection(target); setSelectedDay(""); setSelectedStage("");}}><span>0{i+1}</span><strong>{__pulseText(title)}</strong><small>{__pulseText(description)}</small></button>)}
+        {([ ["Overview", "Overview", "The big picture"], ["Relationships", "Relationships", "People and conversations"], ["Opportunities", "Opportunities", "Pipeline and movement"], ["Productivity", "Commitments", "Follow-ups and data quality"] ] as const).map(([target, title, description], i) => <button key={target} aria-pressed={target === "Productivity" ? section === "Productivity" || section === "Data quality" : section === target} onClick={() => {setSection(target); setSelectedDay(""); setSelectedStage("");}}><span>0{i+1}</span><strong>{__pulseText(title)}</strong><small>{__pulseText(description)}</small></button>)}
       </nav>
       {(section === "Productivity" || section === "Data quality") && <nav className="analytics-health-nav" aria-label={__pulseText("Workspace health views")}><button aria-pressed={section === "Productivity"} onClick={() => setSection("Productivity")}>{__pulseText("Follow-ups")}</button><button aria-pressed={section === "Data quality"} onClick={() => setSection("Data quality")}>{__pulseText("Data quality")}</button></nav>}
-      <ContextTip title="Read the story behind the numbers">Choose a section to explore relationships, opportunities, productivity or missing context. Date filters describe recorded activity; current-state counts are labeled separately.</ContextTip>
-      {section !== "Overview" && <div className="analytics-section-intro" key={section}><p className="eyebrow">{__pulseText("YOUR WORK THROUGH A DIFFERENT LENS")}</p><h2>{__pulseText(section === "Relationships" ? "See who is part of your story." : section === "Opportunities" ? "Follow the possibilities in motion." : section === "Productivity" ? "Make room for meaningful progress." : "Give your records more context.")}</h2><p>{__pulseText(section === "Relationships" ? "Explore recorded conversations and the relationships behind them." : section === "Opportunities" ? "Explore saved values, stages, and actual movement." : section === "Productivity" ? "Review follow-ups and activity you have recorded." : "Find missing details that can make your workspace more useful.")}</p></div>}
       {result.error && (
         <p role="alert" className="form-error">
           {__pulseText(result.error)}
@@ -415,10 +411,11 @@ export function Analytics() {
       )}
       {report && (
         <>
-          <p className="muted">
-            {report.range.start} {" " + __pulseText("through") + " "}{report.range.end} {" " + __pulseText("· current-state figures are labeled below.")}</p>
+
           {section === "Overview" && (
             <>
+              <ConversationVisual report={report} selected={selectedDay} overview onSelect={(bucket) => { setSelectedDay(bucket); setSection("Relationships"); requestAnimationFrame(() => { const records = document.getElementById("conversation-records"); records?.scrollIntoView({block:"start",behavior:"instant"}); records?.focus({preventScroll:true}); }); }} />
+              <OverviewSignals report={report} onSection={(next) => {setSelectedDay(""); setSelectedStage(""); setSection(next);}} />
               <AnalyticsBrief
                 report={report}
                 onEdit={setEditor}
@@ -476,90 +473,12 @@ export function Analytics() {
 
             </>
           )}
-          {(section === "Overview" || section === "Relationships") && (
-            <section className="surface analytics-chart">
-              <h2>{__pulseText("Recorded conversations over time")}</h2>
-              <p className="muted">
-                {__pulseText("Select a bar to inspect its underlying conversations.")}{" "}
-                {report.range.days > 90
-                  ? __pulseText("Grouped by month.")
-                  : section === "Overview" && report.range.days > 14
-                    ? __pulseText("Seven-day groups starting at the report’s first date. Select one to inspect its exact records.")
-                    : __pulseText("Grouped by workspace calendar day.")}
-              </p>
-              {report.interactions.length ? (
-                <div
-                  className="analytics-bars"
-                  role="group"
-                  aria-label={__pulseText("Conversation activity by date")}
-                >
-                  {analyticsDisplayTrend(
-                    report,
-                    section === "Overview",
-                    p.settings.timezone,
-                  ).map(([d, n]) => (
-                    <button
-                      key={d}
-                      className="analytics-bar"
-                      aria-pressed={selectedDay === d}
-                      title={__pulseText("{0} conversations · {1}", n, d.replace("..", " through "))}
-                      onClick={() => {
-                        setSelectedDay(selectedDay === d ? "" : d);
-                        setSection("Relationships");
-                      }}
-                    >
-                      <span
-                        className="analytics-bar-fill"
-                        style={{
-                          height: `${n ? Math.max(8, (n / Math.max(1, ...analyticsDisplayTrend(report, section === "Overview", p.settings.timezone).map((x) => x[1]))) * 110) : 0}px`,
-                        }}
-                      />
-                      <strong>{n}</strong>
-                      <small>
-                        {d.includes("..")
-                          ? `${d.slice(5, 10)} – ${d.slice(17)}`
-                          : d.length === 10
-                            ? d.slice(5)
-                            : d}
-                      </small>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <p>
-                  {__pulseText("No meaningful conversations in this range.")}{" "}
-                  <Link to="/network">{__pulseText("Open Network")}</Link> {" " + __pulseText("to log one.")}</p>
-              )}
-            </section>
-          )}
+          {section === "Relationships" && <ConversationVisual report={report} selected={selectedDay} onSelect={(bucket) => setSelectedDay(selectedDay === bucket ? "" : bucket)} />}
           {section === "Relationships" && (
             <>
-              <section className="surface">
-                <h2>{__pulseText("Relationship status now")}</h2>
-                <p className="muted">
-                  {__pulseText("Uses your existing relationship review rules; this is recorded activity, not a measure of sentiment.")}</p>
-                <div className="analytics-metrics">
-                  {[
-                    "Active",
-                    "Needs attention",
-                    "Cooling",
-                    "Dormant",
-                    "Paused",
-                    "Restricted",
-                    "Not enough history",
-                  ].map((h) => (
-                    <div key={h}>
-                      <strong>
-                        {report.health.filter((r) => r.health === h).length}
-                      </strong>
-                      <p>{__pulseText(h)}</p>
-                    </div>
-                  ))}
-                </div>
-                <Link to="/review">{__pulseText("Open relationship review")}</Link>
-              </section>
-              <section className="surface">
-                <h2>
+              <RelationshipVisual report={report} />
+              <section className="surface pulse-records-section">
+                <h2 id="conversation-records" tabIndex={-1}>
                   {selectedDay
                     ? `Conversations · ${selectedDay.replace("..", " through ")}`
                     : __pulseText("Conversations in this period")}
@@ -597,7 +516,7 @@ export function Analytics() {
                           __pulseText("Unlinked")
                         )}{" "}
                         · {i.type} ·{" "}
-                        {calendarDay(i.occurredAt, p.settings.timezone)}
+                        {calendarDay(i.occurredAt, p.settings.timezone)} {" "}<button className="text-link" onClick={() => setEditor({kind:"interaction",record:i})}>{__pulseText("Open conversation")}</button>
                       </li>
                     ))}
                 </ul>
@@ -618,6 +537,8 @@ export function Analytics() {
           )}
           {section === "Opportunities" && (
             <>
+              <PipelineVisual report={report} selected={selectedStage} onSelect={setSelectedStage} onEdit={setEditor} />
+              <details className="analytics-detailed-report"><summary>{__pulseText("Detailed stages, values and outcomes")}</summary>
               <section className="surface">
                 <h2>{__pulseText("Current pipeline snapshot")}</h2>
                 <p>
@@ -724,6 +645,7 @@ export function Analytics() {
                     </div>
                   ))}
               </section>
+              </details>
               <section className="surface">
                 <h2>{__pulseText("Recorded stage movements")}</h2>
                 <p className="muted">
@@ -782,6 +704,7 @@ export function Analytics() {
                 <h2>{__pulseText("Opportunities to review")}</h2>
                 <p className="muted">
                   {__pulseText("Based on the same evidence and thresholds used in Relationship Review.")}</p>
+                {!p.intelligence.opportunities.some((i) => i.flags.length && report.opportunities.some((o) => o.id === i.opportunityId)) && <p>{__pulseText("No matching opportunity reviews in this scope.")}</p>}
                 {p.intelligence.opportunities
                   .filter(
                     (i) =>
@@ -815,6 +738,7 @@ export function Analytics() {
               </section>
               <section className="surface">
                 <h2>{__pulseText("Opportunity records")}</h2>
+                {!report.opportunities.length && <p>{__pulseText("No saved opportunities match these filters.")}</p>}
                 {report.opportunities
                   .filter((o) => !selectedStage || o.stageId === selectedStage)
                   .slice(0, 100)
@@ -836,74 +760,10 @@ export function Analytics() {
           )}
           {section === "Productivity" && (
             <>
+              <CommitmentVisual report={report} selected={selectedDay} onSelect={(bucket) => setSelectedDay(selectedDay === bucket ? "" : bucket)} onEdit={setEditor} />
               <section className="surface">
-                <h2>{__pulseText("Follow-ups")}</h2>
-                <p>
-                  {report.completed.length} {" " + __pulseText("completed in period ·")}{" "}
-                  {report.due.length} {" " + __pulseText("due in period ·") + " "}{report.open.length}{" "}
-                  {__pulseText("currently open ·") + " "}{report.overdue.length} {" " + __pulseText("currently overdue.")}</p>
-                <p className="muted">
-                  {__pulseText("Due date and completion date are separate cohorts. Historic on-time rates are unavailable because previous due-date changes are not recorded.")}</p>
-                <Link
-                  className="button secondary"
-                  to="/activity?filter=overdue"
-                >
-                  {__pulseText("Review overdue follow-ups")}</Link>
-                <Link className="button ghost" to="/focus">
-                  {__pulseText("Open My Focus")}</Link>
-              </section>
-              <section className="surface">
-                <h2>{__pulseText("Completion trend")}</h2>
-                <p className="muted">
-                  {__pulseText("Select a date to inspect completed follow-ups.")}{" "}
-                  {report.range.days > 90
-                    ? __pulseText("Grouped by month.")
-                    : __pulseText("Grouped by workspace calendar day.")}
-                </p>
-                <div
-                  className="analytics-bars"
-                  role="group"
-                  aria-label={__pulseText("Completed follow-ups over time")}
-                >
-                  {Array.from(
-                    report.completed.reduce((m, t) => {
-                      const d = calendarDay(
-                          t.completedAt!,
-                          p.settings.timezone,
-                        ),
-                        bucket = report.range.days > 90 ? d.slice(0, 7) : d;
-                      m.set(bucket, (m.get(bucket) || 0) + 1);
-                      return m;
-                    }, new Map<string, number>()),
-                  )
-                    .sort(([a], [b]) => a.localeCompare(b))
-                    .map(([d, n]) => (
-                      <button
-                        key={d}
-                        className="analytics-bar"
-                        aria-label={__pulseText("{0}: {1} completed follow-ups", d, n)}
-                        aria-pressed={selectedDay === d}
-                        onClick={() =>
-                          setSelectedDay(selectedDay === d ? "" : d)
-                        }
-                      >
-                        <span
-                          className="analytics-bar-fill"
-                          style={{
-                            height: `${Math.max(8, (n / Math.max(1, report.completed.length)) * 110)}px`,
-                          }}
-                        />
-                        <strong>{n}</strong>
-                        <small>{d}</small>
-                      </button>
-                    ))}
-                </div>
-                {!report.completed.length && (
-                  <p>{__pulseText("No completion trend recorded for this period.")}</p>
-                )}
-              </section>
-              <section className="surface">
-                <h2>{__pulseText("Completed in this period")}</h2>
+                <h2>{selectedDay ? `${__pulseText("Completed follow-ups")} · ${selectedDay.replace("..", " through ")}` : __pulseText("Completed in this period")}</h2>
+                {selectedDay && <button className="button ghost" onClick={() => setSelectedDay("")}>{__pulseText("Clear date selection")}</button>}
                 {report.completed
                   .filter((t) =>
                     inAnalyticsBucket(
@@ -915,7 +775,7 @@ export function Analytics() {
                   .slice(0, 100)
                   .map((t) => (
                     <p key={t.id}>
-                      {t.title} ·{" "}
+                      <button className="text-link" onClick={() => setEditor({kind:"task",record:t})}>{t.title}</button> ·{" "}
                       {calendarDay(t.completedAt!, p.settings.timezone)}{" "}
                       {t.contactId && (
                         <Link to={`/network/people/${t.contactId}`}>
@@ -923,8 +783,8 @@ export function Analytics() {
                       )}
                     </p>
                   ))}
-                {!report.completed.length && (
-                  <p>{__pulseText("No completed follow-ups in this period.")}</p>
+                {!report.completed.some((task) => inAnalyticsBucket(task.completedAt!, selectedDay, p.settings.timezone)) && (
+                  <p>{__pulseText("No completed follow-ups for this selection.")}</p>
                 )}
               </section>
             </>
@@ -1001,6 +861,7 @@ export function Analytics() {
           )}
         </>
       )}
+      <ContextTip title="Read the story behind the numbers">Choose a section to explore relationships, opportunities, productivity or missing context. Date filters describe recorded activity; current-state counts are labeled separately.</ContextTip>
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}

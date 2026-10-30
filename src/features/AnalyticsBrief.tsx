@@ -34,7 +34,6 @@ export function AnalyticsBrief({ report, onEdit, onSection, onCompany }: {
   const [companyLimit, setCompanyLimit] = useState(4);
   const active = lanes.find((l) => l.id === choice) || lanes.find((l) => l.rows.length) || lanes[0];
   const events = analyticsStory(report);
-  const change = report.interactions.length - report.previousInteractions.length;
   function open(t: FocusTarget) {
     if (t.type === "task") { const record = p.tasks.find((r) => r.id === t.id); if (record) onEdit({ kind: "task", record }); }
     else if (t.type === "opportunity") { if (p.opportunities.some((r) => r.id === t.id)) setBriefId(t.id); }
@@ -52,14 +51,6 @@ export function AnalyticsBrief({ report, onEdit, onSection, onCompany }: {
   return (
     <>
       <section className="analytics-brief insight-editorial" aria-label={text("Focus briefing")}>
-        <div className="insight-issue-head">
-          <div className="insight-issue-copy"><p className="eyebrow">{text("YOUR RELATIONSHIP PICTURE")}</p><h2>{text("A little clarity for your next move.")}</h2><p>{text("Your saved activity, the work in motion, and a thoughtful place to begin.")}</p><span className="insight-period">{text("SELECTED PERIOD")} · {report.range.start} — {report.range.end}</span></div>
-          <div className="insight-issue-stats" aria-label={text("Selected-period activity")}>
-            <button onClick={() => onSection("Relationships")}><strong>{report.interactions.length}</strong><span>{text("recorded conversations")}</span><small>{change >= 0 ? "+" : ""}{change} {text("compared with the previous period")}</small></button>
-            <button onClick={() => onSection("Productivity")}><strong>{report.completed.length}</strong><span>{text("follow-ups completed")}</span><small>{text("By saved completion date")}</small></button>
-            <button onClick={() => onSection("Opportunities")}><strong>{report.transitions.length}</strong><span>{text("recorded opportunity updates")}</span><small>{text("Recorded movements only")}</small></button>
-          </div>
-        </div>
         <div className="insight-spread">
           <section className="insight-priorities" aria-labelledby="insight-priority-title">
             <div className="insight-section-title"><div><p className="eyebrow">{text("A PLACE TO BEGIN · CURRENT")}</p><h3 id="insight-priority-title">{text("Where should your focus go?")}</h3><p>{text("Select a lane to see the saved evidence behind it.")}</p></div><Target aria-hidden="true" size={28}/></div>
