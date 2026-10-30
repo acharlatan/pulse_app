@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUpRight, ArrowRight, BarChart3, CircleDot, Sparkles } from "lucide-react";
+import { ArrowUpRight, ArrowRight, BarChart3, CircleDot } from "lucide-react";
 import { Link } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { Avatar, useFormat } from "../components/ui";
@@ -20,7 +20,7 @@ function TimeChart({ data, selected, onSelect, label }: { data: [string, number]
   const text = useInterfaceText();
   const max = Math.max(1, ...data.map(([, count]) => count));
   return <div className="pulse-chart-scroll"><div className="pulse-time-chart" role="group" aria-label={label}>
-    {data.map(([key, count]) => <button key={key} className="pulse-time-bar" aria-pressed={selected === key} aria-label={text("{0}: {1}", key.replace("..", " through "), count)} onClick={() => onSelect(key)}>
+    {data.map(([key, count]) => <button key={key} className="pulse-time-bar" aria-pressed={selected === key} aria-label={text("{0}: {1}", key.replace("..", ` ${text("through")} `), count)} onClick={() => onSelect(key)}>
       <strong>{count}</strong><span className="pulse-time-rail"><span style={{height:`${count ? Math.max(7, count / max * 100) : 0}%`}} /></span><small>{bucketLabel(key)}</small>
     </button>)}
   </div></div>;
@@ -52,8 +52,12 @@ export function RelationshipVisual({ report }: {report:AnalyticsReport}) {
   const [health, setHealth]=useState<string>(""); const [limit,setLimit]=useState(8);
   const counts=healthStates.map(name=>({name,count:report.health.filter(item=>item.health===name).length}));
   const rows=report.health.filter(item=>item.health===health).map(item=>p.contacts.find(person=>person.id===item.contactId)).filter(item=>!!item);
+  const colors=["#9076bd","#de8da9","#6e9a83","#bd865f","#8284c4","#ad667d","#88899a"];
+  let progress=0;
+  const segments=counts.map(({count},index)=>{const start=progress;progress+=report.health.length?count/report.health.length*100:0;return `${colors[index]} ${start}% ${progress}%`;});
+  const distribution=report.health.length?`conic-gradient(${segments.join(",")})`:"#d5c9dd";
   return <section className="pulse-relationship-visual" aria-label={text("Relationship status now")}><div className="pulse-section-heading"><div><p className="eyebrow">{text("RELATIONSHIPS · CURRENT SNAPSHOT")}</p><h2>{text("Your network, in context.")}</h2><p>{text("Based on your existing review rules and recorded activity, not sentiment. Select a category to see the people behind it.")}</p></div><Link to="/review">{text("Open relationship review")} <ArrowUpRight size={16}/></Link></div>
-    <div className="pulse-health-layout"><div className="pulse-health-total"><strong>{report.health.length}</strong><span>{text("people with a current review status")}</span><Sparkles aria-hidden="true" size={38}/></div><div className="pulse-health-list">{counts.map(({name,count},index)=><button key={name} aria-pressed={health===name} onClick={()=>{setHealth(health===name?"":name);setLimit(8);}}><span>{text(name)}</span><i><b className={`tone-${index}`} style={{width:`${report.health.length ? count/report.health.length*100 : 0}%`}}/></i><strong>{count}</strong></button>)}</div></div>
+    <div className="pulse-health-layout"><div className="pulse-health-total"><div className="pulse-health-ring" style={{background:distribution}}><div><strong>{report.health.length}</strong><span>{text("people with a current review status")}</span></div></div><p>{text("A snapshot of recorded review statuses, not a measure of relationship quality.")}</p></div><div className="pulse-health-list">{counts.map(({name,count},index)=><button key={name} aria-pressed={health===name} onClick={()=>{setHealth(health===name?"":name);setLimit(8);}}><span className="pulse-health-label"><i aria-hidden="true" style={{background:colors[index]}}/>{text(name)}</span><span className="pulse-health-track" aria-hidden="true"><b className={`tone-${index}`} style={{width:`${report.health.length ? count/report.health.length*100 : 0}%`}}/></span><strong>{count}</strong><small>{report.health.length?Math.round(count/report.health.length*100):0}%</small></button>)}</div></div>
     {health && <div className="pulse-health-records"><div><strong>{text(health)} · {rows.length}</strong><button className="button ghost" onClick={()=>setHealth("")}>{text("Clear selection")}</button></div>{rows.slice(0,limit).map(item=><Link key={item.id} to={`/network/people/${encodeURIComponent(item.id)}`}><Avatar name={item.name} mediaId={item.avatar}/><span>{item.name}</span><ArrowUpRight size={16}/></Link>)}{rows.length>limit && <button className="button secondary" onClick={()=>setLimit(limit+8)}>{text("Show more people")}</button>}{!rows.length&&<p>{text("No people in this category.")}</p>}</div>}
   </section>;
 }

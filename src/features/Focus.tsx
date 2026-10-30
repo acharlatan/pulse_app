@@ -15,6 +15,7 @@ import type { FocusItem } from "../data/expansion-models";
 import { OpportunityBrief } from "./OpportunityBrief";
 import { focusHorizon } from "../services/focus-horizon";
 import { ContextTip } from "../components/context-tip";
+import { FocusWorkbench } from "./FocusWorkbench";
 export function Focus({ embedded = false }: { embedded?: boolean }) {
   const __pulseText = useInterfaceText();
   const t = useTranslation();
@@ -28,7 +29,9 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
   const picker = useRef<HTMLDetailsElement>(null);
   const [type, setType] = useState<FocusItem["entityType"]>("contact"),
     [id, setId] = useState(""),
-    [search, setSearch] = useState("");
+    [search, setSearch] = useState(""),
+    [focusSearch, setFocusSearch] = useState(""),
+    [focusType, setFocusType] = useState("all");
   const records =
     type === "contact"
       ? p.contacts
@@ -57,6 +60,10 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
   const completedCount = p.focusItems.filter((f) => f.entityType === "task" && !!p.tasks.find((task) => task.id === f.recordId)?.completedAt).length;
   const [board, setBoard] = useState<"today" | "ahead" | "saved" | "completed">(() => requestedView === "today" || requestedView === "ahead" || requestedView === "saved" || requestedView === "completed" ? requestedView : horizon.today.length ? "today" : horizon.later.length ? "saved" : horizon.ahead.length ? "ahead" : completedCount ? "completed" : "today");
   const focusReturn = `/focus?view=${board}`;
+  const boardItems = board === "today" ? horizon.today : board === "ahead" ? horizon.ahead : board === "saved" ? horizon.later : p.focusItems.filter(f => f.entityType === "task" && !!p.tasks.find(task => task.id === f.recordId)?.completedAt);
+  const matchesFocus = (item: FocusItem) => (focusType === "all" || item.entityType === focusType) && (!focusSearch.trim() || name(label(item) || {}).toLowerCase().includes(focusSearch.trim().toLowerCase()));
+  const matchingCount = boardItems.filter(matchesFocus).length;
+
   const identity = (f: FocusItem) => {
     if (f.entityType === "contact") return p.contacts.find((item) => item.id === f.recordId);
     if (f.entityType === "organization") return p.organizations.find((item) => item.id === f.recordId);
@@ -187,10 +194,13 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
               {__pulseText("Add example priorities")}</button>
           </aside>
         )}
+      <FocusWorkbench today={horizon.today} focusReturn={focusReturn} onAdd={openPicker} onEdit={setEditor} onOpportunity={setBriefId} />
       <div id="focus-board" className="focus-board-heading"><div><p className="eyebrow">{__pulseText("YOUR PRIORITIES, YOUR PACE")}</p><h2>{__pulseText("A little more room to move.")}</h2><p>{__pulseText("Choose where to spend your attention. Your saved records stay yours to manage.")}</p></div><Link className="button secondary" to="/analytics" state={{focusReturn}}>{__pulseText("Explore Analytics")} <ArrowUpRight size={16}/></Link></div>
       <nav className="focus-board-tabs" aria-label={__pulseText("Focus views")}>
         {([["today","Today",horizon.today.length],["ahead","Planned ahead",horizon.ahead.length],["saved","Saved for later",horizon.later.length],["completed","Recently completed",completedCount]] as const).map(([view,label,count]) => <button key={view} aria-pressed={board === view} onClick={() => changeBoard(view)}><span>{__pulseText(label)}</span><strong>{count}</strong></button>)}
       </nav>
+      {activeItems.length + completedCount > 0 && <div className="focus-board-controls"><label><span>{__pulseText("Search priorities")}</span><input value={focusSearch} placeholder={__pulseText("Find a saved priority")} onChange={e=>setFocusSearch(e.target.value)}/></label><label><span>{__pulseText("Show")}</span><select value={focusType} onChange={e=>setFocusType(e.target.value)}><option value="all">{__pulseText("All types")}</option><option value="contact">{__pulseText("People")}</option><option value="organization">{__pulseText("Companies")}</option><option value="opportunity">{__pulseText("Opportunities")}</option><option value="task">{__pulseText("Follow-ups")}</option></select></label>{(focusSearch || focusType !== "all") && <button className="button ghost" onClick={()=>{setFocusSearch("");setFocusType("all");}}>{__pulseText("Clear filters")}</button>}<small>{__pulseText("{0} matching priorities",matchingCount)}</small></div>}
+      {board !== "today" && boardItems.length > 0 && matchingCount === 0 && <div className="focus-filter-empty"><p>{__pulseText("No priorities match these filters.")}</p><button className="button secondary" onClick={()=>{setFocusSearch("");setFocusType("all");}}>{__pulseText("Clear filters")}</button></div>}
       {board !== "today" && (board === "ahead" ? horizon.ahead.length === 0 : board === "saved" ? horizon.later.length === 0 : completedCount === 0) && <section className="focus-board-empty"><Empty title={__pulseText(board === "ahead" ? "Nothing planned ahead yet" : board === "saved" ? "Nothing saved for later yet" : "No completed priorities yet")} body={__pulseText(board === "ahead" ? "Choose a date for a saved priority to see it here." : board === "saved" ? "Pin a person, company, opportunity or follow-up to keep it close." : "Completed follow-ups you pinned will appear here.")} action={board !== "completed" ? <button className="button secondary" onClick={openPicker}>{__pulseText("Add a priority")}</button> : undefined}/></section>}
       {(
         [
@@ -206,7 +216,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
         if (!visible) return null;
         const items = p.focusItems.filter((f) => {
           const r = label(f);
-          if (!r) return false;
+          if (!r || !matchesFocus(f)) return false;
           const done =
             f.entityType === "task" &&
             p.tasks.find((t) => t.id === f.recordId)?.completedAt;
@@ -235,9 +245,9 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
             {section === "Today" && <p className="focus-collection-description">{__pulseText("Your selected priorities for today. Pinned records stay saved until you remove them.")}</p>}
             {!items.length && (
               <Empty
-                title={__pulseText("Give today a little direction.")}
-                body={__pulseText(hasRecords ? "Open Add a priority to choose a person, company, opportunity or follow-up. Find your other pins in Saved for later." : "Add a person or company to your workspace, then choose what belongs in your focus.")}
-                action={hasRecords ? <button className="button secondary" onClick={openPicker}>{__pulseText("Add a priority")}</button> : <Link className="button secondary" to="/network">{__pulseText("Open Network")}</Link>}
+                title={__pulseText(horizon.today.length ? "No priorities match these filters." : "Give today a little direction.")}
+                body={__pulseText(horizon.today.length ? "Try another search or clear your filters." : hasRecords ? "Open Add a priority to choose a person, company, opportunity or follow-up. Find your other pins in Saved for later." : "Add a person or company to your workspace, then choose what belongs in your focus.")}
+                action={horizon.today.length ? <button className="button secondary" onClick={()=>{setFocusSearch("");setFocusType("all");}}>{__pulseText("Clear filters")}</button> : hasRecords ? <button className="button secondary" onClick={openPicker}>{__pulseText("Add a priority")}</button> : <Link className="button secondary" to="/network">{__pulseText("Open Network")}</Link>}
               />
             )}
             {items.slice(0, 100).map((f) => {
@@ -265,7 +275,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                           <Badge tone="purple">
                             {p.pipelineStages.find((s) => s.id === o.stageId)
                               ?.name || __pulseText("Stage")}{" "}
-                            · {o.status}
+                            · {__pulseText(o.status)}
                           </Badge>
                           {p.intelligence.opportunities.find((i) => i.opportunityId === o.id)?.flags.length ? <span className="focus-context-evidence">{p.intelligence.opportunities.find((i) => i.opportunityId === o.id)?.reason}</span> : null}
                         </p>
@@ -290,7 +300,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
                     {f.today === day
                       ? __pulseText("· Selected today")
                       : f.today
-                        ? `· Selected ${f.today}`
+                        ? `· ${__pulseText("Selected")} ${f.today}`
                         : ""}
                   </p>
                   {f.entityType === "contact" ||

@@ -1,6 +1,7 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { AnalyticsBrief } from "./AnalyticsBrief";
+import { RelationshipInsights } from "./RelationshipInsights";
 import { ConversationVisual, OverviewSignals, RelationshipVisual, PipelineVisual, CommitmentVisual } from "./AnalyticsVisual";
 import { setFocus } from "../data/expansion-repository";
 import { upcomingCommitments } from "../services/weekly-review";
@@ -476,11 +477,12 @@ export function Analytics() {
           {section === "Relationships" && <ConversationVisual report={report} selected={selectedDay} onSelect={(bucket) => setSelectedDay(selectedDay === bucket ? "" : bucket)} />}
           {section === "Relationships" && (
             <>
+              <RelationshipInsights report={report} bucket={selectedDay} onEdit={setEditor} />
               <RelationshipVisual report={report} />
               <section className="surface pulse-records-section">
                 <h2 id="conversation-records" tabIndex={-1}>
                   {selectedDay
-                    ? `Conversations · ${selectedDay.replace("..", " through ")}`
+                    ? `${__pulseText("Conversations")} · ${selectedDay.replace("..", ` ${__pulseText("through")} `)}`
                     : __pulseText("Conversations in this period")}
                 </h2>
                 {selectedDay && (
@@ -515,7 +517,7 @@ export function Analytics() {
                         ) : (
                           __pulseText("Unlinked")
                         )}{" "}
-                        · {i.type} ·{" "}
+                        · {__pulseText(i.type)} ·{" "}
                         {calendarDay(i.occurredAt, p.settings.timezone)} {" "}<button className="text-link" onClick={() => setEditor({kind:"interaction",record:i})}>{__pulseText("Open conversation")}</button>
                       </li>
                     ))}

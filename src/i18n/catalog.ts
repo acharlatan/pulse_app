@@ -123,9 +123,6 @@ export type MessageKey = keyof typeof catalog;
 export const messageKeys = Object.keys(catalog) as MessageKey[];
 export const languageOptions = [
   ["en-US", "English"], ["es-ES", "Español"], ["fr-FR", "Français"],
-  ["pt-BR", "Português"], ["de-DE", "Deutsch"], ["it-IT", "Italiano"],
-  ["id-ID", "Bahasa Indonesia"], ["fil-PH", "Filipino"], ["ja-JP", "日本語"],
-  ["ko-KR", "한국어"], ["zh-CN", "中文（简体）"],
 ] as const;
 export function languageChoice(locale: string | null | undefined) {
   const prefix = (locale || "en-US").toLowerCase().split("-")[0];
