@@ -43,4 +43,11 @@ describe("workspace language catalogue", () => {
       }
     }
   });
+  it("bundles translated labels for the new Analytics and Orbit controls", () => {
+    for (const [locale] of languageOptions.filter(([locale]) => locale !== "en-US")) {
+      expect(translateInterface(locale, "Keep commitments")).not.toBe("Keep commitments");
+      expect(translateInterface(locale, "Back to previous selection")).not.toBe("Back to previous selection");
+      expect(translateInterface(locale, "Saved follow-up due {0}. Review the date, scope and any contact restrictions.", "2026-10-30")).toContain("2026-10-30");
+    }
+  });
 });

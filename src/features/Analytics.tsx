@@ -1,6 +1,5 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
-import { DecisionDesk } from "./DecisionDesk";
 import { AnalyticsBrief } from "./AnalyticsBrief";
 import { setFocus } from "../data/expansion-repository";
 import { upcomingCommitments } from "../services/weekly-review";
@@ -416,7 +415,6 @@ export function Analytics() {
             {report.range.start} {" " + __pulseText("through") + " "}{report.range.end} {" " + __pulseText("· current-state figures are labeled below.")}</p>
           {section === "Overview" && (
             <>
-              <DecisionDesk report={report} onSection={setSection} />
               <AnalyticsBrief
                 report={report}
                 onEdit={setEditor}
@@ -426,7 +424,7 @@ export function Analytics() {
                   setFiltersOpen(true);
                 }}
               />
-              <section
+              <details className="weekly-review-disclosure"><summary>{__pulseText("Review your week and upcoming commitments")}</summary><section
                 className="weekly-review"
                 aria-labelledby="weekly-review-title"
               >
@@ -470,48 +468,8 @@ export function Analytics() {
                   <Link className="button ghost" to="/focus">
                     {__pulseText("Plan your focus")}</Link>
                 </div>
-              </section>
-              <section className="analytics-period-pulse">
-                <div className="section-heading">
-                  <div>
-                    <p className="eyebrow">{__pulseText("WHAT HAPPENED · SELECTED PERIOD")}</p>
-                    <h2>{__pulseText("Your recorded rhythm.")}</h2>
-                  </div>
-                </div>
-                <div className="analytics-metrics">
-                  <button
-                    className="metric-card"
-                    onClick={() => setSection("Relationships")}
-                  >
-                    <strong>{report.interactions.length}</strong>
-                    <span>{__pulseText("Meaningful conversations")}</span>
-                    <small>
-                      {report.previousInteractions.length
-                        ? `${report.interactions.length - report.previousInteractions.length >= 0 ? "+" : ""}${report.interactions.length - report.previousInteractions.length} vs previous ${report.range.days} days`
-                        : __pulseText("No previous-period activity recorded")}
-                    </small>
-                  </button>
-                  <button
-                    className="metric-card"
-                    onClick={() => setSection("Productivity")}
-                  >
-                    <strong>{report.completed.length}</strong>
-                    <span>{__pulseText("Follow-ups completed")}</span>
-                    <small>{__pulseText("By saved completion date")}</small>
-                  </button>
-                  <button
-                    className="metric-card"
-                    onClick={() => setSection("Relationships")}
-                  >
-                    <strong>{report.previousInteractions.length}</strong>
-                    <span>{__pulseText("Previous-period conversations")}</span>
-                    <small>
-                      {report.range.previousStart} {" " + __pulseText("through")}{" "}
-                      {report.range.previousEnd}
-                    </small>
-                  </button>
-                </div>
-              </section>
+              </section></details>
+
             </>
           )}
           {(section === "Overview" || section === "Relationships") && (
@@ -590,7 +548,7 @@ export function Analytics() {
                       <strong>
                         {report.health.filter((r) => r.health === h).length}
                       </strong>
-                      <p>{h}</p>
+                      <p>{__pulseText(h)}</p>
                     </div>
                   ))}
                 </div>
@@ -982,7 +940,7 @@ export function Analytics() {
               ].map(([title, rows]) => (
                 <div key={title as string}>
                   <h3>
-                    {title as string} · {(rows as typeof p.contacts).length}
+                    {__pulseText(title as string)} · {(rows as typeof p.contacts).length}
                   </h3>
                   <ul>
                     {(rows as typeof p.contacts).slice(0, 20).map((c) => (

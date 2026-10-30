@@ -2,182 +2,99 @@ import { OpportunityBrief } from "./OpportunityBrief";
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight, Check, Target } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Check, Target, MessageCircle, CheckCircle2, MoveUpRight } from "lucide-react";
 import { usePulse } from "../app/context";
 import { Avatar, useFormat } from "../components/ui";
 import { FocusButton } from "../components/focus";
 import type { Editor } from "../components/forms";
 import type { AnalyticsReport } from "../services/analytics";
-import {
-  analyticsGuidance,
-  type FocusTarget,
-} from "../services/analytics-guidance";
-export function AnalyticsBrief({
-  report,
-  onEdit,
-  onSection,
-  onCompany,
-}: {
+import { analyticsGuidance, type FocusTarget } from "../services/analytics-guidance";
+import { analyticsStory, type AnalyticsStoryEvent } from "../services/analytics-story";
+import { calendarDay } from "../services/progress";
+
+export function AnalyticsBrief({ report, onEdit, onSection, onCompany }: {
   report: AnalyticsReport;
   onEdit: (e: Editor) => void;
   onCompany: (id: string) => void;
-  onSection: (
-    s: "Relationships" | "Opportunities" | "Productivity" | "Data quality",
-  ) => void;
+  onSection: (s: "Relationships" | "Opportunities" | "Productivity" | "Data quality") => void;
 }) {
-  const __pulseText = useInterfaceText();
-  const p = usePulse(),
-    { money } = useFormat();
-  const g = analyticsGuidance(
-    report,
-    p.intelligence.queue,
-    p.intelligence.opportunities,
-    p.settings.timezone,
-  );
+  const text = useInterfaceText();
+  const __pulseText = text;
+  const p = usePulse(), { money, date } = useFormat();
+  const g = analyticsGuidance(report, p.intelligence.queue, p.intelligence.opportunities, p.settings.timezone);
   const lanes = [
-    {
-      id: "commitments",
-      name: "Keep commitments",
-      rows: g.commitments,
-      description:
-        "Overdue follow-ups now. Start by reviewing what was promised.",
-      empty: "No overdue follow-ups in this scope.",
-    },
-    {
-      id: "opportunities",
-      name: "Protect opportunities",
-      rows: g.opportunities,
-      description: "Open opportunities flagged by your existing review rules.",
-      empty: "No open opportunities flagged in this scope.",
-    },
-    {
-      id: "relationships",
-      name: "Renew connections",
-      rows: g.relationships,
-      description:
-        "Eligible, undeferred reviews based on your relationship rhythm.",
-      empty: "No eligible relationship reviews due in this scope.",
-    },
+    { id: "commitments", name: "Keep commitments", rows: g.commitments, description: "Overdue follow-ups now. Start by reviewing what was promised.", empty: "No overdue follow-ups in this scope." },
+    { id: "relationships", name: "Renew connections", rows: g.relationships, description: "Eligible, undeferred reviews based on your relationship rhythm.", empty: "No eligible relationship reviews due in this scope." },
+    { id: "opportunities", name: "Protect opportunities", rows: g.opportunities, description: "Open opportunities flagged by your existing review rules.", empty: "No open opportunities flagged in this scope." },
   ];
   const [choice, setChoice] = useState("");
   const [evidenceLimit, setEvidenceLimit] = useState(3);
+  const [eventLimit, setEventLimit] = useState(4);
   const [briefId, setBriefId] = useState<string | null>(null);
   const [companyLimit, setCompanyLimit] = useState(4);
-  const active =
-    lanes.find((l) => l.id === choice) ||
-    lanes.find((l) => l.rows.length) ||
-    lanes[0];
+  const active = lanes.find((l) => l.id === choice) || lanes.find((l) => l.rows.length) || lanes[0];
+  const events = analyticsStory(report);
+  const change = report.interactions.length - report.previousInteractions.length;
   function open(t: FocusTarget) {
-    if (t.type === "task") {
-      const record = p.tasks.find((r) => r.id === t.id);
-      if (record) onEdit({ kind: "task", record });
-    } else if (t.type === "opportunity") {
-      const record = p.opportunities.find((r) => r.id === t.id);
-      if (record) setBriefId(record.id);
-    }
+    if (t.type === "task") { const record = p.tasks.find((r) => r.id === t.id); if (record) onEdit({ kind: "task", record }); }
+    else if (t.type === "opportunity") { if (p.opportunities.some((r) => r.id === t.id)) setBriefId(t.id); }
   }
+  function openEvent(event: AnalyticsStoryEvent) {
+    if (event.kind === "conversation") onEdit({ kind: "interaction", record: event.record });
+    else if (event.kind === "completed") onEdit({ kind: "task", record: event.record });
+    else setBriefId(event.record.opportunityId);
+  }
+  const subject = (event: AnalyticsStoryEvent) => {
+    if (event.kind === "completed") return event.record.title;
+    if (event.kind === "movement") return report.opportunities.find((o) => o.id === event.record.opportunityId)?.title || text("Opportunity");
+    return p.contacts.find((c) => c.id === event.record.contactId)?.name || p.organizations.find((o) => o.id === event.record.organizationId)?.name || text("Unlinked conversation");
+  };
   return (
     <>
-      <section className="analytics-brief" aria-label={__pulseText("Focus briefing")}>
-        <header>
-          <div>
-            <p className="eyebrow">{__pulseText("TURN INFORMATION INTO INTENTION")}</p>
-            <h2>{__pulseText("Where should your focus go?")}</h2>
-            <p>
-              {__pulseText("Choose a lane. Inspect the evidence. Keep the next step deliberate.")}</p>
-            <small className="brief-scope-note">
-              {__pulseText("Current priorities · activity dates apply to the period reports below.")}</small>
-          </div>
-          <span className="brief-symbol" aria-hidden="true">
-            <Target size={36} />
-          </span>
-        </header>
-        <div className="brief-start" role="status">
-          <span>{__pulseText(active.rows.length ? "YOUR SELECTED FOCUS" : "THIS LANE IS CLEAR")}</span>
-          <div>
-            <strong>{__pulseText(active.rows.length ? active.name : "No current items in this lane")}</strong>
-            <p>{__pulseText(active.rows.length ? active.description : "Choose another lane or explore the reports below.")}</p>
+      <section className="analytics-brief insight-editorial" aria-label={text("Focus briefing")}>
+        <div className="insight-issue-head">
+          <div className="insight-issue-copy"><p className="eyebrow">{text("YOUR RELATIONSHIP PICTURE")}</p><h2>{text("A little clarity for your next move.")}</h2><p>{text("Your saved activity, the work in motion, and a thoughtful place to begin.")}</p><span className="insight-period">{text("SELECTED PERIOD")} · {report.range.start} — {report.range.end}</span></div>
+          <div className="insight-issue-stats" aria-label={text("Selected-period activity")}>
+            <button onClick={() => onSection("Relationships")}><strong>{report.interactions.length}</strong><span>{text("recorded conversations")}</span><small>{change >= 0 ? "+" : ""}{change} {text("compared with the previous period")}</small></button>
+            <button onClick={() => onSection("Productivity")}><strong>{report.completed.length}</strong><span>{text("follow-ups completed")}</span><small>{text("By saved completion date")}</small></button>
+            <button onClick={() => onSection("Opportunities")}><strong>{report.transitions.length}</strong><span>{text("recorded opportunity updates")}</span><small>{text("Recorded movements only")}</small></button>
           </div>
         </div>
-        <div className="focus-lanes" aria-label={__pulseText("Focus lanes")}>
-          {lanes.map((l, i) => (
-            <button
-              key={l.id}
-              aria-pressed={active.id === l.id}
-              onClick={() => { setChoice(l.id); setEvidenceLimit(3); }}
-            >
-              <span className="lane-number">0{i + 1}</span>
-              <strong>{l.rows.length}</strong>
-              <h3>{__pulseText(l.name)}</h3>
-              <span>{__pulseText(l.description)}</span>
-              <ArrowRight size={18} />
-            </button>
-          ))}
-        </div>
-        <div className="focus-desk">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">{__pulseText("CURRENT SAVED EVIDENCE")}</p>
-              <h3>{__pulseText(active.name)}</h3>
+        <div className="insight-spread">
+          <section className="insight-priorities" aria-labelledby="insight-priority-title">
+            <div className="insight-section-title"><div><p className="eyebrow">{text("A PLACE TO BEGIN · CURRENT")}</p><h3 id="insight-priority-title">{text("Where should your focus go?")}</h3><p>{text("Select a lane to see the saved evidence behind it.")}</p></div><Target aria-hidden="true" size={28}/></div>
+            <div className="focus-lanes insight-lane-nav" aria-label={text("Focus lanes")}>
+              {lanes.map((lane, i) => <button key={lane.id} aria-pressed={active.id === lane.id} onClick={() => { setChoice(lane.id); setEvidenceLimit(3); }}><span className="lane-number">0{i + 1}</span><span className="insight-lane-name">{text(lane.name)}</span><strong>{lane.rows.length}</strong><ArrowRight size={18}/></button>)}
             </div>
-            <Link className="text-link" to="/focus">
-              {__pulseText("Open My Focus") + " "}<ArrowUpRight size={16} />
-            </Link>
-          </div>
-          {active.rows.length ? (
-            active.rows.slice(0, evidenceLimit).map((t) => (
-              <article className="focus-evidence" key={t.type + ":" + t.id}>
-                <div>
-                  <h4>{t.title}</h4>
-                  <p>{t.reason}</p>
-                </div>
-                <div className="evidence-actions">
-                  {t.type === "contact" ? (
-                    <Link
-                      className="button secondary"
-                      to={`/network/people/${t.id}`}
-                    >
-                      {__pulseText(t.label)}
-                      <ArrowUpRight size={15} />
-                    </Link>
-                  ) : (
-                    <button
-                      className="button secondary"
-                      onClick={() => open(t)}
-                    >
-                      {__pulseText(t.label)}
-                      <ArrowUpRight size={15} />
-                    </button>
-                  )}
-                  <FocusButton type={t.type} id={t.id} />
-                </div>
-              </article>
-            ))
-          ) : (
-            <div className="brief-clear">
-              <Check size={22} />
-              <p>{__pulseText(active.empty)}</p>
+            <div className="focus-desk insight-evidence-list">
+              <div className="insight-evidence-heading"><div><p className="eyebrow">{text("CURRENT SAVED EVIDENCE")}</p><h4>{text(active.name)}</h4><p>{text(active.description)}</p></div><Link to="/focus">{text("My Focus")} <ArrowUpRight size={15}/></Link></div>
+              {active.rows.length ? active.rows.slice(0,evidenceLimit).map((item) => {
+                const contact = item.type === "contact" ? p.contacts.find(c => c.id === item.id) : item.type === "task" ? p.contacts.find(c => c.id === p.tasks.find(t => t.id === item.id)?.contactId) : undefined;
+                const opportunity = item.type === "opportunity" ? p.opportunities.find(o => o.id === item.id) : undefined;
+                const org = opportunity ? p.organizations.find(o => o.id === opportunity.organizationId) : undefined;
+                const task = item.type === "task" ? p.tasks.find(t => t.id === item.id) : undefined;
+                const reason = task ? text("Saved follow-up due {0}. Review the date, scope and any contact restrictions.", calendarDay(task.dueAt, p.settings.timezone)) : item.reason;
+                return <article className="focus-evidence insight-evidence-row" key={`${item.type}:${item.id}`}>
+                  <div className="insight-evidence-identity"><Avatar name={contact?.name || org?.name || item.title} mediaId={contact?.avatar || org?.avatar} company={!contact && !!org}/><div><h4>{item.title}</h4>{(contact || org) && <small>{contact?.name || org?.name}</small>}<p>{reason}</p></div></div>
+                  <div className="evidence-actions">{item.type === "contact" ? <Link className="button secondary" to={`/network/people/${item.id}`}>{text(item.label)} <ArrowUpRight size={15}/></Link> : <button className="button secondary" onClick={() => open(item)}>{text(item.label)} <ArrowUpRight size={15}/></button>}<FocusButton type={item.type} id={item.id}/></div>
+                </article>;
+              }) : <div className="brief-clear"><Check size={22}/><p>{text(active.empty)}</p></div>}
+              {active.rows.length > evidenceLimit && <p className="muted">{text("Showing")} {Math.min(evidenceLimit, active.rows.length)} {text("of")} {active.rows.length}. <button className="text-link" onClick={() => setEvidenceLimit(evidenceLimit + 6)}>{text("Show more")}</button> <Link to={active.id === "commitments" ? "/activity?filter=overdue" : "/review"}>{text("Open the full work queue")}</Link>.</p>}
+              <details className="insight-explainer"><summary>{text("Why these focus lanes?")}</summary><p>{text("Commitments use saved overdue dates. Opportunity flags and relationship reviews use the same rules as Review; there is no hidden score or prediction. These are current snapshots in your selected record scope, independent of the report’s activity dates. Tasks may be reviewed administratively even when outreach is restricted. Pinning is your choice; nothing is sent or completed here.")}</p></details>
             </div>
-          )}
-          {active.rows.length > evidenceLimit && (
-            <p className="muted">
-              {__pulseText("Showing")} {Math.min(evidenceLimit, active.rows.length)} {__pulseText("of")} {active.rows.length}. <button className="text-link" onClick={() => setEvidenceLimit(evidenceLimit + 6)}>{__pulseText("Show more")}</button>{" "}
-              <Link
-                to={
-                  active.id === "commitments"
-                    ? "/activity?filter=overdue"
-                    : "/review"
-                }
-              >
-                {__pulseText("Open the full work queue")}</Link>
-              .
-            </p>
-          )}
-          <details className="insight-explainer">
-            <summary>{__pulseText("Why these focus lanes?")}</summary>
-            <p>
-              {__pulseText("Commitments use saved overdue dates. Opportunity flags and relationship reviews use the same rules as Review; there is no hidden score or prediction. These are current snapshots in your selected record scope, independent of the report’s activity dates. Tasks may be reviewed administratively even when outreach is restricted. Pinning is your choice; nothing is sent or completed here.")}</p>
-          </details>
+          </section>
+          <section className="insight-activity" aria-labelledby="insight-activity-title">
+            <div className="insight-section-title"><div><p className="eyebrow">{text("WHAT MOVED · SELECTED PERIOD")}</p><h3 id="insight-activity-title">{text("The latest chapters.")}</h3><p>{text("Open an entry to see the source behind it.")}</p></div><MoveUpRight aria-hidden="true" size={27}/></div>
+            <div className="insight-timeline">
+              {events.slice(0,eventLimit).map(event => <button className={`insight-timeline-item is-${event.kind}`} key={`${event.kind}:${event.id}`} onClick={() => openEvent(event)}>
+                <span className="insight-timeline-symbol" aria-hidden="true">{event.kind === "conversation" ? <MessageCircle size={16}/> : event.kind === "completed" ? <CheckCircle2 size={16}/> : <MoveUpRight size={16}/>}</span>
+                <span className="insight-timeline-copy"><small>{text(event.kind === "conversation" ? "Conversation" : event.kind === "completed" ? "Follow-up completed" : event.record.previousStageId === event.record.stageId && event.record.previousPipelineId === event.record.pipelineId ? "Outcome updated" : "Recorded stage change")} · {date(event.at)}</small><strong>{subject(event)}</strong><span>{event.kind === "conversation" ? event.record.summary : event.kind === "completed" ? text("Completed follow-up") : event.record.previousStageId === event.record.stageId && event.record.previousPipelineId === event.record.pipelineId ? `${text(event.record.previousOutcome)} → ${text(event.record.outcome)}` : `${event.record.previousStageName} → ${event.record.stageName}`}</span>{event.kind === "movement" && event.record.source === "configuration" && <small>{text("Changed during pipeline configuration")}</small>}</span><ArrowUpRight size={16} aria-hidden="true"/>
+              </button>)}
+              {!events.length && <div className="insight-empty"><strong>{text("Your story starts with a record.")}</strong><p>{text("There is no recorded activity in this period yet. Log a conversation or plan a follow-up to build your picture.")}</p><Link className="button secondary" to="/network">{text("Open Network")}</Link></div>}
+            </div>
+            {events.length > eventLimit && <button className="button secondary insight-more" onClick={() => setEventLimit(eventLimit + 6)}>{text("Show more activity")}</button>}
+            <p className="insight-activity-footnote">{text("Activity follows the selected date range. Current priorities are shown separately. Older stage history may be unavailable.")}</p>
+          </section>
         </div>
       </section>
       <details className="analytics-deeper-context"><summary>{__pulseText("Explore coverage and company context")}</summary>
@@ -199,7 +116,7 @@ export function AnalyticsBrief({
           />
           <p>
             {g.coverage.total
-              ? `${g.coverage.total - g.coverage.reached} have no logged conversation in this period.`
+              ? __pulseText("{0} have no logged conversation in this period.", g.coverage.total - g.coverage.reached)
               : __pulseText("Add people to build a useful view of your relationships.")}
           </p>
           <p className="muted">

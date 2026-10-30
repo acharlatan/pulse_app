@@ -29,6 +29,7 @@ export function deriveOrbit(
     limit?: number;
     priority?: string;
     balance?: boolean;
+    preferredId?: string;
   } = {},
 ) {
   const limit = Math.max(1, Math.min(options.limit || 60, 80)),
@@ -100,8 +101,11 @@ export function deriveOrbit(
       if (!added) break;
     }
     return chosen;
-  })() : candidates.slice(0, limit),
-    nodes: OrbitNode[] = shown.map((n) => {
+  })() : candidates.slice(0, limit);
+  // An explicit "show on map" request keeps the selected saved record within the bound.
+  const preferred = options.preferredId && candidates.find((n) => n.id === options.preferredId);
+  if (preferred && !shown.some((n) => n.id === preferred.id)) shown[shown.length - 1] = preferred;
+  const nodes: OrbitNode[] = shown.map((n) => {
       const group = shown.filter((x) => x.kind === n.kind);
       const position = group.findIndex((x) => x.id === n.id);
       const angle =
