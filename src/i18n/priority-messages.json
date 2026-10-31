@@ -1142,5 +1142,53 @@
   "Your previous language is no longer supported. The interface uses English until you choose a language; your saved date format is unchanged.": [
     "Tu idioma anterior ya no está disponible. La interfaz usa inglés hasta que elijas un idioma; tu formato de fecha guardado no cambia.",
     "Votre langue précédente n’est plus disponible. L’interface utilise l’anglais jusqu’à ce que vous choisissiez une langue ; votre format de date enregistré reste inchangé."
+  ],
+  "Good morning": [
+    "Buenos días",
+    "Bonjour"
+  ],
+  "Good afternoon": [
+    "Buenas tardes",
+    "Bon après-midi"
+  ],
+  "Good evening": [
+    "Buenas noches",
+    "Bonsoir"
+  ],
+  "Your world,": [
+    "Tu mundo,",
+    "Votre monde,"
+  ],
+  "in motion.": [
+    "en movimiento.",
+    "en mouvement."
+  ],
+  "NEXT OPEN FOLLOW-UP": [
+    "PRÓXIMO SEGUIMIENTO ABIERTO",
+    "PROCHAIN SUIVI OUVERT"
+  ],
+  "Plan a first follow-up": [
+    "Planifica un primer seguimiento",
+    "Planifier un premier suivi"
+  ],
+  "People in your workspace": [
+    "Personas en tu espacio",
+    "Personnes de votre espace"
+  ],
+  "Your workspace at a glance": [
+    "Tu espacio de un vistazo",
+    "Votre espace en un coup d’œil"
+  ],
+  "people in your world": [
+    "personas en tu mundo",
+    "personnes dans votre univers"
+  ],
+  "chosen for today": [
+    "elegidas para hoy",
+    "choisies pour aujourd’hui"
+  ],
+  "open follow-ups": [
+    "seguimientos abiertos",
+    "suivis ouverts"
   ]
 }
