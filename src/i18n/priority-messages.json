@@ -1374,5 +1374,9 @@
   "Opportunity representative": [
     "Representante de la oportunidad",
     "Représentant de l’opportunité"
+  ],
+  "Lines show saved company and opportunity links. Portraits may overlap as you move the map. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.": [
+    "Las líneas muestran vínculos guardados de empresas y oportunidades. Los retratos pueden superponerse al mover el mapa. La profundidad es visual y no mide cercanía. Trabajar en la misma empresa no significa que las personas se conozcan.",
+    "Les lignes montrent les liens enregistrés avec des entreprises et des opportunités. Les portraits peuvent se chevaucher lorsque vous déplacez la carte. La profondeur est visuelle et ne mesure pas la proximité. Travailler dans la même entreprise ne signifie pas que les personnes se connaissent."
   ]
 }

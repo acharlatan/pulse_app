@@ -1,6 +1,7 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useEffect, useRef } from "react";
 import type { OrbitNode, OrbitEdge } from "../services/orbit";
+import { orbitMarkerPosition } from "../services/orbit-projection";
 import { usePulse } from "../app/context";
 import { Avatar } from "./ui";
 import { useTranslation } from "../i18n/useTranslation";
@@ -23,7 +24,6 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, cen
   const t = useTranslation();
   const host = useRef<HTMLDivElement>(null);
   const markerRefs = useRef(new Map<string, HTMLButtonElement>());
-  const leaderRefs = useRef(new Map<string, SVGLineElement>());
   const controls = useRef<Controls | null>(null);
   const previousTurn = useRef(0);
   const previousCenter = useRef(0);
@@ -100,46 +100,25 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, cen
         const signature = [width, height, galaxy.rotation.x, galaxy.rotation.y, galaxy.rotation.z, camera.position.x, camera.position.y, camera.position.z].join("|");
         if (signature === lastProjection) return;
         lastProjection = signature;
-        const cardWidth = width <= 600 ? 108 : 120, cardHeight = 90;
-        const markers = nodes.flatMap((node) => {
+        for (const node of nodes) {
           const marker = markerRefs.current.get(node.id), position = positions.get(node.id);
-          if (!marker || !position) return [];
+          if (!marker || !position) continue;
           projected.copy(position).applyMatrix4(galaxy.matrixWorld).project(camera);
-          const originX = (projected.x + 1) * width / 2, originY = (1 - projected.y) * height / 2;
-          const inView = projected.z > -1 && projected.z < 1 && originX > -20 && originX < width + 20 && originY > -20 && originY < height + 20;
-          marker.style.visibility = inView ? "visible" : "hidden";
-          const leader = leaderRefs.current.get(node.id);
-          if (!inView) { if (leader) leader.style.display = "none"; return []; }
-          return [{ marker, leader, originX, originY, x: Math.max(cardWidth / 2, Math.min(width - cardWidth / 2, originX)), y: Math.max(cardHeight / 2, Math.min(height - cardHeight / 2, originY)), z: projected.z }];
-        });
-        // Fixed, bounded passes separate visible controls without changing saved graph data.
-        for (let pass = 0; pass < 20; pass++) {
-          for (let i = 0; i < markers.length; i++) for (let j = i + 1; j < markers.length; j++) {
-            const a = markers[i], b = markers[j];
-            const dx = b.x - a.x, dy = b.y - a.y;
-            const overlapX = cardWidth - Math.abs(dx), overlapY = cardHeight - Math.abs(dy);
-            if (overlapX <= 0 || overlapY <= 0) continue;
-            if (overlapX < overlapY) { const shift = (overlapX / 2 + 1) * (dx < 0 ? -1 : 1); a.x -= shift; b.x += shift; }
-            else { const shift = (overlapY / 2 + 1) * (dy < 0 ? -1 : 1); a.y -= shift; b.y += shift; }
-            for (const item of [a, b]) { item.x = Math.max(cardWidth / 2, Math.min(width - cardWidth / 2, item.x)); item.y = Math.max(cardHeight / 2, Math.min(height - cardHeight / 2, item.y)); }
-          }
-        }
-        for (const item of markers) {
-          item.marker.style.transform = `translate(${item.x}px, ${item.y}px) translate(-50%, -50%)`;
-          item.marker.style.zIndex = String(Math.round((1 - item.z) * 1000));
-          if (item.leader) {
-            const shifted = Math.hypot(item.x - item.originX, item.y - item.originY) > 8;
-            item.leader.style.display = shifted ? "" : "none";
-            item.leader.setAttribute("x1", String(item.originX)); item.leader.setAttribute("y1", String(item.originY));
-            item.leader.setAttribute("x2", String(item.x)); item.leader.setAttribute("y2", String(item.y - 13));
-          }
+          const placement = orbitMarkerPosition(projected, width, height);
+          marker.style.visibility = placement.visible ? "visible" : "hidden";
+          if (!placement.visible) continue;
+          marker.style.transform = `translate3d(${placement.x}px, ${placement.y}px, 0) translate(-50%, calc(0px - var(--orbit-avatar-radius)))`;
+          marker.style.zIndex = String(placement.layer);
         }
       };
       const resize = () => { const { clientWidth: w, clientHeight: h } = element; if (!w || !h) return; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); render(); };
       const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(element); resize();
       const media = matchMedia("(prefers-reduced-motion: reduce)");
       const reduced = () => settings.reducedMotion || media.matches;
-      let frame = 0, visible = false;
+      let frame = 0, interactionFrame = 0, visible = false;
+      const renderOnNextFrame = () => {
+        if (!interactionFrame && !stopped) interactionFrame = requestAnimationFrame(() => { interactionFrame = 0; if (!stopped) render(); });
+      };
       const tick = () => { frame = 0; if (stopped || !visible || document.hidden || reduced()) return; orbitRings.forEach((ring, i) => { ring.rotation.z += (i % 2 ? -1 : 1) * 0.0006; }); render(); schedule(); };
       const schedule = () => { if (!stopped && visible && !document.hidden && !reduced() && !frame) frame = requestAnimationFrame(tick); };
       const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; if (visible) schedule(); else { cancelAnimationFrame(frame); frame = 0; } }); observer.observe(element);
@@ -148,7 +127,7 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, cen
       let drag: { x: number; y: number; total: number } | null = null;
       const raycaster = new T.Raycaster(), mouse = new T.Vector2();
       const down = (event: PointerEvent) => { event.stopPropagation(); drag = { x: event.clientX, y: event.clientY, total: 0 }; renderer.domElement.setPointerCapture(event.pointerId); };
-      const move = (event: PointerEvent) => { if (!drag) return; event.stopPropagation(); const dx = event.clientX - drag.x, dy = event.clientY - drag.y; drag.total += Math.abs(dx) + Math.abs(dy); galaxy.rotation.y += dx * 0.008; galaxy.rotation.x = Math.max(-1.2, Math.min(1.2, galaxy.rotation.x + dy * 0.008)); orientation.current = { x: galaxy.rotation.x, y: galaxy.rotation.y, z: galaxy.rotation.z }; drag.x = event.clientX; drag.y = event.clientY; render(); };
+      const move = (event: PointerEvent) => { if (!drag) return; event.stopPropagation(); const dx = event.clientX - drag.x, dy = event.clientY - drag.y; drag.total += Math.abs(dx) + Math.abs(dy); galaxy.rotation.y += dx * 0.008; galaxy.rotation.x = Math.max(-1.2, Math.min(1.2, galaxy.rotation.x + dy * 0.008)); orientation.current = { x: galaxy.rotation.x, y: galaxy.rotation.y, z: galaxy.rotation.z }; drag.x = event.clientX; drag.y = event.clientY; renderOnNextFrame(); };
       const up = (event: PointerEvent) => { if (!drag) return; event.stopPropagation(); if (drag.total < 7) { const rect = renderer.domElement.getBoundingClientRect(); mouse.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1); raycaster.setFromCamera(mouse, camera); const hit = raycaster.intersectObjects(targets)[0]?.object.userData.nodeId; const node = nodes.find((item) => item.id === hit); if (node) selectionCallback.current(node); } drag = null; };
       renderer.domElement.addEventListener("pointerdown", down); renderer.domElement.addEventListener("pointermove", move); renderer.domElement.addEventListener("pointerup", up); renderer.domElement.addEventListener("pointercancel", up);
       controls.current = {
@@ -166,7 +145,7 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, cen
       };
       controls.current.select(latestView.current.selected); controls.current.move(latestView.current.zoom, latestView.current.pan); schedule();
       cleanup = () => {
-        controls.current = null; cancelAnimationFrame(frame); observer.disconnect(); resizeObserver.disconnect(); document.removeEventListener("visibilitychange", visibility); media.removeEventListener("change", visibility);
+        controls.current = null; cancelAnimationFrame(frame); cancelAnimationFrame(interactionFrame); observer.disconnect(); resizeObserver.disconnect(); document.removeEventListener("visibilitychange", visibility); media.removeEventListener("change", visibility);
         renderer.domElement.removeEventListener("pointerdown", down); renderer.domElement.removeEventListener("pointermove", move); renderer.domElement.removeEventListener("pointerup", up); renderer.domElement.removeEventListener("pointercancel", up);
         scene.traverse((object) => { if (object instanceof T.Mesh || object instanceof T.Points || object instanceof T.Line) { object.geometry.dispose(); (Array.isArray(object.material) ? object.material : [object.material]).forEach((material) => material.dispose()); } });
         renderer.dispose(); renderer.domElement.remove();
@@ -188,7 +167,6 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, cen
   const selectedOnMap = nodes.some((node) => node.id === selected);
   const connected = new Set(edges.flatMap((edge) => edge.from === selected ? [edge.to] : edge.to === selected ? [edge.from] : []));
   return <div className="orbit-world" ref={host}>
-    <svg className="orbit-marker-leaders" aria-hidden="true">{nodes.map((node) => <line key={node.id} ref={(element) => { if (element) leaderRefs.current.set(node.id, element); else leaderRefs.current.delete(node.id); }} />)}</svg>
     <div className="orbit-dom-nodes" role="group" aria-label={__pulseText("3D relationship nodes")}>
       {nodes.map((node) => <button key={node.id} ref={(element) => { if (element) markerRefs.current.set(node.id, element); else markerRefs.current.delete(node.id); }} className={`orbit-3d-node ${node.kind}${node.id === selected ? " selected" : ""}${connected.has(node.id) ? " connected" : ""}${selectedOnMap && node.id !== selected && !connected.has(node.id) ? " unrelated" : ""}`} aria-pressed={node.id === selected} title={node.label} onClick={() => onSelect(node)}>
         <Avatar name={node.label} mediaId={node.mediaId} company={node.kind === "company"} ariaHidden={false} />{" "}
