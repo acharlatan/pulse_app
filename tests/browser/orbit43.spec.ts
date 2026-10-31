@@ -10,16 +10,38 @@ test("Orbit starting points lead to saved work and preserve the selection trail"
   const detail = page.getByRole("complementary", { name: "Selected relationship" });
   await expect(detail).toBeVisible();
   await expect(page.getByLabel("Map filters").getByRole("button", { name: "Follow-ups" })).toHaveAttribute("aria-pressed", "true");
-  await expect(detail.getByRole("heading", { name: "Open opportunities" })).toBeVisible();
+  await expect(detail.getByRole("button", { name: /Open opportunities/ })).toBeVisible();
   const selectedName = await detail.locator("h2").innerText();
-  const linked = detail.locator(".orbit-link-cards button").first();
+  const linked = detail.locator(".orbit-inspector-links button").first();
   await linked.click();
   await expect(detail.getByRole("button", {name:/Back to previous selection/})).toBeVisible();
   await expect(detail.locator("h2")).toBeFocused();
   await detail.getByRole("button", {name:/Back to previous selection/}).click();
   await expect(detail.locator("h2")).toHaveText(selectedName);
-  await detail.locator(".orbit-workbench-block").filter({has:page.getByRole("heading",{name:"Open opportunities"})}).locator(".orbit-activity-entry").first().click();
+  await detail.getByRole("button", {name:/Open opportunities/}).click();
+  await detail.locator(".orbit-inspector-records button").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
+});
+
+test("focused map follows explicit saved connections and returns to the original map", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await page.goto("/#/orbit");
+  await page.locator(".orbit-list-item").filter({hasText:"Olivia Chen"}).click();
+  const detail = page.getByRole("complementary", { name: "Selected relationship" });
+  await detail.getByRole("button", {name:"Focus saved connections"}).click();
+  await expect(page.locator(".orbit-focus-notice")).toContainText("Olivia Chen");
+  await expect(page.locator(".orbit-viewport .orbit-node, .orbit-viewport .orbit-3d-node")).toHaveCount(3);
+  await detail.getByRole("button", {name:/Forma Studio Works at/}).click();
+  await expect(detail.locator("h2")).toHaveText("Forma Studio");
+  await expect(page.locator(".orbit-viewport .orbit-node, .orbit-viewport .orbit-3d-node")).toHaveCount(5);
+  await detail.getByRole("button", {name:/Back to previous selection/}).click();
+  await expect(detail.locator("h2")).toHaveText("Olivia Chen");
+  await detail.getByRole("button", {name:"Return to map"}).click();
+  await expect(page.locator(".orbit-focus-notice")).toHaveCount(0);
+  const is3d = await page.getByRole("button", {name:"3D Orbit"}).getAttribute("aria-pressed") === "true";
+  const expected = test.info().project.name === "mobile" ? (is3d ? 12 : 18) : 24;
+  await expect(page.locator(".orbit-viewport .orbit-node, .orbit-viewport .orbit-3d-node")).toHaveCount(expected);
 });
 
 test("Orbit fits supported widths in both themes", async ({page}) => {

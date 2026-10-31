@@ -10,11 +10,13 @@ interface Controls {
   move: (zoom: number, pan: { x: number; y: number }) => void;
   turn: (amount: number) => void;
   reset: () => void;
+  center: (id: string) => { x: number; y: number } | undefined;
 }
 /** A bounded 3D rendering of the same saved nodes and edges as the accessible map. */
-export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onSelect, onUnavailable }: {
+export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, center, onCenter, onSelect, onUnavailable }: {
   nodes: OrbitNode[]; edges: OrbitEdge[]; selected: string; zoom: number;
-  pan: { x: number; y: number }; turn: number; reset: number;
+  pan: { x: number; y: number }; turn: number; reset: number; center: number;
+  onCenter: (pan: { x: number; y: number }) => void;
   onSelect: (node: OrbitNode) => void; onUnavailable: () => void;
 }) {
   const __pulseText = useInterfaceText();
@@ -24,6 +26,8 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
   const leaderRefs = useRef(new Map<string, SVGLineElement>());
   const controls = useRef<Controls | null>(null);
   const previousTurn = useRef(0);
+  const previousCenter = useRef(0);
+  const orientation = useRef({ x: -0.12, y: -0.18, z: 0 });
   const latestView = useRef({ selected, zoom, pan });
   const selectionCallback = useRef(onSelect);
   const failureCallback = useRef(onUnavailable);
@@ -47,7 +51,7 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
       const camera = new T.PerspectiveCamera(40, 1, 0.1, 100);
       camera.position.set(0, 0, 18);
       const galaxy = new T.Group(); scene.add(galaxy);
-      galaxy.rotation.set(-0.12, -0.18, 0);
+      galaxy.rotation.set(orientation.current.x, orientation.current.y, orientation.current.z);
       const positions = new Map<string, import("three").Vector3>();
       const targets: import("three").Mesh[] = [];
       const bodies = new Map<string, import("three").Mesh>();
@@ -72,8 +76,14 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
         const line = new T.Line(new T.BufferGeometry().setFromPoints(curve.getPoints(20)), new T.LineBasicMaterial({ color: 0xd8d2ff, transparent: true, opacity: 0.6 }));
         galaxy.add(line); lines.push({ edge, line });
       }
-      const orbitRing = new T.Mesh(new T.TorusGeometry(5.25, 0.012, 5, 140), new T.MeshBasicMaterial({ color: 0xa89ad5, transparent: true, opacity: 0.24 }));
-      orbitRing.rotation.set(0.8, 0.4, 0); galaxy.add(orbitRing);
+      const orbitRings = [
+        { radius: 5.25, color: 0xa89ad5, rotation: [0.8, 0.4, 0] },
+        { radius: 4.7, color: 0x9cdae0, rotation: [1.12, -0.45, 0.55] },
+        { radius: 5.7, color: 0xe5b5df, rotation: [0.55, 0.95, -0.25] },
+      ].map(({ radius, color, rotation }) => {
+        const ring = new T.Mesh(new T.TorusGeometry(radius, 0.012, 5, 140), new T.MeshBasicMaterial({ color, transparent: true, opacity: 0.2 }));
+        ring.rotation.set(rotation[0], rotation[1], rotation[2]); galaxy.add(ring); return ring;
+      });
       const stars: number[] = [];
       for (let i = 0; i < 170; i++) { const a = i * 2.399; const r = 5.8 + (i % 24) * 0.12; stars.push(Math.cos(a) * r, Math.sin(a) * r * 0.65, Math.sin(i) * 2); }
       const dustGeo = new T.BufferGeometry(); dustGeo.setAttribute("position", new T.Float32BufferAttribute(stars, 3));
@@ -130,7 +140,7 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
       const media = matchMedia("(prefers-reduced-motion: reduce)");
       const reduced = () => settings.reducedMotion || media.matches;
       let frame = 0, visible = false;
-      const tick = () => { frame = 0; if (stopped || !visible || document.hidden || reduced()) return; orbitRing.rotation.z += 0.0015; render(); schedule(); };
+      const tick = () => { frame = 0; if (stopped || !visible || document.hidden || reduced()) return; orbitRings.forEach((ring, i) => { ring.rotation.z += (i % 2 ? -1 : 1) * 0.0006; }); render(); schedule(); };
       const schedule = () => { if (!stopped && visible && !document.hidden && !reduced() && !frame) frame = requestAnimationFrame(tick); };
       const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; if (visible) schedule(); else { cancelAnimationFrame(frame); frame = 0; } }); observer.observe(element);
       const visibility = () => { if (document.hidden || reduced()) { cancelAnimationFrame(frame); frame = 0; } else schedule(); };
@@ -138,14 +148,21 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
       let drag: { x: number; y: number; total: number } | null = null;
       const raycaster = new T.Raycaster(), mouse = new T.Vector2();
       const down = (event: PointerEvent) => { event.stopPropagation(); drag = { x: event.clientX, y: event.clientY, total: 0 }; renderer.domElement.setPointerCapture(event.pointerId); };
-      const move = (event: PointerEvent) => { if (!drag) return; event.stopPropagation(); const dx = event.clientX - drag.x, dy = event.clientY - drag.y; drag.total += Math.abs(dx) + Math.abs(dy); galaxy.rotation.y += dx * 0.008; galaxy.rotation.x = Math.max(-1.2, Math.min(1.2, galaxy.rotation.x + dy * 0.008)); drag.x = event.clientX; drag.y = event.clientY; render(); };
+      const move = (event: PointerEvent) => { if (!drag) return; event.stopPropagation(); const dx = event.clientX - drag.x, dy = event.clientY - drag.y; drag.total += Math.abs(dx) + Math.abs(dy); galaxy.rotation.y += dx * 0.008; galaxy.rotation.x = Math.max(-1.2, Math.min(1.2, galaxy.rotation.x + dy * 0.008)); orientation.current = { x: galaxy.rotation.x, y: galaxy.rotation.y, z: galaxy.rotation.z }; drag.x = event.clientX; drag.y = event.clientY; render(); };
       const up = (event: PointerEvent) => { if (!drag) return; event.stopPropagation(); if (drag.total < 7) { const rect = renderer.domElement.getBoundingClientRect(); mouse.set(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1); raycaster.setFromCamera(mouse, camera); const hit = raycaster.intersectObjects(targets)[0]?.object.userData.nodeId; const node = nodes.find((item) => item.id === hit); if (node) selectionCallback.current(node); } drag = null; };
       renderer.domElement.addEventListener("pointerdown", down); renderer.domElement.addEventListener("pointermove", move); renderer.domElement.addEventListener("pointerup", up); renderer.domElement.addEventListener("pointercancel", up);
       controls.current = {
         select: (id) => { const visibleId = positions.has(id) ? id : ""; bodies.forEach((body, key) => { body.scale.setScalar(key === visibleId ? 1.45 : 1); const material = body.material as import("three").MeshPhysicalMaterial; material.emissiveIntensity = key === visibleId ? 0.7 : 0.16; }); lines.forEach(({edge,line}) => { const material = line.material as import("three").LineBasicMaterial; const active = !!visibleId && (edge.from === visibleId || edge.to === visibleId); material.color.setHex(active ? 0xd9f28e : 0xd8d2ff); material.opacity = visibleId ? (active ? 1 : 0.18) : 0.6; }); render(); },
         move: (scale, offset) => { camera.position.set(-offset.x * 0.012, offset.y * 0.012, 14 / Math.max(0.35, scale)); render(); },
-        turn: (amount) => { galaxy.rotation.y += amount; render(); },
-        reset: () => { galaxy.rotation.set(-0.12, -0.18, 0); render(); },
+        turn: (amount) => { galaxy.rotation.y += amount; orientation.current = { x: galaxy.rotation.x, y: galaxy.rotation.y, z: galaxy.rotation.z }; render(); },
+        reset: () => { galaxy.rotation.set(-0.12, -0.18, 0); orientation.current = { x: -0.12, y: -0.18, z: 0 }; render(); },
+        center: (id) => {
+          const point = positions.get(id);
+          if (!point) return undefined;
+          galaxy.updateMatrixWorld(true);
+          const worldPoint = point.clone().applyMatrix4(galaxy.matrixWorld);
+          return { x: -worldPoint.x / 0.012, y: worldPoint.y / 0.012 };
+        },
       };
       controls.current.select(latestView.current.selected); controls.current.move(latestView.current.zoom, latestView.current.pan); schedule();
       cleanup = () => {
@@ -162,6 +179,12 @@ export function OrbitWorld({ nodes, edges, selected, zoom, pan, turn, reset, onS
   useEffect(() => { latestView.current.zoom = zoom; latestView.current.pan = pan; controls.current?.move(zoom, pan); }, [zoom, pan]);
   useEffect(() => { const delta = turn - previousTurn.current; previousTurn.current = turn; if (delta) controls.current?.turn(delta * 0.35); }, [turn]);
   useEffect(() => { if (reset) controls.current?.reset(); }, [reset]);
+  useEffect(() => {
+    if (center === previousCenter.current) return;
+    previousCenter.current = center;
+    const offset = controls.current?.center(selected);
+    if (offset) onCenter(offset);
+  }, [center, selected, onCenter]);
   const selectedOnMap = nodes.some((node) => node.id === selected);
   const connected = new Set(edges.flatMap((edge) => edge.from === selected ? [edge.to] : edge.to === selected ? [edge.from] : []));
   return <div className="orbit-world" ref={host}>

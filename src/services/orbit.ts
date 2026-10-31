@@ -32,6 +32,8 @@ export function deriveOrbit(
     preferredId?: string;
     preferredIds?: string[];
     includeIds?: ReadonlySet<string>;
+    /** Optional visual center for an explicitly selected saved record. */
+    centerId?: string;
   } = {},
 ) {
   const limit = Math.max(1, Math.min(options.limit || 60, 80)),
@@ -118,7 +120,16 @@ export function deriveOrbit(
   // An explicit "show on map" request keeps the selected saved record within the bound.
   const preferred = options.preferredId && candidates.find((n) => n.id === options.preferredId);
   if (preferred && !shown.some((n) => n.id === preferred.id)) shown[shown.length - 1] = preferred;
+  const centered = options.centerId && shown.some((n) => n.id === options.centerId);
+  const surrounding = centered ? shown.filter((n) => n.id !== options.centerId) : [];
   const nodes: OrbitNode[] = shown.map((n) => {
+      if (centered) {
+        if (n.id === options.centerId) return { ...n, x: 500, y: 380 };
+        const index = surrounding.findIndex((item) => item.id === n.id);
+        const angle = index / Math.max(surrounding.length, 1) * Math.PI * 2 - Math.PI / 2;
+        const radius = surrounding.length <= 4 ? 200 : 285;
+        return { ...n, x: 500 + Math.cos(angle) * radius * 1.15, y: 380 + Math.sin(angle) * radius };
+      }
       const group = shown.filter((x) => x.kind === n.kind);
       const position = group.findIndex((x) => x.id === n.id);
       const angle =

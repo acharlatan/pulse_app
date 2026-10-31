@@ -31,6 +31,8 @@ Use a 4px base and 8px major rhythm; card padding 20–32px, page gutters 14–4
 
 Desktop: four top-level destinations in the top bar, contextual section navigation and centered content. Daily Pulse uses an editorial full-width opening with workspace links; the People cover combines the masthead and overview. Tablet and mobile stack these compositions. Below 768px: bottom navigation, safe-area spacing, top settings/alerts, contextual floating add. The directory adapts its columns and profiles stack essential details and relationship story. Settings category navigation wraps rather than clips. Dialogs use native `showModal`, internal scrolling and small-screen margins.
 
+Orbit Atlas uses a compact, dark introductory masthead followed immediately by the map and its filters. The selected record remains full width below the map; a four-way inspector gives saved links, follow-ups, opportunities and activity their own readable space. Focused map mode uses explicit saved associations and keeps marker text legible on smaller screens. The map briefing and accessible list remain below the selected record.
+
 ## Components and states
 
 Filled primary, soft secondary, ghost and destructive actions. Selection uses explicit theme/tab state; keyboard focus always visible. Badges combine status text with color. Profiles use named avatars, role, company and restriction labels. Error/empty/loading states are deliberate. Toasts report completed writes or recoverable errors; update notices require user action before reloading.

@@ -1,3 +1,11 @@
+# Orbit Atlas verification — 31 October 2026
+
+Typecheck, lint, 244 unit tests and a production build passed. New graph tests cover a person and company focused around directly saved neighbors, map caps, an isolated person, and no mutation; language tests cover the new focused-map controls in Spanish and French. No database or backup schema changes were made.
+
+The managed preview exercised a saved person → company → previous selection trail, focused-map filtering and restoration of a prior follow-up filter, the follow-up editor, the underlying opportunity brief, filtered empty results and their clear action, and a new empty personal workspace. Light and dark selected views passed the responsive fixture's horizontal document-overflow check at 320, 375, 390, 430, 768, 1024, 1280 and 1440 CSS pixels; the focused 320px Spanish view also passed. Desktop and mobile compositions were visually inspected. These checks do not constitute a full contrast, screen-reader or physical-device audit.
+
+The targeted Playwright suite could not launch because its Chromium executable is absent. The managed browser could not create a WebGL context, so the 2D fallback and its focused selection were inspected; the changed Three.js scene, rotation and 3D centering still require a WebGL-capable device. App-wide translation remains incomplete and saved user content is not translated.
+
 # World in Motion verification — 31 October 2026
 
 Typecheck, lint, 240 unit tests, and the production build passed. The new Home snapshot tests cover timezone boundaries, open follow-up ordering, missing/completed Focus records, empty data, and non-mutation. In the managed preview, the populated demo opened its existing person and follow-up editors, and an empty Personal workspace showed zero records and a first-follow-up action. English, Spanish, and French Home labels were checked, along with light and dark appearance and a dark Analytics view. Interface translation remains incomplete elsewhere; user-created content is not translated. No database or backup schema changes were made.
