@@ -33,6 +33,8 @@ Desktop: four top-level destinations in the top bar, contextual section navigati
 
 Orbit Atlas uses a compact, dark introductory masthead followed immediately by the map and its filters. The selected record remains full width below the map; a four-way inspector gives saved links, follow-ups, opportunities and activity their own readable space. Focused map mode uses explicit saved associations and keeps marker text legible on smaller screens. The map briefing and accessible list remain below the selected record.
 
+In 3D, portrait controls follow their projected position directly, can overlap, and keep full labels accessible through the record list. Selected and keyboard-focused records remain visually emphasized. Off-screen controls are not pushed back into the map.
+
 ## Components and states
 
 Filled primary, soft secondary, ghost and destructive actions. Selection uses explicit theme/tab state; keyboard focus always visible. Badges combine status text with color. Profiles use named avatars, role, company and restriction labels. Error/empty/loading states are deliberate. Toasts report completed writes or recoverable errors; update notices require user action before reloading.

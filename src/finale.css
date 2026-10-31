@@ -1,7 +1,7 @@
 /* Clear interface layers in the dimensional map: images and text are real UI, not canvas textures. */
 .orbit-world canvas { position: absolute; inset: 0; z-index: 0; }
 .orbit-dom-nodes { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
-.orbit-3d-node { position: absolute; top: 0; left: 0; pointer-events: auto; visibility: hidden; display: flex; flex-direction: column; align-items: center; gap: 3px; width: 112px; min-height: 68px; color: #fff; cursor: pointer; padding: 0; background: transparent; border: 0; }
+.orbit-3d-node { --orbit-avatar-radius: 22px; position: absolute; top: 0; left: 0; pointer-events: auto; visibility: hidden; display: flex; flex-direction: column; align-items: center; gap: 3px; width: 112px; min-height: 68px; color: #fff; cursor: pointer; padding: 0; background: transparent; border: 0; }
 .orbit-3d-node .avatar { width: 44px; height: 44px; flex-shrink: 0; border: 3px solid #dfcaff; box-shadow: 0 3px 16px #06041c99, 0 0 0 4px #a896eb44; font-size: 15px; }
 .orbit-3d-node.company .avatar { border-color: #8cdeea; box-shadow: 0 3px 16px #06041c99, 0 0 0 4px #8cdeea44; }
 .orbit-3d-node.opportunity .avatar { border-color: #f3abd8; box-shadow: 0 3px 16px #06041c99, 0 0 0 4px #f3abd844; }
@@ -9,7 +9,7 @@
 .orbit-3d-node:hover .avatar, .orbit-3d-node.selected .avatar { box-shadow: 0 0 0 5px #ddffa5, 0 6px 22px #000a; }
 .orbit-3d-node:focus-visible { outline: 3px solid #d9ff9b; outline-offset: 3px; border-radius: 12px; z-index: 5000 !important; }
 .orbit-3d-node.selected { z-index: 4000 !important; }
-@media (max-width: 600px) { .orbit-3d-node { width: 96px; min-height: 64px; } .orbit-3d-node .avatar { width: 40px; height: 40px; } .orbit-3d-label { max-width: 106px; font-size: 13px; } }
+@media (max-width: 600px) { .orbit-3d-node { --orbit-avatar-radius: 20px; width: 96px; min-height: 64px; } .orbit-3d-node .avatar { width: 40px; height: 40px; } .orbit-3d-label { max-width: 106px; font-size: 13px; } }
 /* More space for work: compact mastheads, navigation and controls. */
 .unified-shell .topbar { min-height: 62px; padding-block: 7px; }
 .unified-section-nav { padding-top: 8px; }
@@ -80,9 +80,6 @@
 
 .orbit-mode-tabs button { white-space: nowrap; }
 @media (max-width: 360px) { .workspace-switcher-text::after, .workspace-switcher summary[data-workspace="demo"] .workspace-switcher-text::after { content: "●"; font-size: 12px; } }
-
-.orbit-marker-leaders { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-.orbit-marker-leaders line { stroke: #e7dbff; stroke-width: 1.3; stroke-dasharray: 3 4; opacity: .85; }
 
 .language-selector small { overflow-wrap: anywhere; }
 @media (min-width:768px) and (max-width:1050px) { .unified-shell .topbar { gap: 10px; padding-inline: 16px; } .unified-main-nav a { padding-inline: 8px; font-size: 13px; } }

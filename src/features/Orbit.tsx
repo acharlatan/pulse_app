@@ -661,7 +661,7 @@ export function Orbit() {
             <span>{__pulseText("▢ Company")}</span>
             <span>{__pulseText("◇ Opportunity")}</span>
             <p>
-              {__pulseText("Solid lines show works at · opportunity representative · company opportunity. Dotted lines connect portraits to their positions. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.")}</p>
+              {__pulseText("Lines show saved company and opportunity links. Portraits may overlap as you move the map. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.")}</p>
           </div>
         </section>
 

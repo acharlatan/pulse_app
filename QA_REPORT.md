@@ -1,3 +1,9 @@
+# Orbit motion verification — 31 October 2026
+
+Typecheck, lint, 248 unit tests and the production build passed. New projection tests cover overlapping points, depth ordering, off-screen movement without clamping and smooth small rotations. A component regression test uses actual Three.js geometry with a mocked WebGL renderer to verify that two overlapping portrait controls stay together during pointer rotation. These checks do not validate real hardware rendering or subjective motion quality.
+
+The managed browser could not create a WebGL context, so the 3D view still requires visual verification on a WebGL-capable device. The 2D fallback and record-selection flow were checked in the preview. The targeted Playwright suite could not launch because its Chromium executable is absent. The change makes no database or backup schema changes.
+
 # Orbit Atlas verification — 31 October 2026
 
 Typecheck, lint, 244 unit tests and a production build passed. New graph tests cover a person and company focused around directly saved neighbors, map caps, an isolated person, and no mutation; language tests cover the new focused-map controls in Spanish and French. No database or backup schema changes were made.
