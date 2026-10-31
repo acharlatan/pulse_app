@@ -62,6 +62,13 @@ describe("workspace language catalogue", () => {
       expect(translateInterface(locale, "{0} matching priorities", 3)).toContain("3");
     }
   });
+  it("localizes the Orbit map and focused connection controls", () => {
+    for (const [locale] of languageOptions.slice(1)) {
+      for (const message of ["Focus saved connections", "Your other map filters are paused.", "Selected record sections", "Works at", "Company opportunity", "Opportunity representative", "Clear map filters"]) {
+        expect(translateInterface(locale, message)).not.toBe(message);
+      }
+    }
+  });
   it("bundles translated labels for the new Analytics and Orbit controls", () => {
     for (const [locale] of languageOptions.filter(([locale]) => locale !== "en-US")) {
       expect(translateInterface(locale, "Keep commitments")).not.toBe("Keep commitments");

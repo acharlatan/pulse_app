@@ -1190,5 +1190,189 @@
   "open follow-ups": [
     "seguimientos abiertos",
     "suivis ouverts"
+  ],
+  "Saved in your workspace": [
+    "Guardado en tu espacio",
+    "Enregistré dans votre espace"
+  ],
+  "Showing saved connections for": [
+    "Mostrando las conexiones guardadas de",
+    "Connexions enregistrées pour"
+  ],
+  "Your other map filters are paused.": [
+    "Los demás filtros del mapa están en pausa.",
+    "Les autres filtres de la carte sont suspendus."
+  ],
+  "Return to map": [
+    "Volver al mapa",
+    "Retour à la carte"
+  ],
+  "Focus saved connections": [
+    "Enfocar conexiones guardadas",
+    "Centrer les connexions enregistrées"
+  ],
+  "Selected record sections": [
+    "Secciones del registro seleccionado",
+    "Sections de l’élément sélectionné"
+  ],
+  "FOLLOW THE THREAD": [
+    "SIGUE EL HILO",
+    "SUIVRE LE FIL"
+  ],
+  "YOUR NEXT STEPS": [
+    "TUS PRÓXIMOS PASOS",
+    "VOS PROCHAINES ÉTAPES"
+  ],
+  "WORK IN PROGRESS": [
+    "TRABAJO EN CURSO",
+    "TRAVAIL EN COURS"
+  ],
+  "LATEST SAVED ENTRIES": [
+    "ÚLTIMOS REGISTROS GUARDADOS",
+    "DERNIÈRES ENTRÉES ENREGISTRÉES"
+  ],
+  "Add a person, company or opportunity to start building your map.": [
+    "Añade una persona, empresa u oportunidad para empezar tu mapa.",
+    "Ajoutez une personne, une entreprise ou une opportunité pour commencer votre carte."
+  ],
+  "Clear map filters": [
+    "Quitar filtros del mapa",
+    "Effacer les filtres de la carte"
+  ],
+  "No records match this view.": [
+    "Ningún registro coincide con esta vista.",
+    "Aucun élément ne correspond à cette vue."
+  ],
+  "A good place to begin.": [
+    "Un buen punto de partida.",
+    "Un bon point de départ."
+  ],
+  "A live view of the work and activity you have saved. Choose a thread or explore the whole map.": [
+    "Una vista actual de tu trabajo y actividad guardados. Elige un hilo o explora todo el mapa.",
+    "Une vue actuelle de votre travail et de votre activité enregistrés. Suivez un fil ou explorez toute la carte."
+  ],
+  "Add your first connection": [
+    "Añade tu primera conexión",
+    "Ajoutez votre première relation"
+  ],
+  "Company activity uses the company saved on each conversation.": [
+    "La actividad de la empresa usa la empresa guardada en cada conversación.",
+    "L’activité de l’entreprise utilise l’entreprise enregistrée pour chaque conversation."
+  ],
+  "Explore the whole network": [
+    "Explorar toda la red",
+    "Explorer tout le réseau"
+  ],
+  "Filters include records directly linked to saved work.": [
+    "Los filtros incluyen registros vinculados directamente al trabajo guardado.",
+    "Les filtres incluent les éléments directement liés au travail enregistré."
+  ],
+  "Lines show only saved company membership and opportunity associations": [
+    "Las líneas muestran solo vínculos guardados de empresa y oportunidad",
+    "Les lignes montrent uniquement les liens enregistrés avec des entreprises et des opportunités"
+  ],
+  "List finds individual records. Explore organizes a company’s saved people and opportunities; Map shows their explicit links.": [
+    "La lista encuentra registros individuales. Explorar organiza las personas y oportunidades guardadas de una empresa; el mapa muestra sus vínculos explícitos.",
+    "La liste trouve les éléments individuels. Explorer organise les personnes et opportunités enregistrées d’une entreprise ; la carte montre leurs liens explicites."
+  ],
+  "MAP VIEW": [
+    "VISTA DEL MAPA",
+    "VUE DE LA CARTE"
+  ],
+  "Map filters": [
+    "Filtros del mapa",
+    "Filtres de la carte"
+  ],
+  "No open opportunities for this selection.": [
+    "No hay oportunidades abiertas para esta selección.",
+    "Aucune opportunité ouverte pour cette sélection."
+  ],
+  "Only interactions directly linked to this opportunity appear here.": [
+    "Aquí solo aparecen las interacciones vinculadas directamente a esta oportunidad.",
+    "Seules les interactions directement liées à cette opportunité apparaissent ici."
+  ],
+  "Orbit starting points": [
+    "Puntos de partida de Órbita",
+    "Points de départ d’Orbite"
+  ],
+  "Recent activity": [
+    "Actividad reciente",
+    "Activité récente"
+  ],
+  "Relationship map. Select a record or use the equivalent List view.": [
+    "Mapa de relaciones. Selecciona un registro o usa la vista de lista equivalente.",
+    "Carte relationnelle. Sélectionnez un élément ou utilisez la vue en liste équivalente."
+  ],
+  "Solid lines show works at · opportunity representative · company opportunity. Dotted lines connect portraits to their positions. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.": [
+    "Las líneas continuas muestran vínculos guardados de empresa y oportunidad. Las líneas punteadas conectan retratos con sus posiciones. La profundidad es visual y no mide cercanía. Trabajar en la misma empresa no significa que las personas se conozcan.",
+    "Les lignes continues indiquent les liens enregistrés avec des entreprises et des opportunités. Les pointillés relient les portraits à leur position. La profondeur est visuelle et ne mesure pas la proximité. Travailler dans la même entreprise ne signifie pas que les personnes se connaissent."
+  ],
+  "These follow-ups are related through the company or a representative and may support other work.": [
+    "Estos seguimientos están relacionados por la empresa o una persona representante y pueden apoyar otros trabajos.",
+    "Ces suivis sont liés par l’entreprise ou un représentant et peuvent concerner d’autres travaux."
+  ],
+  "YOUR NETWORK, IN MOTION": [
+    "TU RED, EN MOVIMIENTO",
+    "VOTRE RÉSEAU EN MOUVEMENT"
+  ],
+  "priority ·": [
+    "prioridad ·",
+    "priorité ·"
+  ],
+  "All records": [
+    "Todos los registros",
+    "Tous les éléments"
+  ],
+  "Linked follow-ups due": [
+    "Seguimientos vinculados pendientes",
+    "Suivis liés à échéance"
+  ],
+  "Overdue and next 7 days": [
+    "Vencidos y próximos 7 días",
+    "En retard et 7 prochains jours"
+  ],
+  "Current saved work": [
+    "Trabajo guardado actual",
+    "Travail enregistré actuel"
+  ],
+  "Recently recorded": [
+    "Registrado recientemente",
+    "Enregistré récemment"
+  ],
+  "Last 30 days, including notes": [
+    "Últimos 30 días, incluidas las notas",
+    "30 derniers jours, notes comprises"
+  ],
+  "No linked follow-ups due in this window.": [
+    "No hay seguimientos vinculados que venzan en este periodo.",
+    "Aucun suivi lié à échéance dans cette période."
+  ],
+  "No open opportunities yet.": [
+    "Aún no hay oportunidades abiertas.",
+    "Aucune opportunité ouverte pour le moment."
+  ],
+  "No activity recorded in the last 30 days.": [
+    "No se ha registrado actividad en los últimos 30 días.",
+    "Aucune activité enregistrée au cours des 30 derniers jours."
+  ],
+  "Showing this on the map": [
+    "Mostrando en el mapa",
+    "Affiché sur la carte"
+  ],
+  "Show related records on map": [
+    "Mostrar registros relacionados en el mapa",
+    "Afficher les éléments liés sur la carte"
+  ],
+  "Works at": [
+    "Trabaja en",
+    "Travaille chez"
+  ],
+  "Company opportunity": [
+    "Oportunidad de la empresa",
+    "Opportunité de l’entreprise"
+  ],
+  "Opportunity representative": [
+    "Representante de la oportunidad",
+    "Représentant de l’opportunité"
   ]
 }
