@@ -3,7 +3,7 @@ import { useTranslation } from "../i18n/useTranslation";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLiveQuery } from "dexie-react-hooks";
-import { ArrowUpRight, Plus } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { usePulse } from "../app/context";
 import { Avatar, useFormat } from "../components/ui";
 import { GettingStarted } from "../components/GettingStarted";
@@ -11,7 +11,7 @@ import { ProgressSummary } from "../components/progress";
 import { EditorModal, type Editor } from "../components/forms";
 import { DailyPlan } from "./DailyPlan";
 import { Focus } from "./Focus";
-import { ConstellationScene } from "../components/ConstellationScene";
+import { HomeStage } from "./HomeStage";
 export function Home({ focus = false }: { focus?: boolean }) {
   const __pulseText = useInterfaceText();
   const t = useTranslation();
@@ -59,64 +59,7 @@ export function Home({ focus = false }: { focus?: boolean }) {
       className={`page home-page editorial-home daily-home home-${p.settings.focus.homeLayout}`}
     >
       {todayTabs}
-      <div className="home-feature">
-        <header className="editorial-masthead">
-          <div>
-            <p className="eyebrow">
-              {date(new Date().toISOString(), {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-              })}{" "}
-              {__pulseText("· DAILY PULSE")}</p>
-            <h1>
-              {t("today")}<span className="accent">.</span>
-            </h1>
-            <p className="editorial-deck">
-              {p.settings.name ? `${t("hello")}, ${p.settings.name}. ` : ""}{t("homeIntro")}
-            </p>
-          </div>
-          <div className="editorial-create">
-            <button
-              className="button secondary"
-              onClick={() => setEditor({ kind: "contact" })}
-            >
-              <Plus size={17} />
-              {t("newConnection")}
-            </button>
-            <button
-              className="button ghost"
-              onClick={() => setEditor({ kind: "task" })}
-            >
-              {t("planFollowup")}
-            </button>
-          </div>
-        </header>
-
-        <section className="pulse-opening" aria-label={__pulseText("Your relationship workspace")}>
-          <div className="pulse-opening-copy">
-            <span className="pulse-opening-label"><span className="opening-spark">✳</span> {" " + __pulseText("YOUR SPACE · YOUR PACE")}</span>
-            <h2>{t("hero1")}<br /><em>{t("hero2")}</em><span>.</span></h2>
-            <p>{t("heroCopy")}</p>
-            <div className="opening-actions"><Link className="pulse-opening-link" to="/network">{t("exploreNetwork")} <ArrowUpRight size={17} /></Link><Link className="opening-orbit-link" to="/orbit">{t("enterOrbit")} ↗</Link></div>
-            {p.contacts.length > 0 && <div className="opening-people"><div className="opening-avatar-stack">{p.contacts.slice(0, 5).map((person) => <Avatar key={person.id} name={person.name} mediaId={person.avatar} />)}</div><span><strong>{p.contacts.length} {p.contacts.length === 1 ? __pulseText("person") : __pulseText("people")}</strong> {" " + __pulseText("in your world")}</span></div>}
-          </div>
-          <div className="opening-art">
-            <div className="opening-art-fallback" aria-hidden="true" />
-            <ConstellationScene variant="home" />
-            <div className="opening-portrait-links">
-              {p.contacts.slice(0, 3).map((person) => (
-                <Link className="opening-portrait" key={person.id} to={`/network/people/${person.id}`}>
-                  <Avatar name={person.name} mediaId={person.avatar} />
-                  <span><strong>{person.name}</strong><small>{person.role || __pulseText("Person")}</small></span>
-                  <ArrowUpRight size={15} aria-hidden="true" />
-                </Link>
-              ))}
-            </div>
-            <span className="opening-art-caption" aria-hidden="true">{__pulseText("A WORLD OF CONNECTIONS") + " "}<b>✳</b></span>
-          </div>
-        </section>
-      </div>
+      <HomeStage onEdit={setEditor} />
 
       {p.workspace === "personal" &&
         p.contacts.length +

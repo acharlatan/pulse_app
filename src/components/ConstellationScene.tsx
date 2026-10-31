@@ -27,7 +27,7 @@ export function ConstellationScene({ variant }: { variant: "home" | "orbit" }) {
       element.appendChild(renderer.domElement);
       const scene = new T.Scene();
       const camera = new T.PerspectiveCamera(38, 1, 0.1, 100);
-      camera.position.z = variant === "home" ? 9 : 12;
+      camera.position.z = variant === "home" ? 7.5 : 12;
       const world = new T.Group();
       scene.add(world);
       const sculpture = new T.Group();
@@ -35,20 +35,34 @@ export function ConstellationScene({ variant }: { variant: "home" | "orbit" }) {
       sculpture.position.x = variant === "home" ? 0 : 1.5;
       sculpture.scale.setScalar(variant === "home" ? 1 : 0.9);
       const body = new T.Mesh(
-        new T.TorusKnotGeometry(0.83, 0.25, 180, 24, 2, 3),
+        variant === "home" ? new T.SphereGeometry(0.95, 48, 32) : new T.TorusKnotGeometry(0.83, 0.25, 180, 24, 2, 3),
         new T.MeshPhysicalMaterial({ color: 0xc4a5ff, metalness: 0.5, roughness: 0.2, clearcoat: 1, clearcoatRoughness: 0.12, iridescence: 0.7 }),
       );
       sculpture.add(body);
       const core = new T.Mesh(
-        new T.IcosahedronGeometry(0.43, 2),
+        new T.IcosahedronGeometry(variant === "home" ? 0.27 : 0.43, 2),
         new T.MeshPhysicalMaterial({ color: 0xe7ffb1, metalness: 0.3, roughness: 0.2, clearcoat: 1 }),
       );
+      if (variant === "home") core.position.set(-0.72, 0.5, 0.65);
       sculpture.add(core);
       const shell = new T.Mesh(
         new T.IcosahedronGeometry(1.42, 1),
         new T.MeshBasicMaterial({ color: 0xffd3fa, wireframe: true, transparent: true, opacity: 0.13 }),
       );
       sculpture.add(shell);
+      if (variant === "home") {
+        const meridians = new T.Mesh(
+          new T.SphereGeometry(1.04, 20, 12),
+          new T.MeshBasicMaterial({ color: 0xf5dbff, wireframe: true, transparent: true, opacity: 0.18 }),
+        );
+        sculpture.add(meridians);
+        const halo = new T.Mesh(
+          new T.TorusGeometry(1.27, 0.034, 12, 128),
+          new T.MeshPhysicalMaterial({ color: 0xe5c8ff, metalness: 0.6, roughness: 0.24, clearcoat: 1 }),
+        );
+        halo.rotation.set(0.9, 0.35, 0.5);
+        sculpture.add(halo);
+      }
       const rings: import("three").Mesh[] = [];
       [0xe8d6ff, 0xffa5d8, 0xd5ff92, 0x9cdffc].forEach((color, i) => {
         const ring = new T.Mesh(

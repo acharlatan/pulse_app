@@ -2,7 +2,7 @@
 
 ## Identity
 
-An editorial workspace pairs warm paper, deep plum navigation, periwinkle and lime accents, and relationship-centered cards. The Daily Pulse opening includes links to saved people beside a decorative three-dimensional sculpture; the People overview combines identity and live counts. Initials provide private, deterministic avatars with no remote requests. Avoid unnecessary decoration, button outlines and fake analytics.
+An editorial workspace pairs warm paper, deep plum navigation, periwinkle and lime accents, and relationship-centered layouts. The full-width Daily Pulse opening includes real saved portrait links, an interactive decorative three-dimensional sculpture, and a CSS fallback; the People overview combines identity and live counts. Initials provide private, deterministic avatars with no remote requests. Avoid unnecessary decoration, button outlines and fake analytics.
 
 ## Tokens
 
@@ -10,10 +10,10 @@ Current semantic variables in `src/experience.css`, extending `src/styles.css`:
 
 | Token        | Light     | Dark      |
 | ------------ | --------- | --------- |
-| Background   | `#f5f2ed` | `#13111b` |
-| Surface      | `#fffdf9` | `#292536` |
-| Text         | `#211c2d` | `#fdfaff` |
-| Muted        | `#625b6c` | `#e0dbe9` |
+| Background   | `#f5f0ea` | `#120e19` |
+| Surface      | `#fffdf9` | `#2b2233` |
+| Text         | `#231c2d` | `#fffaff` |
+| Muted        | `#625767` | `#e2d7e8` |
 | Primary      | `#6650ce` | `#b3a3ff` |
 | Soft primary | `#efebfb` | `#332b4b` |
 | Success      | `#247965` | `#8dd6ba` |
@@ -29,7 +29,7 @@ Use a 4px base and 8px major rhythm; card padding 20–32px, page gutters 14–4
 
 ## Layout
 
-Desktop: four top-level destinations in the top bar, contextual section navigation and centered content. Daily Pulse uses a two-part opening; the People cover combines the masthead and overview. Tablet and mobile stack these compositions. Below 768px: bottom navigation, safe-area spacing, top settings/alerts, contextual floating add. The directory adapts its columns and profiles stack essential details and relationship story. Settings category navigation wraps rather than clips. Dialogs use native `showModal`, internal scrolling and small-screen margins.
+Desktop: four top-level destinations in the top bar, contextual section navigation and centered content. Daily Pulse uses an editorial full-width opening with workspace links; the People cover combines the masthead and overview. Tablet and mobile stack these compositions. Below 768px: bottom navigation, safe-area spacing, top settings/alerts, contextual floating add. The directory adapts its columns and profiles stack essential details and relationship story. Settings category navigation wraps rather than clips. Dialogs use native `showModal`, internal scrolling and small-screen margins.
 
 ## Components and states
 
