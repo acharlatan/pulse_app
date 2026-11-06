@@ -66,7 +66,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run build
       - name: Core workflow and source-record navigation
-        run: npm run test:browser -- --config=playwright.production.config.ts tests/browser/phase3-journey.spec.ts tests/browser/phase3-deletion.spec.ts tests/browser/phase3-search.spec.ts tests/browser/phase3-orbit-motion.spec.ts tests/browser/analytics44.spec.ts tests/browser/orbit43.spec.ts tests/browser/focus42.spec.ts --grep 'a new consultant|editing and deletion|global search respects|3D Orbit portraits move|visual Analytics charts|focused map follows|Focus, relationship context' --workers=2
+        run: npm run test:browser -- --config=playwright.production.config.ts tests/browser/phase3-journey.spec.ts tests/browser/phase3-deletion.spec.ts tests/browser/phase3-search.spec.ts tests/browser/phase3-orbit-motion.spec.ts tests/browser/iteration10.spec.ts tests/browser/analytics44.spec.ts tests/browser/orbit43.spec.ts tests/browser/focus42.spec.ts --grep 'a new consultant|editing and deletion|global search respects|3D Orbit portraits move|a restricted contact blocks|visual Analytics charts|focused map follows|Focus, relationship context' --workers=2
       - name: Preserve journey diagnostics
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
