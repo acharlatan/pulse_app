@@ -97,8 +97,9 @@ test("archive and restore preserve linked records across a backup", async ({
   await searchDialog
     .getByRole("option", { name: /Taylor Archive Test.*Archived contact/ })
     .click();
+  await expect(page).toHaveURL(personURL);
   await expect(
-    page.getByRole("heading", { name: "Taylor Archive Test", exact: true }),
+    page.getByRole("heading", { name: "Taylor Archive Test", level: 1, exact: true }),
   ).toBeVisible();
   await expect(page.locator("#next-steps")).toContainText(
     "Archive journey follow-up",
