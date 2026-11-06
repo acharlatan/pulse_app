@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main, hardening/v1-phase-1]
+    branches: [main, hardening/v1-phase-1, hardening/v1-phase-2]
   workflow_dispatch:
 
 permissions:
@@ -51,4 +51,26 @@ jobs:
           path: |
             test-results/
             .codex/pwa-results/
+          if-no-files-found: ignore
+
+  core-journeys:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Core workflow and source-record navigation
+        run: npm run test:browser -- --config=playwright.production.config.ts tests/browser/phase3-journey.spec.ts tests/browser/analytics44.spec.ts tests/browser/orbit43.spec.ts tests/browser/focus42.spec.ts --grep 'a new consultant|visual Analytics charts|focused map follows|Focus, relationship context' --workers=2
+      - name: Preserve journey diagnostics
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-journey-results
+          path: test-results/
           if-no-files-found: ignore
