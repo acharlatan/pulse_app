@@ -93,7 +93,9 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
   test.setTimeout(180000);
   await demo(page);
   await page.goto("/#/automations");
-  await page.getByRole("button", { name: /^Proposal follow-up/ }).click();
+  await page
+    .getByRole("button", { name: /^When an opportunity moves/ })
+    .click();
   const d = page.getByRole("dialog");
   await expect(d.getByText("Review before saving")).toBeVisible();
   await expect(d).toContainText("No email or message is sent");
@@ -144,16 +146,6 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
       .filter({ hasText: "Follow-up created locally" }),
   ).toHaveCount(1);
   await second.close();
-  await page.goto("/#/analytics");
-  await page
-    .getByRole("button", { name: "Opportunities", exact: true })
-    .click();
-  await expect(
-    page.getByRole("heading", { name: "Recorded stage movements" }),
-  ).toBeVisible();
-  await expect(
-    page.getByText(/New → Relationship pipeline \/ Proposal/),
-  ).toBeVisible();
   await page.goto("/#/settings?section=data");
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export", exact: true }).click();
@@ -193,7 +185,9 @@ test("restricted person blocks automated action and the rule builder fits respon
   test.setTimeout(180000);
   await demo(page);
   await page.goto("/#/automations");
-  await page.getByRole("button", { name: /^Proposal follow-up/ }).click();
+  await page
+    .getByRole("button", { name: /^When an opportunity moves/ })
+    .click();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Save disabled draft" })

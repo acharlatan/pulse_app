@@ -4,7 +4,7 @@ PULSE stores records in this browser profile and origin, with separate Demo and 
 
 ## Export
 
-Settings → Privacy & data → Export downloads a JSON workspace copy containing CRM records, settings, Smart Lists, review actions, import history and authoritative progress. Metadata records format, version and export time. Check Downloads; a requested download does not prove that a file was safely retained. Keep copies in a trusted location.
+Settings → Privacy & data → Export downloads a JSON workspace copy containing CRM records, settings, Smart Lists, review actions, import history and authoritative progress. Metadata records format, version and export time. Check Downloads; a requested download does not prove that a file was safely retained. Keep copies in a trusted location. Restore accepts files up to 32 MiB. If an exported file exceeds that limit, PULSE warns that it cannot restore the file: keep it, reduce workspace size, then export a new copy within the limit.
 
 The Getting Started check records when a download was requested, after constructing the file. It is not an automatic-backup guarantee. That preference is workspace-local and included on subsequent exports.
 

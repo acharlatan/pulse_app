@@ -503,6 +503,57 @@ export async function exportBackup(db: PulseDB) {
   }));
 }
 export function validateBackup(input: unknown) {
+  // Each historical exporter writes every store available in its version.
+  // Applying defaults to an omitted existing store can erase data on restore;
+  // only stores introduced in later versions may safely use defaults.
+  if (
+    input &&
+    typeof input === "object" &&
+    "version" in input &&
+    typeof input.version === "number" &&
+    Number.isInteger(input.version) &&
+    input.version >= 1 &&
+    input.version <= 6
+  ) {
+    const source = input as Record<string, unknown>;
+    const storesByVersion = [
+      [
+        "organizations",
+        "contacts",
+        "interactions",
+        "tasks",
+        "opportunities",
+        "events",
+        "settings",
+        "restrictions",
+        "permissions",
+        "gamification",
+        "integrations",
+      ],
+      ["smartLists", "recommendationActions", "importBatches"],
+      ["rewards", "rewardChanges", "progressState", "dailyQuests"],
+      [
+        "pipelines",
+        "pipelineStages",
+        "fieldDefinitions",
+        "fieldValues",
+        "focusItems",
+      ],
+      ["media"],
+      [
+        "transitions",
+        "automationRules",
+        "automationExecutions",
+        "automationControl",
+      ],
+    ];
+    for (const key of storesByVersion.slice(0, input.version).flat()) {
+      if (!Array.isArray(source[key]))
+        throw new Error(
+          `Incomplete version ${input.version} backup: missing ${key}. Nothing was replaced.`,
+        );
+    }
+  }
   const b = backupSchema.parse(input);
   // Version-one backups remain supported. The stage is authoritative for outcomes.
   if (b.version < 4) {

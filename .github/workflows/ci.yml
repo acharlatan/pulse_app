@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, hardening/v1-phase-1]
   workflow_dispatch:
 
 permissions:
@@ -25,3 +25,30 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run check:worker
+
+  data-recovery-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Backup, stale edits and workspace isolation
+        run: npm run test:browser -- --config=playwright.production.config.ts tests/browser/backup-integrity.spec.ts tests/browser/release07.spec.ts tests/browser/workspace22.spec.ts tests/browser/iteration09.spec.ts tests/browser/iteration10.spec.ts --grep 'backup transfers|edited dialog dismissal|denied IndexedDB|switching workspaces|local profile portraits|disabled rule creates|invalid, incomplete|warns when' --workers=2
+      - name: Offline persistence and updates
+        if: ${{ !cancelled() }}
+        run: npm run test:pwa -- tests/pwa/reliability.spec.ts --workers=1
+      - name: Preserve browser failure diagnostics
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-recovery-browser-results
+          path: |
+            test-results/
+            .codex/pwa-results/
+          if-no-files-found: ignore

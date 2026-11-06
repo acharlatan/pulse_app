@@ -85,6 +85,13 @@ test("production manifest and cached CRM support offline routes, edits and backu
   });
   expect(privateCached).toBe(false);
   await context.setOffline(false);
+  await page.goto("/#/network/people/contact-0");
+  await page.reload();
+  await expect(
+    page.getByText("A fictional note created and saved while offline.", {
+      exact: true,
+    }),
+  ).toBeVisible();
 });
 test("real waiting SW update warns about unfinished work and does not reload another editing tab", async ({
   page,
