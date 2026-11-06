@@ -257,3 +257,45 @@ test("restricted person blocks automated action and the rule builder fits respon
     ).violations,
   ).toEqual([]);
 });
+
+test("a restricted contact blocks an automatic follow-up", async ({ page }) => {
+  test.setTimeout(90000);
+  await demo(page);
+  await page.goto("/#/automations");
+  await page
+    .getByRole("button", { name: /^When an opportunity moves/ })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Save disabled draft" })
+    .click();
+  await page
+    .locator(".automation-rule")
+    .getByRole("button", { name: "Enable", exact: true })
+    .click();
+  await createDeal(
+    page,
+    "Restricted Phase 3 test",
+    "Sunday Supply",
+    "Mia Patel",
+  );
+  await page
+    .locator(".pipeline-deal")
+    .filter({ hasText: "Restricted Phase 3 test" })
+    .getByLabel("Move to stage / reopen")
+    .selectOption("Proposal");
+  await expect(
+    page.getByRole("status").filter({ hasText: "Opportunity updated" }),
+  ).toBeVisible();
+  await page.goto("/#/automations");
+  await expect(
+    page
+      .locator(".automation-history")
+      .filter({ hasText: "restriction or denied/withdrawn permission" }),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator(".automation-history")
+      .filter({ hasText: "Follow-up created locally" }),
+  ).toHaveCount(0);
+});
