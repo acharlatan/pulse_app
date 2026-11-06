@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { Blob as NodeBlob } from "node:buffer";
 import { it, expect } from "vitest";
 import { PulseDB } from "../src/data/db";
 import {
@@ -195,6 +196,23 @@ it.each([1, 2, 3, 4, 5] as const)(
     const fixture = JSON.parse(
       readFileSync("tests/fixtures/backup-v2.json", "utf8"),
     );
+    const png =
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=";
+    if (version === 5) {
+      const bytes = Uint8Array.from(atob(png), (c) => c.charCodeAt(0));
+      fixture.contacts[0].avatar = "media-migration";
+      fixture.media = [
+        {
+          id: "media-migration",
+          mime: "image/png",
+          width: 1,
+          height: 1,
+          bytes: bytes.length,
+          createdAt: "2026-01-01T00:00:00.000Z",
+          blob: new NodeBlob([bytes], { type: "image/png" }),
+        },
+      ];
+    }
     const old = new Dexie("pulse-personal");
     old.version(version).stores(schema);
     await old.open();
@@ -218,6 +236,7 @@ it.each([1, 2, 3, 4, 5] as const)(
       }
       expect(await db.opportunities.count()).toBe(fixture.opportunities.length);
       const migrated = await exportBackup(db);
+      if (version === 5) expect(migrated.media[0]?.encoded).toBe(png);
       expect(() => validateBackup(migrated)).not.toThrow();
       expect(migrated.automationExecutions).toEqual([]);
       expect(migrated.rewards).toEqual([]);
