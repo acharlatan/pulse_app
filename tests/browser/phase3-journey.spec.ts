@@ -143,6 +143,24 @@ test("a new consultant manages and recovers a complete relationship", async ({
     await expect(
       row.getByRole("button", { name: "Complete task", exact: true }),
     ).toBeVisible();
+    await page.goto("/#/");
+    await expect(page.locator(".world-next-line")).toContainText(task);
+    await page.goto("/#/activity");
+    await page.getByLabel("Filter tasks").selectOption("open");
+    await expect(page.getByText(task, { exact: true }).first()).toBeVisible();
+    await page.goto(profile);
+    await expect(page.locator("#next-steps")).toContainText(task);
+    await expect(page.locator("#next-steps")).toContainText("Complete");
+    await page.goto("/#/analytics");
+    await page
+      .getByLabel("Analytics sections")
+      .getByRole("button", { name: /Commitments/ })
+      .click();
+    await expect(
+      page.getByLabel("Follow-up overview").locator(".pulse-donut strong"),
+    ).toHaveText("1");
+    await page.goto("/#/focus?view=today");
+    await expect(row).toBeVisible();
     await row
       .getByRole("button", { name: "Complete task", exact: true })
       .click();
