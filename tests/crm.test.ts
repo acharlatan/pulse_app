@@ -202,7 +202,7 @@ describe("CRM data integrity", () => {
       }),
     ).rejects.toThrow();
     expect(await db.contacts.count()).toBe(1);
-    await expect(restoreBackup(db, { ...b, contacts: [c, c] })).rejects.toThrow(
+    await expect(restoreBackup(db, { ...b, contacts: [b.contacts[0], b.contacts[0]] })).rejects.toThrow(
       "duplicate",
     );
     expect(await db.contacts.count()).toBe(1);

@@ -5,6 +5,7 @@ import {
   interactionSchema,
   importBatchSchema,
   stamp,
+  nextRecordTimestamp,
 } from "./models";
 import { sourceDigest, type ImportPlan } from "../services/csv-import";
 export async function commitImport(db: PulseDB, plan: ImportPlan) {
@@ -58,6 +59,13 @@ export async function commitImport(db: PulseDB, plan: ImportPlan) {
         throw new Error(
           "Import cannot alter contact restrictions or identity timestamps.",
         );
+      c.archivedAt = old?.archivedAt ?? null;
+      if (old) c.updatedAt = nextRecordTimestamp(old.updatedAt);
+    }
+    for (const o of organizations) {
+      const old = currentOrgs.find((record) => record.id === o.id);
+      o.archivedAt = old?.archivedAt ?? null;
+      if (old) o.updatedAt = nextRecordTimestamp(old.updatedAt);
     }
     const countNew = contacts.filter(
         (c) => !currentContacts.some((old) => old.id === c.id),

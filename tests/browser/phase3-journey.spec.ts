@@ -326,7 +326,7 @@ test("a new consultant manages and recovers a complete relationship", async ({
         .locator('input[type="file"][accept="application/json,.json"]')
         .setInputFiles(file!);
       await expect(target.getByRole("dialog")).toContainText(
-        "Compatible backup v6",
+        "Compatible backup v7",
       );
       await target
         .getByRole("button", { name: "Validate & restore", exact: true })

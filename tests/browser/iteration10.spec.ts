@@ -151,7 +151,7 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
   await page.getByRole("button", { name: "Export", exact: true }).click();
   const file = await (await download).path();
   const data = JSON.parse(fs.readFileSync(file!, "utf8"));
-  expect(data.version).toBe(6);
+  expect(data.version).toBe(7);
   expect(data.automationRules).toHaveLength(1);
   expect(data.automationExecutions).toHaveLength(1);
   expect(data.transitions).toHaveLength(1);
@@ -162,7 +162,7 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
   await other.getByRole("button", { name: /Create My Workspace/ }).click();
   await other.goto("/#/settings?section=data");
   await other.locator('input[type="file"]').setInputFiles(file!);
-  await expect(other.getByRole("dialog")).toContainText("Compatible backup v6");
+  await expect(other.getByRole("dialog")).toContainText("Compatible backup v7");
   await other
     .getByRole("button", { name: "Validate & restore", exact: true })
     .click();

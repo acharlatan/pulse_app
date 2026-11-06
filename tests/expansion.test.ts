@@ -286,7 +286,7 @@ it("upgrades an actual v3 database atomically preserving IDs, dates, outcomes an
   await old.table("opportunities").bulkPut(deals);
   old.close();
   await db.open();
-  expect(db.verno).toBe(6);
+  expect(db.verno).toBe(7);
   expect(await db.opportunities.toArray()).toEqual(
     [...deals].sort((a, b) => a.id.localeCompare(b.id)),
   );

@@ -158,6 +158,21 @@ export class PulseDB extends Dexie {
       automationExecutions: "id,ruleId,at,sourceId,resultId",
       automationControl: "id",
     });
+    this.version(7)
+      .stores({
+        organizations: "id,name,updatedAt,archivedAt",
+        contacts: "id,organizationId,name,stage,priority,archivedAt",
+      })
+      .upgrade(async (tx) => {
+        for (const name of ["organizations", "contacts"]) {
+          await tx
+            .table(name)
+            .toCollection()
+            .modify((record) => {
+              record.archivedAt = record.archivedAt ?? null;
+            });
+        }
+      });
   }
 }
 const instances = new Map<Workspace, PulseDB>();
