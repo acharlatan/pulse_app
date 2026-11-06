@@ -103,6 +103,19 @@ test("a new consultant manages and recovers a complete relationship", async ({
     await expect(card.getByLabel("Move to stage / reopen")).toHaveValue(
       "Negotiation",
     );
+    await page.goto(profile);
+    await page
+      .getByRole("button", { name: "Create opportunity", exact: true })
+      .first()
+      .click();
+    const euro = page.getByRole("dialog");
+    await euro.getByLabel("Opportunity title").fill("Euro campaign project");
+    await euro.getByLabel("Value (optional)").fill("5000");
+    await euro.getByLabel("Currency", { exact: true }).fill("EUR");
+    await euro
+      .getByRole("button", { name: "Save changes", exact: true })
+      .click();
+    await expect(euro).toHaveCount(0);
   });
 
   await test.step("Choose the follow-up in Focus, complete it and reopen it", async () => {
@@ -133,6 +146,13 @@ test("a new consultant manages and recovers a complete relationship", async ({
     await row
       .getByRole("button", { name: "Complete task", exact: true })
       .click();
+    await page.goto("/#/");
+    await expect(page.locator(".world-next-line")).toContainText(
+      "Plan a first follow-up",
+    );
+    await page.goto("/#/activity");
+    await page.getByLabel("Filter tasks").selectOption("complete");
+    await expect(page.getByText(task, { exact: true }).first()).toBeVisible();
     await page.goto(profile);
     await expect(page.locator("#next-steps")).toContainText(task);
     await expect(page.locator("#next-steps")).toContainText("Reopen");
@@ -154,6 +174,12 @@ test("a new consultant manages and recovers a complete relationship", async ({
     );
     await expect(pipeline.locator(".pulse-pipeline-value")).toContainText(
       "USD",
+    );
+    await expect(pipeline.locator(".pulse-pipeline-value")).toContainText(
+      "5,000",
+    );
+    await expect(pipeline.locator(".pulse-pipeline-value")).toContainText(
+      "EUR",
     );
     await expect(pipeline.locator(".pulse-stage-list")).toContainText(
       "Negotiation",
