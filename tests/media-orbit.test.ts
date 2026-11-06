@@ -85,7 +85,7 @@ it("rejects stale image changes and rolls back quota failure, preserving the ori
 it("exports binary media as a bounded v5 payload and rejects corruption before replacement", async () => {
   await saveMedia(db, "contact", "contact-0", "avatar", asset(), null);
   const b = await exportBackup(db);
-  expect(b.version).toBe(6);
+  expect(b.version).toBe(7);
   expect(b.media[0].encoded).toBe(png);
   expect(decodeMedia(b.media[0]).bytes).toBe(asset().bytes);
   const broken = structuredClone(b);
@@ -133,6 +133,8 @@ it("upgrades a real v4 workspace without rewriting CRM records", async () => {
         [t.schema.primKey.src, ...t.schema.indexes.map((i) => i.src)].join(","),
       ]),
   );
+  schema.organizations = "id,name,updatedAt";
+  schema.contacts = "id,organizationId,name,stage,priority";
   await db.delete();
   const old = new Dexie("pulse-demo");
   old.version(4).stores(schema);
@@ -141,8 +143,8 @@ it("upgrades a real v4 workspace without rewriting CRM records", async () => {
   await old.table("organizations").bulkPut(orgs);
   old.close();
   await db.open();
-  expect(db.verno).toBe(6);
-  expect(await db.contacts.toArray()).toEqual(contacts);
+  expect(db.verno).toBe(7);
+  expect(await db.contacts.toArray()).toEqual(contacts.map((c) => ({ ...c, archivedAt: c.archivedAt ?? null })));
   expect(await db.media.count()).toBe(0);
 });
 it("recognizes PNG dimensions and refuses active or truncated content", () => {

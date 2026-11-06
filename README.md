@@ -72,7 +72,7 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 - Centralized, explainable relationship health and reviews; saved snoozes/dismissals; opportunity risk flags; authoritative restriction and permission checks.
 - Dynamic built-in and saved ALL/ANY Smart Lists; Network applies the same saved definitions.
 - CSV preview, editable mapping, row validation, deterministic duplicate comparisons, selected-field merges, company matching, atomic import and accurate result/history reports. No consent or availability is imported.
-- Version-six JSON backups with optimized local images, metadata and a validated replacement preview; versions one through five remain supported.
+- Version-seven JSON backups with optimized local images, archive status, metadata and a validated replacement preview; versions one through six remain supported.
 - Light/dark/device themes; motion preference; local name, locale/timezone and rhythm settings; category-specific in-app alerts.
 - JSON backups with runtime validation and atomic restore; contact CSV export; separate demo reset/personal deletion; workspace switching.
 - Complete opportunity creation, editing, deletion and stage/outcome transitions; company and representative associations, values, expected close and user-entered probabilities.
@@ -82,7 +82,9 @@ Included `.github/workflows/pages.yml` builds and uploads the static site. Enabl
 
 ## Storage and privacy
 
-Dexie schema version 6 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
+Dexie schema version 7 uses `pulse-demo` and `pulse-personal`. Settings are stored per workspace. The active workspace and startup theme hint alone use localStorage. All timestamps are ISO UTC; display uses selected locale/timezone. Date/time inputs explicitly use the browser device timezone. Last interaction and next open task are derived from records rather than fabricated profile dates.
+
+People and companies can be archived from their profile and restored through the directory's Archived records filter. Archiving preserves all history and links, and does not stop follow-ups or existing automations. Global search, reports and linked records can still include archived records. Back up before updating to the v7 database; older code cannot open it. Use a v7-compatible forward fix rather than downgrading.
 
 No mandatory account, analytics, external fonts or external avatars. Records remain local unless you export them, open a reviewed external communication handoff, or explicitly approve selected context for optional Gemini processing. AI is off by default and production generation remains unconfigured. Provider keys are never entered in the frontend. IndexedDB is **not application-level encryption**; browser-profile access permits data access. Browser clearing/eviction and device loss can erase data. Back up important records. Workspace data is scoped to an origin: preview, GitHub Pages and hosted deployments do not share records. Export/import to move between them. Databases are not yet namespaced for multiple PULSE deployments on the same origin.
 

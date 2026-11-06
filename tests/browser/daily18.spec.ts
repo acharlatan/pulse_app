@@ -80,7 +80,7 @@ test("Daily Pulse chooses, reschedules and completes a saved commitment in place
   const backup = JSON.parse(
     fs.readFileSync(await (await pending).path(), "utf8"),
   );
-  expect(backup.version).toBe(6);
+  expect(backup.version).toBe(7);
   expect(
     backup.tasks.find((t: { title: string }) => t.title === title),
   ).toMatchObject({

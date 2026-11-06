@@ -54,7 +54,7 @@ it.each([1, 2])(
   },
 );
 
-it("rejects incomplete v6 backups before replacing any existing data", async () => {
+it("rejects incomplete v7 backups before replacing any existing data", async () => {
   const fixture = JSON.parse(
     readFileSync("tests/fixtures/backup-v2.json", "utf8"),
   );
@@ -74,7 +74,7 @@ it("rejects incomplete v6 backups before replacing any existing data", async () 
       const damaged: Record<string, unknown> = { ...before };
       delete damaged[key];
       await expect(restoreBackup(db, damaged), key).rejects.toThrow(
-        /Incomplete version 6 backup/,
+        /Incomplete version 7 backup/,
       );
       const after = await exportBackup(db);
       for (const store of keys) {
@@ -88,7 +88,7 @@ it("rejects incomplete v6 backups before replacing any existing data", async () 
   }
 });
 
-it.each([1, 2, 3, 4, 5] as const)(
+it.each([1, 2, 3, 4, 5, 6] as const)(
   "rejects missing stores from version %s backups without replacing the workspace",
   async (version) => {
     const db = new PulseDB("personal");
@@ -124,6 +124,12 @@ it.each([1, 2, 3, 4, 5] as const)(
           "focusItems",
         ],
         ["media"],
+        [
+          "transitions",
+          "automationRules",
+          "automationExecutions",
+          "automationControl",
+        ],
       ];
       const required = versionStores.slice(0, version).flat();
       const legacy = { ...before, version };
@@ -148,7 +154,7 @@ it.each([1, 2, 3, 4, 5] as const)(
   },
 );
 
-it.each([1, 2, 3, 4, 5] as const)(
+it.each([1, 2, 3, 4, 5, 6] as const)(
   "upgrades historical database version %s and preserves linked records",
   async (version) => {
     const { default: Dexie } = await import("dexie");
@@ -178,6 +184,12 @@ it.each([1, 2, 3, 4, 5] as const)(
         "focusItems",
       ],
       ["media"],
+      [
+        "transitions",
+        "automationRules",
+        "automationExecutions",
+        "automationControl",
+      ],
     ]
       .slice(0, version)
       .flat();
@@ -192,6 +204,8 @@ it.each([1, 2, 3, 4, 5] as const)(
           ].join(","),
         ]),
     );
+    schema.organizations = "id,name,updatedAt";
+    schema.contacts = "id,organizationId,name,stage,priority";
     if (version < 4) schema.opportunities = "id,organizationId,stageId";
     const fixture = JSON.parse(
       readFileSync("tests/fixtures/backup-v2.json", "utf8"),
@@ -222,7 +236,7 @@ it.each([1, 2, 3, 4, 5] as const)(
     old.close();
     try {
       await db.open();
-      expect(db.verno).toBe(6);
+      expect(db.verno).toBe(7);
       for (const key of [
         "organizations",
         "contacts",
@@ -232,7 +246,13 @@ it.each([1, 2, 3, 4, 5] as const)(
         "restrictions",
         "permissions",
       ]) {
-        expect(await db.table(key).toArray(), key).toEqual(fixture[key]);
+        const expected = ["organizations", "contacts"].includes(key)
+          ? fixture[key].map((record: object) => ({
+              ...record,
+              archivedAt: null,
+            }))
+          : fixture[key];
+        expect(await db.table(key).toArray(), key).toEqual(expected);
       }
       expect(await db.opportunities.count()).toBe(fixture.opportunities.length);
       const migrated = await exportBackup(db);

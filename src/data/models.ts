@@ -33,8 +33,13 @@ const base = {
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 };
+// A later write must never reuse an editor's previous snapshot timestamp.
+export function nextRecordTimestamp(previous: string) {
+  return new Date(Math.max(Date.now(), Date.parse(previous) + 1)).toISOString();
+}
 export const organizationSchema = z.object({
   ...base,
+  archivedAt: z.string().datetime().nullable().optional(),
   name: z.string().trim().min(1).max(200),
   industry: z.string(),
   website: z.string(),
@@ -47,6 +52,7 @@ export const organizationSchema = z.object({
 });
 export const contactSchema = z.object({
   ...base,
+  archivedAt: z.string().datetime().nullable().optional(),
   name: z.string().trim().min(1).max(200),
   preferredName: z.string(),
   role: z.string(),
@@ -300,7 +306,15 @@ export const settingsSchema = z.object({
     .object({
       hidden: z.boolean().default(false),
       intention: z
-        .enum(["", "clients", "partnerships", "opportunities", "job_search", "networking", "other"])
+        .enum([
+          "",
+          "clients",
+          "partnerships",
+          "opportunities",
+          "job_search",
+          "networking",
+          "other",
+        ])
         .default(""),
       exportInitiatedAt: z.string().datetime().nullable().default(null),
     })

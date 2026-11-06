@@ -44,6 +44,9 @@ export function Network() {
     params.get("view") === "companies" ? "companies" : "people",
   );
   const [search, setSearch] = useState(params.get("q") || "");
+  const [archiveScope, setArchiveScope] = useState<"active" | "archived" | "all">(
+    params.get("archive") === "archived" ? "archived" : params.get("archive") === "all" ? "all" : "active",
+  );
   const [priority, setPriority] = useState(params.get("priority") || "");
   const [availability, setAvailability] = useState(
     params.get("availability") || "",
@@ -66,6 +69,7 @@ export function Network() {
       availability,
       sort: sort === "name" ? "" : sort,
       list: smart === "all" ? "" : smart,
+      archive: archiveScope === "active" ? "" : archiveScope,
     }))
       if (value) next.set(key, value);
     if (next.toString() !== params.toString())
@@ -79,6 +83,7 @@ export function Network() {
     availability,
     sort,
     smart,
+    archiveScope,
     params,
     setParams,
   ]);
@@ -86,6 +91,7 @@ export function Network() {
   const people = contacts
     .filter(
       (c) =>
+        (archiveScope === "all" || (archiveScope === "archived" ? !!c.archivedAt : !c.archivedAt)) &&
         `${c.name} ${c.role} ${c.emails.join(" ")} ${c.tags.join(" ")} ${organizations.find((o) => o.id === c.organizationId)?.name || ""}`
           .toLowerCase()
           .includes(query) &&
@@ -110,6 +116,7 @@ export function Network() {
   const companies = organizations
     .filter(
       (o) =>
+        (archiveScope === "all" || (archiveScope === "archived" ? !!o.archivedAt : !o.archivedAt)) &&
         `${o.name} ${o.industry} ${o.location} ${o.tags.join(" ")}`
           .toLowerCase()
           .includes(query) &&
@@ -127,7 +134,7 @@ export function Network() {
     .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
     .map((interaction) => interaction.contactId)))
     .map((id) => contacts.find((contact) => contact.id === id))
-    .filter((contact): contact is (typeof contacts)[number] => !!contact)
+    .filter((contact): contact is (typeof contacts)[number] => !!contact && !contact.archivedAt)
     .slice(0, 4);
   const openFollowups = p.tasks.filter((task) => !task.completedAt).length;
   return (
@@ -146,7 +153,7 @@ export function Network() {
           <div className="network-hero-art">
             <div className="network-hero-orbit" aria-hidden="true"><span>✳</span></div>
             <div className="network-hero-faces" aria-hidden="true">
-              {contacts.slice(0, 5).map((contact) => <Avatar key={contact.id} name={contact.name} mediaId={contact.avatar} size="large" />)}
+              {contacts.filter((contact) => !contact.archivedAt).slice(0, 5).map((contact) => <Avatar key={contact.id} name={contact.name} mediaId={contact.avatar} size="large" />)}
             </div>
             <button
               className="button primary"
@@ -240,7 +247,7 @@ export function Network() {
             onClick={() => setTab("people")}
           >
             <Users size={17} />
-            {t("people")} <span>{contacts.length}</span>
+            {t("people")} <span>{contacts.filter((c) => archiveScope === "all" || (archiveScope === "archived" ? !!c.archivedAt : !c.archivedAt)).length}</span>
           </button>
           <button
             role="tab"
@@ -252,10 +259,20 @@ export function Network() {
             onClick={() => setTab("companies")}
           >
             <Building2 size={17} />
-            {t("companies")} <span>{organizations.length}</span>
+            {t("companies")} <span>{organizations.filter((o) => archiveScope === "all" || (archiveScope === "archived" ? !!o.archivedAt : !o.archivedAt)).length}</span>
           </button>
         </div>
         <div className="directory-controls">
+          <select
+            aria-label={__pulseText("Archive status")}
+            className="sort-select"
+            value={archiveScope}
+            onChange={(e) => { setArchiveScope(e.target.value as typeof archiveScope); setLimit(60); }}
+          >
+            <option value="active">{__pulseText("Active records")}</option>
+            <option value="archived">{__pulseText("Archived records")}</option>
+            <option value="all">{__pulseText("All records")}</option>
+          </select>
           <label className="search-field">
             <Search size={18} />
             <input
@@ -477,6 +494,7 @@ export function Network() {
                           )}
                         </div>
                         <h3>{c.name}</h3>
+                        {c.archivedAt && <Badge>{__pulseText("Archived")}</Badge>}
                         <p>{c.role || __pulseText("A new connection")}</p>
                         <div className="company-line">
                           <Building2 size={14} />
@@ -574,6 +592,7 @@ export function Network() {
                       <Badge>{o.industry || __pulseText("Company")}</Badge>
                     </div>
                     <h3>{o.name}</h3>
+                    {o.archivedAt && <Badge>{__pulseText("Archived")}</Badge>}
                     <p className="company-description">
                       {o.description || __pulseText("The next chapter starts here.")}
                     </p>
@@ -609,7 +628,8 @@ export function Network() {
                 priority ||
                 availability ||
                 category ||
-                smart !== "all"
+                smart !== "all" ||
+                archiveScope === "archived"
                   ? __pulseText("No connections found")
                   : __pulseText("A little space for possibility")
               }
@@ -620,7 +640,8 @@ export function Network() {
                 priority ||
                 availability ||
                 category ||
-                smart !== "all" ? (
+                smart !== "all" ||
+                archiveScope === "archived" ? (
                   <button
                     className="button secondary"
                     onClick={() => {
@@ -630,6 +651,7 @@ export function Network() {
                       setStage("");
                       setAvailability("");
                       setCategory("");
+                      setArchiveScope("active");
                     }}
                   >
                     {__pulseText("Reset search & filters")}</button>

@@ -13,6 +13,7 @@ import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import {
   ArrowLeft,
   ArrowUpRight,
+  Archive,
   Building2,
   CalendarPlus,
   Mail,
@@ -41,7 +42,7 @@ import {
   HealthSummary,
 } from "../components/relationship";
 import { EditorModal, type Editor } from "../components/forms";
-import { deleteContact, deleteOrganization } from "../data/repository";
+import { deleteContact, deleteOrganization, setArchiveStatus } from "../data/repository";
 import {
   eligible,
   effectiveAvailability,
@@ -65,6 +66,7 @@ export function Profile({ company = false }: { company?: boolean }) {
   const { date } = useFormat();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [archiveAction, setArchiveAction] = useState<{ updatedAt: string; archived: boolean } | null>(null);
   const contact = company ? undefined : p.contacts.find((c) => c.id === id);
   const org = p.organizations.find(
     (o) => o.id === (company ? id : contact?.organizationId),
@@ -154,6 +156,13 @@ export function Profile({ company = false }: { company?: boolean }) {
               <Pencil size={16} />
               {__pulseText("Edit profile")}</button>
             <button
+              className="button secondary"
+              onClick={() => setArchiveAction({ updatedAt: record.updatedAt, archived: !record.archivedAt })}
+            >
+              <Archive size={16} />
+              {record.archivedAt ? __pulseText("Restore from archive") : __pulseText("Archive {0}", company ? "company" : "contact")}
+            </button>
+            <button
               className="icon-button destructive"
               aria-label={__pulseText("Delete {0}", company ? "company" : "contact")}
               onClick={() => setDeleting(true)}
@@ -183,6 +192,7 @@ export function Profile({ company = false }: { company?: boolean }) {
               )}
             </p>
             <div className="profile-badges">
+              {record.archivedAt && <Badge>{__pulseText("Archived")}</Badge>}
               {contact && (
                 <>
                   <Badge>{contact.category}</Badge>
@@ -644,6 +654,22 @@ export function Profile({ company = false }: { company?: boolean }) {
       {briefId && <OpportunityBrief id={briefId} onClose={() => setBriefId(null)} onEdit={(next) => { setBriefId(null); setEditor(next); }} />}
       {editor && (
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
+      )}
+      {archiveAction && (
+        <Confirm
+          title={archiveAction.archived ? __pulseText("Archive {0}?", record.name) : __pulseText("Restore {0} from archive?", record.name)}
+          body={archiveAction.archived
+            ? __pulseText("This removes the record from the active directory. Its history and links are preserved; follow-ups and existing automations remain active. You can restore it from Archived records.")
+            : __pulseText("This returns the record to the active directory. Its history and links remain unchanged.")}
+          action={archiveAction.archived ? __pulseText("Archive") : __pulseText("Restore")}
+          onClose={() => setArchiveAction(null)}
+          onConfirm={async () => {
+            if (await p.run(
+              () => setArchiveStatus(p.db, company ? "organization" : "contact", record.id, archiveAction.updatedAt, archiveAction.archived),
+              archiveAction.archived ? "Record archived" : "Record restored",
+            )) setArchiveAction(null);
+          }}
+        />
       )}
       {deleting && (
         <Confirm
