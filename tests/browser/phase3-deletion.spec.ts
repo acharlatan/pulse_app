@@ -68,6 +68,7 @@ test("editing and deletion preserve the documented linked records", async ({
     .getByRole("dialog")
     .getByRole("button", { name: "Delete", exact: true })
     .click();
+  await expect(page).toHaveURL(/#\/network$/);
   await page.goto(personURL);
   await expect(
     page.getByRole("heading", { name: "Casey Updated Test", exact: true }),
@@ -103,6 +104,7 @@ test("editing and deletion preserve the documented linked records", async ({
     .getByRole("dialog")
     .getByRole("button", { name: "Delete", exact: true })
     .click();
+  await expect(page).toHaveURL(/#\/network$/);
   await page.goto(personURL);
   await expect(page.getByText("This connection isn't here")).toBeVisible();
 });
