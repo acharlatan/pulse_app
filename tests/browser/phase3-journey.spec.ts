@@ -156,6 +156,16 @@ test("a new consultant manages and recovers a complete relationship", async ({
     await page.goto(profile);
     await expect(page.locator("#next-steps")).toContainText(task);
     await expect(page.locator("#next-steps")).toContainText("Reopen");
+    await page
+      .getByRole("button", { name: "Follow up", exact: true })
+      .first()
+      .click();
+    await page.getByLabel("Follow-up title").fill("Past due example follow-up");
+    await page.getByLabel("Due date and time").fill("2020-01-01T09:00");
+    await page
+      .getByRole("button", { name: "Save follow-up", exact: true })
+      .click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
   });
 
   await test.step("Check saved activity and pipeline values in Analytics", async () => {
@@ -189,10 +199,53 @@ test("a new consultant manages and recovers a complete relationship", async ({
       .getByRole("button", { name: /Commitments/ })
       .click();
     const followups = page.getByLabel("Follow-up overview");
-    await expect(followups).toContainText("0 overdue now");
+    await expect(followups).toContainText("1 overdue now");
     await expect(followups.locator(".pulse-commitment-trend")).toContainText(
       "1",
     );
+  });
+
+  await test.step("Open saved company, opportunity and follow-up through search", async () => {
+    await page.keyboard.press("Control+k");
+    const searchDialog = page.getByRole("dialog", { name: "Search PULSE" });
+    const search = searchDialog.getByRole("combobox", {
+      name: "Search records and actions",
+    });
+    await search.fill(company);
+    await searchDialog
+      .getByRole("option", { name: /Northstar Fictional Studio.*Company/ })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: company, exact: true }),
+    ).toBeVisible();
+    await page.keyboard.press("Control+k");
+    await search.fill(deal);
+    await searchDialog
+      .getByRole("option", { name: /Northstar campaign project.*Opportunity/ })
+      .click();
+    await expect(
+      page
+        .getByRole("dialog", { name: "Opportunity details" })
+        .getByLabel("Opportunity title"),
+    ).toHaveValue(deal);
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Close dialog" })
+      .click();
+    await page.keyboard.press("Control+k");
+    await search.fill(task);
+    await searchDialog
+      .getByRole("option", { name: /Send the campaign proposal.*Task/ })
+      .click();
+    await expect(
+      page
+        .getByRole("dialog", { name: "Edit follow-up" })
+        .getByLabel("Follow-up title"),
+    ).toHaveValue(task);
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "Close dialog" })
+      .click();
   });
 
   await test.step("Inspect actual Orbit connections and return to the record", async () => {

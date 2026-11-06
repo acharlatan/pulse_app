@@ -30,6 +30,7 @@ test("global search respects private notes and workspace boundaries", async ({
   await page
     .getByRole("button", { name: "Save interaction", exact: true })
     .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.keyboard.press("Control+k");
   const dialog = page.getByRole("dialog", { name: "Search PULSE" });
   const search = dialog.getByRole("combobox", {
