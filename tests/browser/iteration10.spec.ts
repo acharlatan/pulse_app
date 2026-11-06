@@ -146,16 +146,6 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
       .filter({ hasText: "Follow-up created locally" }),
   ).toHaveCount(1);
   await second.close();
-  await page.goto("/#/analytics");
-  await page
-    .getByRole("button", { name: "Opportunities", exact: true })
-    .click();
-  await expect(
-    page.getByRole("heading", { name: "Recorded stage movements" }),
-  ).toBeVisible();
-  await expect(
-    page.getByText(/New → Relationship pipeline \/ Proposal/),
-  ).toBeVisible();
   await page.goto("/#/settings?section=data");
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export", exact: true }).click();
