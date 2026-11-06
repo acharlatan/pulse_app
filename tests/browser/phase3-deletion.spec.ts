@@ -57,6 +57,14 @@ test("editing and deletion preserve the documented linked records", async ({
   await page
     .getByRole("button", { name: "Save follow-up", exact: true })
     .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Create opportunity", exact: true })
+    .first()
+    .click();
+  await page.getByLabel("Opportunity title").fill("Preserved test opportunity");
+  await page.getByRole("button", { name: "Save changes", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.goto(companyURL);
   await page
     .getByRole("button", { name: "Delete company", exact: true })
@@ -93,6 +101,8 @@ test("editing and deletion preserve the documented linked records", async ({
   expect(backup.contacts[0].organizationId).toBeNull();
   expect(backup.interactions[0].organizationId).toBeNull();
   expect(backup.tasks[0].organizationId).toBeNull();
+  expect(backup.opportunities[0].organizationId).toBeNull();
+  expect(backup.opportunities[0].contactIds).toContain(backup.contacts[0].id);
   await page.goto(personURL);
   await page
     .getByRole("button", { name: "Delete contact", exact: true })
@@ -107,4 +117,14 @@ test("editing and deletion preserve the documented linked records", async ({
   await expect(page).toHaveURL(/#\/network$/);
   await page.goto(personURL);
   await expect(page.getByText("This connection isn't here")).toBeVisible();
+  await page.goto("/#/settings?section=data");
+  const finalDownload = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  const finalFile = await (await finalDownload).path();
+  const after = JSON.parse(fs.readFileSync(finalFile!, "utf8"));
+  expect(after.contacts).toHaveLength(0);
+  expect(after.interactions).toHaveLength(0);
+  expect(after.tasks).toHaveLength(0);
+  expect(after.opportunities).toHaveLength(1);
+  expect(after.opportunities[0].contactIds).toEqual([]);
 });
