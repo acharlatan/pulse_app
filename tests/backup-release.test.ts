@@ -83,3 +83,143 @@ it("rejects incomplete v6 backups before replacing any existing data", async () 
     await db.delete();
   }
 });
+
+it.each([1, 2, 3, 4, 5] as const)(
+  "rejects missing stores from version %s backups without replacing the workspace",
+  async (version) => {
+    const db = new PulseDB("personal");
+    await db.delete();
+    await db.open();
+    try {
+      const fixture = JSON.parse(
+        readFileSync("tests/fixtures/backup-v2.json", "utf8"),
+      );
+      await restoreBackup(db, fixture);
+      const before = await exportBackup(db);
+      const versionStores = [
+        [
+          "organizations",
+          "contacts",
+          "interactions",
+          "tasks",
+          "opportunities",
+          "events",
+          "settings",
+          "restrictions",
+          "permissions",
+          "gamification",
+          "integrations",
+        ],
+        ["smartLists", "recommendationActions", "importBatches"],
+        ["rewards", "rewardChanges", "progressState", "dailyQuests"],
+        [
+          "pipelines",
+          "pipelineStages",
+          "fieldDefinitions",
+          "fieldValues",
+          "focusItems",
+        ],
+        ["media"],
+      ];
+      const required = versionStores.slice(0, version).flat();
+      const legacy = { ...before, version };
+      for (const key of required) {
+        const damaged: Record<string, unknown> = { ...legacy };
+        delete damaged[key];
+        await expect(
+          restoreBackup(db, damaged),
+          `${version}: ${key}`,
+        ).rejects.toThrow(/Incomplete version/);
+      }
+      const after = await exportBackup(db);
+      for (const key of Object.keys(before)) {
+        if (key !== "metadata")
+          expect(after[key as keyof typeof after], key).toEqual(
+            before[key as keyof typeof before],
+          );
+      }
+    } finally {
+      await db.delete();
+    }
+  },
+);
+
+it.each([1, 2, 3, 4, 5] as const)(
+  "upgrades historical database version %s and preserves linked records",
+  async (version) => {
+    const { default: Dexie } = await import("dexie");
+    const db = new PulseDB("personal");
+    await db.delete();
+    const stores = [
+      [
+        "organizations",
+        "contacts",
+        "interactions",
+        "tasks",
+        "opportunities",
+        "events",
+        "settings",
+        "restrictions",
+        "permissions",
+        "gamification",
+        "integrations",
+      ],
+      ["smartLists", "recommendationActions", "importBatches"],
+      ["rewards", "rewardChanges", "progressState", "dailyQuests"],
+      [
+        "pipelines",
+        "pipelineStages",
+        "fieldDefinitions",
+        "fieldValues",
+        "focusItems",
+      ],
+      ["media"],
+    ]
+      .slice(0, version)
+      .flat();
+    const schema = Object.fromEntries(
+      db.tables
+        .filter((table) => stores.includes(table.name))
+        .map((table) => [
+          table.name,
+          [
+            table.schema.primKey.src,
+            ...table.schema.indexes.map((index) => index.src),
+          ].join(","),
+        ]),
+    );
+    if (version < 4) schema.opportunities = "id,organizationId,stageId";
+    const fixture = JSON.parse(
+      readFileSync("tests/fixtures/backup-v2.json", "utf8"),
+    );
+    const old = new Dexie("pulse-personal");
+    old.version(version).stores(schema);
+    await old.open();
+    for (const key of stores)
+      if (Array.isArray(fixture[key]))
+        await old.table(key).bulkPut(fixture[key]);
+    old.close();
+    try {
+      await db.open();
+      expect(db.verno).toBe(6);
+      for (const key of [
+        "organizations",
+        "contacts",
+        "interactions",
+        "tasks",
+        "events",
+        "restrictions",
+        "permissions",
+      ]) {
+        expect(await db.table(key).toArray(), key).toEqual(fixture[key]);
+      }
+      expect(await db.opportunities.count()).toBe(fixture.opportunities.length);
+      const migrated = await exportBackup(db);
+      expect(() => validateBackup(migrated)).not.toThrow();
+      expect(migrated.automationExecutions).toEqual([]);
+      expect(migrated.rewards).toEqual([]);
+    } finally {
+      await db.delete();
+    }
+  },
+);
