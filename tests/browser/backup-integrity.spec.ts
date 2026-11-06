@@ -59,6 +59,9 @@ test("warns when a downloaded backup exceeds the restore limit", async ({
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await page.goto("/#/settings?section=data");
+  await expect(
+    page.getByRole("button", { name: "Export", exact: true }),
+  ).toBeVisible();
   await page.evaluate(async () => {
     const db = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("pulse-demo");

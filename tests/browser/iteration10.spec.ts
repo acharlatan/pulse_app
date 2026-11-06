@@ -93,7 +93,9 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
   test.setTimeout(180000);
   await demo(page);
   await page.goto("/#/automations");
-  await page.getByRole("button", { name: /^Proposal follow-up/ }).click();
+  await page
+    .getByRole("button", { name: /^When an opportunity moves/ })
+    .click();
   const d = page.getByRole("dialog");
   await expect(d.getByText("Review before saving")).toBeVisible();
   await expect(d).toContainText("No email or message is sent");
@@ -193,7 +195,9 @@ test("restricted person blocks automated action and the rule builder fits respon
   test.setTimeout(180000);
   await demo(page);
   await page.goto("/#/automations");
-  await page.getByRole("button", { name: /^Proposal follow-up/ }).click();
+  await page
+    .getByRole("button", { name: /^When an opportunity moves/ })
+    .click();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Save disabled draft" })
