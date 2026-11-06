@@ -66,6 +66,9 @@ it("rejects incomplete v6 backups before replacing any existing data", async () 
     const keys = Object.keys(before).filter((key) =>
       Array.isArray(before[key as keyof typeof before]),
     );
+    expect([...keys].sort()).toEqual(
+      db.tables.map((table) => table.name).sort(),
+    );
     for (const key of keys) {
       const damaged: Record<string, unknown> = { ...before };
       delete damaged[key];

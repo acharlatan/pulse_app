@@ -51,3 +51,39 @@ test("invalid, incomplete, unsupported and oversized backups never replace saved
     page.getByRole("heading", { name: "Olivia Chen", exact: true }),
   ).toBeVisible();
 });
+
+test("warns when a downloaded backup exceeds the restore limit", async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await page.goto("/#/settings?section=data");
+  await page.evaluate(async () => {
+    const db = await new Promise<IDBDatabase>((resolve, reject) => {
+      const request = indexedDB.open("pulse-demo");
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction("organizations", "readwrite");
+      const store = tx.objectStore("organizations");
+      const get = store.get("org-0");
+      get.onsuccess = () =>
+        store.put({ ...get.result, description: "x".repeat(33 * 1024 * 1024) });
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+    db.close();
+  });
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  await download;
+  await expect(page.getByRole("alert")).toContainText(
+    "exceeds the 32 MB restore limit",
+  );
+  await expect(
+    page.getByText("No backup download requested yet."),
+  ).toBeVisible();
+});
