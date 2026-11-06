@@ -52,3 +52,34 @@ it.each([1, 2])(
     }
   },
 );
+
+it("rejects incomplete v6 backups before replacing any existing data", async () => {
+  const fixture = JSON.parse(
+    readFileSync("tests/fixtures/backup-v2.json", "utf8"),
+  );
+  const db = new PulseDB("personal");
+  await db.delete();
+  await db.open();
+  try {
+    await restoreBackup(db, fixture);
+    const before = await exportBackup(db);
+    const keys = Object.keys(before).filter((key) =>
+      Array.isArray(before[key as keyof typeof before]),
+    );
+    for (const key of keys) {
+      const damaged: Record<string, unknown> = { ...before };
+      delete damaged[key];
+      await expect(restoreBackup(db, damaged), key).rejects.toThrow(
+        /Incomplete version 6 backup/,
+      );
+      const after = await exportBackup(db);
+      for (const store of keys) {
+        expect(after[store as keyof typeof after], `${key}: ${store}`).toEqual(
+          before[store as keyof typeof before],
+        );
+      }
+    }
+  } finally {
+    await db.delete();
+  }
+});

@@ -503,6 +503,52 @@ export async function exportBackup(db: PulseDB) {
   }));
 }
 export function validateBackup(input: unknown) {
+  // A v6 export always includes every store. Applying schema defaults to a
+  // truncated v6 file could otherwise erase existing records during restore.
+  // Keep legacy defaults for older formats, which did not contain all stores.
+  if (
+    input &&
+    typeof input === "object" &&
+    "version" in input &&
+    input.version === 6
+  ) {
+    const source = input as Record<string, unknown>;
+    for (const key of [
+      "transitions",
+      "automationRules",
+      "automationExecutions",
+      "automationControl",
+      "media",
+      "pipelines",
+      "pipelineStages",
+      "fieldDefinitions",
+      "fieldValues",
+      "focusItems",
+      "rewards",
+      "rewardChanges",
+      "progressState",
+      "dailyQuests",
+      "smartLists",
+      "recommendationActions",
+      "importBatches",
+      "organizations",
+      "contacts",
+      "interactions",
+      "tasks",
+      "opportunities",
+      "events",
+      "settings",
+      "restrictions",
+      "permissions",
+      "gamification",
+      "integrations",
+    ]) {
+      if (!Array.isArray(source[key]))
+        throw new Error(
+          `Incomplete version 6 backup: missing ${key}. Nothing was replaced.`,
+        );
+    }
+  }
   const b = backupSchema.parse(input);
   // Version-one backups remain supported. The stage is authoritative for outcomes.
   if (b.version < 4) {
