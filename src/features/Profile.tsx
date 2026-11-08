@@ -1,5 +1,6 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { profileSnapshot } from "../services/profile-snapshot";
+import { scrollBehavior } from "../services/motion";
 import { MediaControls } from "../components/media-controls";
 import { LocalMedia } from "../components/local-media";
 import { FocusButton } from "../components/focus";
@@ -98,7 +99,7 @@ export function Profile({ company = false }: { company?: boolean }) {
   const next = snapshot.nextTask;
   const peopleAtCompany = company ? p.contacts.filter((c) => c.organizationId === id) : [];
   const scrollTo = (target: string) => document.getElementById(target)?.scrollIntoView({
-    behavior: p.settings.reducedMotion ? "instant" : "smooth", block: "start",
+    behavior: scrollBehavior(p.settings.reducedMotion), block: "start",
   });
   return (
     <div className="page profile-page editorial-profile">
@@ -392,7 +393,7 @@ export function Profile({ company = false }: { company?: boolean }) {
             key={section}
             onClick={() =>
               document.getElementById(section)?.scrollIntoView({
-                behavior: p.settings.reducedMotion ? "instant" : "smooth",
+                behavior: scrollBehavior(p.settings.reducedMotion),
                 block: "start",
               })
             }

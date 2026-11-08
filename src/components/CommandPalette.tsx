@@ -183,23 +183,7 @@ export function CommandPalette({
   }
   return (
     <Modal title={__pulseText("Search PULSE")} onClose={onClose}>
-      <div
-        className="command-palette"
-        onKeyDown={(e) => {
-          if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-            e.preventDefault();
-            setSelected((n) =>
-              results.length
-                ? (n + (e.key === "ArrowDown" ? 1 : -1) + results.length) %
-                  results.length
-                : 0,
-            );
-          } else if (e.key === "Enter" && results[active]) {
-            e.preventDefault();
-            choose(results[active]);
-          }
-        }}
-      >
+      <div className="command-palette">
         <label className="command-input">
           <Search size={20} />
           <input
@@ -210,6 +194,20 @@ export function CommandPalette({
             onChange={(e) => {
               setQuery(e.target.value);
               setSelected(0);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                e.preventDefault();
+                setSelected((n) =>
+                  results.length
+                    ? (n + (e.key === "ArrowDown" ? 1 : -1) + results.length) %
+                      results.length
+                    : 0,
+                );
+              } else if (e.key === "Enter" && results[active]) {
+                e.preventDefault();
+                choose(results[active]);
+              }
             }}
             placeholder={__pulseText("Search people, companies, tasks…")}
             aria-controls="command-results"
@@ -249,6 +247,7 @@ export function CommandPalette({
                 id={`command-${index}`}
                 className={`command-result ${index === active ? "selected" : ""}`}
                 key={item.id}
+                onFocus={() => setSelected(index)}
                 onMouseMove={() => setSelected(index)}
                 onClick={() => choose(item)}
               >

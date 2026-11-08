@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 const root = path.resolve(process.env.PULSE_DIST || "dist");
 let version = 1;
+let failNextWorkerRequest = false;
 const types = {
   ".html": "text/html",
   ".js": "application/javascript",
@@ -19,6 +20,11 @@ http
       if (url.pathname === "/test/update" && req.method === "POST") {
         version++;
         res.end(String(version));
+        return;
+      }
+      if (url.pathname === "/test/interrupt-update" && req.method === "POST") {
+        failNextWorkerRequest = true;
+        res.end("ready");
         return;
       }
       if (url.pathname.startsWith("/api/")) {
@@ -37,6 +43,12 @@ http
       const assetPath = url.pathname.startsWith("/pulse_app/")
         ? url.pathname.slice("/pulse_app".length)
         : url.pathname;
+      if (assetPath === "/sw.js" && failNextWorkerRequest) {
+        failNextWorkerRequest = false;
+        res.writeHead(503, { "Cache-Control": "no-store" });
+        res.end("simulated update failure");
+        return;
+      }
       const name = path.resolve(
         root,
         "." + decodeURIComponent(assetPath === "/" ? "/index.html" : assetPath),

@@ -1,0 +1,82 @@
+name: Phase 4 browser and accessibility checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/phase4.yml'
+      - 'playwright.phase4.config.ts'
+      - 'src/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-engines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        engine: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps ${{ matrix.engine }}
+      - run: npm run build
+      - name: Keyboard, reduced motion, axe and core CRM journey
+        run: npx playwright test --config=playwright.phase4.config.ts tests/browser/phase4-accessibility.spec.ts tests/browser/phase3-journey.spec.ts --project=${{ matrix.engine }} --workers=1 --reporter=line
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: phase4-engine-${{ matrix.engine }}
+          path: test-results/
+          if-no-files-found: ignore
+
+  responsive-and-theme:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Viewports, themes, accents and network axe
+        run: npx playwright test --config=playwright.phase4.config.ts tests/browser/phase4-layout.spec.ts --project=chromium --workers=2 --reporter=line
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: phase4-layout-results
+          path: test-results/
+          if-no-files-found: ignore
+
+  offline-and-scale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Offline recovery, deferred updates and synthetic scale
+        run: npm run test:pwa -- tests/pwa/reliability.spec.ts tests/pwa/phase4-update.spec.ts tests/pwa/scale.spec.ts --workers=1 --reporter=line
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: phase4-offline-scale-results
+          path: .codex/pwa-results/
+          if-no-files-found: ignore
