@@ -5,6 +5,7 @@ import { ArrowUpRight, BriefcaseBusiness, CalendarCheck, Plus, Sparkles } from "
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { calendarDay } from "../services/progress";
+import { scrollBehavior } from "../services/motion";
 import { setFocus } from "../data/expansion-repository";
 import { completeTask, reopenTask } from "../data/repository";
 import { Avatar, Badge, Empty, useFormat } from "../components/ui";
@@ -76,7 +77,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
   };
   const chosenPortraits = horizon.today.map(identity).filter((item): item is NonNullable<typeof item> => !!item).filter((item, index, all) => all.findIndex((other) => other.id === item.id) === index).slice(0, 4);
   function openPicker() {
-    if (picker.current) { picker.current.open = true; picker.current.scrollIntoView({block:"center", behavior:p.settings.reducedMotion ? "instant" : "smooth"}); }
+    if (picker.current) { picker.current.open = true; picker.current.scrollIntoView({block:"center", behavior:scrollBehavior(p.settings.reducedMotion)}); }
   }
   function changeBoard(view: typeof board) {
     setBoard(view);
@@ -88,7 +89,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
   }
   function chooseBoard(view: typeof board) {
     changeBoard(view);
-    requestAnimationFrame(() => document.getElementById("focus-board")?.scrollIntoView({block:"start",behavior:p.settings.reducedMotion ? "instant" : "smooth"}));
+    requestAnimationFrame(() => document.getElementById("focus-board")?.scrollIntoView({block:"start",behavior:scrollBehavior(p.settings.reducedMotion)}));
   }
   async function addToFocus(mode: "pin" | "today") {
     const existing = p.focusItems.find((item) => item.entityType === type && item.recordId === id);

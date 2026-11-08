@@ -6,6 +6,7 @@ import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { usePulse } from "../app/context";
 import { Avatar, Badge, Empty, useFormat } from "../components/ui";
 import { deriveOrbit, type OrbitNode } from "../services/orbit";
+import { scrollBehavior } from "../services/motion";
 import { savedOrbitConnections, savedOrbitNode } from "../services/orbit-connections";
 import { orbitSignals, type OrbitLens, type OrbitSignal } from "../services/orbit-signals";
 import { EditorModal, type Editor } from "../components/forms";
@@ -211,14 +212,14 @@ export function Orbit() {
       previousMapView.current = { zoom, pan };
       setFocusConnections(true); setPan({ x: 0, y: 0 }); setZoom(mobileMap ? 0.65 : 1);
     }
-    requestAnimationFrame(() => viewport.current?.scrollIntoView({ block: "center", behavior: p.settings.reducedMotion ? "instant" : "smooth" }));
+    requestAnimationFrame(() => viewport.current?.scrollIntoView({ block: "center", behavior: scrollBehavior(p.settings.reducedMotion) }));
   }
   function revealOnMap() {
     if (!node) return;
     setFocusConnections(false);
     setSearch(""); setType(""); setPriority(""); setLens("all"); setParams({}, { state: navigationState });
     setMapAnchor(node.id);
-    requestAnimationFrame(() => viewport.current?.scrollIntoView({ block:"center", behavior:p.settings.reducedMotion ? "instant" : "smooth" }));
+    requestAnimationFrame(() => viewport.current?.scrollIntoView({ block:"center", behavior:scrollBehavior(p.settings.reducedMotion) }));
   }
   function selectSignal(signal: OrbitSignal) {
     setFocusConnections(false); setLens(signal.kind); setSearch(""); setType(""); setPriority("");
@@ -485,7 +486,7 @@ export function Orbit() {
               >
                 {t("reset")}
               </button>
-              {node && <button className="button secondary" onClick={() => detail.current?.scrollIntoView({block:"start", behavior:p.settings.reducedMotion ? "instant" : "smooth"})}>{__pulseText("View selected details")}</button>}
+              {node && <button className="button secondary" onClick={() => detail.current?.scrollIntoView({block:"start", behavior:scrollBehavior(p.settings.reducedMotion)})}>{__pulseText("View selected details")}</button>}
               {node && <button className="orbit-focus-toggle" aria-pressed={focusConnections} onClick={toggleFocusConnections}><Crosshair size={16} aria-hidden="true"/>{__pulseText(focusConnections ? "Return to map" : "Focus saved connections")}</button>}
               {node && graph.nodes.some((n) => n.id === node.id) && (
                 <button

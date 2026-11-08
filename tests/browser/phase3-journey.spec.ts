@@ -321,6 +321,7 @@ test("a new consultant manages and recovers a complete relationship", async ({
       const target = await clean.newPage();
       await target.goto(new URL("/", page.url()).href);
       await target.getByRole("button", { name: /Create My Workspace/ }).click();
+      await expect(target.getByRole("heading", { name: "Today.", exact: true })).toBeVisible();
       await target.goto(new URL("/#/settings?section=data", page.url()).href);
       await target
         .locator('input[type="file"][accept="application/json,.json"]')
