@@ -6,7 +6,7 @@ The hosted web app is the primary distribution. Installation is optional.
 - Android or desktop Chromium: use the browser's Install app/Add to Home Screen control when offered.
 - Other browsers: use the website normally. Installation UI varies by browser/OS.
 
-Open the workspace online first and wait for offline availability. The cached app can use local records offline; external services require their own connectivity. Automated Chromium manifest/service-worker checks are not proof of physical iOS/Android installation. Physical device and native screen-reader QA remain pending for this candidate.
+Open the workspace online first so the app files can be cached. If the offline banner reports that some files need a connection, reconnect and open the app again. The cached app can use local records offline; AI and external services require connectivity. Automated browser manifest/service-worker checks are not proof of physical iOS/Android installation. Physical device and native screen-reader QA remain pending for this candidate.
 
 ## Own deployment
 
@@ -16,7 +16,7 @@ For a repository path, use `VITE_BASE_PATH=/pulse_app/ npm run build`. The inclu
 
 A packaged static frontend contains no Cloudflare AI service. CRM operations remain local; the API availability check fails safely when no protected backend exists. A ZIP is a web distribution, not a native app. Moving the hosting origin requires backup transfer; browser storage does not follow the URL.
 
-Use clean build output for release packaging. Exclude credentials, databases, logs, dependency caches and local development files. Preserve MIT attribution. Do not downgrade the IndexedDB v3 data layer or Cloudflare Durable Object migration on rollback.
+Use clean build output for release packaging. Exclude credentials, databases, logs, dependency caches and local development files. Preserve MIT attribution. Do not downgrade the IndexedDB v7 data layer or Cloudflare Durable Object migration on rollback.
 
 ## Reproducible static package
 

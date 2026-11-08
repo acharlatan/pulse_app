@@ -42,10 +42,11 @@ test("Studio branding, responsive screens and contextual controls", async ({
     }
   }
   await page.goto("/#/pipeline");
+  await page.getByRole("group", { name: "Pipeline views" }).getByRole("button", { name: "Board" }).click();
   const stage = page
     .getByRole("navigation", { name: "Pipeline stage overview" })
     .getByRole("button")
-    .first();
+    .nth(1);
   await stage.click();
   await expect(stage).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".pipeline-column")).toHaveCount(1);

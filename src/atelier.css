@@ -197,6 +197,9 @@ body { background: var(--bg); }
 .network-page .network-cover .network-orientation p:not(.eyebrow) { font-size: 14px; line-height: 1.4; }
 .network-cover .network-orientation-facts { gap: 6px; }
 .network-cover .network-orientation-facts > div { border-left: 1px solid #aa96b6; padding-left: 10px; }
+@media (max-width: 360px) {
+  .network-cover .network-orientation-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 .network-page .network-cover .network-orientation-facts strong { color: #5c3782; }
 .network-page .network-cover .network-orientation-links { border-top: 1px solid #c6b3d0; gap: 7px 16px; padding-top: 12px; }
 .network-page .network-cover .network-orientation-links a { font-size: 13px; text-decoration: underline; text-decoration-color: #9177a4; text-underline-offset: 3px; }

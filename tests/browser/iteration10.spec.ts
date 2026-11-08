@@ -40,19 +40,15 @@ test("analytics uses real records, scoped filters, accessible charts and local C
   await demo(page);
   await page.goto("/#/analytics");
   await expect(page.getByRole("heading", { name: "Analytics." })).toBeVisible();
-  const metric = page
-    .locator(".metric-card")
-    .filter({ hasText: "Meaningful conversations" });
+  const metric = page.locator(".pulse-conversation-total strong");
   await page.getByLabel("Date range").selectOption("custom");
   await page.getByLabel("From", { exact: true }).fill("2000-01-01");
   await page.getByLabel("Through", { exact: true }).fill("2000-01-30");
-  await expect(metric.locator("strong")).toHaveText("0");
+  await expect(metric).toHaveText("0");
   await page.getByLabel("Date range").selectOption("30");
-  await expect(metric.locator("strong")).not.toHaveText("0");
-  await metric.click();
-  await expect(
-    page.getByRole("heading", { name: "Relationship status now" }),
-  ).toBeVisible();
+  await expect(metric).not.toHaveText("0");
+  await page.getByRole("navigation", { name: "Analytics sections" }).getByRole("button", { name: /Relationships/ }).click();
+  await expect(page.getByLabel("Relationship status now")).toBeVisible();
   const csv = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export this report" }).click();
   const path = await (await csv).path();
@@ -71,7 +67,7 @@ test("analytics uses real records, scoped filters, accessible charts and local C
   await page
     .getByRole("button", { name: "Opportunities", exact: true })
     .click();
-  await expect(page.getByText("Open value by currency")).toBeVisible();
+  await expect(page.getByLabel("Current pipeline snapshot")).toContainText("Values remain separate by currency");
   expect(
     (
       await new AxeBuilder({ page })
@@ -246,7 +242,7 @@ test("restricted person blocks automated action and the rule builder fits respon
     }
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto("/#/automations");
-  await page.getByRole("button", { name: /^Closing soon review/ }).click();
+  await page.getByRole("button", { name: /^When a close date is near/ }).click();
   const d = page.getByRole("dialog");
   await expect(d).toBeVisible();
   expect(

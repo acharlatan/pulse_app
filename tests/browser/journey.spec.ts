@@ -51,7 +51,8 @@ test("demo acceptance journey persists CRM records and appearance", async ({
   await page.reload();
   await expect(page.getByText("A meaningful browser test note.")).toBeVisible();
   await expect(page.getByText(/Temporarily unavailable · until/)).toBeVisible();
-  await page.getByRole("link", { name: "Open settings", exact: true }).click();
+  await page.getByRole("button", { name: "Open workspace menu", exact: true }).click();
+  await page.getByRole("link", { name: "Settings & backups", exact: true }).click();
   await page.getByRole("button", { name: "Dark", exact: true }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.reload();

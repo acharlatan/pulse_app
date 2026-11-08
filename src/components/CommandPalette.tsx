@@ -186,6 +186,9 @@ export function CommandPalette({
       <div
         className="command-palette"
         onKeyDown={(e) => {
+          // Result buttons keep their native Enter/Space behavior when reached
+          // with Tab; the combobox alone controls the highlighted suggestion.
+          if (e.target !== inputRef.current) return;
           if (e.key === "ArrowDown" || e.key === "ArrowUp") {
             e.preventDefault();
             setSelected((n) =>
@@ -249,6 +252,7 @@ export function CommandPalette({
                 id={`command-${index}`}
                 className={`command-result ${index === active ? "selected" : ""}`}
                 key={item.id}
+                onFocus={() => setSelected(index)}
                 onMouseMove={() => setSelected(index)}
                 onClick={() => choose(item)}
               >

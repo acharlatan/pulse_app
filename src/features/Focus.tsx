@@ -1,3 +1,4 @@
+import { motionAwareScroll } from "../services/motion-preference";
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useTranslation } from "../i18n/useTranslation";
 import { useRef, useState } from "react";
@@ -76,7 +77,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
   };
   const chosenPortraits = horizon.today.map(identity).filter((item): item is NonNullable<typeof item> => !!item).filter((item, index, all) => all.findIndex((other) => other.id === item.id) === index).slice(0, 4);
   function openPicker() {
-    if (picker.current) { picker.current.open = true; picker.current.scrollIntoView({block:"center", behavior:p.settings.reducedMotion ? "instant" : "smooth"}); }
+    if (picker.current) { picker.current.open = true; picker.current.scrollIntoView({block:"center", behavior:motionAwareScroll(p.settings.reducedMotion)}); }
   }
   function changeBoard(view: typeof board) {
     setBoard(view);
@@ -88,7 +89,7 @@ export function Focus({ embedded = false }: { embedded?: boolean }) {
   }
   function chooseBoard(view: typeof board) {
     changeBoard(view);
-    requestAnimationFrame(() => document.getElementById("focus-board")?.scrollIntoView({block:"start",behavior:p.settings.reducedMotion ? "instant" : "smooth"}));
+    requestAnimationFrame(() => document.getElementById("focus-board")?.scrollIntoView({block:"start",behavior:motionAwareScroll(p.settings.reducedMotion)}));
   }
   async function addToFocus(mode: "pin" | "today") {
     const existing = p.focusItems.find((item) => item.entityType === type && item.recordId === id);

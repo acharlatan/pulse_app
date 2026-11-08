@@ -45,11 +45,11 @@ const topics = [
   ],
   [
     "Install and work offline",
-    "Open PULSE online first and wait for OfflineStatus to report the app is available offline. In iPhone Safari, use Share → Add to Home Screen when offered; Android/desktop Chromium may offer Install app. Availability varies. After caching, local CRM work works offline; AI and external apps require their own connection. Physical installation on iOS/Android has not been verified by this release process.",
+    "Open PULSE online first so its application files can be cached. If the offline banner says some files need a connection, reconnect and open the app again. Cached CRM records stay on this device; AI and external apps need a connection. In iPhone Safari, use Share → Add to Home Screen when offered; Android/desktop Chromium may offer Install app. Availability varies. Physical installation on iOS/Android has not been verified by this release process.",
   ],
   [
     "Updates and unfinished work",
-    "Save edits before adopting an update. Update & reload asks before discarding tracked edits; another editing tab stays open. Internal links and workspace switching warn about tracked unfinished work. Dialog dismissal also warns about tracked edits. Person, company, follow-up, opportunity and conversation editors reject stale saves after another tab changes the record. Keep one editing tab per record; settings and other editors have no universal conflict resolution. Browser Back is not universally guarded. There is no persistent draft recovery.",
+    "Save edits before adopting an update. Update & reload asks before discarding tracked edits; another editing tab stays open. If an update check fails, reconnect and return to PULSE to retry; saved records remain on this device. Internal links and workspace switching warn about tracked unfinished work. Dialog dismissal also warns about tracked edits. Person, company, follow-up, opportunity and conversation editors reject stale saves after another tab changes the record. Keep one editing tab per record; settings and other editors have no universal conflict resolution. Browser Back is not universally guarded. There is no persistent draft recovery.",
   ],
   [
     "Troubleshooting",

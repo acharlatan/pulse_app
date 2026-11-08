@@ -199,9 +199,14 @@ export function Modal({
     const viewport = window.visualViewport;
     const fit = () => {
       if (!dialog || !viewport) return;
-      dialog.style.maxHeight = `${Math.max(120, viewport.height - 24)}px`;
+      // visualViewport uses viewport CSS pixels. A page-level CSS zoom can
+      // scale the dialog independently; convert back to its layout pixels.
+      const scale = dialog.offsetWidth
+        ? dialog.getBoundingClientRect().width / dialog.offsetWidth
+        : 1;
+      dialog.style.maxHeight = `${Math.max(120, (viewport.height - 24) / scale)}px`;
       if (viewport.height < window.innerHeight - 100) {
-        dialog.style.top = `${viewport.offsetTop + 12}px`;
+        dialog.style.top = `${(viewport.offsetTop + 12) / scale}px`;
         dialog.style.marginBlock = "0";
       } else {
         dialog.style.top = "";

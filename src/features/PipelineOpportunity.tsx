@@ -13,10 +13,12 @@ export function PipelineOpportunity({
   opportunity: o,
   onEdit,
   onReview,
+  headingLevel,
 }: {
   opportunity: Opportunity;
   onEdit: (e: Editor) => void;
   onReview: (id: string) => void;
+  headingLevel: 3 | 4;
 }) {
   const __pulseText = useInterfaceText();
   const p = usePulse(),
@@ -27,6 +29,7 @@ export function PipelineOpportunity({
     .filter((c) => !!c);
   const stage = p.pipelineStages.find((s) => s.id === o.stageId);
   const followUp = opportunityFollowUp(o, p.tasks, p.interactions);
+  const Heading = headingLevel === 3 ? "h3" : "h4";
   const next = followUp?.task;
   const last = p.interactions.filter((i) => i.opportunityId === o.id && i.type !== "Note" && Date.parse(i.occurredAt) <= Date.now()).sort((a,b) => b.occurredAt.localeCompare(a.occurredAt))[0];
   const restricted = people.some((c) => restrictionReasons(c, p.permissions, p.restrictions).length > 0);
@@ -49,14 +52,14 @@ export function PipelineOpportunity({
         </Badge>
         <ArrowUpRight size={17} aria-hidden="true" />
       </div>
-      <h4>
+      <Heading>
         <button
           className="board-title"
           onClick={() => onReview(o.id)}
         >
           {o.title}
         </button>
-      </h4>
+      </Heading>
       {org && (
         <Link className="board-company" to={`/network/companies/${org.id}`}>
           <Avatar name={org.name} mediaId={org.avatar} company />

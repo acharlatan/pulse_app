@@ -49,9 +49,9 @@ test("all primary screens and editors fit supported widths in both themes", asyn
       if (width >= 768)
         expect(
           await page
-            .locator(".sidebar")
+            .getByRole("navigation", { name: "Main areas" })
             .evaluate((el) => el.scrollWidth <= el.clientWidth),
-          "sidebar text wraps within the navigation rail",
+          "main navigation fits within its container",
         ).toBe(true);
       await page.goto("/#/network/people/contact-0");
       await expect(

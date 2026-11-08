@@ -32,11 +32,12 @@ test("Analytics turns saved evidence into an inspected and pinned Focus record",
   await expect(
     target.getByRole("button", { name: "Unpin", exact: true }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Open My Focus", exact: true }).click();
+  await page.getByRole("link", { name: "My Focus", exact: true }).click();
   await page.getByRole("navigation", { name: "Focus views" }).getByRole("button", { name: /Saved for later/ }).click();
   const row = page.locator(".focus-row").filter({ hasText: title });
   await expect(row).toHaveCount(1);
   await row.getByRole("button", { name: "Choose today", exact: true }).click();
+  await page.getByRole("navigation", { name: "Focus views" }).getByRole("button", { name: /^Today/ }).click();
   await expect(row).toHaveCount(1);
   await expect(page.locator(".focus-today")).toContainText(title);
   await page.reload();
@@ -50,12 +51,11 @@ test("Analytics turns saved evidence into an inspected and pinned Focus record",
   await page.getByLabel("Through", { exact: true }).fill("2000-01-30");
   await expect(
     page
-      .locator(".metric-card")
-      .filter({ hasText: "Meaningful conversations" })
-      .locator("strong"),
+      .locator(".pulse-conversation-total strong"),
   ).toHaveText("0");
   await expect(page.locator(".focus-evidence")).not.toHaveCount(0);
   await page.getByLabel("Date range").selectOption("30");
+  await page.getByText("Explore coverage and company context", { exact: true }).click();
   await page
     .getByRole("button", { name: "Scope report to Forma Studio", exact: true })
     .click();
@@ -71,17 +71,17 @@ test("Analytics turns saved evidence into an inspected and pinned Focus record",
   );
   await page
     .getByRole("navigation", { name: "Analytics sections" })
-    .getByRole("button", { name: "Relationships", exact: true })
+    .getByRole("button", { name: /Relationships/ })
     .click();
   await page
     .getByRole("combobox", { name: "Interaction type", exact: true })
     .selectOption("Call");
   await page
     .getByRole("navigation", { name: "Analytics sections" })
-    .getByRole("button", { name: "Overview", exact: true })
+    .getByRole("button", { name: /Overview/ })
     .click();
   const bucket = page
-    .locator(".analytics-chart .analytics-bar")
+    .locator(".pulse-time-chart .pulse-time-bar")
     .filter({ has: page.locator("strong").filter({ hasText: /^[1-9]/ }) })
     .first();
   const count = Number(await bucket.locator("strong").innerText());
@@ -121,12 +121,10 @@ test("Orbit explains company context and keeps map/list/profile journeys working
     name: "Selected relationship",
   });
   await expect(panel).toContainText("Creative Director");
-  await panel
-    .getByText("Saved connections in this view", { exact: true })
-    .click();
+  await expect(panel.getByRole("heading", { name: "Saved connections" })).toBeVisible();
   await panel.getByRole("button", { name: /Forma Studio.*Works at/ }).click();
-  await expect(panel).toContainText("3 representatives");
-  await panel.getByRole("link", { name: "Open Company", exact: true }).click();
+  await expect(panel.locator(".orbit-inspector-links")).toContainText("Olivia Chen");
+  await panel.getByRole("link", { name: /^Open Company/ }).click();
   await expect(page.locator("main h1")).toHaveText("Forma Studio");
   await page
     .getByRole("link", { name: "View in Relationship Orbit", exact: true })
@@ -143,7 +141,7 @@ test("Orbit explains company context and keeps map/list/profile journeys working
   await page.getByRole("button", { name: "List", exact: true }).click();
   await page.locator(".orbit-list-item").filter({hasText: "Forma Studio"}).click();
   await expect(
-    panel.getByRole("link", { name: "Open Company", exact: true }),
+    panel.getByRole("link", { name: /^Open Company/ }),
   ).toBeVisible();
 });
 test("five insight workspaces remain readable across widths and themes", async ({

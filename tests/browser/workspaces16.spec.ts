@@ -8,15 +8,16 @@ test("working board preserves currency, stage and agenda edit/complete/reopen jo
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await page.getByRole("heading", { name: "Today." }).waitFor();
   await page.goto("/#/pipeline");
-  await page.getByRole("heading", { name: "Pipeline." }).waitFor();
+  await page.getByRole("heading", { name: "Pipeline studio." }).waitFor();
+  await page.getByRole("group", { name: "Pipeline views" }).getByRole("button", { name: "Board" }).click();
   await expect(page.locator('.pipeline-column[data-empty="true"]')).toHaveCount(
     0,
   );
-  await page.getByRole("button", { name: "Empty stages", exact: true }).click();
+  await page.getByRole("button", { name: "Show empty stages", exact: true }).click();
   await expect(
     page.locator('.pipeline-column[data-empty="true"]').first(),
   ).toBeVisible();
-  await page.getByRole("button", { name: "Empty stages", exact: true }).click();
+  await page.getByRole("button", { name: "Show empty stages", exact: true }).click();
   await expect(page.locator('.pipeline-column[data-empty="true"]')).toHaveCount(
     0,
   );
@@ -39,21 +40,22 @@ test("working board preserves currency, stage and agenda edit/complete/reopen jo
     .locator(".pipeline-deal")
     .filter({ has: page.getByRole("heading", { name: title, exact: true }) });
   await expect(card).toBeVisible();
-  await expect(page.locator(".pipeline-money")).toContainText("EUR");
-  await expect(page.locator(".pipeline-money")).toContainText("USD");
+  await expect(page.locator(".studio-value-line > div")).toContainText("EUR");
+  await expect(page.locator(".studio-value-line > div")).toContainText("USD");
   await card.getByLabel("Move to stage / reopen").selectOption("Won");
   await expect(card.locator(".board-card-kicker .badge")).toHaveText(
     "Won · won",
   );
-  await expect(page.locator(".pipeline-money")).not.toContainText("EUR");
+  await expect(page.locator(".studio-value-line > div")).not.toContainText("EUR");
   await card.getByLabel("Move to stage / reopen").selectOption("Proposal");
   await expect(card.locator(".board-card-kicker .badge")).toHaveText(
     "Proposal · open",
   );
   await page.reload();
   await expect(card).toBeVisible();
-  await expect(page.locator(".pipeline-money")).toContainText("EUR");
+  await expect(page.locator(".studio-value-line > div")).toContainText("EUR");
   await card.getByRole("button", { name: title, exact: true }).click();
+  await d.getByRole("button", { name: "Edit opportunity", exact: true }).click();
   await expect(d.getByLabel("Opportunity title")).toHaveValue(title);
   await page.keyboard.press("Escape");
   await page.goto("/#/activity");
@@ -152,7 +154,7 @@ test("empty personal workspaces keep creation reachable", async ({ page }) => {
     page.getByRole("button", { name: "New opportunity", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Make room for possibility" }),
+    page.getByRole("heading", { name: "A little room to grow." }),
   ).toBeVisible();
   await page.goto("/#/activity");
   await expect(
