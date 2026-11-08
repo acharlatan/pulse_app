@@ -210,6 +210,13 @@ test("appearance controls persist and enlarged content keeps the editor usable",
   await page.screenshot({
     path: info.outputPath("enlarged-person-editor.png"),
   });
+  console.log("PHASE4_ZOOM_DIALOG", JSON.stringify(await page.getByRole("dialog").evaluate((el) => ({
+    width: el.getBoundingClientRect().width,
+    layoutWidth: (el as HTMLElement).offsetWidth,
+    height: el.getBoundingClientRect().height,
+    viewportHeight: window.visualViewport?.height,
+    maxHeight: (el as HTMLElement).style.maxHeight,
+  }))));
   await page
     .getByRole("button", { name: "Save person", exact: true })
     .click({ timeout: 15000 });
