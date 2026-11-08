@@ -28,6 +28,9 @@ for (const theme of ["light", "dark"] as const) {
             const report = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
             expect.soft(report.violations, `${theme}/${accent} ${width}px network axe`).toEqual([]);
           }
+          if (route === "/network" && accent === "periwinkle" && (width === 320 || width === 1440)) {
+            await page.screenshot({ path: info.outputPath(`${theme}-${accent}-${width}.png`) });
+          }
         }
         await page.goto("/#/network/people/contact-0");
         await page.getByRole("button", { name: "Edit profile", exact: true }).click();

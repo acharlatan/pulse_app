@@ -23,7 +23,9 @@ test("deferring an update keeps an unfinished edit and saved data through an off
   await context.setOffline(false);
   await page.getByRole("button", { name: "Save your rhythm", exact: true }).click();
   await expect(page.getByRole("status").filter({ hasText: "Preferences saved" })).toBeVisible();
+  const updatedPage = page.waitForEvent("load");
   await page.getByRole("button", { name: "Update & reload" }).click();
+  await updatedPage;
   await expect(page.getByRole("textbox", { name: "Your preferred name" })).toHaveValue("Unfinished fictional edit");
   await page.reload();
   await expect(page.getByRole("textbox", { name: "Your preferred name" })).toHaveValue("Unfinished fictional edit");

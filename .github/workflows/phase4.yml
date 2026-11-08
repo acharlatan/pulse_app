@@ -32,6 +32,9 @@ jobs:
       - run: npm run build
       - name: Keyboard, reduced motion, axe and core CRM journey
         run: npx playwright test --config=playwright.phase4.config.ts tests/browser/phase4-accessibility.spec.ts tests/browser/phase3-journey.spec.ts --project=${{ matrix.engine }} --workers=1 --reporter=line
+      - name: Denied storage, invalid backup and missing route asset
+        if: ${{ matrix.engine == 'chromium' }}
+        run: npx playwright test --config=playwright.phase4.config.ts tests/browser/iteration06.spec.ts tests/browser/release07.spec.ts tests/browser/backup-integrity.spec.ts --project=chromium --grep 'missing lazy chunk|denied IndexedDB|invalid, incomplete' --workers=1 --reporter=line
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:

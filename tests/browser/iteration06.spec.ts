@@ -134,7 +134,7 @@ test("missing lazy chunk has a bounded manual recovery and preserves saved recor
   const chunks = ["**/src/features/Pipeline.tsx*", "**/assets/Pipeline-*.js"];
   for (const chunk of chunks) await page.route(chunk, (r) => r.abort());
   await page
-    .getByRole("link", { name: "Pipeline", exact: true })
+    .getByRole("link", { name: "Work", exact: true })
     .first()
     .click();
   await expect(
@@ -146,7 +146,7 @@ test("missing lazy chunk has a bounded manual recovery and preserves saved recor
     .getByRole("button", { name: "Reload current version", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Pipeline.", exact: true }),
+    page.getByRole("heading", { name: "Pipeline studio.", exact: true }),
   ).toBeVisible();
   expect(reloads).toBe(1);
   await page.goto("/#/network");
