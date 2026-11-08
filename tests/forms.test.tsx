@@ -62,7 +62,8 @@ it("saves the interaction before opening an optional follow-up and keeps it save
   fireEvent.change(await screen.findByLabelText("What would you like to remember?"), { target: { value: "Discussed the next step" } });
   fireEvent.click(screen.getByRole("checkbox", { name: /Plan a follow-up after saving/ }));
   fireEvent.click(screen.getByRole("button", { name: "Save interaction" }));
-  expect(await screen.findByText(/Interaction saved\. You can plan a separate follow-up/)).toBeInTheDocument();
+  expect(await screen.findByRole("dialog", { name: "Plan a follow-up" })).toBeVisible();
+  expect(screen.getByText(/Interaction saved\. You can plan a separate follow-up/)).toBeInTheDocument();
   expect(addInteraction).toHaveBeenCalledOnce();
   expect(close).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("button", { name: "Cancel" }));

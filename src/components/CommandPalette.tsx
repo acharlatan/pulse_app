@@ -102,7 +102,7 @@ export function CommandPalette({
       ...p.contacts.map((c) => ({
         id: `contact:${c.id}`,
         title: c.name,
-        context: `Contact · ${companies.get(c.organizationId || "") || c.role || "Independent"}`,
+        context: `${c.archivedAt ? "Archived contact" : "Contact"} · ${companies.get(c.organizationId || "") || c.role || "Independent"}`,
         terms: [
           c.preferredName,
           c.role,
@@ -116,7 +116,7 @@ export function CommandPalette({
       ...p.organizations.map((o) => ({
         id: `company:${o.id}`,
         title: o.name,
-        context: "Company",
+        context: o.archivedAt ? "Archived company" : "Company",
         terms: [o.industry, ...o.tags].join(" "),
         icon: "company" as const,
         media: o.avatar,

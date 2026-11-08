@@ -36,14 +36,17 @@ import {
   validateBackup,
 } from "../data/repository";
 import { resetWorkspace } from "../data/seed";
+import { mediaLimits } from "../data/media-models";
 import type { Settings as Preferences } from "../data/models";
 function download(content: string, name: string, type = "application/json") {
-  const url = URL.createObjectURL(new Blob([content], { type }));
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return blob.size;
 }
 export function Settings() {
   const __pulseText = useInterfaceText();
@@ -518,10 +521,16 @@ export function Settings() {
                   className="button secondary"
                   onClick={() =>
                     p.run(async () => {
-                      download(
+                      setFileError("");
+                      const size = download(
                         JSON.stringify(await exportBackup(p.db), null, 2),
                         `pulse-${p.workspace}-backup.json`,
                       );
+                      if (size > mediaLimits.backupBytes) {
+                        const message = "The backup download was requested, but the file exceeds the 32 MB restore limit. Keep the file, reduce workspace size and export again.";
+                        setFileError(message);
+                        throw new Error(message);
+                      }
                       await p.setSettings({
                         onboarding: {
                           ...p.settings.onboarding,
@@ -550,7 +559,7 @@ export function Settings() {
                     const file = e.target.files?.[0];
                     e.target.value = "";
                     if (!file) return;
-                    if (file.size > 32 * 1024 * 1024) {
+                    if (file.size > mediaLimits.backupBytes) {
                       setFileError("Choose a backup smaller than 32 MB.");
                       return;
                     }

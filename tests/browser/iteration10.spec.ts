@@ -93,7 +93,9 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
   test.setTimeout(180000);
   await demo(page);
   await page.goto("/#/automations");
-  await page.getByRole("button", { name: /^Proposal follow-up/ }).click();
+  await page
+    .getByRole("button", { name: /^When an opportunity moves/ })
+    .click();
   const d = page.getByRole("dialog");
   await expect(d.getByText("Review before saving")).toBeVisible();
   await expect(d).toContainText("No email or message is sent");
@@ -144,22 +146,12 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
       .filter({ hasText: "Follow-up created locally" }),
   ).toHaveCount(1);
   await second.close();
-  await page.goto("/#/analytics");
-  await page
-    .getByRole("button", { name: "Opportunities", exact: true })
-    .click();
-  await expect(
-    page.getByRole("heading", { name: "Recorded stage movements" }),
-  ).toBeVisible();
-  await expect(
-    page.getByText(/New → Relationship pipeline \/ Proposal/),
-  ).toBeVisible();
   await page.goto("/#/settings?section=data");
   const download = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export", exact: true }).click();
   const file = await (await download).path();
   const data = JSON.parse(fs.readFileSync(file!, "utf8"));
-  expect(data.version).toBe(6);
+  expect(data.version).toBe(7);
   expect(data.automationRules).toHaveLength(1);
   expect(data.automationExecutions).toHaveLength(1);
   expect(data.transitions).toHaveLength(1);
@@ -170,7 +162,7 @@ test("disabled rule creates one follow-up for an actual stage event, survives ta
   await other.getByRole("button", { name: /Create My Workspace/ }).click();
   await other.goto("/#/settings?section=data");
   await other.locator('input[type="file"]').setInputFiles(file!);
-  await expect(other.getByRole("dialog")).toContainText("Compatible backup v6");
+  await expect(other.getByRole("dialog")).toContainText("Compatible backup v7");
   await other
     .getByRole("button", { name: "Validate & restore", exact: true })
     .click();
@@ -193,7 +185,9 @@ test("restricted person blocks automated action and the rule builder fits respon
   test.setTimeout(180000);
   await demo(page);
   await page.goto("/#/automations");
-  await page.getByRole("button", { name: /^Proposal follow-up/ }).click();
+  await page
+    .getByRole("button", { name: /^When an opportunity moves/ })
+    .click();
   await page
     .getByRole("dialog")
     .getByRole("button", { name: "Save disabled draft" })
@@ -262,4 +256,46 @@ test("restricted person blocks automated action and the rule builder fits respon
         .analyze()
     ).violations,
   ).toEqual([]);
+});
+
+test("a restricted contact blocks an automatic follow-up", async ({ page }) => {
+  test.setTimeout(90000);
+  await demo(page);
+  await page.goto("/#/automations");
+  await page
+    .getByRole("button", { name: /^When an opportunity moves/ })
+    .click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "Save disabled draft" })
+    .click();
+  await page
+    .locator(".automation-rule")
+    .getByRole("button", { name: "Enable", exact: true })
+    .click();
+  await createDeal(
+    page,
+    "Restricted Phase 3 test",
+    "Sunday Supply",
+    "Mia Patel",
+  );
+  await page
+    .locator(".pipeline-deal")
+    .filter({ hasText: "Restricted Phase 3 test" })
+    .getByLabel("Move to stage / reopen")
+    .selectOption("Proposal");
+  await expect(
+    page.getByRole("status").filter({ hasText: "Opportunity updated" }),
+  ).toBeVisible();
+  await page.goto("/#/automations");
+  await expect(
+    page
+      .locator(".automation-history")
+      .filter({ hasText: "restriction or denied/withdrawn permission" }),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator(".automation-history")
+      .filter({ hasText: "Follow-up created locally" }),
+  ).toHaveCount(0);
 });

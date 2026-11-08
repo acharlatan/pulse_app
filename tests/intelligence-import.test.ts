@@ -35,6 +35,7 @@ import {
   restoreBackup,
   validateBackup,
   savePermission,
+  setArchiveStatus,
 } from "../src/data/repository";
 const days = (d: number) => new Date(Date.now() + d * 86400000).toISOString();
 const person = (name = "Sarah Example"): Contact => ({
@@ -466,6 +467,21 @@ it("compares email/phone/name and preserves restrictions/consent during selected
   );
   expect(possible.rows[0].matches[0].confidence).toBe("Possible match");
 });
+it("preserves archived status when an existing person is updated by CSV", async () => {
+  const c = person();
+  await saveContact(db, c);
+  const saved = (await db.contacts.get(c.id))!;
+  await setArchiveStatus(db, "contact", c.id, saved.updatedAt, true);
+  const contacts = await db.contacts.toArray();
+  const csv = parseCsv(`Name,Email,Role\nSarah Updated,${c.emails[0]},VP Partnerships`);
+  const inspected = inspectCsv(csv, suggestMapping(csv.headers), contacts, []);
+  inspected.decisions[2] = { mode: "update", targetId: c.id, fields: ["role"] };
+  const plan = buildImportPlan(inspected, contacts, [], [], "update.csv");
+  // Even a plan missing the field cannot silently restore an archived record.
+  delete plan.contacts[0].archivedAt;
+  await commitImport(db, plan);
+  expect(await db.contacts.get(c.id)).toMatchObject({ role: "VP Partnerships", archivedAt: contacts[0].archivedAt });
+});
 it("rejects stale or corrupt import plans atomically and preserves workspace isolation", async () => {
   const csv = parseCsv("Name,Company\nA,New Company"),
     plan = buildImportPlan(
@@ -503,7 +519,7 @@ it("roundtrips v2 tables and old v1 backups; failed restore leaves all data inta
     conditions: [{ field: "category", operator: "is", value: "Prospect" }],
   });
   const backup = await exportBackup(db);
-  expect(backup.version).toBe(6);
+  expect(backup.version).toBe(7);
   expect(validateBackup(backup).smartLists).toHaveLength(1);
   await restoreBackup(db, backup);
   expect(await db.smartLists.count()).toBe(1);
@@ -555,7 +571,7 @@ it("upgrades a real version-one database without dropping CRM records", async ()
   expect((await db.settings.get("settings"))?.intelligence.coolingDays).toBe(
     30,
   );
-  expect(db.verno).toBe(6);
+  expect(db.verno).toBe(7);
 });
 it("supports 10, 100 and 1000-contact imports and intelligence without fabricated history", async () => {
   for (const size of [10, 100, 1000]) {

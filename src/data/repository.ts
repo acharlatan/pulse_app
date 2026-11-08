@@ -53,6 +53,7 @@ import {
   restrictionSchema,
   permissionSchema,
   stamp,
+  nextRecordTimestamp,
   defaults,
   type Organization,
   type Contact,
@@ -119,7 +120,11 @@ export async function saveOrganization(
   await db.transaction("rw", [db.organizations, db.events], async () => {
     const previous = await db.organizations.get(parsed.id);
     assertEditorVersion(previous, expectedUpdatedAt);
-    if (previous) parsed.createdAt = previous.createdAt;
+    if (previous) {
+      parsed.createdAt = previous.createdAt;
+      parsed.updatedAt = nextRecordTimestamp(previous.updatedAt);
+    }
+    parsed.archivedAt = previous?.archivedAt ?? null;
     await db.organizations.put(parsed);
     await event(db, `Updated company · ${parsed.name}`, null, parsed.id);
   });
@@ -144,7 +149,11 @@ export async function saveContact(
         throw new Error("Choose an existing company.");
       const previous = await db.contacts.get(parsed.id);
       assertEditorVersion(previous, expectedUpdatedAt);
-      if (previous) parsed.createdAt = previous.createdAt;
+      if (previous) {
+        parsed.createdAt = previous.createdAt;
+        parsed.updatedAt = nextRecordTimestamp(previous.updatedAt);
+      }
+      parsed.archivedAt = previous?.archivedAt ?? null;
       await db.contacts.put(parsed);
       const restrictionId = `profile-${parsed.id}`;
       const previousRestriction = await db.restrictions.get(restrictionId);
@@ -181,6 +190,34 @@ export async function saveContact(
       );
     },
   );
+}
+// Archiving only changes directory visibility. Linked records and communication
+// permissions remain untouched; a dedicated operation makes it reversible.
+export async function setArchiveStatus(
+  db: PulseDB,
+  type: "contact" | "organization",
+  id: string,
+  expectedUpdatedAt: string,
+  archived: boolean,
+) {
+  const table = type === "contact" ? db.contacts : db.organizations;
+  await db.transaction("rw", [table, db.events], async () => {
+    const previous = await table.get(id);
+    assertEditorVersion(previous, expectedUpdatedAt);
+    if (!previous) throw new Error("This record no longer exists.");
+    if (!!previous.archivedAt === archived) return;
+    const changedAt = nextRecordTimestamp(previous.updatedAt);
+    await table.update(id, {
+      archivedAt: archived ? changedAt : null,
+      updatedAt: changedAt,
+    });
+    await event(
+      db,
+      `${archived ? "Archived" : "Restored"} ${type === "contact" ? "contact" : "company"} · ${previous.name}`,
+      type === "contact" ? id : null,
+      type === "organization" ? id : (previous as Contact).organizationId,
+    );
+  });
 }
 export async function addInteraction(db: PulseDB, value: Interaction) {
   const parsed = interactionSchema.parse(value);
@@ -404,6 +441,7 @@ export const backupSchema = z.object({
     z.literal(4),
     z.literal(5),
     z.literal(6),
+    z.literal(7),
   ]),
   metadata: z
     .object({
@@ -444,7 +482,7 @@ export const backupSchema = z.object({
 export async function exportBackup(db: PulseDB) {
   return db.transaction("r", db.tables, async () => ({
     format: "pulse-backup",
-    version: 6,
+    version: 7,
     metadata: {
       appVersion: "1.5.0-rc.1",
       exportedAt: new Date().toISOString(),
@@ -489,8 +527,14 @@ export async function exportBackup(db: PulseDB) {
     smartLists: await db.smartLists.toArray(),
     recommendationActions: await db.recommendationActions.toArray(),
     importBatches: await db.importBatches.toArray(),
-    organizations: await db.organizations.toArray(),
-    contacts: await db.contacts.toArray(),
+    organizations: (await db.organizations.toArray()).map((r) => ({
+      ...r,
+      archivedAt: r.archivedAt ?? null,
+    })),
+    contacts: (await db.contacts.toArray()).map((r) => ({
+      ...r,
+      archivedAt: r.archivedAt ?? null,
+    })),
     interactions: await db.interactions.toArray(),
     tasks: await db.tasks.toArray(),
     opportunities: await db.opportunities.toArray(),
@@ -503,7 +547,82 @@ export async function exportBackup(db: PulseDB) {
   }));
 }
 export function validateBackup(input: unknown) {
+  // Each historical exporter writes every store available in its version.
+  // Applying defaults to an omitted existing store can erase data on restore;
+  // only stores introduced in later versions may safely use defaults.
+  if (
+    input &&
+    typeof input === "object" &&
+    "version" in input &&
+    typeof input.version === "number" &&
+    Number.isInteger(input.version) &&
+    input.version >= 1 &&
+    input.version <= 7
+  ) {
+    const source = input as Record<string, unknown>;
+    const storesByVersion = [
+      [
+        "organizations",
+        "contacts",
+        "interactions",
+        "tasks",
+        "opportunities",
+        "events",
+        "settings",
+        "restrictions",
+        "permissions",
+        "gamification",
+        "integrations",
+      ],
+      ["smartLists", "recommendationActions", "importBatches"],
+      ["rewards", "rewardChanges", "progressState", "dailyQuests"],
+      [
+        "pipelines",
+        "pipelineStages",
+        "fieldDefinitions",
+        "fieldValues",
+        "focusItems",
+      ],
+      ["media"],
+      [
+        "transitions",
+        "automationRules",
+        "automationExecutions",
+        "automationControl",
+      ],
+    ];
+    for (const key of storesByVersion.slice(0, input.version).flat()) {
+      if (!Array.isArray(source[key]))
+        throw new Error(
+          `Incomplete version ${input.version} backup: missing ${key}. Nothing was replaced.`,
+        );
+    }
+    if (input.version === 7) {
+      for (const key of ["contacts", "organizations"]) {
+        if (
+          (source[key] as unknown[]).some(
+            (row) =>
+              !row ||
+              typeof row !== "object" ||
+              !("archivedAt" in row) ||
+              row.archivedAt === undefined,
+          )
+        )
+          throw new Error(
+            `Incomplete version 7 backup: missing ${key} archive status. Nothing was replaced.`,
+          );
+      }
+    }
+  }
   const b = backupSchema.parse(input);
+  b.contacts = b.contacts.map((r) => ({
+    ...r,
+    archivedAt: r.archivedAt ?? null,
+  }));
+  b.organizations = b.organizations.map((r) => ({
+    ...r,
+    archivedAt: r.archivedAt ?? null,
+  }));
   // Version-one backups remain supported. The stage is authoritative for outcomes.
   if (b.version < 4) {
     const legacy = b.opportunities.map((o) => ({
@@ -1150,7 +1269,7 @@ export async function saveRestriction(db: PulseDB, value: Restriction) {
           availability: parsed.type,
           timeoutUntil:
             parsed.type === "Temporarily unavailable" ? parsed.endAt : null,
-          updatedAt: parsed.updatedAt,
+          updatedAt: nextRecordTimestamp(c.updatedAt),
         });
       await event(
         db,
@@ -1171,11 +1290,12 @@ export async function endRestriction(db: PulseDB, id: string) {
       // Preserve the original instruction as an ended record.
       const now = new Date().toISOString();
       await db.restrictions.update(id, { endAt: now, updatedAt: now });
-      if (id === `profile-${r.contactId}`)
+      const contact = await db.contacts.get(r.contactId);
+      if (id === `profile-${r.contactId}` && contact)
         await db.contacts.update(r.contactId, {
           availability: "Available",
           timeoutUntil: null,
-          updatedAt: now,
+          updatedAt: nextRecordTimestamp(contact.updatedAt),
         });
       await event(db, "Availability restriction ended", r.contactId);
     },

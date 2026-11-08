@@ -16,6 +16,10 @@ const topics = [
     "Do Not Contact stops routine outreach recommendations and message handoffs. A timeout pauses review until its end; an independent restriction still applies afterwards. Availability is separate from permission. Unknown marketing consent is never permission.",
   ],
   [
+    "Archive a person or company",
+    "Open a profile and choose Archive. The record leaves the active directory but its history and links stay intact. Follow-ups and existing automations remain active; archiving does not change restrictions or permissions. In People, select Archived records to find the profile and restore it. Search, reports and linked records can still show archived records.",
+  ],
+  [
     "Tasks and opportunities",
     "Activity contains follow-ups you can edit, reschedule, complete or reopen. Pipeline tracks deals: Won and Lost set the outcome; an active stage reopens a deal. No message is automatically sent.",
   ],
