@@ -41,6 +41,13 @@ for (const theme of ["light", "dark"] as const) {
         expect(bounds!.x).toBeGreaterThanOrEqual(0);
         expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
         expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+        const save = dialog.getByRole("button", { name: "Save person", exact: true });
+        await save.scrollIntoViewIfNeeded();
+        const saveBounds = await save.boundingBox();
+        expect(saveBounds).not.toBeNull();
+        expect(saveBounds!.x).toBeGreaterThanOrEqual(0);
+        expect(saveBounds!.x + saveBounds!.width).toBeLessThanOrEqual(width);
+        expect(saveBounds!.y + saveBounds!.height).toBeLessThanOrEqual(900);
         await dialog.getByRole("button", { name: "Cancel", exact: true }).scrollIntoViewIfNeeded();
         await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
       }

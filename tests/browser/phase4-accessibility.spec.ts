@@ -18,7 +18,12 @@ test("keyboard search activates the focused result and restores focus on Escape"
   await page.keyboard.press("Tab");
   await expect(searchDialog.getByRole("option", { name: /Add person/ })).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(searchDialog.getByRole("option", { name: /Add company/ })).toBeFocused();
+  const focusedCompany = searchDialog.getByRole("option", { name: /Add company/ });
+  await expect(focusedCompany).toBeFocused();
+  expect(await focusedCompany.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return el.matches(":focus-visible") && style.outlineStyle !== "none" && parseFloat(style.outlineWidth) > 0;
+  })).toBe(true);
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog", { name: "New company" })).toBeVisible();
   await page.keyboard.press("Escape");
@@ -49,6 +54,7 @@ test("keyboard search activates the focused result and restores focus on Escape"
 test("invalid form data remains editable and identifies the field", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Create My Workspace/ }).click();
+  await expect(page.getByRole("heading", { name: "Today.", exact: true })).toBeVisible();
   await page.goto("/#/network");
   await page.getByRole("button", { name: "Add person", exact: true }).first().click();
   const dialog = page.getByRole("dialog");
@@ -77,6 +83,7 @@ test("reduced-motion profile navigation and Orbit list remain usable", async ({ 
   });
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await expect(page.getByRole("heading", { name: "Today.", exact: true })).toBeVisible();
   await page.goto("/#/network/people/contact-0");
   await page.getByRole("navigation", { name: "Profile sections" }).getByRole("button", { name: "Story" }).click();
   const calls = await page.evaluate(() => (window as unknown as { __phase4ScrollCalls: string[] }).__phase4ScrollCalls);
@@ -97,6 +104,7 @@ test("major navigation and an open editor have no axe A/AA violations", async ({
   test.setTimeout(90000);
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await expect(page.getByRole("heading", { name: "Today.", exact: true })).toBeVisible();
   await page.goto("/#/network/people/contact-0");
   await expect(page.getByRole("heading", { name: "Olivia Chen", exact: true })).toBeVisible();
   const analyze = () => new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
