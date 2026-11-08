@@ -28,6 +28,19 @@ for (const theme of ["light", "dark"] as const) {
             const report = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
             expect.soft(report.violations, `${theme}/${accent} ${width}px network axe`).toEqual([]);
           }
+          if (route === "/network" && width === 320) {
+            const fragments = await page.getByText("pinned connections", { exact: true }).evaluate((label) => {
+              const text = label.firstChild;
+              if (!text?.textContent) return 0;
+              const offset = text.textContent.indexOf("connections");
+              if (offset < 0) return 0;
+              const range = document.createRange();
+              range.setStart(text, offset);
+              range.setEnd(text, offset + "connections".length);
+              return range.getClientRects().length;
+            });
+            expect.soft(fragments, `${theme}/${accent} ${width}px pinned connections word`).toBe(1);
+          }
           if (route === "/network" && accent === "periwinkle" && (width === 320 || width === 1440)) {
             await page.screenshot({ path: info.outputPath(`${theme}-${accent}-${width}.png`) });
           }

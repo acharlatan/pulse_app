@@ -311,6 +311,13 @@ body { background: var(--bg); }
   .opening-orbit-link { padding-block: 8px; }
   .pipeline-page .directory-toolbar { padding: 12px; }
 }
+
+@media (max-width: 360px) {
+  .network-cover .network-orientation-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 16px;
+  }
+}
 @media (max-width: 380px) {
   .network-recent-people { grid-template-columns: minmax(0, 1fr); }
   .network-recent-person { flex-direction: row; align-items: center; }
