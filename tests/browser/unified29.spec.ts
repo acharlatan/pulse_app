@@ -44,7 +44,7 @@ test("unified workspaces, editable lists and interactive 3D preserve the core jo
   await page.getByRole("button", { name: "2D map" }).click();
   await expect(page.locator(".orbit-node").first()).toBeAttached();
   await nav.getByRole("link", { name: "Work" }).click();
-  await expect(page.getByRole("heading", { name: "Pipeline.", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pipeline studio.", exact: true })).toBeVisible();
   await page.getByRole("navigation", { name: "Work views" }).getByRole("link", { name: "Follow-ups & activity" }).click();
   await expect(page.getByRole("heading", { name: "Activity.", exact: true })).toBeVisible();
   await page.getByRole("navigation", { name: "Work views" }).getByRole("link", { name: "Automations" }).click();

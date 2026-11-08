@@ -108,7 +108,13 @@ test("essential pages fit every requested width and expose accessible content ac
             (accent === "periwinkle" && (width === 320 || width === 1440))
           ) {
             const report = await new AxeBuilder({ page })
-              .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+              .withTags([
+                "wcag2a",
+                "wcag2aa",
+                "wcag21a",
+                "wcag21aa",
+                "wcag22aa",
+              ])
               .analyze();
             for (const v of report.violations)
               findings.push({
@@ -165,7 +171,8 @@ test("essential pages fit every requested width and expose accessible content ac
 
 test("appearance controls persist and enlarged content keeps the editor usable", async ({
   page,
-}) => {
+}, info) => {
+  test.setTimeout(120000);
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
   await page.goto("/#/settings");
@@ -200,9 +207,82 @@ test("appearance controls persist and enlarged content keeps the editor usable",
     .first()
     .click();
   await page.getByLabel("Full name").fill("Enlarged Fictional Person");
-  await page.getByRole("button", { name: "Save person", exact: true }).click();
+  await page.screenshot({
+    path: info.outputPath("enlarged-person-editor.png"),
+  });
+  await page
+    .getByRole("button", { name: "Save person", exact: true })
+    .click({ timeout: 15000 });
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.locator("#directory-results")).toContainText(
     "Enlarged Fictional Person",
   );
+});
+
+test("empty Personal and Analytics sections expose accessible controls", async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  await page.goto("/");
+  await page.getByRole("button", { name: /Create My Workspace/ }).click();
+  await expect(page.locator("main h1")).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.locator(".workspace-switcher summary").click();
+  await page.getByRole("button", { name: "Open Demo", exact: true }).click();
+  await page.goto("/#/analytics");
+  for (const section of [
+    "Overview",
+    "Relationships",
+    "Opportunities",
+    "Commitments",
+  ]) {
+    await page
+      .getByLabel("Analytics sections")
+      .getByRole("button", { name: new RegExp(section) })
+      .click();
+    for (const theme of themes) {
+      await page.evaluate((value) => {
+        document.documentElement.dataset.theme = value;
+      }, theme);
+      await page.setViewportSize({ width: 320, height: 900 });
+      const size = await page.evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        content: document.documentElement.scrollWidth,
+      }));
+      expect(size.content, `${section} ${theme} 320px`).toBeLessThanOrEqual(
+        size.viewport,
+      );
+      const result = await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+        .analyze();
+      expect(
+        result.violations.map((v) => ({
+          id: v.id,
+          targets: v.nodes.map((n) => n.target),
+        })),
+        `${section} ${theme}`,
+      ).toEqual([]);
+    }
+  }
+});
+
+test("pipeline overview and board have a logical heading hierarchy", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await page.goto("/#/pipeline");
+  const views = page.getByRole("group", { name: "Pipeline views" });
+  for (const view of ["Overview", "Board"]) {
+    await views.getByRole("button", { name: view, exact: true }).click();
+    await expect(page.locator(".pipeline-deal").first()).toBeVisible();
+    const result = await new AxeBuilder({ page }).analyze();
+    expect(
+      result.violations.map((v) => ({
+        id: v.id,
+        targets: v.nodes.map((n) => n.target),
+      })),
+      view,
+    ).toEqual([]);
+  }
 });

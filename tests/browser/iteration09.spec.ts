@@ -163,8 +163,9 @@ test("Orbit uses saved connections, supports focused views, keyboard/list access
   const detail = page.getByRole("complementary", {
     name: "Selected relationship",
   });
-  await expect(detail).toContainText("3 representatives");
-  await detail.getByRole("link", { name: "Open Company", exact: true }).click();
+  await expect(detail.getByRole("heading", { name: "Saved connections" })).toBeVisible();
+  await expect(detail.locator(".orbit-inspector-links")).toContainText("Olivia Chen");
+  await detail.getByRole("link", { name: /^Open Company/ }).click();
   await expect(
     page.getByRole("heading", { name: "Forma Studio", exact: true }),
   ).toBeVisible();
@@ -177,7 +178,7 @@ test("Orbit uses saved connections, supports focused views, keyboard/list access
   await page.getByRole("button", { name: "Zoom in", exact: true }).click();
   await page.getByRole("button", { name: "Center selected" }).click();
   await page.getByRole("button", { name: "Fit network" }).click();
-  await detail.getByRole("link", { name: "Open Profile" }).click();
+  await detail.getByRole("link", { name: /^Open Profile/ }).click();
   await expect(
     page.getByRole("heading", { name: "Olivia Chen", exact: true }),
   ).toBeVisible();

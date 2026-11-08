@@ -20,7 +20,7 @@ function TimeChart({ data, selected, onSelect, label }: { data: [string, number]
   const text = useInterfaceText();
   const max = Math.max(1, ...data.map(([, count]) => count));
   return <div className="pulse-chart-scroll"><div className="pulse-time-chart" role="group" aria-label={label}>
-    {data.map(([key, count]) => <button key={key} className="pulse-time-bar" aria-pressed={selected === key} aria-label={text("{0}: {1}", key.replace("..", ` ${text("through")} `), count)} onClick={() => onSelect(key)}>
+    {data.map(([key, count]) => <button key={key} className="pulse-time-bar" aria-pressed={selected === key} aria-label={text("{0} {1} ({2})", count, bucketLabel(key), key.replace("..", ` ${text("through")} `))} onClick={() => onSelect(key)}>
       <strong>{count}</strong><span className="pulse-time-rail"><span style={{height:`${count ? Math.max(7, count / max * 100) : 0}%`}} /></span><small>{bucketLabel(key)}</small>
     </button>)}
   </div></div>;

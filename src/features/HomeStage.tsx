@@ -40,9 +40,9 @@ export function HomeStage({ onEdit }: { onEdit: (editor: Editor) => void }) {
       <div className="opening-art-fallback world-stage-fallback" aria-hidden="true"><i/><i/><i/><b>✳</b></div>
       <div className="world-stage-art-label" aria-hidden="true"><span>✳</span> {text("A WORLD OF CONNECTIONS")}</div>
       <ConstellationScene variant="home" />
-      <div className="world-stage-people" aria-label={text("People in your workspace")}>
+      {people.length > 0 && <div className="world-stage-people" role="group" aria-label={text("People in your workspace")}>
         {people.map(person => <Link className="world-person" key={person.id} to={`/network/people/${encodeURIComponent(person.id)}`}><Avatar name={person.name} mediaId={person.avatar}/><span><strong>{person.name}</strong><small>{person.role || text("Person")}</small></span><ArrowUpRight size={15} aria-hidden="true"/></Link>)}
-      </div>
+      </div>}
       <Link className="world-stage-orbit" to="/orbit">{t("enterOrbit")} <ArrowUpRight size={16} aria-hidden="true"/></Link>
     </div>
     <nav className="world-stage-index" aria-label={text("Your workspace at a glance")}>

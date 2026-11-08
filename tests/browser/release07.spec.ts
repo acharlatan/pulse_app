@@ -36,7 +36,8 @@ test("personal guide can be skipped and reopened without demo data", async ({
   await expect(
     page.getByRole("heading", { name: "Your next connection starts here." }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Open settings", exact: true }).click();
+  await page.getByRole("button", { name: "Open workspace menu", exact: true }).click();
+  await page.getByRole("link", { name: "Settings & backups", exact: true }).click();
   await page
     .getByRole("link", { name: "Help & getting started", exact: true })
     .click();

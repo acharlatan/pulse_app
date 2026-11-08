@@ -32,6 +32,6 @@ test("visual workspace additions fit both themes and navigate to working feature
     .click();
   await expect(page).toHaveURL(/network/);
   await page.getByText("Directory tools", {exact:true}).click();
-  await page.locator(".network-tools").getByRole("link", {name:"Relationship Orbit", exact:true}).click();
+  await page.getByRole("link", {name:"Explore Orbit", exact:true}).click();
   await expect(page).toHaveURL(/orbit/);
 });

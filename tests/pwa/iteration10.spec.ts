@@ -11,7 +11,7 @@ test("analytics and due reminders work offline without duplicate execution", asy
       Number(localStorage.getItem("pulse-test-clock")) || realNow();
   });
   await page.goto("/");
-  await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await page.getByRole("button", { name: /Create My Workspace/ }).click();
   await expect(page.locator("main h1")).toBeVisible();
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
@@ -24,7 +24,17 @@ test("analytics and due reminders work offline without duplicate execution", asy
         ),
       );
   });
-  await page.goto("/#/network/people/contact-0");
+  await page.goto("/#/network");
+  await page
+    .getByRole("button", { name: "Add person", exact: true })
+    .first()
+    .click();
+  await page.getByLabel("Full name").fill("Offline Reminder Fictional");
+  await page.getByRole("button", { name: "Save person", exact: true }).click();
+  await page
+    .locator(".profile-card")
+    .filter({ hasText: "Offline Reminder Fictional" })
+    .click();
   await page.getByRole("button", { name: "Follow up", exact: true }).click();
   await page
     .getByLabel("Follow-up title")
@@ -40,7 +50,9 @@ test("analytics and due reminders work offline without duplicate execution", asy
     .getByRole("button", { name: "Save follow-up", exact: true })
     .click();
   await page.goto("/#/automations");
-  await page.getByRole("button", { name: /^Overdue reminder/ }).click();
+  await page
+    .getByRole("button", { name: /^When a follow-up is overdue/ })
+    .click();
   const d = page.getByRole("dialog");
   await d
     .getByRole("combobox", { name: "When", exact: true })

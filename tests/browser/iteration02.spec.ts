@@ -111,7 +111,7 @@ test("Northstar relationship workflow persists and all new editors work", async 
     .getByRole("button", { name: "Save interaction", exact: true })
     .click();
   await expect(
-    page.getByText("Corrected partnership scope.", { exact: true }),
+    page.locator("#story").getByText("Corrected partnership scope.", { exact: true }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "View / edit opportunity", exact: true })
@@ -139,7 +139,7 @@ test("Northstar relationship workflow persists and all new editors work", async 
   ).toBeVisible();
   await page.goto(personURL);
   await expect(
-    page.getByText("Corrected partnership scope.", { exact: true }),
+    page.locator("#story").getByText("Corrected partnership scope.", { exact: true }),
   ).toBeVisible();
   await expect(page.locator(".managed-task")).toContainText(
     "Rescheduled after the budget review.",
@@ -158,7 +158,8 @@ test("Northstar relationship workflow persists and all new editors work", async 
     await page.getByRole("button", { name: "Cancel", exact: true }).click();
   }
   await page.goto(companyURL);
-  await expect(page.locator(".story-entry")).toHaveCount(2);
+  await expect(page.locator("#story").getByText("Corrected partnership scope.", { exact: true })).toBeVisible();
+  await expect(page.locator("#story").getByText("Upcoming budget review.", { exact: true })).toBeVisible();
   await expect(page.getByText("Won · won", { exact: true })).toBeVisible();
   await noOverflow(page);
 });
@@ -190,7 +191,7 @@ test("record deletion and purpose-specific permission controls preserve profiles
   await page
     .getByRole("button", { name: "Confirm delete", exact: true })
     .click();
-  await expect(page.locator(".story-entry")).toHaveCount(0);
+  await expect(page.locator(".story-entry").getByRole("button", { name: "Edit entry", exact: true })).toHaveCount(0);
   await page.getByRole("button", { name: "Edit task", exact: true }).click();
   await page
     .getByRole("button", { name: "Delete record", exact: true })

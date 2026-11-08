@@ -135,7 +135,7 @@ test("review snoozes persist and Smart List membership follows task completion",
   await page
     .locator(".review-card")
     .first()
-    .getByRole("button", { name: "Reschedule follow-up", exact: true })
+    .getByRole("button", { name: "Review follow-up", exact: true })
     .click();
   await page.getByLabel("Due date and time").fill("2028-01-01T10:00");
   await page

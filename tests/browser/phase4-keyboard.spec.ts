@@ -65,7 +65,7 @@ test("keyboard can create and find a person, escape a dialog and use Orbit list"
   ).toBeVisible();
   const report = await new AxeBuilder({ page })
     .include("dialog")
-    .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
   expect(
     report.violations.map((v) => ({
@@ -121,6 +121,12 @@ test("Tab and Enter activate the focused search result", async ({ page }) => {
   await expect(person).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(company).toBeFocused();
+  const focusRing = await company.evaluate((element) => ({
+    style: getComputedStyle(element).outlineStyle,
+    width: parseFloat(getComputedStyle(element).outlineWidth),
+  }));
+  expect(focusRing.style).not.toBe("none");
+  expect(focusRing.width).toBeGreaterThanOrEqual(2);
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog", { name: "New company" })).toBeVisible();
   await expect(page.getByLabel("Company name")).toBeVisible();
@@ -198,4 +204,35 @@ test("Orbit offers a list and 2D map without WebGL", async ({ page }) => {
   await page.getByRole("button", { name: "List", exact: true }).click();
   await expect(page.locator(".orbit-record-list")).toBeVisible();
   await expect(page.locator(".orbit-list-item").first()).toBeVisible();
+});
+
+test("a duplicate email is announced in the open editor without losing text", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Create My Workspace/ }).click();
+  await page.goto("/#/network");
+  const add = page
+    .getByRole("button", { name: "Add person", exact: true })
+    .first();
+  await add.click();
+  await page.getByLabel("Full name").fill("Avery Error Fixture");
+  await page.getByLabel("Email", { exact: true }).fill("unique-qa@example.com");
+  await page.getByRole("button", { name: "Save person", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await add.click();
+  const editor = page.getByRole("dialog");
+  await page.getByLabel("Full name").fill("Taylor Error Fixture");
+  await page.getByLabel("Email", { exact: true }).fill("unique-qa@example.com");
+  await page.getByRole("button", { name: "Save person", exact: true }).click();
+  await expect(editor.getByRole("alert")).toContainText(
+    "A contact with this email already exists.",
+  );
+  await expect(editor.locator("form")).toHaveAttribute(
+    "aria-describedby",
+    "form-error",
+  );
+  await expect(page.getByLabel("Full name")).toHaveValue(
+    "Taylor Error Fixture",
+  );
 });

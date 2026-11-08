@@ -14,7 +14,7 @@ test("demo Michelle, company marks, focus examples and map-first Orbit", async (
     /demo-michelle/,
   );
   await expect(
-    page.getByText("Hello, Michelle.", { exact: false }),
+    page.getByText(/Good (morning|afternoon|evening), Michelle\./),
   ).toBeVisible();
   await page.goto("/#/focus");
   await expect(

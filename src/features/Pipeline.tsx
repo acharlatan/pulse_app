@@ -51,7 +51,7 @@ export function Pipeline() {
   const lensNames = { all: "Open opportunities", review: "Needs attention", closing: "Closing in 14 days", missing: "No related follow-up" };
   const renderDeal = (o: typeof rows[number]) => (
     <div key={o.id} className="pipeline-deal studio-deal-wrap">
-      <PipelineOpportunity opportunity={o} onEdit={setEditor} onReview={setBriefId} />
+      <PipelineOpportunity opportunity={o} onEdit={setEditor} onReview={setBriefId} headingLevel={view === "board" ? 4 : 3} />
       <label className="field studio-move">
         <span>{text("Move to stage / reopen")}</span>
         <select value={o.stageId} onChange={(e) => void p.run(() => moveOpportunity(p.db, o.id, e.target.value), "Opportunity updated")}>
