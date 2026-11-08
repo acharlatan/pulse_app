@@ -1,3 +1,4 @@
+import { motionAwareScroll } from "../services/motion-preference";
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { profileSnapshot } from "../services/profile-snapshot";
 import { MediaControls } from "../components/media-controls";
@@ -98,7 +99,7 @@ export function Profile({ company = false }: { company?: boolean }) {
   const next = snapshot.nextTask;
   const peopleAtCompany = company ? p.contacts.filter((c) => c.organizationId === id) : [];
   const scrollTo = (target: string) => document.getElementById(target)?.scrollIntoView({
-    behavior: p.settings.reducedMotion ? "instant" : "smooth", block: "start",
+    behavior: motionAwareScroll(p.settings.reducedMotion), block: "start",
   });
   return (
     <div className="page profile-page editorial-profile">
@@ -392,7 +393,7 @@ export function Profile({ company = false }: { company?: boolean }) {
             key={section}
             onClick={() =>
               document.getElementById(section)?.scrollIntoView({
-                behavior: p.settings.reducedMotion ? "instant" : "smooth",
+                behavior: motionAwareScroll(p.settings.reducedMotion),
                 block: "start",
               })
             }

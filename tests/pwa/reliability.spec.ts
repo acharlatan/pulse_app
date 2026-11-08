@@ -150,6 +150,37 @@ test("real waiting SW update warns about unfinished work and does not reload ano
   ).toHaveCount(0);
   await second.close();
 });
+test("a failed service-worker update preserves saved work and the installed app", async ({
+  page,
+  context,
+}) => {
+  test.setTimeout(90000);
+  await cached(page);
+  await page.goto("/#/network/people/contact-0");
+  await page.getByRole("button", { name: "Add note", exact: true }).click();
+  const note = "Saved before a simulated interrupted update.";
+  await page.getByLabel("What would you like to remember?").fill(note);
+  await page
+    .getByRole("button", { name: "Save interaction", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await page.request.post("/test/fail-next-update");
+  const failed = await page.evaluate(async () => {
+    try {
+      await (await navigator.serviceWorker.ready).update();
+      return false;
+    } catch {
+      return true;
+    }
+  });
+  expect(failed).toBe(true);
+  await expect(page.getByText(note, { exact: true }).first()).toBeVisible();
+  await context.setOffline(true);
+  await page.reload();
+  await expect(page.getByText(note, { exact: true }).first()).toBeVisible();
+  await context.setOffline(false);
+});
+
 test("repository subpath retains scoped registration and offline profile navigation", async ({
   page,
   context,

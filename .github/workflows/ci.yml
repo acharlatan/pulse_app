@@ -5,7 +5,13 @@ on:
     branches: [main]
   pull_request:
     branches:
-      [main, hardening/v1-phase-1, hardening/v1-phase-2, hardening/v1-phase-3]
+      [
+        main,
+        hardening/v1-phase-1,
+        hardening/v1-phase-2,
+        hardening/v1-phase-3,
+        hardening/v1-archive,
+      ]
   workflow_dispatch:
 
 permissions:
@@ -77,3 +83,73 @@ jobs:
           name: core-journey-results
           path: test-results/
           if-no-files-found: ignore
+
+  phase4-layout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Width, theme, accent and accessibility matrix
+        run: npm run test:browser -- --config=playwright.phase4.config.ts --project=chromium tests/browser/phase4-layout.spec.ts --workers=1
+      - name: Preserve visual and accessibility evidence
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-layout-evidence
+          path: test-results/
+          if-no-files-found: warn
+
+  phase4-engines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: npm run build
+      - name: Keyboard, forms, search and Orbit list
+        run: npm run test:browser -- --config=playwright.phase4.config.ts --project=${{ matrix.browser }} tests/browser/phase4-keyboard.spec.ts tests/browser/phase3-journey.spec.ts --workers=1
+      - name: Preserve engine diagnostics
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-${{ matrix.browser }}-results
+          path: test-results/
+          if-no-files-found: ignore
+
+  phase4-scale:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Synthetic 100 and 1000 contact workspaces
+        run: npm run test:pwa -- tests/pwa/scale.spec.ts --workers=1
+      - name: Preserve scale observations
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-scale-evidence
+          path: .codex/pwa-results/
+          if-no-files-found: warn

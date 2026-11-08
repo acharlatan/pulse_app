@@ -1,0 +1,178 @@
+import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+
+const widths = [320, 390, 768, 1024, 1440];
+const themes = ["light", "dark"];
+const accents = ["periwinkle", "forest", "coral", "blue"];
+const routes = [
+  "/",
+  "/network",
+  "/network/people/contact-0",
+  "/pipeline",
+  "/activity",
+  "/focus",
+  "/analytics",
+  "/orbit",
+  "/settings?section=data",
+];
+
+test("essential pages fit every requested width and expose accessible content across themes and accents", async ({
+  page,
+  browser,
+}, info) => {
+  test.setTimeout(600000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await expect(page.locator("main h1")).toBeVisible();
+  const findings: unknown[] = [];
+  const visited: string[] = [];
+  console.log(
+    "PHASE4_ENV",
+    JSON.stringify({
+      engine: info.project.name,
+      browser: browser.version(),
+      node: process.version,
+      platform: process.platform,
+      arch: process.arch,
+    }),
+  );
+  for (const route of routes) {
+    await page.goto(`/#${route}`);
+    await expect(page.locator("main h1").first(), route).toBeVisible();
+    for (const theme of themes) {
+      for (const width of widths) {
+        await page.setViewportSize({ width, height: 900 });
+        for (const accent of accents) {
+          await page.evaluate(
+            ({ theme, accent }) => {
+              document.documentElement.dataset.theme = theme;
+              document.documentElement.dataset.accent = accent;
+            },
+            { theme, accent },
+          );
+          const overflow = await page.evaluate(() => ({
+            width: document.documentElement.clientWidth,
+            scrollWidth: document.documentElement.scrollWidth,
+            offenders: [...document.querySelectorAll("body *")]
+              .filter(
+                (el) =>
+                  el.getBoundingClientRect().right >
+                  document.documentElement.clientWidth + 1,
+              )
+              .slice(0, 5)
+              .map(
+                (el) =>
+                  `${el.tagName.toLowerCase()}.${typeof el.className === "string" ? el.className : ""}`,
+              ),
+          }));
+          visited.push(`${route}|${theme}|${width}|${accent}`);
+          if (overflow.scrollWidth > overflow.width + 1)
+            findings.push({
+              kind: "overflow",
+              route,
+              theme,
+              width,
+              accent,
+              ...overflow,
+            });
+          if (
+            width === 390 ||
+            (accent === "periwinkle" && (width === 320 || width === 1440))
+          ) {
+            const report = await new AxeBuilder({ page })
+              .withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"])
+              .analyze();
+            for (const v of report.violations)
+              findings.push({
+                kind: "axe",
+                route,
+                theme,
+                width,
+                accent,
+                id: v.id,
+                impact: v.impact,
+                nodes: v.nodes.map((node) => ({
+                  target: node.target,
+                  summary: node.failureSummary,
+                })),
+              });
+          }
+          if (
+            accent === "periwinkle" &&
+            ["/", "/network", "/pipeline", "/analytics", "/orbit"].includes(
+              route,
+            )
+          ) {
+            await page.screenshot({
+              path: info.outputPath(
+                `${route === "/" ? "today" : route.slice(1)}-${theme}-${width}.png`,
+              ),
+            });
+          }
+        }
+      }
+    }
+  }
+  console.log(
+    "PHASE4_MATRIX",
+    JSON.stringify({
+      count: visited.length,
+      routes,
+      themes,
+      widths,
+      accents,
+      axe: "all accents at 390; periwinkle at 320 and 1440",
+      findings,
+    }),
+  );
+  await info.attach("phase4-matrix.json", {
+    body: JSON.stringify({ visited, findings }, null, 2),
+    contentType: "application/json",
+  });
+  expect(
+    findings,
+    "See PHASE4_MATRIX and the attached report for exact locations",
+  ).toEqual([]);
+});
+
+test("appearance controls persist and enlarged content keeps the editor usable", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await page.goto("/#/settings");
+  for (const theme of ["Dark", "Light"]) {
+    await page.getByRole("button", { name: theme, exact: true }).click();
+    await expect(page.locator("html")).toHaveAttribute(
+      "data-theme",
+      theme.toLowerCase(),
+    );
+    for (const accent of accents) {
+      await page.getByLabel("Accent preset").selectOption(accent);
+      await expect(page.locator("html")).toHaveAttribute("data-accent", accent);
+    }
+  }
+  await page.getByRole("switch", { name: /Reduce motion/ }).check();
+  await expect(page.locator("html")).toHaveAttribute("data-motion", "reduced");
+  await page.reload();
+  await expect(
+    page.getByRole("switch", { name: /Reduce motion/ }),
+  ).toBeChecked();
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.goto("/#/network");
+  // CSS zoom approximates enlarged content; it is not a real browser-UI zoom test.
+  await page.evaluate(() => {
+    document.documentElement.style.zoom = "2";
+  });
+  await page
+    .getByRole("button", { name: "Add person", exact: true })
+    .first()
+    .click();
+  await page.getByLabel("Full name").fill("Enlarged Fictional Person");
+  await page.getByRole("button", { name: "Save person", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.locator("#directory-results")).toContainText(
+    "Enlarged Fictional Person",
+  );
+});
