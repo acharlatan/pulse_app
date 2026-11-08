@@ -15,6 +15,7 @@ export function useAppUpdate() {
     if (!import.meta.env.PROD || !("serviceWorker" in navigator)) return;
     let hadController = !!navigator.serviceWorker.controller;
     let disposed = false,
+      checking = false,
       observed: ServiceWorker | null = null;
     const installed = () => {
       if (observed?.state === "installed") {
@@ -38,8 +39,28 @@ export function useAppUpdate() {
       hadController = true;
     };
     const check = () => {
-      if (navigator.onLine && document.visibilityState === "visible")
-        void registration.current?.update().catch(() => {});
+      if (
+        !navigator.onLine ||
+        document.visibilityState !== "visible" ||
+        checking ||
+        !registration.current
+      )
+        return;
+      checking = true;
+      void registration.current
+        .update()
+        .then(() => {
+          if (!disposed) setError("");
+        })
+        .catch(() => {
+          if (!disposed)
+            setError(
+              "Could not check for updates. Your current session and saved records are still available. Reconnect and return to PULSE to try again.",
+            );
+        })
+        .finally(() => {
+          checking = false;
+        });
     };
     navigator.serviceWorker.addEventListener("controllerchange", controlled);
     window.addEventListener("focus", check);

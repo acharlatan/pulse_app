@@ -77,6 +77,33 @@ test("essential pages fit every requested width and expose accessible content ac
               ...overflow,
             });
           if (
+            route === "/network" &&
+            width === 320 &&
+            accent === "periwinkle"
+          ) {
+            const pieces = await page
+              .locator(".network-orientation-facts span")
+              .last()
+              .evaluate((el) => {
+                const node = el.firstChild;
+                if (!node?.textContent) return 0;
+                const start = node.textContent.indexOf("connections");
+                if (start < 0) return 0;
+                const range = document.createRange();
+                range.setStart(node, start);
+                range.setEnd(node, start + "connections".length);
+                return range.getClientRects().length;
+              });
+            if (pieces !== 1)
+              findings.push({
+                kind: "broken-word",
+                route,
+                width,
+                theme,
+                pieces,
+              });
+          }
+          if (
             width === 390 ||
             (accent === "periwinkle" && (width === 320 || width === 1440))
           ) {
@@ -153,7 +180,10 @@ test("appearance controls persist and enlarged content keeps the editor usable",
       await expect(page.locator("html")).toHaveAttribute("data-accent", accent);
     }
   }
-  await page.getByRole("switch", { name: /Reduce motion/ }).check();
+  await page.getByRole("switch", { name: /Reduce motion/ }).click();
+  await expect(
+    page.getByRole("switch", { name: /Reduce motion/ }),
+  ).toBeChecked();
   await expect(page.locator("html")).toHaveAttribute("data-motion", "reduced");
   await page.reload();
   await expect(

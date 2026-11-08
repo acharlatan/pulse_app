@@ -52,6 +52,7 @@ test("keyboard can create and find a person, escape a dialog and use Orbit list"
   await page.keyboard.press("Enter");
   await expect(dialog).toHaveCount(0);
   await page.reload();
+  await expect(page.locator("main h1")).toBeVisible();
   await page.keyboard.press("Control+k");
   const search = page.getByRole("dialog", { name: "Search PULSE" });
   const field = search.getByRole("combobox", {
@@ -110,6 +111,7 @@ test("keyboard can create and find a person, escape a dialog and use Orbit list"
 test("Tab and Enter activate the focused search result", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: /Explore Demo/ }).click();
+  await expect(page.locator("main h1")).toBeVisible();
   await page.keyboard.press("Control+k");
   const search = page.getByRole("dialog", { name: "Search PULSE" });
   await expect(search.getByRole("combobox")).toBeFocused();

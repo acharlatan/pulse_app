@@ -5,6 +5,9 @@ import production from "./playwright.production.config";
 // report actual engine results on the compiled app without implying device QA.
 export default defineConfig({
   ...production,
+  // The cross-browser checks exercise ordinary caching; tests that intercept
+  // missing chunks continue to use the existing service-worker-blocked config.
+  use: { ...production.use, serviceWorkers: "allow" },
   projects: [
     {
       name: "chromium",

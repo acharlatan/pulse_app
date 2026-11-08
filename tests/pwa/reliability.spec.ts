@@ -164,16 +164,14 @@ test("a failed service-worker update preserves saved work and the installed app"
     .getByRole("button", { name: "Save interaction", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page.request.post("/test/fail-next-update");
-  const failed = await page.evaluate(async () => {
-    try {
-      await (await navigator.serviceWorker.ready).update();
-      return false;
-    } catch {
-      return true;
-    }
+  await page.evaluate(async () => {
+    await (await navigator.serviceWorker.ready).update();
   });
-  expect(failed).toBe(true);
+  await page.request.post("/test/fail-next-update");
+  await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+  await expect(
+    page.getByRole("status").filter({ hasText: "Could not check for updates" }),
+  ).toBeVisible();
   await expect(page.getByText(note, { exact: true }).first()).toBeVisible();
   await context.setOffline(true);
   await page.reload();

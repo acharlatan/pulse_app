@@ -153,3 +153,51 @@ jobs:
           name: phase4-scale-evidence
           path: .codex/pwa-results/
           if-no-files-found: warn
+
+  phase4-full-browser-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Existing browser regression
+        run: npm run test:browser -- --config=playwright.regression.config.ts --shard=${{ matrix.shard }}/4 --workers=2
+      - name: Preserve regression diagnostics
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-browser-shard-${{ matrix.shard }}
+          path: test-results/
+          if-no-files-found: ignore
+
+  phase4-full-pwa-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Existing offline and PWA regression
+        run: npm run test:pwa -- --workers=1
+      - name: Preserve PWA diagnostics
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase4-pwa-regression
+          path: .codex/pwa-results/
+          if-no-files-found: ignore
