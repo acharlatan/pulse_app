@@ -73,8 +73,24 @@ export function WorkspaceApp({
           <RouteBoundary>
             <Suspense
               fallback={
-                <div className="page" role="status">
-                  {__pulseText("Finding your rhythm…")}</div>
+                <div
+                  className="page workspace-loading"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <span className="workspace-loading-label">
+                    <span className="workspace-loading-mark" aria-hidden="true">
+                      ✳
+                    </span>
+                    {__pulseText("Finding your rhythm…")}
+                  </span>
+                  <div className="workspace-skeleton" aria-hidden="true">
+                    <div />
+                    <div />
+                    <div />
+                    <div />
+                  </div>
+                </div>
               }
             >
               <Routes>
@@ -104,7 +120,8 @@ export function WorkspaceApp({
                     <div className="page">
                       <h1>{__pulseText("A little off the path.")}</h1>
                       <Link className="button primary" to="/">
-                        {__pulseText("Back to Daily Pulse")}</Link>
+                        {__pulseText("Back to Daily Pulse")}
+                      </Link>
                     </div>
                   }
                 />

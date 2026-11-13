@@ -1,7 +1,20 @@
 import { useInterfaceText } from "../i18n/useInterfaceText";
 import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Activity, ArrowUpRight, AudioLines, Bell, Building2, ChevronDown, Home, Plus, Search, Users, Workflow, ChartNoAxesCombined } from "lucide-react";
+import {
+  Activity,
+  ArrowUpRight,
+  AudioLines,
+  Bell,
+  Building2,
+  ChevronDown,
+  Home,
+  Plus,
+  Search,
+  Users,
+  Workflow,
+  ChartNoAxesCombined,
+} from "lucide-react";
 import { OfflineStatus } from "../components/OfflineStatus";
 import { LanguageSelector } from "../components/LanguageSelector";
 import { useTranslation } from "../i18n/useTranslation";
@@ -19,13 +32,8 @@ const mainAreas = [
 ] as const;
 export function Shell({ children }: { children: ReactNode }) {
   const __pulseText = useInterfaceText();
-  const {
-    intelligence,
-    workspace,
-    settings,
-    tasks,
-    switchWorkspace,
-  } = usePulse();
+  const { intelligence, workspace, settings, tasks, switchWorkspace } =
+    usePulse();
   const t = useTranslation();
   const [editor, setEditor] = useState<Editor | null>(null);
   const [add, setAdd] = useState(false);
@@ -51,18 +59,47 @@ export function Shell({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!profileMenu) return;
-    const closeOutside = (event: PointerEvent) => { if (!profileMenuRef.current?.contains(event.target as Node)) setProfileMenu(false); };
-    const escape = (event: KeyboardEvent) => { if (event.key === "Escape") setProfileMenu(false); };
+    const closeOutside = (event: PointerEvent) => {
+      if (!profileMenuRef.current?.contains(event.target as Node))
+        setProfileMenu(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setProfileMenu(false);
+    };
     document.addEventListener("pointerdown", closeOutside);
     document.addEventListener("keydown", escape);
-    return () => { document.removeEventListener("pointerdown", closeOutside); document.removeEventListener("keydown", escape); };
+    return () => {
+      document.removeEventListener("pointerdown", closeOutside);
+      document.removeEventListener("keydown", escape);
+    };
   }, [profileMenu]);
   const location = useLocation();
   const path = location.pathname;
-  const area = path === "/" || path === "/focus" ? "Today" : ["/network", "/review", "/lists", "/orbit"].some((prefix) => path.startsWith(prefix)) ? "People" : ["/pipeline", "/activity", "/automations"].some((prefix) => path.startsWith(prefix)) ? "Work" : path.startsWith("/analytics") ? "Insights" : "";
+  const area =
+    path === "/" || path === "/focus"
+      ? "Today"
+      : ["/network", "/review", "/lists", "/orbit"].some((prefix) =>
+            path.startsWith(prefix),
+          )
+        ? "People"
+        : ["/pipeline", "/activity", "/automations"].some((prefix) =>
+              path.startsWith(prefix),
+            )
+          ? "Work"
+          : path.startsWith("/analytics")
+            ? "Insights"
+            : "";
   const areaLinks: Record<string, [string, string][]> = {
-    People: [["/network", "Directory"], ["/orbit", "Orbit"], ["/review", "Needs attention"]],
-    Work: [["/pipeline", "Pipeline"], ["/activity", "Follow-ups & activity"], ["/automations", "Automations"]],
+    People: [
+      ["/network", "Directory"],
+      ["/orbit", "Orbit"],
+      ["/review", "Needs attention"],
+    ],
+    Work: [
+      ["/pipeline", "Pipeline"],
+      ["/activity", "Follow-ups & activity"],
+      ["/automations", "Automations"],
+    ],
   };
   const firstRoute = useRef(true);
   useEffect(() => {
@@ -88,7 +125,10 @@ export function Shell({ children }: { children: ReactNode }) {
     : 0;
   const count = overdueCount + upcomingCount + reconnectionCount;
   return (
-    <div className="app-shell connected-shell unified-shell">
+    <div
+      className="app-shell connected-shell unified-shell"
+      data-area={area.toLowerCase()}
+    >
       <a
         className="skip-link"
         href="#main"
@@ -97,12 +137,33 @@ export function Shell({ children }: { children: ReactNode }) {
           document.querySelector<HTMLElement>("main")?.focus();
         }}
       >
-        {__pulseText("Skip to content")}</a>
+        {__pulseText("Skip to content")}
+      </a>
       <div className="workspace-main">
         <header className="topbar">
-          <Link to="/" className="unified-brand"><AudioLines size={23} /> PULSE<span>.</span></Link>
-          <nav className="unified-main-nav" aria-label={__pulseText("Main areas")}>
-            {mainAreas.map(({ to, label }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}>{t(label.toLowerCase() as "today" | "people" | "work" | "insights")}</Link>)}
+          <Link to="/" className="unified-brand">
+            <AudioLines size={23} /> PULSE<span>.</span>
+          </Link>
+          <nav
+            className="unified-main-nav"
+            aria-label={__pulseText("Main areas")}
+          >
+            {mainAreas.map(({ to, label, icon: Icon }) => (
+              <Link
+                key={to}
+                to={to}
+                className={area === label ? "active" : ""}
+                aria-current={area === label ? "page" : undefined}
+              >
+                <Icon size={16} aria-hidden="true" />
+                <span>
+                  {t(
+                    label.toLowerCase() as
+                      "today" | "people" | "work" | "insights",
+                  )}
+                </span>
+              </Link>
+            ))}
           </nav>
           <div className="topbar-actions">
             <details className="workspace-switcher">
@@ -117,8 +178,20 @@ export function Shell({ children }: { children: ReactNode }) {
               </summary>
               <div className="workspace-switcher-menu">
                 <strong>{t("switchWorkspace")}</strong>
-                <p>{__pulseText("Demo and Personal have separate records on this device.")}</p>
-                <p>{workspace === "demo" ? __pulseText("You are exploring fictional people and companies. Your personal workspace starts with your own records.") : __pulseText("You are using your personal records. The demo is a separate fictional workspace.")}</p>
+                <p>
+                  {__pulseText(
+                    "Demo and Personal have separate records on this device.",
+                  )}
+                </p>
+                <p>
+                  {workspace === "demo"
+                    ? __pulseText(
+                        "You are exploring fictional people and companies. Your personal workspace starts with your own records.",
+                      )
+                    : __pulseText(
+                        "You are using your personal records. The demo is a separate fictional workspace.",
+                      )}
+                </p>
                 <button
                   type="button"
                   className="button secondary"
@@ -128,12 +201,16 @@ export function Shell({ children }: { children: ReactNode }) {
                 >
                   {workspace === "demo" ? t("openPersonal") : t("openDemo")}
                 </button>
-                <small>{__pulseText("Switching does not delete either workspace.")}</small>
+                <small>
+                  {__pulseText("Switching does not delete either workspace.")}
+                </small>
               </div>
             </details>
             <span className="local-indicator">
               <i />
-              {workspace === "demo" ? __pulseText("Demo workspace") : __pulseText("Saved on this device")}
+              {workspace === "demo"
+                ? __pulseText("Demo workspace")
+                : __pulseText("Saved on this device")}
             </span>
             <button
               type="button"
@@ -153,22 +230,98 @@ export function Shell({ children }: { children: ReactNode }) {
               {count > 0 && <i />}
             </button>
             <div className="unified-profile-menu" ref={profileMenuRef}>
-              <button type="button" className="unified-profile-trigger" aria-label={t("workspaceMenu")} aria-expanded={profileMenu} onClick={() => setProfileMenu(!profileMenu)}><Avatar workspaceIdentity mediaId={settings.identity.avatarMediaId} name={settings.name || "You"} size="small" /></button>
-              {profileMenu && <div className="unified-profile-dropdown">
-                <strong>{settings.name || __pulseText("Your workspace")}</strong><small>{workspace === "demo" ? __pulseText("Demo workspace") : __pulseText("Saved on this device")}</small>
-                <LanguageSelector compact />
-                <Link to="/settings" onClick={() => setProfileMenu(false)}>{t("settingsBackups")}</Link>
-                <Link to="/customize" onClick={() => setProfileMenu(false)}>{t("personalize")}</Link>
-                <Link to="/import" onClick={() => setProfileMenu(false)}>{t("importContacts")}</Link>
-                <Link to="/assistant" onClick={() => setProfileMenu(false)}>{t("intelligence")}</Link>
-                <Link to="/help" onClick={() => setProfileMenu(false)}>{t("help")}</Link>
-              </div>}
+              <button
+                type="button"
+                className="unified-profile-trigger"
+                aria-label={t("workspaceMenu")}
+                aria-expanded={profileMenu}
+                onClick={() => setProfileMenu(!profileMenu)}
+              >
+                <Avatar
+                  workspaceIdentity
+                  mediaId={settings.identity.avatarMediaId}
+                  name={settings.name || "You"}
+                  size="small"
+                />
+              </button>
+              {profileMenu && (
+                <div className="unified-profile-dropdown">
+                  <strong>
+                    {settings.name || __pulseText("Your workspace")}
+                  </strong>
+                  <small>
+                    {workspace === "demo"
+                      ? __pulseText("Demo workspace")
+                      : __pulseText("Saved on this device")}
+                  </small>
+                  <LanguageSelector compact />
+                  <Link to="/settings" onClick={() => setProfileMenu(false)}>
+                    {t("settingsBackups")}
+                  </Link>
+                  <Link to="/customize" onClick={() => setProfileMenu(false)}>
+                    {t("personalize")}
+                  </Link>
+                  <Link to="/import" onClick={() => setProfileMenu(false)}>
+                    {t("importContacts")}
+                  </Link>
+                  <Link to="/assistant" onClick={() => setProfileMenu(false)}>
+                    {t("intelligence")}
+                  </Link>
+                  <Link to="/help" onClick={() => setProfileMenu(false)}>
+                    {t("help")}
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </header>
-        {areaLinks[area] && <nav className="unified-section-nav" aria-label={__pulseText("{0} views", area === "People" ? t("people") : t("work"))}>
-          <div>{areaLinks[area].map(([to, label]) => <Link key={to} to={to} className={path === to || (to === "/network" && (path.startsWith("/network/") || path === "/lists")) ? "active" : ""} aria-current={path === to ? "page" : undefined}>{t(({ "Directory": "directory", "Orbit": "orbit", "Needs attention": "attention", "Pipeline": "pipeline", "Follow-ups & activity": "activity", "Automations": "automations" } as const)[label as "Directory" | "Orbit" | "Needs attention" | "Pipeline" | "Follow-ups & activity" | "Automations"])}</Link>)}</div>
-        </nav>}
+        {areaLinks[area] && (
+          <nav
+            className="unified-section-nav"
+            aria-label={__pulseText(
+              "{0} views",
+              area === "People" ? t("people") : t("work"),
+            )}
+          >
+            <div>
+              {areaLinks[area].map(([to, label]) => (
+                <Link
+                  key={to}
+                  to={to}
+                  className={
+                    path === to ||
+                    (to === "/network" &&
+                      (path.startsWith("/network/") || path === "/lists"))
+                      ? "active"
+                      : ""
+                  }
+                  aria-current={path === to ? "page" : undefined}
+                >
+                  {t(
+                    (
+                      {
+                        Directory: "directory",
+                        Orbit: "orbit",
+                        "Needs attention": "attention",
+                        Pipeline: "pipeline",
+                        "Follow-ups & activity": "activity",
+                        Automations: "automations",
+                      } as const
+                    )[
+                      label as
+                        | "Directory"
+                        | "Orbit"
+                        | "Needs attention"
+                        | "Pipeline"
+                        | "Follow-ups & activity"
+                        | "Automations"
+                    ],
+                  )}
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
         <OfflineStatus />
         <main id="main" tabIndex={-1}>
           {children}
@@ -176,12 +329,30 @@ export function Shell({ children }: { children: ReactNode }) {
         <footer className="app-footer">
           <span>
             <AudioLines size={14} />
-            {__pulseText("Every relationship has a story.")}</span>
+            {__pulseText("Every relationship has a story.")}
+          </span>
           <span>{__pulseText("Made for meaningful connections.")}</span>
         </footer>
       </div>
-      <nav className="bottom-nav unified-bottom-nav" aria-label={__pulseText("Mobile navigation")}>
-        {mainAreas.map(({ to, label, icon: Icon }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}><Icon size={21} /><span>{t(label.toLowerCase() as "today" | "people" | "work" | "insights")}</span></Link>)}
+      <nav
+        className="bottom-nav unified-bottom-nav"
+        aria-label={__pulseText("Mobile navigation")}
+      >
+        {mainAreas.map(({ to, label, icon: Icon }) => (
+          <Link
+            key={to}
+            to={to}
+            className={area === label ? "active" : ""}
+            aria-current={area === label ? "page" : undefined}
+          >
+            <Icon size={21} />
+            <span>
+              {t(
+                label.toLowerCase() as "today" | "people" | "work" | "insights",
+              )}
+            </span>
+          </Link>
+        ))}
       </nav>
       <button
         className="floating-add"
@@ -192,8 +363,13 @@ export function Shell({ children }: { children: ReactNode }) {
         <Plus size={23} />
       </button>
       {add && (
-        <Modal title={__pulseText("Make a new connection")} onClose={() => setAdd(false)}>
-          <p className="muted">{__pulseText("Every great relationship starts somewhere.")}</p>
+        <Modal
+          title={__pulseText("Make a new connection")}
+          onClose={() => setAdd(false)}
+        >
+          <p className="muted">
+            {__pulseText("Every great relationship starts somewhere.")}
+          </p>
           <div className="add-options">
             {[
               {
@@ -246,21 +422,33 @@ export function Shell({ children }: { children: ReactNode }) {
         <EditorModal editor={editor} onClose={() => setEditor(null)} />
       )}
       {alerts && (
-        <Modal title={__pulseText("Your in-app alerts")} onClose={() => setAlerts(false)}>
+        <Modal
+          title={__pulseText("Your in-app alerts")}
+          onClose={() => setAlerts(false)}
+        >
           <p className="muted">
-            {__pulseText("Checked while PULSE is open. Your notification preferences apply here.")}</p>
+            {__pulseText(
+              "Checked while PULSE is open. Your notification preferences apply here.",
+            )}
+          </p>
           {count ? (
             <div className="alert-summary">
               <Bell />
               <h3>{__pulseText("A little attention goes a long way")}</h3>
               <p>
-                {overdueCount} {" " + __pulseText("overdue tasks ·") + " "}{upcomingCount} {" " + __pulseText("follow-ups in the next 24 hours ·") + " "}{reconnectionCount} {" " + __pulseText("relationship/deal reviews")}</p>
+                {overdueCount} {" " + __pulseText("overdue tasks ·") + " "}
+                {upcomingCount}{" "}
+                {" " + __pulseText("follow-ups in the next 24 hours ·") + " "}
+                {reconnectionCount}{" "}
+                {" " + __pulseText("relationship/deal reviews")}
+              </p>
               <Link
                 className="button primary"
                 to="/activity"
                 onClick={() => setAlerts(false)}
               >
-                {__pulseText("Review tasks")}</Link>
+                {__pulseText("Review tasks")}
+              </Link>
             </div>
           ) : (
             <div className="empty">
@@ -274,7 +462,8 @@ export function Shell({ children }: { children: ReactNode }) {
             to="/settings"
             onClick={() => setAlerts(false)}
           >
-            {__pulseText("Manage alert preferences") + " "}<ArrowUpRight size={16} />
+            {__pulseText("Manage alert preferences") + " "}
+            <ArrowUpRight size={16} />
           </Link>
         </Modal>
       )}
