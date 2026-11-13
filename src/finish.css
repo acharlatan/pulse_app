@@ -686,7 +686,10 @@ textarea:focus {
 }
 
 /* Inner pages share scale and rhythm, rather than repeating the Home hero. */
-.unified-shell .page :is(.work-masthead, .insight-masthead, .studio-heading),
+:root[data-theme]
+  .unified-shell
+  .page
+  :is(.work-masthead, .insight-masthead, .studio-heading),
 .unified-shell .page.customize-page > .page-heading,
 .unified-shell .page.import-page > .page-heading,
 .unified-shell .page.assistant-page > .page-heading {
@@ -700,7 +703,8 @@ textarea:focus {
   gap: 18px;
   margin-bottom: 22px;
 }
-.unified-shell
+:root[data-theme]
+  .unified-shell
   .page
   :is(.work-masthead, .insight-masthead, .studio-heading)
   :is(h1, p),
@@ -709,7 +713,11 @@ textarea:focus {
 .unified-shell .page.assistant-page > .page-heading :is(h1, p) {
   color: var(--text);
 }
-.unified-shell .page :is(.work-masthead, .insight-masthead, .studio-heading) h1,
+:root[data-theme]
+  .unified-shell
+  .page
+  :is(.work-masthead, .insight-masthead, .studio-heading)
+  h1,
 .unified-shell .page.customize-page > .page-heading h1,
 .unified-shell .page.import-page > .page-heading h1,
 .unified-shell .page.assistant-page > .page-heading h1 {
@@ -1497,7 +1505,10 @@ textarea:focus {
   .network-page .results-label {
     padding-top: 18px;
   }
-  .unified-shell .page :is(.work-masthead, .insight-masthead, .studio-heading),
+  :root[data-theme]
+    .unified-shell
+    .page
+    :is(.work-masthead, .insight-masthead, .studio-heading),
   .unified-shell .page.customize-page > .page-heading,
   .unified-shell .page.import-page > .page-heading,
   .unified-shell .page.assistant-page > .page-heading {

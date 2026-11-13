@@ -12,6 +12,28 @@ permissions:
   contents: read
 
 jobs:
+  visual-completion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Responsive layouts and automated accessibility
+        run: npm run test:browser -- --config=playwright.production.config.ts tests/browser/visual-completion.spec.ts --workers=2
+      - name: Preserve visual verification output
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-completion-results
+          path: test-results/
+          if-no-files-found: ignore
+
   verify:
     runs-on: ubuntu-latest
     steps:
