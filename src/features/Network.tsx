@@ -44,8 +44,14 @@ export function Network() {
     params.get("view") === "companies" ? "companies" : "people",
   );
   const [search, setSearch] = useState(params.get("q") || "");
-  const [archiveScope, setArchiveScope] = useState<"active" | "archived" | "all">(
-    params.get("archive") === "archived" ? "archived" : params.get("archive") === "all" ? "all" : "active",
+  const [archiveScope, setArchiveScope] = useState<
+    "active" | "archived" | "all"
+  >(
+    params.get("archive") === "archived"
+      ? "archived"
+      : params.get("archive") === "all"
+        ? "all"
+        : "active",
   );
   const [priority, setPriority] = useState(params.get("priority") || "");
   const [availability, setAvailability] = useState(
@@ -91,7 +97,8 @@ export function Network() {
   const people = contacts
     .filter(
       (c) =>
-        (archiveScope === "all" || (archiveScope === "archived" ? !!c.archivedAt : !c.archivedAt)) &&
+        (archiveScope === "all" ||
+          (archiveScope === "archived" ? !!c.archivedAt : !c.archivedAt)) &&
         `${c.name} ${c.role} ${c.emails.join(" ")} ${c.tags.join(" ")} ${organizations.find((o) => o.id === c.organizationId)?.name || ""}`
           .toLowerCase()
           .includes(query) &&
@@ -116,7 +123,8 @@ export function Network() {
   const companies = organizations
     .filter(
       (o) =>
-        (archiveScope === "all" || (archiveScope === "archived" ? !!o.archivedAt : !o.archivedAt)) &&
+        (archiveScope === "all" ||
+          (archiveScope === "archived" ? !!o.archivedAt : !o.archivedAt)) &&
         `${o.name} ${o.industry} ${o.location} ${o.tags.join(" ")}`
           .toLowerCase()
           .includes(query) &&
@@ -129,12 +137,24 @@ export function Network() {
         ? b.updatedAt.localeCompare(a.updatedAt)
         : a.name.localeCompare(b.name),
     );
-  const recentPeople = Array.from(new Set(p.interactions
-    .filter((interaction) => interaction.contactId && interaction.type !== "Note" && Date.parse(interaction.occurredAt) <= Date.now())
-    .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
-    .map((interaction) => interaction.contactId)))
+  const recentPeople = Array.from(
+    new Set(
+      p.interactions
+        .filter(
+          (interaction) =>
+            interaction.contactId &&
+            interaction.type !== "Note" &&
+            Date.parse(interaction.occurredAt) <= Date.now(),
+        )
+        .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
+        .map((interaction) => interaction.contactId),
+    ),
+  )
     .map((id) => contacts.find((contact) => contact.id === id))
-    .filter((contact): contact is (typeof contacts)[number] => !!contact && !contact.archivedAt)
+    .filter(
+      (contact): contact is (typeof contacts)[number] =>
+        !!contact && !contact.archivedAt,
+    )
     .slice(0, 4);
   const openFollowups = p.tasks.filter((task) => !task.completedAt).length;
   return (
@@ -142,34 +162,47 @@ export function Network() {
       <div className="network-cover">
         <header className="page-heading editorial-masthead network-masthead">
           <div>
-            <p className="eyebrow">{__pulseText("YOUR RELATIONSHIPS, REMEMBERED")}</p>
-            <h1>
-              {t("network")}<span className="accent">.</span>
-            </h1>
-            <p className="editorial-deck">
-              {t("peopleIntro")}
+            <p className="eyebrow">
+              {__pulseText("YOUR RELATIONSHIPS, REMEMBERED")}
             </p>
+            <h1>
+              {t("network")}
+              <span className="accent">.</span>
+            </h1>
+            <p className="editorial-deck">{t("peopleIntro")}</p>
           </div>
           <div className="network-hero-art">
-            <div className="network-hero-orbit" aria-hidden="true"><span>✳</span></div>
+            <div className="network-hero-orbit" aria-hidden="true">
+              <span>✳</span>
+            </div>
             <div className="network-hero-faces" aria-hidden="true">
-              {contacts.filter((contact) => !contact.archivedAt).slice(0, 5).map((contact) => <Avatar key={contact.id} name={contact.name} mediaId={contact.avatar} size="large" />)}
+              {contacts
+                .filter((contact) => !contact.archivedAt)
+                .slice(0, 5)
+                .map((contact) => (
+                  <Avatar
+                    key={contact.id}
+                    name={contact.name}
+                    mediaId={contact.avatar}
+                    size="large"
+                  />
+                ))}
             </div>
             <button
               className="button primary"
-              onClick={() => setEditor({ kind: tab === "people" ? "contact" : "company" })}
+              onClick={() =>
+                setEditor({ kind: tab === "people" ? "contact" : "company" })
+              }
             >
-              <Plus size={18} /> {tab === "people" ? t("addPerson") : t("addCompany")}
+              <Plus size={18} />{" "}
+              {tab === "people" ? t("addPerson") : t("addCompany")}
             </button>
           </div>
         </header>
-        <section className="network-orientation" aria-label={__pulseText("Network overview")}>
-          <div>
-            <p className="eyebrow">{__pulseText("YOUR RELATIONSHIP LANDSCAPE")}</p>
-            <h2>{__pulseText("Every connection has a next chapter.")}</h2>
-            <p>
-              {__pulseText("Find a person or company, revisit the context, and choose a thoughtful next step.")}</p>
-          </div>
+        <section
+          className="network-orientation"
+          aria-label={__pulseText("Network overview")}
+        >
           <div className="network-orientation-facts">
             <div>
               <strong>{contacts.length}</strong>
@@ -194,26 +227,73 @@ export function Network() {
           </div>
           <div className="network-orientation-links">
             <Link to="/review">
-              {__pulseText("Review relationships") + " "}<ArrowUpRight size={16} />
+              {__pulseText("Review relationships") + " "}
+              <ArrowUpRight size={16} />
             </Link>
             <Link to="/orbit">
-              {__pulseText("Explore Orbit") + " "}<ArrowUpRight size={16} />
+              {__pulseText("Explore Orbit") + " "}
+              <ArrowUpRight size={16} />
             </Link>
             <Link to="/analytics">
-              {__pulseText("Understand your network") + " "}<ArrowUpRight size={16} />
+              {__pulseText("Understand your network") + " "}
+              <ArrowUpRight size={16} />
             </Link>
           </div>
         </section>
       </div>
       {recentPeople.length > 0 && (
-        <section className="network-recent" aria-labelledby="network-recent-title">
-          <div className="network-recent-heading"><div><p className="eyebrow">{__pulseText("A LITTLE CLOSER")}</p><h2 id="network-recent-title">{t("recently")}<span>.</span></h2><p>{t("recentDesc")}</p></div><span className="network-recent-count">{openFollowups} {" " + __pulseText("open") + " "}{openFollowups === 1 ? __pulseText("follow-up") : __pulseText("follow-ups")}</span></div>
-          <div className="network-recent-people">{recentPeople.map((contact) => {
-            const organization = organizations.find((org) => org.id === contact.organizationId);
-            return <Link className="network-recent-person" key={contact.id} to={`/network/people/${contact.id}`} state={{ networkReturn: "/network" + (params.size ? "?" + params.toString() : "") }}>
-              <Avatar name={contact.name} mediaId={contact.avatar} size="large" /><span><strong>{contact.name}</strong><small>{contact.role || __pulseText("Connection")}{organization ? ` · ${organization.name}` : ""}</small></span><ArrowUpRight size={18} />
-            </Link>;
-          })}</div>
+        <section
+          className="network-recent"
+          aria-labelledby="network-recent-title"
+        >
+          <div className="network-recent-heading">
+            <div>
+              <p className="eyebrow">{__pulseText("A LITTLE CLOSER")}</p>
+              <h2 id="network-recent-title">
+                {t("recently")}
+                <span>.</span>
+              </h2>
+              <p>{t("recentDesc")}</p>
+            </div>
+            <span className="network-recent-count">
+              {openFollowups} {" " + __pulseText("open") + " "}
+              {openFollowups === 1
+                ? __pulseText("follow-up")
+                : __pulseText("follow-ups")}
+            </span>
+          </div>
+          <div className="network-recent-people">
+            {recentPeople.map((contact) => {
+              const organization = organizations.find(
+                (org) => org.id === contact.organizationId,
+              );
+              return (
+                <Link
+                  className="network-recent-person"
+                  key={contact.id}
+                  to={`/network/people/${contact.id}`}
+                  state={{
+                    networkReturn:
+                      "/network" + (params.size ? "?" + params.toString() : ""),
+                  }}
+                >
+                  <Avatar
+                    name={contact.name}
+                    mediaId={contact.avatar}
+                    size="large"
+                  />
+                  <span>
+                    <strong>{contact.name}</strong>
+                    <small>
+                      {contact.role || __pulseText("Connection")}
+                      {organization ? ` · ${organization.name}` : ""}
+                    </small>
+                  </span>
+                  <ArrowUpRight size={18} />
+                </Link>
+              );
+            })}
+          </div>
         </section>
       )}
       <div className="directory-toolbar">
@@ -247,7 +327,18 @@ export function Network() {
             onClick={() => setTab("people")}
           >
             <Users size={17} />
-            {t("people")} <span>{contacts.filter((c) => archiveScope === "all" || (archiveScope === "archived" ? !!c.archivedAt : !c.archivedAt)).length}</span>
+            {t("people")}{" "}
+            <span>
+              {
+                contacts.filter(
+                  (c) =>
+                    archiveScope === "all" ||
+                    (archiveScope === "archived"
+                      ? !!c.archivedAt
+                      : !c.archivedAt),
+                ).length
+              }
+            </span>
           </button>
           <button
             role="tab"
@@ -259,7 +350,18 @@ export function Network() {
             onClick={() => setTab("companies")}
           >
             <Building2 size={17} />
-            {t("companies")} <span>{organizations.filter((o) => archiveScope === "all" || (archiveScope === "archived" ? !!o.archivedAt : !o.archivedAt)).length}</span>
+            {t("companies")}{" "}
+            <span>
+              {
+                organizations.filter(
+                  (o) =>
+                    archiveScope === "all" ||
+                    (archiveScope === "archived"
+                      ? !!o.archivedAt
+                      : !o.archivedAt),
+                ).length
+              }
+            </span>
           </button>
         </div>
         <div className="directory-controls">
@@ -267,7 +369,10 @@ export function Network() {
             aria-label={__pulseText("Archive status")}
             className="sort-select"
             value={archiveScope}
-            onChange={(e) => { setArchiveScope(e.target.value as typeof archiveScope); setLimit(60); }}
+            onChange={(e) => {
+              setArchiveScope(e.target.value as typeof archiveScope);
+              setLimit(60);
+            }}
           >
             <option value="active">{__pulseText("Active records")}</option>
             <option value="archived">{__pulseText("Archived records")}</option>
@@ -301,14 +406,19 @@ export function Network() {
             <option value="name">{__pulseText("Name A–Z")}</option>
             <option value="recent">{__pulseText("Recently updated")}</option>
             {tab === "people" && (
-              <option value="priority">{__pulseText("Highest priority")}</option>
+              <option value="priority">
+                {__pulseText("Highest priority")}
+              </option>
             )}
           </select>
         </div>
       </div>
       <div className="network-viewbar">
         {tab === "people" && (
-          <div className="network-segments" aria-label={__pulseText("Relationship segments")}>
+          <div
+            className="network-segments"
+            aria-label={__pulseText("Relationship segments")}
+          >
             {[
               ["all", t("everyone")],
               ["overdue", t("overdue")],
@@ -327,34 +437,57 @@ export function Network() {
             ))}
           </div>
         )}
-        <div className="directory-saved-list">            <label className="field">
-              <span>{t("smartList")}</span>
-              <select value={smart} onChange={(e) => setSmart(e.target.value)}>
-                {(tab === "people"
-                  ? [...builtInLists, ["pinned", "Pinned relationships"]]
-                  : [["all", "All companies"]]
-                ).map(([id, name]) => (
-                  <option key={id} value={id}>
-                    {name}
+        <div className="directory-saved-list">
+          {" "}
+          <label className="field">
+            <span>{t("smartList")}</span>
+            <select value={smart} onChange={(e) => setSmart(e.target.value)}>
+              {(tab === "people"
+                ? [...builtInLists, ["pinned", "Pinned relationships"]]
+                : [["all", "All companies"]]
+              ).map(([id, name]) => (
+                <option key={id} value={id}>
+                  {name}
+                </option>
+              ))}
+              {p.smartLists
+                .filter(
+                  (l) =>
+                    (l.entityType || "contact") ===
+                    (tab === "people" ? "contact" : "organization"),
+                )
+                .map((l) => (
+                  <option key={l.id} value={l.id}>
+                    {l.name}
                   </option>
                 ))}
-                {p.smartLists
-                  .filter(
-                    (l) =>
-                      (l.entityType || "contact") ===
-                      (tab === "people" ? "contact" : "organization"),
-                  )
-                  .map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.name}
-                    </option>
-                  ))}
-              </select>
-            </label>
-<button className="button secondary" aria-expanded={showLists} aria-controls="network-saved-lists" onClick={() => setShowLists(!showLists)}>{t("manageLists")}</button></div>
-        <div className="tabs directory-display" aria-label={__pulseText("Directory presentation")}>
-          <button aria-pressed={display === "cards"} onClick={() => setDisplay("cards")}>{t("cards")}</button>
-          <button aria-pressed={display === "list"} onClick={() => setDisplay("list")}>{t("compact")}</button>
+            </select>
+          </label>
+          <button
+            className="button secondary"
+            aria-expanded={showLists}
+            aria-controls="network-saved-lists"
+            onClick={() => setShowLists(!showLists)}
+          >
+            {t("manageLists")}
+          </button>
+        </div>
+        <div
+          className="tabs directory-display"
+          aria-label={__pulseText("Directory presentation")}
+        >
+          <button
+            aria-pressed={display === "cards"}
+            onClick={() => setDisplay("cards")}
+          >
+            {t("cards")}
+          </button>
+          <button
+            aria-pressed={display === "list"}
+            onClick={() => setDisplay("list")}
+          >
+            {t("compact")}
+          </button>
         </div>
         <details className="network-tools">
           <summary>{t("directoryTools")}</summary>
@@ -365,51 +498,72 @@ export function Network() {
             />
 
             <Link className="button ghost" to="/import">
-              {__pulseText("Import contacts")}</Link>
+              {__pulseText("Import contacts")}
+            </Link>
           </div>
         </details>
       </div>
-      {showLists && <section className="network-lists-panel" id="network-saved-lists" aria-label={__pulseText("Manage saved lists")}><SmartLists embedded /></section>}
+      {showLists && (
+        <section
+          className="network-lists-panel"
+          id="network-saved-lists"
+          aria-label={__pulseText("Manage saved lists")}
+        >
+          <SmartLists embedded />
+        </section>
+      )}
       {filters && tab === "people" && (
         <div className="filter-panel">
           <label>
-            {__pulseText("Priority")}<select
+            {__pulseText("Priority")}
+            <select
               value={priority}
               onChange={(e) => setPriority(e.target.value)}
             >
               <option value="">{__pulseText("All priorities")}</option>
               {priorities.map((v) => (
-                <option key={v} value={v}>{__pulseText(v)}</option>
+                <option key={v} value={v}>
+                  {__pulseText(v)}
+                </option>
               ))}
             </select>
           </label>
           <label>
-            {__pulseText("Stage")}<select value={stage} onChange={(e) => setStage(e.target.value)}>
+            {__pulseText("Stage")}
+            <select value={stage} onChange={(e) => setStage(e.target.value)}>
               <option value="">{__pulseText("All stages")}</option>
               {stages.map((v) => (
-                <option key={v} value={v}>{__pulseText(v)}</option>
+                <option key={v} value={v}>
+                  {__pulseText(v)}
+                </option>
               ))}
             </select>
           </label>
           <label>
-            {__pulseText("Availability")}<select
+            {__pulseText("Availability")}
+            <select
               value={availability}
               onChange={(e) => setAvailability(e.target.value)}
             >
               <option value="">{__pulseText("All availability")}</option>
               {availabilities.map((v) => (
-                <option key={v} value={v}>{__pulseText(v)}</option>
+                <option key={v} value={v}>
+                  {__pulseText(v)}
+                </option>
               ))}
             </select>
           </label>
           <label>
-            {__pulseText("Relationship")}<select
+            {__pulseText("Relationship")}
+            <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
               <option value="">{__pulseText("All relationships")}</option>
               {categories.map((v) => (
-                <option key={v} value={v}>{__pulseText(v)}</option>
+                <option key={v} value={v}>
+                  {__pulseText(v)}
+                </option>
               ))}
             </select>
           </label>
@@ -424,14 +578,17 @@ export function Network() {
               setSmart("all");
             }}
           >
-            {__pulseText("Clear filters")}</button>
+            {__pulseText("Clear filters")}
+          </button>
         </div>
       )}
       <div className="results-label">
         <h2>
           {tab === "people" ? people.length : companies.length}{" "}
           {tab === "people" ? __pulseText("people") : __pulseText("companies")}
-          {smart !== "all" ? __pulseText(" in this view") : __pulseText(" in your network")}
+          {smart !== "all"
+            ? __pulseText(" in this view")
+            : __pulseText(" in your network")}
         </h2>
       </div>
       <div
@@ -487,14 +644,18 @@ export function Network() {
                           />
                           {["VIP", "High"].includes(c.priority) ? (
                             <Badge tone="amber">
-                              {c.priority === "VIP" ? __pulseText("★ VIP") : __pulseText("High priority")}
+                              {c.priority === "VIP"
+                                ? __pulseText("★ VIP")
+                                : __pulseText("High priority")}
                             </Badge>
                           ) : (
                             <ArrowUpRight size={18} className="muted" />
                           )}
                         </div>
                         <h3>{c.name}</h3>
-                        {c.archivedAt && <Badge>{__pulseText("Archived")}</Badge>}
+                        {c.archivedAt && (
+                          <Badge>{__pulseText("Archived")}</Badge>
+                        )}
                         <p>{c.role || __pulseText("A new connection")}</p>
                         <div className="company-line">
                           <Building2 size={14} />
@@ -594,7 +755,8 @@ export function Network() {
                     <h3>{o.name}</h3>
                     {o.archivedAt && <Badge>{__pulseText("Archived")}</Badge>}
                     <p className="company-description">
-                      {o.description || __pulseText("The next chapter starts here.")}
+                      {o.description ||
+                        __pulseText("The next chapter starts here.")}
                     </p>
                     <div className="company-line">
                       <MapPin size={14} />
@@ -607,7 +769,8 @@ export function Network() {
                           contacts.filter((c) => c.organizationId === o.id)
                             .length
                         }{" "}
-                        {__pulseText("people")}</span>
+                        {__pulseText("people")}
+                      </span>
                       <ArrowUpRight size={17} />
                     </div>
                   </Link>
@@ -618,7 +781,8 @@ export function Network() {
               className="button secondary"
               onClick={() => setLimit(limit + 60)}
             >
-              {__pulseText("Show more connections")}</button>
+              {__pulseText("Show more connections")}
+            </button>
           )}
           {!(tab === "people" ? people.length : companies.length) && (
             <Empty
@@ -633,7 +797,9 @@ export function Network() {
                   ? __pulseText("No connections found")
                   : __pulseText("A little space for possibility")
               }
-              body={__pulseText("Try a different search, or add your first connection.")}
+              body={__pulseText(
+                "Try a different search, or add your first connection.",
+              )}
               action={
                 search ||
                 stage ||
@@ -654,7 +820,8 @@ export function Network() {
                       setArchiveScope("active");
                     }}
                   >
-                    {__pulseText("Reset search & filters")}</button>
+                    {__pulseText("Reset search & filters")}
+                  </button>
                 ) : (
                   <button
                     className="button primary"
@@ -665,7 +832,10 @@ export function Network() {
                     }
                   >
                     <Plus size={17} />
-                    {__pulseText("Add") + " "}{tab === "people" ? __pulseText("person") : __pulseText("company")}
+                    {__pulseText("Add") + " "}
+                    {tab === "people"
+                      ? __pulseText("person")
+                      : __pulseText("company")}
                   </button>
                 )
               }

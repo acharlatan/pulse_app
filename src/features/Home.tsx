@@ -50,10 +50,38 @@ export function Home({ focus = false }: { focus?: boolean }) {
     p.organizations.length ||
     p.opportunities.length ||
     p.tasks.length;
-  const upcoming = p.tasks.filter((item) => !item.completedAt).sort((a,b) => a.dueAt.localeCompare(b.dueAt)).slice(0,3);
-  const recentPeople = [...p.contacts].sort((a,b) => b.createdAt.localeCompare(a.createdAt)).slice(0,3);
-  const todayTabs = <nav className="today-view-tabs" aria-label={__pulseText("Today views")}><Link to="/" aria-current={!focus ? "page" : undefined} className={!focus ? "active" : ""}>{t("dailyPulse")}</Link><Link to="/focus" aria-current={focus ? "page" : undefined} className={focus ? "active" : ""}>{t("focus")}</Link></nav>;
-  if (focus) return <div className="page home-page editorial-home daily-home today-focus-page">{todayTabs}<Focus embedded /></div>;
+  const upcoming = p.tasks
+    .filter((item) => !item.completedAt)
+    .sort((a, b) => a.dueAt.localeCompare(b.dueAt))
+    .slice(0, 3);
+  const recentPeople = [...p.contacts]
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .slice(0, 3);
+  const todayTabs = (
+    <nav className="today-view-tabs" aria-label={__pulseText("Today views")}>
+      <Link
+        to="/"
+        aria-current={!focus ? "page" : undefined}
+        className={!focus ? "active" : ""}
+      >
+        {t("dailyPulse")}
+      </Link>
+      <Link
+        to="/focus"
+        aria-current={focus ? "page" : undefined}
+        className={focus ? "active" : ""}
+      >
+        {t("focus")}
+      </Link>
+    </nav>
+  );
+  if (focus)
+    return (
+      <div className="page home-page editorial-home daily-home today-focus-page">
+        {todayTabs}
+        <Focus embedded />
+      </div>
+    );
   return (
     <div
       className={`page home-page editorial-home daily-home home-${p.settings.focus.homeLayout}`}
@@ -71,37 +99,185 @@ export function Home({ focus = false }: { focus?: boolean }) {
           const last = p.settings.onboarding.exportInitiatedAt;
           const stale = !last || Date.now() - Date.parse(last) >= 30 * 86400000;
           return stale ? (
-            <aside className="backup-nudge" aria-label={__pulseText("Backup reminder")}>
+            <aside
+              className="backup-nudge"
+              aria-label={__pulseText("Backup reminder")}
+            >
               <div>
                 <strong>{__pulseText("Keep a copy of your work.")}</strong>
                 <p>
                   {last
                     ? `Last backup download requested ${date(last)}.`
-                    : __pulseText("No backup download has been requested yet.")}{" "}
-                  {__pulseText("Records live in this browser. Check your downloaded file and keep it somewhere safe.")}</p>
+                    : __pulseText(
+                        "No backup download has been requested yet.",
+                      )}{" "}
+                  {__pulseText(
+                    "Records live in this browser. Check your downloaded file and keep it somewhere safe.",
+                  )}
+                </p>
               </div>
               <Link className="button secondary" to="/settings?section=data">
-                {__pulseText("Review backups")}</Link>
+                {__pulseText("Review backups")}
+              </Link>
             </aside>
           ) : null;
         })()}
       <GettingStarted />
-      {p.workspace === "demo" && <aside className="journey-demo-banner"><div><span>{__pulseText("EXPLORING THE DEMO")}</span><strong>{__pulseText("Get to know Pulse with a fictional network.")}</strong><p>{__pulseText("When you’re ready, start your own workspace. Both stay separate on this device.")}</p></div><button className="button journey-banner-button" onClick={() => p.switchWorkspace("personal")}>{__pulseText("Start my workspace")} <ArrowUpRight size={16}/></button></aside>}
-      {p.workspace === "personal" && !!active && <section className="journey-today" aria-label={__pulseText("Your workspace today")}><div className="journey-today-heading"><div><p className="eyebrow">{__pulseText("YOUR RELATIONSHIP JOURNEY")}</p><h2>{__pulseText("Your next chapter starts here.")}</h2><p>{__pulseText("A quick look at the people and commitments you’ve saved.")}</p></div><Link className="text-link" to="/focus">{__pulseText("Choose today’s focus")} <ArrowUpRight size={16}/></Link></div><div className="journey-today-grid"><article><span className="eyebrow">{__pulseText("YOUR NEXT COMMITMENTS")}</span>{upcoming.length ? upcoming.map((task)=><button key={task.id} onClick={()=>setEditor({kind:"task",record:task})}><span><strong>{task.title}</strong><small>{date(task.dueAt)} · {p.contacts.find(c=>c.id===task.contactId)?.name || p.organizations.find(o=>o.id===task.organizationId)?.name || __pulseText("No person or company linked")}</small></span><ArrowUpRight size={16}/></button>) : <p>{__pulseText("No open follow-ups yet. Plan one when you’re ready.")}</p>}<button className="text-link" onClick={()=>setEditor({kind:"task"})}>{__pulseText("Plan a follow-up")}</button></article><article><span className="eyebrow">{__pulseText("RECENTLY ADDED PEOPLE")}</span>{recentPeople.length ? recentPeople.map((c)=><Link key={c.id} to={`/network/people/${c.id}`}><Avatar name={c.name} mediaId={c.avatar}/><span><strong>{c.name}</strong><small>{c.role || __pulseText("Person")}</small></span><ArrowUpRight size={16}/></Link>) : <p>{__pulseText("Add a person to start building your network.")}</p>}<Link className="text-link" to="/network">{__pulseText("Open your network")}</Link></article></div></section>}
-      {p.workspace === "demo" && <details className="demo-quickstart"><summary>{__pulseText("New to PULSE? Take a quick tour")}</summary><div className="demo-quickstart-content"><p>{__pulseText("Try these steps with fictional records. Your demo edits stay in this browser and are separate from your personal workspace.")}</p><div><button className="button secondary" onClick={() => setEditor({ kind: "contact" })}>{__pulseText("1 · Add a person")}</button><Link className="button secondary" to="/network">{__pulseText("2 · Open a profile & log a conversation")}</Link><button className="button secondary" onClick={() => setEditor({ kind: "task" })}>{__pulseText("3 · Plan a follow-up")}</button></div></div></details>}
+      {p.workspace === "demo" && (
+        <details className="demo-quickstart">
+          <summary>{__pulseText("New to PULSE? Take a quick tour")}</summary>
+          <div className="demo-quickstart-content">
+            <p>
+              {__pulseText(
+                "Try these steps with fictional records. Your demo edits stay in this browser and are separate from your personal workspace.",
+              )}
+            </p>
+            <div>
+              <button
+                className="button secondary"
+                onClick={() => setEditor({ kind: "contact" })}
+              >
+                {__pulseText("1 · Add a person")}
+              </button>
+              <Link className="button secondary" to="/network">
+                {__pulseText("2 · Open a profile & log a conversation")}
+              </Link>
+              <button
+                className="button secondary"
+                onClick={() => setEditor({ kind: "task" })}
+              >
+                {__pulseText("3 · Plan a follow-up")}
+              </button>
+            </div>
+            {p.workspace === "demo" && (
+              <aside className="journey-demo-banner">
+                <div>
+                  <span>{__pulseText("EXPLORING THE DEMO")}</span>
+                  <strong>
+                    {__pulseText("Get to know Pulse with a fictional network.")}
+                  </strong>
+                  <p>
+                    {__pulseText(
+                      "When you’re ready, start your own workspace. Both stay separate on this device.",
+                    )}
+                  </p>
+                </div>
+                <button
+                  className="button journey-banner-button"
+                  onClick={() => p.switchWorkspace("personal")}
+                >
+                  {__pulseText("Start my workspace")} <ArrowUpRight size={16} />
+                </button>
+              </aside>
+            )}
+          </div>
+        </details>
+      )}
       {active ? (
         <>
           <DailyPlan onEdit={setEditor} />
+          {p.workspace === "personal" && !!active && (
+            <section
+              className="journey-today"
+              aria-label={__pulseText("Your workspace today")}
+            >
+              <div className="journey-today-heading">
+                <div>
+                  <p className="eyebrow">
+                    {__pulseText("YOUR RELATIONSHIP JOURNEY")}
+                  </p>
+                  <h2>{__pulseText("Your next chapter starts here.")}</h2>
+                  <p>
+                    {__pulseText(
+                      "A quick look at the people and commitments you’ve saved.",
+                    )}
+                  </p>
+                </div>
+                <Link className="text-link" to="/focus">
+                  {__pulseText("Choose today’s focus")}{" "}
+                  <ArrowUpRight size={16} />
+                </Link>
+              </div>
+              <div className="journey-today-grid">
+                <article>
+                  <span className="eyebrow">
+                    {__pulseText("YOUR NEXT COMMITMENTS")}
+                  </span>
+                  {upcoming.length ? (
+                    upcoming.map((task) => (
+                      <button
+                        key={task.id}
+                        onClick={() =>
+                          setEditor({ kind: "task", record: task })
+                        }
+                      >
+                        <span>
+                          <strong>{task.title}</strong>
+                          <small>
+                            {date(task.dueAt)} ·{" "}
+                            {p.contacts.find((c) => c.id === task.contactId)
+                              ?.name ||
+                              p.organizations.find(
+                                (o) => o.id === task.organizationId,
+                              )?.name ||
+                              __pulseText("No person or company linked")}
+                          </small>
+                        </span>
+                        <ArrowUpRight size={16} />
+                      </button>
+                    ))
+                  ) : (
+                    <p>
+                      {__pulseText(
+                        "No open follow-ups yet. Plan one when you’re ready.",
+                      )}
+                    </p>
+                  )}
+                  <button
+                    className="text-link"
+                    onClick={() => setEditor({ kind: "task" })}
+                  >
+                    {__pulseText("Plan a follow-up")}
+                  </button>
+                </article>
+                <article>
+                  <span className="eyebrow">
+                    {__pulseText("RECENTLY ADDED PEOPLE")}
+                  </span>
+                  {recentPeople.length ? (
+                    recentPeople.map((c) => (
+                      <Link key={c.id} to={`/network/people/${c.id}`}>
+                        <Avatar name={c.name} mediaId={c.avatar} />
+                        <span>
+                          <strong>{c.name}</strong>
+                          <small>{c.role || __pulseText("Person")}</small>
+                        </span>
+                        <ArrowUpRight size={16} />
+                      </Link>
+                    ))
+                  ) : (
+                    <p>
+                      {__pulseText(
+                        "Add a person to start building your network.",
+                      )}
+                    </p>
+                  )}
+                  <Link className="text-link" to="/network">
+                    {__pulseText("Open your network")}
+                  </Link>
+                </article>
+              </div>
+            </section>
+          )}
           <section className="editorial-people">
             <div className="section-heading">
               <div>
                 <p className="eyebrow">{__pulseText("KEEP CLOSE")}</p>
-                <h2>
-                  {pins.length ? t("pinned") : t("yourPeople")}
-                </h2>
+                <h2>{pins.length ? t("pinned") : t("yourPeople")}</h2>
               </div>
               <Link className="text-link" to="/network">
-                {__pulseText("Open network") + " "}<ArrowUpRight size={16} />
+                {__pulseText("Open network") + " "}
+                <ArrowUpRight size={16} />
               </Link>
             </div>
             <div className="editorial-people-strip">
@@ -149,7 +325,9 @@ export function Home({ focus = false }: { focus?: boolean }) {
                   · {date(r.at)}
                 </p>
               ))}
-              <Link to="/automations">{__pulseText("Open automation history")}</Link>
+              <Link to="/automations">
+                {__pulseText("Open automation history")}
+              </Link>
             </details>
           )}
 
@@ -158,20 +336,27 @@ export function Home({ focus = false }: { focus?: boolean }) {
       ) : (
         <section className="daily-first-use surface">
           <p className="eyebrow">{__pulseText("YOUR FIRST USEFUL MOVE")}</p>
-          <h2>{__pulseText("Start with a person. Give the next step a home.")}</h2>
+          <h2>
+            {__pulseText("Start with a person. Give the next step a home.")}
+          </h2>
           <p>
-            {__pulseText("Add a real connection, a possible opportunity and a follow-up. Your Daily Pulse will take shape from what you save.")}</p>
+            {__pulseText(
+              "Add a real connection, a possible opportunity and a follow-up. Your Daily Pulse will take shape from what you save.",
+            )}
+          </p>
           <div className="daily-first-steps">
             <button
               className="button secondary"
               onClick={() => setEditor({ kind: "contact" })}
             >
-              {__pulseText("Add someone")}</button>
+              {__pulseText("Add someone")}
+            </button>
             <button
               className="button secondary"
               onClick={() => setEditor({ kind: "opportunity" })}
             >
-              {__pulseText("Create opportunity")}</button>
+              {__pulseText("Create opportunity")}
+            </button>
             <button
               className="button secondary"
               onClick={() => setEditor({ kind: "task" })}
@@ -181,14 +366,17 @@ export function Home({ focus = false }: { focus?: boolean }) {
           </div>
           <div className="form-actions">
             <Link className="text-link" to="/import">
-              {__pulseText("Import contacts")}</Link>
+              {__pulseText("Import contacts")}
+            </Link>
             <button
               className="text-link"
               onClick={() => setEditor({ kind: "company" })}
             >
-              {__pulseText("Add a company")}</button>
+              {__pulseText("Add a company")}
+            </button>
             <Link className="text-link" to="/help">
-              {__pulseText("Getting started")}</Link>
+              {__pulseText("Getting started")}
+            </Link>
           </div>
         </section>
       )}
