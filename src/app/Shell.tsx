@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Activity, ArrowUpRight, AudioLines, Bell, Building2, ChevronDown, Home, Plus, Search, Users, Workflow, ChartNoAxesCombined } from "lucide-react";
 import { OfflineStatus } from "../components/OfflineStatus";
 import { LanguageSelector } from "../components/LanguageSelector";
+import { AppearanceToggle } from "../components/AppearanceToggle";
 import { useTranslation } from "../i18n/useTranslation";
 import { usePulse } from "./context";
 import { Avatar, Modal } from "../components/ui";
@@ -102,7 +103,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <header className="topbar">
           <Link to="/" className="unified-brand"><AudioLines size={23} /> PULSE<span>.</span></Link>
           <nav className="unified-main-nav" aria-label={__pulseText("Main areas")}>
-            {mainAreas.map(({ to, label }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}>{t(label.toLowerCase() as "today" | "people" | "work" | "insights")}</Link>)}
+            {mainAreas.map(({ to, label, icon: Icon }) => <Link key={to} to={to} className={area === label ? "active" : ""} aria-current={area === label ? "page" : undefined}><Icon size={16} aria-hidden="true"/>{t(label.toLowerCase() as "today" | "people" | "work" | "insights")}</Link>)}
           </nav>
           <div className="topbar-actions">
             <details className="workspace-switcher">
@@ -135,6 +136,7 @@ export function Shell({ children }: { children: ReactNode }) {
               <i />
               {workspace === "demo" ? __pulseText("Demo workspace") : __pulseText("Saved on this device")}
             </span>
+            <AppearanceToggle />
             <button
               type="button"
               className="icon-button"
@@ -157,6 +159,7 @@ export function Shell({ children }: { children: ReactNode }) {
               {profileMenu && <div className="unified-profile-dropdown">
                 <strong>{settings.name || __pulseText("Your workspace")}</strong><small>{workspace === "demo" ? __pulseText("Demo workspace") : __pulseText("Saved on this device")}</small>
                 <LanguageSelector compact />
+                <AppearanceToggle labelled />
                 <Link to="/settings" onClick={() => setProfileMenu(false)}>{t("settingsBackups")}</Link>
                 <Link to="/customize" onClick={() => setProfileMenu(false)}>{t("personalize")}</Link>
                 <Link to="/import" onClick={() => setProfileMenu(false)}>{t("importContacts")}</Link>
@@ -177,7 +180,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <span>
             <AudioLines size={14} />
             {__pulseText("Every relationship has a story.")}</span>
-          <span>{__pulseText("Made for meaningful connections.")}</span>
+          <div className="footer-links"><Link to="/help">{__pulseText("Getting started")}</Link><Link to="/settings?section=data">{__pulseText("Review backups")}</Link></div>
         </footer>
       </div>
       <nav className="bottom-nav unified-bottom-nav" aria-label={__pulseText("Mobile navigation")}>

@@ -12,6 +12,27 @@ permissions:
   contents: read
 
 jobs:
+  visual-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Core journeys, visual layouts and accessibility
+        run: npm run test:browser -- --config=playwright.production.config.ts tests/browser/release-visual.spec.ts tests/browser/phase3-journey.spec.ts tests/browser/analytics44.spec.ts tests/browser/phase3-search.spec.ts tests/browser/archive.spec.ts tests/browser/world46.spec.ts tests/browser/phase3-orbit-motion.spec.ts --workers=2
+      - name: Preserve visual results
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-release-results
+          path: test-results/
+          if-no-files-found: ignore
   verify:
     runs-on: ubuntu-latest
     steps:

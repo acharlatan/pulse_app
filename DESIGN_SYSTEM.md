@@ -118,3 +118,7 @@ Orbit opens a guided company explorer on desktop, with mobile List preserved and
 ## Daily Pulse — revision 18
 
 `daily.css` extends the shared system with an ink daily orientation, three bounded evidence suggestions, a chosen Today list and an in-page record inspector. Choosing/inspecting has an explicit keyboard focus destination; completed work retains context. Future work, suggestion rules, wrap-up evidence and optional setup steps use native disclosures. The composition stacks at mobile widths and preserves all light/dark/accent tokens. Counts describe saved records and dates rather than inferred quality or automatic priorities.
+
+## November visual release presentation
+
+`src/release.css` is the final shared presentation layer. It retains the established paper, plum, lime and local-art identity while aligning working headers, cards, control sizing, report filters and dark elevation. It uses existing semantic and accent tokens. Tablet navigation reduces icon/spacing density before the mobile breakpoint; mobile navigation uses semantic text colors rather than the earlier dark-header colors. Daily suggestions precede secondary activity. Help provides five linked guides to real workflows; appearance changes use the normal settings repository. See VISUAL_RELEASE.md for exact verification and limits.
