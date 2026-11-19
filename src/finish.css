@@ -1,0 +1,555 @@
+/* Directory, secondary headers and route loading share the release palette. */
+:root { --finish-lilac: #eae3f5; }
+:root[data-theme="dark"] { --finish-lilac: #3b304c; }
+.network-page .network-cover {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 0;
+  padding: 0;
+  border: 1px solid #5b486b;
+  border-radius: 20px;
+  box-shadow: none;
+  background: var(--release-ink);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.network-page .network-cover .network-masthead {
+  min-height: 210px;
+  border-radius: 0;
+  background: transparent;
+  padding: 28px 30px;
+  gap: 20px;
+}
+.network-page
+  .network-cover
+  .network-masthead
+  :is(h1, .eyebrow, .editorial-deck) {
+  color: #fffaff;
+}
+.network-page .network-cover .network-masthead h1 {
+  font-size: clamp(36px, 3.5vw, 50px);
+  line-height: 1.04;
+  margin: 10px 0;
+}
+.network-page .network-cover .network-masthead .accent {
+  color: var(--release-lime);
+}
+.network-page .network-cover .network-masthead .editorial-deck {
+  font-size: 15px;
+  max-width: 30ch;
+}
+.network-cover .network-hero-art {
+  min-height: 140px;
+  min-width: 150px;
+  width: 170px;
+  flex-shrink: 0;
+}
+.network-cover .network-hero-orbit {
+  width: 160px;
+  height: 160px;
+  opacity: 0.45;
+}
+.network-cover .network-hero-faces {
+  padding-top: 18px;
+}
+.network-cover .network-hero-faces .avatar {
+  width: 40px;
+  height: 40px;
+}
+.network-page .network-cover .network-orientation {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 22px;
+  margin: 0;
+  padding: 28px 30px;
+  border: 0;
+  border-left: 1px solid #ffffff25;
+  border-radius: 0;
+  background: #35283f;
+  color: #fffaff;
+}
+.network-cover .network-orientation-facts {
+  gap: 0;
+}
+.network-cover .network-orientation-facts > div {
+  border-color: #bfaacc50;
+  padding-inline: 18px;
+}
+.network-cover .network-orientation-facts > div:first-child {
+  padding-left: 0;
+  border: 0;
+}
+.unified-shell .network-page .network-cover .network-orientation-facts strong {
+  color: var(--release-lime);
+  font-size: 32px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.unified-shell .network-page .network-cover .network-orientation-facts span {
+  color: #e8deef;
+  font-size: 13px;
+}
+.network-cover .network-orientation-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px 18px;
+  border-color: #ffffff25;
+  padding-top: 16px;
+}
+.unified-shell .network-page .network-cover .network-orientation-links a {
+  color: #f2e9fa;
+  font-size: 13px;
+}
+.network-page .network-recent {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 18px;
+  padding: 14px 0 18px;
+  margin: 0 0 18px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.network-recent-heading {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+.network-recent-heading h2 {
+  font-family: inherit;
+  font-size: 19px;
+  letter-spacing: -0.04em;
+  margin: 0;
+}
+.network-recent-heading :is(.eyebrow, p:not(.eyebrow)) {
+  display: none;
+}
+.network-recent-count {
+  display: none;
+}
+.network-page .network-recent-people {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.network-page .network-recent-person {
+  min-height: 64px;
+  padding: 9px 10px;
+  gap: 9px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--text);
+}
+.network-page .network-recent-person .avatar {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+}
+.network-recent-person small {
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.network-recent-person strong {
+  font-size: 13px;
+}
+.network-recent-person > svg {
+  display: none;
+}
+.network-page .directory-toolbar {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px 14px 0 0;
+  background: var(--surface);
+}
+.network-page .network-viewbar {
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 0;
+  border-radius: 0 0 14px 14px;
+}
+.network-page .profile-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: none;
+}
+.network-page .profile-card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 14px #241b320b;
+}
+.network-page .network-person {
+  border-radius: 15px;
+}
+.network-page .context-selected {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+.network-page .network-row-context {
+  border-radius: 9px;
+  padding: 12px;
+  background: var(--surface-secondary);
+  border: 0;
+}
+.network-page .network-row-context strong {
+  color: var(--text);
+  font-size: 14px;
+}
+.network-page .network-row-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.network-page .results-label {
+  padding-top: 24px;
+  padding-bottom: 14px;
+}
+.network-page .results-label h2 {
+  font-size: 16px;
+  color: var(--muted);
+  letter-spacing: -0.02em;
+}
+.network-page .network-context {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: none;
+}
+:root[data-theme]
+  .unified-shell
+  .page
+  :is(.work-masthead, .insight-masthead, .studio-heading),
+.unified-shell .page.customize-page > .page-heading,
+.unified-shell .page.import-page > .page-heading,
+.unified-shell .page.assistant-page > .page-heading {
+  padding: 26px 30px;
+  min-height: 168px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--finish-lilac);
+  box-shadow: none;
+  color: var(--text);
+  gap: 18px;
+  margin-bottom: 22px;
+}
+:root[data-theme]
+  .unified-shell
+  .page
+  :is(.work-masthead, .insight-masthead, .studio-heading)
+  :is(h1, p),
+.unified-shell .page.customize-page > .page-heading :is(h1, p),
+.unified-shell .page.import-page > .page-heading :is(h1, p),
+.unified-shell .page.assistant-page > .page-heading :is(h1, p) {
+  color: var(--text);
+}
+:root[data-theme]
+  .unified-shell
+  .page
+  :is(.work-masthead, .insight-masthead, .studio-heading)
+  h1,
+.unified-shell .page.customize-page > .page-heading h1,
+.unified-shell .page.import-page > .page-heading h1,
+.unified-shell .page.assistant-page > .page-heading h1 {
+  font-size: clamp(34px, 3.4vw, 48px);
+  line-height: 1.06;
+  margin: 8px 0 10px;
+  letter-spacing: -0.05em;
+}
+.unified-shell .page :is(.work-masthead, .insight-masthead)::after {
+  display: none;
+}
+.workspace-loading {
+  min-height: 65vh;
+}
+.workspace-loading-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 24px;
+  font-weight: 650;
+  color: var(--muted);
+}
+.workspace-loading-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--primary-text);
+  background: var(--primary-soft);
+  font-size: 24px;
+}
+.workspace-skeleton {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+.workspace-skeleton > div {
+  height: 180px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface);
+}
+.workspace-skeleton > div:first-child {
+  height: 200px;
+  grid-column: 1 / -1;
+  background: var(--surface-secondary);
+}
+.help-page .help-heading {
+  padding: 28px 30px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--finish-lilac);
+  margin-bottom: 24px;
+}
+.help-page .help-heading h1 {
+  font-size: clamp(34px, 3.4vw, 48px);
+  letter-spacing: -0.05em;
+  margin: 8px 0 10px;
+}
+
+@media (hover: hover) {
+  .network-recent-person:hover {
+    border-color: var(--primary);
+  }
+}
+@media (max-width: 1100px) {
+  .network-page .network-cover {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+  }
+  .network-cover .network-hero-art {
+    width: 130px;
+    min-width: 130px;
+  }
+  .network-cover .network-hero-faces .avatar {
+    width: 34px;
+    height: 34px;
+  }
+  .network-page .network-cover .network-masthead,
+  .network-page .network-cover .network-orientation {
+    padding: 24px;
+  }
+  .network-cover .network-orientation-facts > div {
+    padding-inline: 12px;
+  }
+  .network-page .network-recent {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .network-page .network-recent-heading > div {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .network-recent-heading p:not(.eyebrow) {
+    display: block;
+    font-size: 13px;
+  }
+}
+@media (max-width: 767px) {
+  .network-page .network-cover {
+    grid-template-columns: minmax(0, 1fr);
+    border-radius: 17px;
+  }
+  .network-page .network-cover .network-masthead {
+    padding: 22px;
+    min-height: 0;
+    gap: 14px;
+  }
+  .network-page .network-cover .network-masthead h1 {
+    font-size: 36px;
+  }
+  .network-cover .network-hero-art {
+    width: 120px;
+    min-width: 0;
+    min-height: 100px;
+  }
+  .network-cover .network-hero-orbit {
+    width: 110px;
+    height: 110px;
+  }
+  .network-cover .network-hero-faces {
+    display: none;
+  }
+  .network-page .network-cover .network-orientation {
+    padding: 18px 22px;
+    gap: 16px;
+    border-left: 0;
+    border-top: 1px solid #ffffff25;
+  }
+  .network-cover .network-orientation-facts strong {
+    font-size: 27px;
+  }
+  .network-cover .network-orientation-facts > div {
+    padding-inline: 12px;
+  }
+  .network-cover .network-orientation-links {
+    padding-top: 12px;
+    gap: 9px 14px;
+  }
+  .network-cover .network-orientation-links a {
+    font-size: 12px;
+  }
+  .network-page .network-recent {
+    padding-top: 3px;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .network-recent-heading h2 {
+    font-size: 17px;
+  }
+  .network-recent-heading p:not(.eyebrow) {
+    display: none;
+  }
+  .network-page .network-recent-people {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .network-page .network-recent-person {
+    flex-direction: row;
+    align-items: center;
+    padding: 8px;
+    min-height: 54px;
+    gap: 7px;
+  }
+  .network-recent-person > span:not(.avatar) {
+    width: auto;
+    min-width: 0;
+  }
+  .network-page .network-recent-person .avatar {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
+  .network-recent-person small {
+    display: none;
+  }
+  .network-page .directory-toolbar,
+  .network-page .network-viewbar {
+    padding: 12px;
+  }
+  .network-page .results-label {
+    padding-top: 18px;
+  }
+  :root[data-theme]
+    .unified-shell
+    .page
+    :is(.work-masthead, .insight-masthead, .studio-heading),
+  .unified-shell .page.customize-page > .page-heading,
+  .unified-shell .page.import-page > .page-heading,
+  .unified-shell .page.assistant-page > .page-heading {
+    padding: 22px;
+    min-height: 0;
+    border-radius: 16px;
+  }
+  .unified-shell
+    .page
+    :is(.work-masthead, .insight-masthead, .studio-heading)
+    h1 {
+    font-size: 34px;
+  }
+  .workspace-skeleton {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-skeleton > div {
+    height: 110px;
+  }
+}
+@media (max-width: 380px) {
+  .network-page .network-cover .network-masthead {
+    display: block;
+    padding: 20px;
+  }
+  .network-cover .network-hero-art {
+    width: 100%;
+    min-height: 0;
+    height: auto;
+    margin-top: 15px;
+  }
+  .network-cover .network-hero-orbit {
+    display: none;
+  }
+  .network-page .network-cover .network-orientation {
+    padding: 18px 20px;
+  }
+  .network-cover .network-orientation-facts > div {
+    padding-inline: 9px;
+  }
+  .network-cover .network-orientation-facts span {
+    font-size: 12px;
+  }
+  .network-page .network-recent-person strong {
+    font-size: 12px;
+  }
+}
+
+:root[data-theme="dark"] .automation-template .template-trigger {
+  color: #fbf7ff;
+}
+
+/* A node's label can extend past its portrait without intercepting a nearby
+   record. Keep the target anchored to the body's projected position. */
+.orbit-page .orbit-3d-node {
+  width: calc(2 * var(--orbit-avatar-radius));
+  height: calc(2 * var(--orbit-avatar-radius));
+  min-height: 0;
+  border-radius: 50%;
+}
+.orbit-page .orbit-3d-label {
+  position: absolute;
+  top: calc(100% + 3px);
+  width: max-content;
+  max-width: 112px;
+  pointer-events: none;
+}
+.pulse-commitment-body > * {
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .pulse-commitment-body { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 767px) {
+  .unified-shell .app-footer {
+    padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.network-cover .network-hero-art .button {
+  align-self: center;
+  justify-self: center;
+  min-height: 44px;
+  height: fit-content;
+  width: max-content;
+  max-width: 100%;
+  padding: 10px 13px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+@media (max-width: 767px) {
+  .network-cover .network-hero-art {
+    min-height: 44px;
+    width: max-content;
+  }
+  .network-cover .network-hero-orbit { display: none; }
+}
+
+@media (max-width: 480px) {
+  .daily-home .world-stage-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .daily-home .world-stage-actions button {
+    flex: 1 1 max-content;
+    width: auto;
+    max-width: 100%;
+    min-height: 44px;
+    overflow-wrap: normal;
+  }
+}

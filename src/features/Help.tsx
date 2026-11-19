@@ -65,10 +65,12 @@ export function Help() {
   const feedback = `What happened: ${what}\nWhat I expected: ${expected}`;
   return (
     <div className="page help-page">
+      <header className="page-heading help-heading"><div>
       <p className="eyebrow">{__pulseText("PULSE · 1.5.0-rc.1")}</p>
       <h1>{__pulseText("A little guidance.")}</h1>
       <p className="subtitle">
         {__pulseText("People, conversations, opportunities and follow-ups in one local workspace.")}</p>
+      </div></header>
       <GettingStarted always />
       <WorkspaceMap />
       <section className="surface help-content">

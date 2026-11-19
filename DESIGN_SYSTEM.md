@@ -1,5 +1,7 @@
 # PULSE design system
 
+The shared presentation lives in `src/release.css`. The directory, secondary headings and loading states use `src/finish.css` for their final layout. See `VISUAL_COMPLETION.md` for scope and automated coverage.
+
 ## Identity
 
 An editorial workspace pairs warm paper, deep plum navigation, periwinkle and lime accents, and relationship-centered layouts. The full-width Daily Pulse opening includes real saved portrait links, an interactive decorative three-dimensional sculpture, and a CSS fallback; the People overview combines identity and live counts. Initials provide private, deterministic avatars with no remote requests. Avoid unnecessary decoration, button outlines and fake analytics.

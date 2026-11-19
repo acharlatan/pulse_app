@@ -61,10 +61,38 @@
           <option value="/settings">Settings</option>
           <option value="/activity">Activity</option>
           <option value="/pipeline">Pipeline</option>
+          <option value="/focus">My Focus</option>
+          <option value="/analytics">Insights</option>
+          <option value="/review">Review</option>
+          <option value="/automations">Automations</option>
+          <option value="/customize">Customize</option>
+          <option value="/import">Import</option>
+          <option value="/assistant">Assistant</option>
+          <option value="/help">Help</option>
         </select></label
-      ><button id="audit">Audit horizontal overflow</button
+      ><label
+        >Theme
+        <select id="theme">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select></label
+      >
+      <label
+        >Accent
+        <select id="accent">
+          <option value="periwinkle">Periwinkle</option>
+          <option value="forest">Forest</option>
+          <option value="coral">Coral</option>
+          <option value="blue">Blue</option>
+        </select></label
+      >
+      <button id="audit">Audit horizontal overflow</button
+      ><button id="matrix">Check all widths and themes</button
+      ><button id="accessibility">Check accessibility</button
+      ><button id="suite">Audit all screens</button
       ><output id="result"></output>
     </header>
+    <pre id="checks" style="white-space: pre-wrap"></pre>
     <div id="stage">
       <iframe
         id="preview"
@@ -74,18 +102,185 @@
         src="/#/"
       ></iframe>
     </div>
-    <script>
+    <script type="module">
+      import axe from "axe-core";
       const frame = document.querySelector("iframe");
+      const applyTheme = () => {
+        const root = frame.contentDocument?.documentElement;
+        if (root) {
+          root.dataset.theme = document.querySelector("#theme").value;
+          root.dataset.accent = document.querySelector("#accent").value;
+        }
+      };
+      // Timers continue in a background QA tab; geometry reads below force layout.
+      const settle = () => new Promise((resolve) => setTimeout(resolve, 60));
+      document.querySelector("#theme").onchange = applyTheme;
+      document.querySelector("#accent").onchange = applyTheme;
+      frame.addEventListener("load", applyTheme);
       document.querySelector("#width").onchange = (e) => {
         frame.width = e.target.value;
       };
       document.querySelector("#route").onchange = (e) => {
+        document.querySelector("#checks").textContent = "";
         frame.src = "/#" + e.target.value;
       };
       document.querySelector("#audit").onclick = () => {
         const d = frame.contentDocument;
         document.querySelector("#result").textContent =
           `${frame.width}px · ${d.documentElement.scrollWidth > d.documentElement.clientWidth ? "OVERFLOW" : "PASS — no horizontal overflow"} · actual content ${d.documentElement.scrollWidth}px`;
+      };
+      document.querySelector("#matrix").onclick = async () => {
+        document.querySelector("#checks").textContent = "Checking sizes…";
+        const checks = [];
+        const previousWidth = frame.width;
+        const previousTheme = document.querySelector("#theme").value;
+        for (const theme of ["light", "dark"]) {
+          document.querySelector("#theme").value = theme;
+          applyTheme();
+          for (const width of [320, 375, 390, 430, 768, 1024, 1280, 1440]) {
+            frame.width = width;
+            await settle();
+            const d = frame.contentDocument;
+            const overflow =
+              d.documentElement.scrollWidth > d.documentElement.clientWidth;
+            const outside = Array.from(
+              d.querySelectorAll("button, input, select, textarea, a"),
+            )
+              .filter((el) => {
+                const r = el.getBoundingClientRect();
+                if (
+                  !r.width ||
+                  !r.height ||
+                  !el.checkVisibility() ||
+                  el.closest(".skip-link")
+                )
+                  return false;
+                // Internal map/board scrollers intentionally clip their own content.
+                if (
+                  el.closest(
+                    ".orbit-viewport, .pipeline-grid, .pulse-chart-scroll, .unified-section-nav",
+                  )
+                )
+                  return false;
+                return (
+                  r.left < -1 || r.right > d.documentElement.clientWidth + 1
+                );
+              })
+              .map((el) => el.textContent.trim().slice(0, 70));
+            checks.push(
+              `${theme} ${width}: ${overflow ? "OVERFLOW" : "PASS"}${outside.length ? ` · outside controls: ${outside.join(" | ")}` : ""}`,
+            );
+          }
+        }
+        frame.width = previousWidth;
+        document.querySelector("#theme").value = previousTheme;
+        applyTheme();
+        document.querySelector("#checks").textContent = checks.join("\n");
+      };
+      document.querySelector("#accessibility").onclick = async () => {
+        document.querySelector("#checks").textContent =
+          "Checking accessibility…";
+        const d = frame.contentDocument;
+        const script = d.createElement("script");
+        script.textContent = axe.source;
+        d.head.append(script);
+        const report = await frame.contentWindow.axe.run(d, {
+          runOnly: {
+            type: "tag",
+            values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"],
+          },
+        });
+        document.querySelector("#checks").textContent = JSON.stringify(
+          {
+            violations: report.violations.map((item) => ({
+              id: item.id,
+              description: item.description,
+              nodes: item.nodes.map((node) => ({
+                target: node.target,
+                summary: node.failureSummary,
+              })),
+            })),
+            passes: report.passes.length,
+          },
+          null,
+          2,
+        );
+        script.remove();
+      };
+      document.querySelector("#suite").onclick = async () => {
+        const output = document.querySelector("#checks");
+        const results = [];
+        output.textContent = "Running visual checks…";
+        const selectors = {
+          "/": ".daily-home",
+          "/network": ".network-page",
+          "/orbit": ".orbit-page",
+          "/network/companies/org-0": ".profile-page",
+          "/network/people/contact-0": ".profile-page",
+          "/settings": ".settings-page",
+          "/activity": ".activity-page",
+          "/pipeline": ".pipeline-page",
+          "/focus": ".today-focus-page",
+          "/analytics": ".analytics-page",
+          "/review": ".review-page",
+          "/automations": ".automations-page",
+          "/customize": ".customize-page",
+          "/import": ".import-page",
+          "/assistant": ".assistant-page",
+          "/help": ".help-page",
+        };
+        try {
+          for (const [route, selector] of Object.entries(selectors)) {
+            document.querySelector("#route").value = route;
+            frame.src = "/#" + route;
+            await new Promise((resolve) => setTimeout(resolve, 150));
+            const started = Date.now();
+            while (!frame.contentDocument?.querySelector(selector + " h1")) {
+              if (Date.now() - started > 15000)
+                throw new Error("Screen did not load: " + route);
+              await new Promise((resolve) => setTimeout(resolve, 100));
+            }
+            for (const theme of ["light", "dark"]) {
+              document.querySelector("#theme").value = theme;
+              applyTheme();
+              for (const width of [320, 375, 390, 430, 768, 1024, 1280, 1440]) {
+                frame.width = width;
+                await settle();
+                const d = frame.contentDocument;
+                const overflow =
+                  d.documentElement.scrollWidth > d.documentElement.clientWidth;
+                results.push(
+                  `${route} ${theme} ${width}: ${overflow ? "OVERFLOW" : "PASS"}`,
+                );
+                if (width === 390 || width === 1440) {
+                  if (!frame.contentWindow.axe) {
+                    const script = d.createElement("script");
+                    script.textContent = axe.source;
+                    d.head.append(script);
+                    script.remove();
+                  }
+                  const report = await frame.contentWindow.axe.run(d, {
+                    runOnly: {
+                      type: "tag",
+                      values: ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"],
+                    },
+                  });
+                  results.push(
+                    `${route} ${theme} ${width} axe: ${report.violations.length ? JSON.stringify(report.violations.map((v) => ({ id: v.id, nodes: v.nodes.map((n) => ({ target: n.target, summary: n.failureSummary })) }))) : "PASS"}`,
+                  );
+                }
+              }
+              output.textContent = results.join("\n");
+            }
+          }
+          output.textContent = results.join("\n") + "\nCOMPLETE";
+        } catch (error) {
+          output.textContent =
+            results.join("\n") + "\nFAILED: " + error.message;
+        } finally {
+          frame.width = document.querySelector("#width").value;
+          applyTheme();
+        }
       };
     </script>
   </body>
