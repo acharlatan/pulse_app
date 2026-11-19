@@ -519,3 +519,37 @@
     padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
   }
 }
+
+.network-cover .network-hero-art .button {
+  align-self: center;
+  justify-self: center;
+  min-height: 44px;
+  height: fit-content;
+  width: max-content;
+  max-width: 100%;
+  padding: 10px 13px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+@media (max-width: 767px) {
+  .network-cover .network-hero-art {
+    min-height: 44px;
+    width: max-content;
+  }
+  .network-cover .network-hero-orbit { display: none; }
+}
+
+@media (max-width: 480px) {
+  .daily-home .world-stage-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .daily-home .world-stage-actions button {
+    flex: 1 1 max-content;
+    width: auto;
+    max-width: 100%;
+    min-height: 44px;
+    overflow-wrap: normal;
+  }
+}
