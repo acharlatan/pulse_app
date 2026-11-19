@@ -525,6 +525,7 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
         </div>
       </section>
       {workspace}
+      {suggestions}
       <section className="daily-extra-grid" aria-label={__pulseText("More from your workspace")}>
         <article className="daily-extra-panel">
           <div className="section-heading"><h2>{t("comingUp")}</h2><Link className="text-link" to="/activity?filter=upcoming">{__pulseText("View follow-ups") + " "}<ArrowUpRight size={16} /></Link></div>
@@ -552,7 +553,6 @@ export function DailyPlan({ onEdit }: { onEdit: (editor: Editor) => void }) {
           <Link className="text-link" to="/analytics">{__pulseText("See relationship insights") + " "}<ArrowUpRight size={16} /></Link>
         </article>
       </section>
-      {suggestions}
       <section className="daily-wrap" aria-labelledby="daily-wrap-title">
         <div className="daily-wrap-intro">
           <CheckCheck size={28} />

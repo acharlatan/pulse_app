@@ -94,8 +94,8 @@ export function TaskRow({
               </Link>
             )}
             <div className="agenda-task-meta">
-              <time dateTime={t.dueAt}>
-                {date(t.dueAt, {
+              <time dateTime={t.completedAt || t.dueAt}>
+                {date(t.completedAt || t.dueAt, {
                   month: "short",
                   day: "numeric",
                   hour: "numeric",
@@ -183,9 +183,9 @@ export function TaskRow({
           </small>
         )}
         <span>
-          <Badge tone={state === "Overdue" ? "red" : ""}>{state}</Badge>{" "}
-          <time>
-            {date(t.dueAt, {
+          <Badge tone={state === "Overdue" ? "red" : t.completedAt ? "green" : ""}>{state}</Badge>{" "}
+          <time dateTime={t.completedAt || t.dueAt}>
+            {date(t.completedAt || t.dueAt, {
               month: "short",
               day: "numeric",
               year: "numeric",

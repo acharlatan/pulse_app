@@ -1378,5 +1378,57 @@
   "Lines show saved company and opportunity links. Portraits may overlap as you move the map. Depth is a visual layout, not a measure of closeness. Shared employment does not imply that people know one another.": [
     "Las líneas muestran vínculos guardados de empresas y oportunidades. Los retratos pueden superponerse al mover el mapa. La profundidad es visual y no mide cercanía. Trabajar en la misma empresa no significa que las personas se conozcan.",
     "Les lignes montrent les liens enregistrés avec des entreprises et des opportunités. Les portraits peuvent se chevaucher lorsque vous déplacez la carte. La profondeur est visuelle et ne mesure pas la proximité. Travailler dans la même entreprise ne signifie pas que les personnes se connaissent."
+  ],
+  "Switch to light mode": [
+    "Cambiar a modo claro",
+    "Passer en mode clair"
+  ],
+  "Switch to dark mode": [
+    "Cambiar a modo oscuro",
+    "Passer en mode sombre"
+  ],
+  "Your relationships, from every angle.": [
+    "Tus relaciones, desde todos los ángulos.",
+    "Vos relations, sous tous les angles."
+  ],
+  "Decide where to begin.": [
+    "Decide por dónde empezar.",
+    "Choisissez par où commencer."
+  ],
+  "Keep the whole story.": [
+    "Conserva toda la historia.",
+    "Gardez toute l’histoire."
+  ],
+  "See what connects.": [
+    "Descubre las conexiones.",
+    "Découvrez les liens."
+  ],
+  "Move work forward.": [
+    "Haz avanzar el trabajo.",
+    "Faites avancer votre travail."
+  ],
+  "Understand what changed.": [
+    "Comprende lo que cambió.",
+    "Comprenez ce qui a changé."
+  ],
+  "Open a commitment, review its context and choose what belongs in today.": [
+    "Abre un compromiso, revisa su contexto y elige qué hacer hoy.",
+    "Ouvrez un engagement, consultez son contexte et choisissez vos priorités du jour."
+  ],
+  "Open a person or company to record a conversation and plan the next step.": [
+    "Abre una persona o empresa para registrar una conversación y planear el siguiente paso.",
+    "Ouvrez une personne ou une entreprise pour consigner une conversation et préparer la suite."
+  ],
+  "Select a saved record, then follow its company, people and opportunity links. List view offers the same records.": [
+    "Selecciona un registro guardado y explora sus vínculos con empresas, personas y oportunidades. La vista de lista ofrece los mismos registros.",
+    "Sélectionnez une fiche, puis explorez ses liens vers les entreprises, les personnes et les opportunités. La liste propose les mêmes fiches."
+  ],
+  "Review an opportunity, record its stage and give its next follow-up a date.": [
+    "Revisa una oportunidad, registra su etapa y programa su próximo seguimiento.",
+    "Examinez une opportunité, notez son étape et fixez la date de son prochain suivi."
+  ],
+  "Choose a reporting period, inspect the source records and select your next priority.": [
+    "Elige un período, consulta los registros de origen y selecciona tu siguiente prioridad.",
+    "Choisissez une période, consultez les fiches sources et définissez votre prochaine priorité."
   ]
 }

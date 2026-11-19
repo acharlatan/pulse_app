@@ -33,7 +33,8 @@ test("switching workspaces preserves isolated data and navigation on reload", as
   await expect(
     page.getByRole("complementary", { name: "Backup reminder" }),
   ).toBeVisible();
-  await page.getByRole("link", { name: "Review backups", exact: true }).click();
+  await page.getByRole("complementary", { name: "Backup reminder" })
+    .getByRole("link", { name: "Review backups", exact: true }).click();
   await expect(
     page.getByText("No backup download requested yet."),
   ).toBeVisible();

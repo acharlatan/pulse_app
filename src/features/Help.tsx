@@ -2,6 +2,7 @@ import { useInterfaceText } from "../i18n/useInterfaceText";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { GettingStarted } from "../components/GettingStarted";
+import { WorkspaceMap } from "../components/WorkspaceMap";
 const topics = [
   [
     "When information is missing",
@@ -64,38 +65,14 @@ export function Help() {
   const feedback = `What happened: ${what}\nWhat I expected: ${expected}`;
   return (
     <div className="page help-page">
-      <header className="page-heading help-heading">
-        <div>
-          <p className="eyebrow">{__pulseText("PULSE · 1.5.0-rc.1")}</p>
-          <h1>{__pulseText("A little guidance.")}</h1>
-          <p className="subtitle">
-            {__pulseText(
-              "People, conversations, opportunities and follow-ups in one local workspace.",
-            )}
-          </p>
-        </div>
-      </header>
+      <header className="page-heading help-heading"><div>
+      <p className="eyebrow">{__pulseText("PULSE · 1.5.0-rc.1")}</p>
+      <h1>{__pulseText("A little guidance.")}</h1>
+      <p className="subtitle">
+        {__pulseText("People, conversations, opportunities and follow-ups in one local workspace.")}</p>
+      </div></header>
       <GettingStarted always />
-      <section className="surface pulse-map">
-        <p className="eyebrow">{__pulseText("A QUICK MAP")}</p>
-        <h2>{__pulseText("Find your next step.")}</h2>
-        <p>
-          {__pulseText(
-            "Home plans today; Network keeps the people and context; Review explains what needs a look. Choose priorities in Focus, explore patterns in Analytics, and see saved connections in Orbit.",
-          )}
-        </p>
-        <div className="form-actions">
-          <Link className="button secondary" to="/">
-            {__pulseText("Daily Pulse")}
-          </Link>
-          <Link className="button secondary" to="/network">
-            {__pulseText("Network")}
-          </Link>
-          <Link className="button secondary" to="/analytics">
-            {__pulseText("Analytics")}
-          </Link>
-        </div>
-      </section>
+      <WorkspaceMap />
       <section className="surface help-content">
         <h2>{__pulseText("Work at your own rhythm")}</h2>
         {topics.map(([title, body]) => (
@@ -105,17 +82,13 @@ export function Help() {
           </details>
         ))}
         <Link className="button secondary" to="/settings?section=data">
-          {__pulseText("Open Privacy & data")}
-        </Link>
+          {__pulseText("Open Privacy & data")}</Link>
       </section>
       <section className="surface beta-feedback">
         <p className="eyebrow">{__pulseText("HELP SHAPE PULSE")}</p>
         <h2>{__pulseText("Share feedback in your own words.")}</h2>
         <p>
-          {__pulseText(
-            "Describe a problem or idea. Nothing is sent automatically; copy the text and share it with the person running your beta. Avoid including private contact details.",
-          )}
-        </p>
+          {__pulseText("Describe a problem or idea. Nothing is sent automatically; copy the text and share it with the person running your beta. Avoid including private contact details.")}</p>
         <label className="field">
           <span>{__pulseText("What happened or felt confusing?")}</span>
           <textarea
@@ -148,8 +121,7 @@ export function Help() {
             }
           }}
         >
-          {__pulseText("Copy feedback")}
-        </button>
+          {__pulseText("Copy feedback")}</button>
         <p role="status">{__pulseText(copyStatus)}</p>
         <label className="field">
           <span>{__pulseText("Feedback text for manual copying")}</span>
@@ -157,10 +129,7 @@ export function Help() {
         </label>
       </section>
       <p className="muted">
-        {__pulseText(
-          "Release candidate: automated Chromium checks are not physical-device or accessibility certification. Closed-app push, cloud sync and OAuth account synchronization are not available.",
-        )}
-      </p>
+        {__pulseText("Release candidate: automated Chromium checks are not physical-device or accessibility certification. Closed-app push, cloud sync and OAuth account synchronization are not available.")}</p>
     </div>
   );
 }
